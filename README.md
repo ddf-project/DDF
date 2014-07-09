@@ -1,4 +1,5 @@
 DDF
 ===
 
-Core DDF API
+Distributed DataFrame: Productivity = Power x Simplicity
+For Big Data Scientists & Engineers
