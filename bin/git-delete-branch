@@ -1,0 +1,51 @@
+#!/bin/bash
+
+function Usage {
+  echo "This command helps you delete a working branch"
+  echo "It will refuse to delete master, local or origin!"
+  echo ""
+  echo "Usage: git `basename $0 | sed -e 's/^git-//'` [branch-name]"
+  echo ""
+  exit 1
+}
+
+[ "$1" == "-h" ] && Usage
+
+BINDIR="`dirname $0`"
+GIT_LOCAL_MASTER=${GIT_LOCAL_MASTER-master}
+
+BRANCH_TO_DELETE=$1
+if [ "$BRANCH_TO_DELETE" == "" ] ; then
+  BRANCH_TO_DELETE=`git branch | grep '^\*' | cut -d' ' -f2`
+fi
+
+if [ "$BRANCH_TO_DELETE" == '' ] ; then
+  echo "Cannot determine current branch name using 'git branch' -- Sum Ting Wong."
+  Usage
+
+elif [ "$BRANCH_TO_DELETE" == "$GIT_LOCAL_MASTER" ] ; then
+  echo "Sorry, I can't help you delete master -- Noah Kan Do"
+  Usage
+
+else
+  echo ""
+  echo -n "About to delete local branch [$BRANCH_TO_DELETE]. Are you sure? (N/y)"
+  read response
+  if [ "$response" == "Y" -o "$response" == "y" ] ; then
+    echo ""
+    echo "First switching to local master branch"
+    echo git checkout "$GIT_LOCAL_MASTER" && git checkout "$GIT_LOCAL_MASTER"
+
+    echo ""
+    echo "Now deleting local branch [$BRANCH_TO_DELETE]"
+    echo git branch -D "$BRANCH_TO_DELETE" && git branch -D "$BRANCH_TO_DELETE"
+	fi
+
+  echo ""
+  echo -n "Would you like to delete the origin (central repo) copy of [$BRANCH_TO_DELETE], too? (N/y)"
+  read response
+  if [ "$response" == "Y" -o "$response" == "y" ] ; then
+    echo "git push origin --delete $BRANCH_TO_DELETE" && git push origin --delete $BRANCH_TO_DELETE
+  fi
+
+fi

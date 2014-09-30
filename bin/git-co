@@ -1,0 +1,14 @@
+#!/bin/bash
+command=`basename $0 | sed -e 's/git-//'` ; [ -z "$command" ] && exit 1
+
+case $command in
+	co) git checkout $@ ;;
+	br) git branch $@ ;;
+	ca) git commit-all $@ ;;
+	cb) git create-branch $@ ;;
+	db) git delete-branch $@ ;;
+	ub) git update-branches $@ ;;
+	cu) git catchup-branch $@ ;;
+	st) git status $@ ;;
+	*) git $command $@ ;;
+esac
