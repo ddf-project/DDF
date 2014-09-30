@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+SCALA_VERSION=2.10
+SPARK_VERSION=0.9
+
+FWDIR="$(cd `dirname $0`/..; pwd)"
+
+if [ -z "$1" ]; then
+  echo "Usage: run-example <example-class> [<args>]" >&2
+  exit 1
+fi
+
+# Figure out the JAR file that our examples were packaged into
+
+EXAMPLES_DIR="$FWDIR"/examples
+
+if [ -f "$FWDIR/RELEASE" ]; then
+  export SPARK_EXAMPLES_JAR=`ls "$FWDIR"/lib/ddf_examples_$SCALA_VERSION-$SPARK_VERSION.jar`
+elif [ -e "$EXAMPLES_DIR"/target/scala-$SCALA_VERSION/ddf_examples_$SCALA_VERSION-$SPARK_VERSION.jar ]; then
+  export SPARK_EXAMPLES_JAR=`ls "$EXAMPLES_DIR"/target/scala-$SCALA_VERSION/ddf_examples_$SCALA_VERSION-$SPARK_VERSION.jar`
+fi
+
+if [[ -z $SPARK_EXAMPLES_JAR ]]; then
+  echo "Failed to find DDF examples assembly in $FWDIR/lib or $FWDIR/examples/target" >&2
+  echo "You need to build DDF with mvn install before running this program" >&2
+  exit 1
+fi
+
+# Find java binary
+if [ -n "${JAVA_HOME}" ]; then
+  RUNNER="${JAVA_HOME}/bin/java"
+else
+  if [ `command -v java` ]; then
+    RUNNER="java"
+  else
+    echo "JAVA_HOME is not set" >&2
+    exit 1
+  fi
+fi
+
+#setup java_opts
+export JAVA_OPTS+=" -Dhive.metastore.warehouse.dir=/tmp/hive/warehouse"
+
+CLASSPATH="$EXAMPLES_DIR"/target/scala-2.10/lib/*
+CLASSPATH="$SPARK_EXAMPLES_JAR:$CLASSPATH"
+
+echo $FWDIR
+echo $SPARK_EXAMPLES_JAR
+echo $CLASSPATH
+echo $RUNNER
+echo $JAVA_OPTS
+echo $@
+#java -Dhive.metastore.warehouse.dir=/tmp/hive/warehouse -cp examples/target/scala-2.10/ddf_examples_2.10-0.9.jar:examples/target/scala-2.10/lib/* io.spark.ddf.examples.RowCount
+exec "$RUNNER" $JAVA_OPTS -cp "$CLASSPATH" "$@"
+
+
+

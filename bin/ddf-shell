@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+SCALA_VERSION=2.10
+SPARK_VERSION=0.9
+
+FWDIR="$(cd `dirname $0`/..; pwd)"
+echo "Starting shell from "$FWDIR/bin 
+echo -ne ".              \r"
+sleep 0.3
+echo -ne "..             \r"
+sleep 0.3
+echo -ne "...            \r"
+echo -ne '\n'
+
+$FWDIR/spark/conf/local/ddf-env.sh
+
+EXAMPLES_DIR="$FWDIR"/examples
+
+SHELL_JAR="$FWDIR"/bin/jline2.jar:"$FWDIR"/bin/jshell.jar
+MAIN_CLASS="bsh.Interpreter"
+CONSOLE_CLASS="jline.console.internal.ConsoleRunner"
+#SPARK_INIT="$FWDIR"/bin/spark-init.bsh
+
+
+# Find java binary
+if [ -n "${JAVA_HOME}" ]; then
+  RUNNER="${JAVA_HOME}/bin/java"
+else
+  if [ `command -v java` ]; then
+    RUNNER="java"
+  else
+    echo "JAVA_HOME is not set" >&2
+    exit 1
+  fi
+fi
+
+#setup hive warehouse dir
+HIVE_WAREHOUSE=/tmp/hive/warehouse
+
+if [ ! -e "$HIVE_WAREHOUSE" ]; then
+  mkdir -p $HIVE_WAREHOUSE
+fi
+
+#setup java_opts
+export JAVA_OPTS+=" -Dhive.metastore.warehouse.dir=${HIVE_WAREHOUSE}"
+export JAVA_OPTS+=" -Dlog4j.configuration=ddf-local-log4j.properties"
+
+CLASSPATH="$EXAMPLES_DIR"/target/scala-2.10/lib/*
+CLASSPATH="$SHELL_JAR:$CLASSPATH:$FWDIR/core/conf/local/"
+echo $CLASSPATH
+
+exec "$RUNNER" $JAVA_OPTS -cp "$CLASSPATH" $CONSOLE_CLASS "$MAIN_CLASS"
+#exec "$RUNNER" $JAVA_OPTS -cp "$CLASSPATH" "$MAIN_CLASS" 
+
+
