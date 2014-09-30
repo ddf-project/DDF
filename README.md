@@ -1,3 +1,9 @@
+DDF
+===
+
+Distributed DataFrame: Productivity = Power x Simplicity
+For Big Data Scientists & Engineers
+
 # DDF - Distributed DataFrame 
 
 DDF aims to make Big Data easy yet powerful, by bringing together
