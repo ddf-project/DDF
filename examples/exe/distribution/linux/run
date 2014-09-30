@@ -1,0 +1,76 @@
+#!/bin/bash
+SCALA_VERSION=2.9.3
+
+# Figure out where the Scala framework is installed
+FWDIR="$(cd `dirname $0`; pwd)"
+
+# Export this as SPARK_HOME
+export SPARK_HOME="$FWDIR"
+
+# Load environment variables from conf/pa-env.sh, if it exists
+if [ -e $FWDIR/../conf/pa-env.sh ] ; then
+  . $FWDIR/../conf/pa-env.sh
+fi
+
+if [ -z "$1" ]; then
+  echo "Usage: run <spark-class> [<args>]" >&2
+  exit 1
+fi
+
+# If this is a standalone cluster daemon, reset SPARK_JAVA_OPTS and SPARK_MEM to reasonable
+# values for that; it doesn't need a lot
+if [ "$1" = "spark.deploy.master.Master" -o "$1" = "spark.deploy.worker.Worker" ]; then
+  SPARK_MEM=${SPARK_DAEMON_MEMORY:-512m}
+  SPARK_DAEMON_JAVA_OPTS+=" -Dspark.akka.logLifecycleEvents=true"
+  SPARK_JAVA_OPTS=$SPARK_DAEMON_JAVA_OPTS   # Empty by default
+fi
+
+
+# Add java opts for master, worker, executor. The opts maybe null
+case "$1" in
+  'spark.deploy.master.Master')
+    SPARK_JAVA_OPTS+=" $SPARK_MASTER_OPTS"
+    ;;
+  'spark.deploy.worker.Worker')
+    SPARK_JAVA_OPTS+=" $SPARK_WORKER_OPTS"
+    ;;
+  'spark.executor.StandaloneExecutorBackend')
+    SPARK_JAVA_OPTS+=" $SPARK_EXECUTOR_OPTS"
+    ;;
+  'spark.executor.MesosExecutorBackend')
+    SPARK_JAVA_OPTS+=" $SPARK_EXECUTOR_OPTS"
+    ;;
+  'spark.repl.Main')
+    SPARK_JAVA_OPTS+=" $SPARK_REPL_OPTS"
+    ;;
+esac
+
+if [ -n "${JAVA_HOME}" ]; then
+	RUNNER="${JAVA_HOME}/bin/java"
+else
+	if [ `command -v java` ]; then
+      RUNNER="java"
+    else
+      echo "JAVA_HOME is not set" >&2
+      exit 1
+    fi
+fi
+
+# Figure out how much memory to use per executor and set it as an environment
+# variable so that our process sees it and can report it to Mesos
+if [ -z "$SPARK_MEM" ] ; then
+  SPARK_MEM="512m"
+fi
+export SPARK_MEM
+
+# Set JAVA_OPTS to be able to load native libraries and to set heap size
+JAVA_OPTS="$SPARK_JAVA_OPTS"
+JAVA_OPTS+=" -Djava.library.path=$SPARK_LIBRARY_PATH"
+JAVA_OPTS+=" -Xms$SPARK_MEM -Xmx$SPARK_MEM"
+export JAVA_OPTS
+
+# Build up classpath
+CLASSPATH="$SPARK_CLASSPATH"
+export CLASSPATH # Needed for spark-shell
+
+exec "$RUNNER" -cp "$CLASSPATH" $JAVA_OPTS "$@"

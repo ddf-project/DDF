@@ -1,0 +1,23 @@
+#!/bin/bash
+
+function Usage {
+  echo "This command helps you update all your local branches with their origin counterparts"
+  echo ""
+  echo "Usage: git `basename $0 | sed -e 's/^git-//'`"
+  echo ""
+  exit 1
+}
+
+[ "$1" == "-h" ] && Usage
+
+CURRENT_BRANCH=`git branch | grep '^\*' | cut -d' ' -f2`
+OTHER_BRANCHES=`git branch | grep -v '^\*' | sed -e 's/^..//'`
+
+for branch in $CURRENT_BRANCH $OTHER_BRANCHES ; do
+  echo "git checkout $branch" && git checkout $branch
+  echo "git pull" && git pull
+  echo ""
+  echo "======================================="
+done
+
+echo "git checkout $CURRENT_BRANCH" && git checkout $CURRENT_BRANCH

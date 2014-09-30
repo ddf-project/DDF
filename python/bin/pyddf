@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+FWDIR="$(cd `dirname $0`/..; pwd)"
+
+export DDF_HOME=$FWDIR/..
+export PYTHONPATH=$PYTHONPATH:$FWDIR/package:$FWDIR/lib/py4j0.8.2.1.jar:$FWDIR/lib/py4j-0.8.2.1-src.zip
+echo $PYTHONPATH
+
+if [[ "$1" =~ \.py$ ]]; then
+  exec python $1
+else
+  if [[ "$IPYTHON" = "1" ]]; then
+    exec ipython $IPYTHON_OPTS
+  else
+    exec python
+  fi
+fi

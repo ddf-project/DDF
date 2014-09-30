@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+	<!--
+	************************************************************************
+	This is the root-level pom.xml, which is referred to by all sub-projects.
+	Common settings/plugins, etc. go here.
+	************************************************************************
+	-->
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>io</groupId>
+	<artifactId>ddf</artifactId>
+	<packaging>pom</packaging>
+	<description>Adatao Distributed DataFrame</description>
+	<version>0.9</version>
+	<name>ddf</name>
+	<organization>
+		<name>com.adatao</name>
+	</organization>
+	<url>http://adatao.com/</url>
+
+	<licenses>
+		<license>
+			<name>Copyright Adatao, Inc.</name>
+			<url>https://github.com/adatao/ddf/blob/master/LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com:adatao/ddf</connection>
+		<url>scm:git:git@github.com:adatao/ddf.git</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>adatao</id>
+			<name>Adatao, Inc.</name>
+			<email>info@adatao.com</email>
+			<url>http://adatao.com/</url>
+			<organization>Adatao, Inc.</organization>
+			<organizationUrl>http://adatao.com/</organizationUrl>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<repositories>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</pluginRepository>
+	</pluginRepositories>
+	
+	<modules>
+	  <module>core</module>
+	  <module>spark</module>
+	  <module>examples</module>
+	</modules>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.10.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.10</artifactId>
+			<version>1.9.1</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>3.1.5</version>
+				<executions>
+					<execution>
+						<id>compile</id>
+						<goals><goal>compile</goal></goals><phase>compile</phase>
+					</execution>
+					<execution>
+						<id>test-compile</id>
+						<goals><goal>testCompile</goal></goals><phase>test-compile</phase>
+					</execution>
+					<execution>
+						<goals><goal>compile</goal></goals><phase>process-resources</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<!--sourceDir>src/main/java</sourceDir-->
+					<jvmArgs>
+						<jvmArg>-Xms64m</jvmArg>
+						<jvmArg>-Xmx1024m</jvmArg>
+					</jvmArgs>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-checkstyle-plugin</artifactId>
+              <version>2.6</version>
+              <configuration>
+                <configLocation>src/main/resources/sun_checks.xml</configLocation>
+                <outputFileFormat>xml</outputFileFormat>
+              </configuration>
+            </plugin>
+            <!--
+            <plugin>
+              <groupId>org.scalastyle</groupId>
+              <artifactId>scalastyle-maven-plugin</artifactId>
+              <version>0.4.0</version>
+              <configuration>
+                <verbose>false</verbose>
+                <failOnViolation>true</failOnViolation>
+                <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                <failOnWarning>false</failOnWarning>
+                <sourceDirectory>${basedir}/core/src/main/scala</sourceDirectory>
+                <testSourceDirectory>${basedir}/core/src/test/scala</testSourceDirectory>
+                <configLocation>src/main/resources/scalastyle-config.xml</configLocation>
+                <outputFile>target/scalastyle-output.xml</outputFile>
+                <outputEncoding>UTF-8</outputEncoding>
+              </configuration>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>check</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+            -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+            
+            <plugin>
+	            <artifactId>maven-dependency-plugin</artifactId>
+	            <executions>
+	              <execution>
+	                <phase>install</phase>
+	                <goals>
+	                  <goal>copy-dependencies</goal>
+	                </goals>
+	                <configuration>
+	                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+	                </configuration>
+	              </execution>
+	            </executions>
+	          </plugin>
+		</plugins>
+	</build>
+
+</project>

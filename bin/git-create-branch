@@ -1,0 +1,16 @@
+#!/bin/bash
+
+function Usage {
+  echo "This command helps you create a new local branch and its parallel central copy at the same time."
+  echo ""
+  echo "Usage: git `basename $0 | sed -e 's/^git-//'` <-h|<new_branch_name>>"
+  echo ""
+  exit 1
+}
+
+[ "$1" == "-h" -o "$1" == "" ] && Usage
+
+NEW_BRANCH_NAME=$1
+
+echo "% git checkout -b $NEW_BRANCH_NAME" && git checkout -b $NEW_BRANCH_NAME
+echo "%git push -u origin $NEW_BRANCH_NAME" && git push -u origin $NEW_BRANCH_NAME

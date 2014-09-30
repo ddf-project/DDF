@@ -1,0 +1,40 @@
+#!/bin/bash
+
+function Usage {
+  echo "This command helps you do a git commit with a good commit message."
+  echo "Just to encourage good practice, it will refuse to do a commit directly from master."
+  echo ""
+  echo "Usage: git `basename $0 | sed -e 's/^git-//'`"
+  echo ""
+  exit 1
+}
+
+[ "$1" == "-h" ] && Usage
+
+BINDIR="`dirname $0`"
+COMMIT_TEMPLATE="$BINDIR/git-commit-message.txt"
+GIT_LOCAL_MASTER=${GIT_LOCAL_MASTER-master}
+
+CURRENT_BRANCH=`git branch | grep '^\*' | cut -d' ' -f2`
+
+if [ "$CURRENT_BRANCH" == '' ] ; then
+  echo "Cannot determine current branch name using 'git branch' -- Sum Ting Wong."
+  Usage
+
+elif [ "$CURRENT_BRANCH" == "$GIT_LOCAL_MASTER" ] ; then
+  echo "Sorry, I can't help you commit directly from local master -- Noah Kan Do"
+  Usage
+
+else
+  echo ""
+  export EDITOR=${EDITOR-vi}
+  echo "git commit -a -t $COMMIT_TEMPLATE" && git commit -a -t $COMMIT_TEMPLATE
+  if [ $? == 0 ] ; then
+    echo ""
+    echo -n "Would you like to push the commit to origin (central repo)? (Y/n)"
+    read response
+    if [ "$response" == "" -o "$response" == "Y" -o "$response" == "y" ] ; then
+      echo "git push" && git push
+    fi
+  fi
+fi

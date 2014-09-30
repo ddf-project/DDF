@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<templates>
+<template autoinsert="true" context="java" deleted="false" description="Start timer to measure performance" enabled="true" name="timerstart">startTime = System.currentTimeMillis();</template>
+<template autoinsert="true" context="java" deleted="false" description="Stop the timer and report elapse time" enabled="true" name="timerstopreport">LOG.info("+++++++++++++ "+Double.toString((System.currentTimeMillis() - startTime) * 1.0 / 1000)+"s");</template>
+</templates>
