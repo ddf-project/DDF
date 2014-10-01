@@ -48,7 +48,7 @@ business analysts, data scientists, and high-level Big Data engineers.
 First clone or fork a copy of DDF, e.g.:
 
 ```
-$ git clone http://git.adatao.com/DDF 
+$ git clone https://github.com/ddf-project/DDF 
 ```
 
 Now you need to prepare the build, which prepares the libraries,
@@ -60,7 +60,7 @@ $ cd DDF
 $ bin/run-once.sh
 ```
 
-If you ever need to regenerated the pom.xml files:
+If you ever need to regenerate the pom.xml files:
 
 ```
 $ bin/make-poms.sh
