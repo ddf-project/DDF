@@ -343,6 +343,15 @@ public abstract class DDF extends ALoggable //
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }
   }
+  
+  public List<String> sql2txt(String sqlCommand, String errorMessage, int numRows) throws DDFException {
+    try {
+      sqlCommand = sqlCommand.replace("@this", this.getTableName());
+      return this.getManager().sql2txt(String.format(sqlCommand, this.getTableName()), numRows);
+    } catch (Exception e) {
+      throw new DDFException(String.format(errorMessage, this.getTableName()), e);
+    }
+  }
 
   public DDF sql2ddf(String sqlCommand) throws DDFException {
     try {
