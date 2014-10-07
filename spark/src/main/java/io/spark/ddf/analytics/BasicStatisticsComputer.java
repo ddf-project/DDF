@@ -15,7 +15,6 @@ import org.apache.commons.lang.math.NumberUtils;
 
 /**
  * Compute the basic statistics for each column in a RDD-based DDF
- * 
  */
 public class BasicStatisticsComputer extends AStatisticsSupporter {
 
@@ -83,6 +82,7 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
       }
     }
   }
+
 
   @SuppressWarnings("serial")
   public static class GetSummaryReducer extends Function2<Summary[], Summary[], Summary[]> {

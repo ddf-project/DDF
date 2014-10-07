@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package io.spark.ddf.etl;
 
@@ -7,6 +7,7 @@ package io.spark.ddf.etl;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.spark.rdd.RDD;
 import scala.Option;
@@ -29,7 +30,6 @@ import org.apache.hadoop.hive.ql.metadata.Hive;
 
 /**
  * @author ctn
- * 
  */
 public class SqlHandler extends ASqlHandler {
 

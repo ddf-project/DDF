@@ -2,6 +2,7 @@ package io.spark.ddf.ml;
 
 
 import static io.spark.ddf.content.RepresentationHandler.RDD_ARR_DOUBLE;
+
 import org.apache.spark.mllib.clustering.KMeansModel;
 import org.apache.spark.rdd.RDD;
 import org.junit.Assert;
