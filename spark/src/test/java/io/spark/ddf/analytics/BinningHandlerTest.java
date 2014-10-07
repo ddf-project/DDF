@@ -4,6 +4,7 @@ package io.spark.ddf.analytics;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import io.ddf.DDF;
@@ -37,7 +38,8 @@ public class BinningHandlerTest {
     // manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, distance, arrdelay, depdelay from airline");
 
     DDF ddf = manager
-        .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
+        .sql2ddf(
+            "select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
 
     DDF newddf = ddf.binning("dayofweek", "EQUALINTERVAL", 2, null, true, true);
 
@@ -75,9 +77,10 @@ public class BinningHandlerTest {
     Assert.assertEquals(3, ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().size());
     Assert.assertEquals("[162,869]", ddf.VIEWS.head(3).get(0).split("\t")[6]);
     System.out.println(">>>>>NEW 1st ROW"
-        + ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().keySet().toString());// [162,869],
-                                                                                                              // (869,1576],
-                                                                                                              // (1576,2283]
+        + ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().keySet()
+        .toString());// [162,869],
+    // (869,1576],
+    // (1576,2283]
 
     manager.shutdown();
   }

@@ -16,108 +16,109 @@ import io.ddf.DDFManager
  */
 @RunWith(classOf[JUnitRunner])
 abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
-	val LOG: Logger = LoggerFactory.getLogger(this.getClass())
-	val manager = DDFManager.get("spark").asInstanceOf[SparkDDFManager]
-	val sharkctx = manager.getSharkContext
+  val LOG: Logger = LoggerFactory.getLogger(this.getClass())
+  val manager = DDFManager.get("spark").asInstanceOf[SparkDDFManager]
+  val sharkctx = manager.getSharkContext
 
-	def truncate(x: Double, n: Int) = {
-		def p10(n: Int, pow: Long = 10): Long = if (n == 0) pow else p10(n - 1, pow * 10)
-		if (n < 0) {
-			val m = p10(-n).toDouble
-			math.round(x / m) * m
-		}
-		else {
-			val m = p10(n - 1).toDouble
-			math.round(x * m) / m
-		}
-	}
+  def truncate(x: Double, n: Int) = {
+    def p10(n: Int, pow: Long = 10): Long = if (n == 0) pow else p10(n - 1, pow * 10)
+    if (n < 0) {
+      val m = p10(-n).toDouble
+      math.round(x / m) * m
+    }
+    else {
+      val m = p10(n - 1).toDouble
+      math.round(x * m) / m
+    }
+  }
 
-	def createTableMtcars() {
-		sharkctx.sql("set shark.test.data.path=../resources")
-		sharkctx.sql("drop table if exists mtcars")
-		sharkctx.sql("CREATE TABLE mtcars ("
-			+ "mpg double,cyl int, disp double, hp int, drat double, wt double, qsec double, vs int, am int, gear int, carb int"
-			+ ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '")
-		sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/mtcars' INTO TABLE mtcars")
-	}
+  def createTableMtcars() {
+    sharkctx.sql("set shark.test.data.path=../resources")
+    sharkctx.sql("drop table if exists mtcars")
+    sharkctx.sql("CREATE TABLE mtcars ("
+      + "mpg double,cyl int, disp double, hp int, drat double, wt double, qsec double, vs int, am int, gear int, carb int"
+      + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '")
+    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/mtcars' INTO TABLE mtcars")
+  }
 
-	def createTableAdmission() = {
-		sharkctx.sql("set shark.test.data.path=../resources")
-		sharkctx.sql("drop table if exists admission")
-		sharkctx.sql("create table admission (v1 int, v2 int, v3 double, v4 int)" +
-			" row format delimited fields terminated by ' '")
-		sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/admission.csv' " +
-			"INTO TABLE admission")
-	}
+  def createTableAdmission() = {
+    sharkctx.sql("set shark.test.data.path=../resources")
+    sharkctx.sql("drop table if exists admission")
+    sharkctx.sql("create table admission (v1 int, v2 int, v3 double, v4 int)" +
+      " row format delimited fields terminated by ' '")
+    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/admission.csv' " +
+      "INTO TABLE admission")
+  }
 
-	def createTableAirlineSmall() {
-		sharkctx.sql("set shark.test.data.path=../resources")
-		sharkctx.sql("drop table if exists airline")
-		sharkctx.sql("create table airline (Year int,Month int,DayofMonth int," +
-			"DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
-			"CRSArrTime int,UniqueCarrier string, FlightNum int, " +
-			"TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
-			"AirTime int, ArrDelay int, DepDelay int, Origin string, " +
-			"Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, " +
-			"CancellationCode string, Diverted string, CarrierDelay int, " +
-			"WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
-		)
-		sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airline.csv' " +
-			"INTO TABLE airline")
-	}
+  def createTableAirlineSmall() {
+    sharkctx.sql("set shark.test.data.path=../resources")
+    sharkctx.sql("drop table if exists airline")
+    sharkctx.sql("create table airline (Year int,Month int,DayofMonth int," +
+      "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
+      "CRSArrTime int,UniqueCarrier string, FlightNum int, " +
+      "TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
+      "AirTime int, ArrDelay int, DepDelay int, Origin string, " +
+      "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, " +
+      "CancellationCode string, Diverted string, CarrierDelay int, " +
+      "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
+    )
+    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airline.csv' " +
+      "INTO TABLE airline")
+  }
 
-	def createTableAirline() {
-		sharkctx.sql("set shark.test.data.path=../resources")
-		sharkctx.sql("drop table if exists airline")
-		sharkctx.sql("create table airline (Year int,Month int,DayofMonth int," +
-			"DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
-			"CRSArrTime int,UniqueCarrier string, FlightNum int, " +
-			"TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
-			"AirTime int, ArrDelay int, DepDelay int, Origin string, " +
-			"Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, " +
-			"CancellationCode string, Diverted string, CarrierDelay int, " +
-			"WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
-		)
-		sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineBig.csv' " +
-			"INTO TABLE airline")
-	}
+  def createTableAirline() {
+    sharkctx.sql("set shark.test.data.path=../resources")
+    sharkctx.sql("drop table if exists airline")
+    sharkctx.sql("create table airline (Year int,Month int,DayofMonth int," +
+      "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
+      "CRSArrTime int,UniqueCarrier string, FlightNum int, " +
+      "TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
+      "AirTime int, ArrDelay int, DepDelay int, Origin string, " +
+      "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, " +
+      "CancellationCode string, Diverted string, CarrierDelay int, " +
+      "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
+    )
+    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineBig.csv' " +
+      "INTO TABLE airline")
+  }
 
-	def createTableAirlineWithNA() {
-		sharkctx.sql("set shark.test.data.path=../resources")
-		sharkctx.sql("drop table if exists airlineWithNA")
-		sharkctx.sql("create table airlineWithNA (Year int,Month int,DayofMonth int," +
-			"DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
-			"CRSArrTime int,UniqueCarrier string, FlightNum int, " +
-			"TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
-			"AirTime int, ArrDelay int, DepDelay int, Origin string, " +
-			"Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, " +
-			"CancellationCode string, Diverted string, CarrierDelay int, " +
-			"WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
-		)
-		sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineWithNA.csv' " +
-			"INTO TABLE airlineWithNA")
-	}
+  def createTableAirlineWithNA() {
+    sharkctx.sql("set shark.test.data.path=../resources")
+    sharkctx.sql("drop table if exists airlineWithNA")
+    sharkctx.sql("create table airlineWithNA (Year int,Month int,DayofMonth int," +
+      "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
+      "CRSArrTime int,UniqueCarrier string, FlightNum int, " +
+      "TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
+      "AirTime int, ArrDelay int, DepDelay int, Origin string, " +
+      "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, " +
+      "CancellationCode string, Diverted string, CarrierDelay int, " +
+      "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
+    )
+    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineWithNA.csv' " +
+      "INTO TABLE airlineWithNA")
+  }
 }
 
 /**
  * This logs the begin/end of each test with timestamps and test #
  */
 abstract class ATimedTestSuite extends ATestSuite {
-	private lazy val testNameArray: Array[String] = testNames.toArray
-	private var testNumber: Int = 0
-	def getCurrentTestName = "Test #%d: %s".format(testNumber + 1, testNameArray(testNumber))
+  private lazy val testNameArray: Array[String] = testNames.toArray
+  private var testNumber: Int = 0
 
-	override def beforeEach = {
-		LOG.info("%s started".format(this.getCurrentTestName))
-	}
+  def getCurrentTestName = "Test #%d: %s".format(testNumber + 1, testNameArray(testNumber))
 
-	override def afterEach = {
-		testNumber += 1
-		LOG.info("%s ended".format(this.getCurrentTestName))
-		super.afterEach
-	}
+  override def beforeEach = {
+    LOG.info("%s started".format(this.getCurrentTestName))
+  }
 
-	override def afterAll = {
-		manager.shutdown()
-	}
+  override def afterEach = {
+    testNumber += 1
+    LOG.info("%s ended".format(this.getCurrentTestName))
+    super.afterEach
+  }
+
+  override def afterAll = {
+    manager.shutdown()
+  }
 }

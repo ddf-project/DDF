@@ -3,8 +3,10 @@ package io.spark.ddf;
 
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
+
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 

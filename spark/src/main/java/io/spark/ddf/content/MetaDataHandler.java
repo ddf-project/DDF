@@ -2,6 +2,7 @@ package io.spark.ddf.content;
 
 
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import io.ddf.DDF;
 import io.ddf.content.AMetaDataHandler;

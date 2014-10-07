@@ -80,11 +80,13 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
     }
   }
 
+
   public static class MetricsReducerR2 extends Function2<double[], double[], double[]> {
     private static final long serialVersionUID = 1L;
 
 
-    public MetricsReducerR2() throws DDFException {}
+    public MetricsReducerR2() throws DDFException {
+    }
 
     @Override
     public double[] call(double[] arg0, double[] arg1) throws Exception {
@@ -130,7 +132,8 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
     private static final long serialVersionUID = 1L;
 
 
-    public MetricsMapperResiduals() throws DDFException {}
+    public MetricsMapperResiduals() throws DDFException {
+    }
 
     public double[] call(double[] input) throws Exception {
       double[] outputRow = new double[1];

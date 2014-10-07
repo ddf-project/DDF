@@ -4,6 +4,7 @@ package io.spark.ddf.analytics;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +41,8 @@ public class AggregationHandlerTest {
     manager.sql2txt("load data local inpath '../resources/test/airline.csv' into table airline");
 
     ddf = manager
-        .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
+        .sql2ddf(
+            "select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
     // ddf1 = manager.sql2ddf("select year, month, dayofweek, deptime from airline");
   }
 
@@ -73,8 +75,8 @@ public class AggregationHandlerTest {
 
     Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics = count(*)")).getNumRows() > 0);
     Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics = count(1)")).getNumRows() > 0);
-    Assert
-        .assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=count(dayofweek )")).getNumRows() > 0);
+    Assert.assertTrue(
+        ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=count(dayofweek )")).getNumRows() > 0);
   }
 
   @After

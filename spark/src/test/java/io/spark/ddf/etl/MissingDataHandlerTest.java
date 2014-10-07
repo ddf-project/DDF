@@ -7,9 +7,11 @@ import io.ddf.etl.IHandleMissingData.NAChecking;
 import io.ddf.exception.DDFException;
 import io.ddf.types.AggregateTypes.AggregateFunction;
 import io.spark.ddf.BaseTest;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

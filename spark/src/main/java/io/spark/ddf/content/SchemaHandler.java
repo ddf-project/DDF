@@ -1,10 +1,11 @@
 /**
- * 
+ *
  */
 package io.spark.ddf.content;
 
 
 import java.util.*;
+
 import io.ddf.Factor;
 import io.ddf.content.IHandleRepresentations;
 import io.ddf.exception.DDFException;

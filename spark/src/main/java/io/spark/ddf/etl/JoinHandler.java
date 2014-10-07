@@ -3,6 +3,7 @@ package io.spark.ddf.etl;
 
 import java.util.HashSet;
 import java.util.List;
+
 import io.ddf.DDF;
 import io.ddf.etl.Types.JoinType;
 import io.ddf.content.Schema.Column;

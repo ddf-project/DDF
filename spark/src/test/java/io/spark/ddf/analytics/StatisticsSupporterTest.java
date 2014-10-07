@@ -2,6 +2,7 @@ package io.spark.ddf.analytics;
 
 
 import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -14,7 +15,9 @@ import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
 import io.ddf.exception.DDFException;
 import io.spark.ddf.SparkDDF;
 import io.spark.ddf.SparkDDFManager;
+
 import java.util.List;
+
 import io.ddf.analytics.AStatisticsSupporter.HistogramBin;
 
 
@@ -47,7 +50,8 @@ public class StatisticsSupporterTest {
     manager.sql2txt("load data local inpath '../resources/test/airline.csv' into table airline");
 
     ddf = manager
-        .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
+        .sql2ddf(
+            "select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
     ddf1 = manager.sql2ddf("select year, month, dayofweek, deptime, arrdelay from airline");
   }
 
