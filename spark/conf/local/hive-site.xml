@@ -24,6 +24,9 @@ limitations under the License.
   <value>/tmp/hive/warehouse</value>
   <description>location of default database for the warehouse</description>
 </property>
-
+<property>
+  <name>javax.jdo.option.ConnectionURL</name>
+  <value>jdbc:derby:;databaseName=/tmp/hive/metastore_db;create=true</value>
+</property>
 </configuration>
 
