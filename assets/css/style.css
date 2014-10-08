@@ -1,0 +1,15 @@
+/* Write your CSS! */
+html {
+  height: 100%; }
+
+body {
+  background: url(../apple-touch-icon.png) no-repeat center center; }
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+  /* Styles for mobile */ }
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+  /* Styles for tablet */ }
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
+  /* Don't forget your Retina CSS! */
+  body {
+    background-size: 72px 72px; } }

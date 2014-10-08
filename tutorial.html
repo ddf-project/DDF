@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Distributed Data Frame</title>
+
+    
+        <!-- Hammer reload -->
+          <script>
+            setInterval(function(){
+              try {
+                if(typeof ws != 'undefined' && ws.readyState == 1){return true;}
+                ws = new WebSocket('ws://'+(location.host || 'localhost').split(':')[0]+':35353')
+                ws.onopen = function(){ws.onclose = function(){document.location.reload()}}
+                ws.onmessage = function(){
+                  var links = document.getElementsByTagName('link'); 
+                    for (var i = 0; i < links.length;i++) { 
+                    var link = links[i]; 
+                    if (link.rel === 'stylesheet' && !link.href.match(/typekit/)) { 
+                      href = link.href.replace(/((&|\?)hammer=)[^&]+/,''); 
+                      link.href = href + (href.indexOf('?')>=0?'&':'?') + 'hammer='+(new Date().valueOf());
+                    }
+                  }
+                }
+              }catch(e){}
+            }, 1000)
+          </script>
+        <!-- /Hammer reload -->
+      
+  
+    <link rel='stylesheet' href='assets/css/normalize.css'>
+<link rel='stylesheet' href='assets/js/modernizr/test/caniuse_files/style.css'>
+<link rel='stylesheet' href='assets/scss/app.css'>
+<link rel='stylesheet' href='assets/js/prismjs/prism.css'>
+<link rel='stylesheet' href='assets/css/extra.css'>
+    
+    <link href='http://fonts.googleapis.com/css?family=Arimo:400,700|Open+Sans:300|Roboto:400,900' rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/favicon.ico" rel="shortcut icon">
+    <link href="assets/apple-touch-icon.png" rel="apple-touch-icon">
+  </head>
+  <body class="tutorial">
+    <div class="wrapper">
+    <header>
+      <ul>
+    <li class="logo"><a href="/">Home</a></li>
+    <li class="current nav-tutorials"><a class='current' href="tutorial.html">Getting Started</a></li>
+    <li class="nav-intro"><a href="introduction.html">Introduction</a></li>
+    <li class="nav-design"><a href="design.html">Design Document</a></li>
+    <li class="nav-api"><a href="apidocs/index.html" target="_blank">API</a></li>
+    <li class="nav-people"><a href="people.html">People</a></li>
+    <li class="nav-plans"><a href="plans.html">Plans</a></li>
+<li class="nav-contribute">
+        <a href="http://adatao.com/forms/ddf.html" >Contribute</a>
+    </li>
+
+</ul>
+    </header>
+
+<section>
+    
+       <iframe frameborder="0" src="markup/tutorial.html" style="
+    position: fixed;
+    top: 74px;
+    left: 0px;
+    right: 100px;
+    bottom: 0px;
+    height: 100%;
+    width: 100%;
+    display: block; overflow: scroll; 
+"></iframe>
+ 
+</section>
+
+
+		<div class="push"></div>
+	</div>
+	<footer>
+      <div class="content">
+        Project supported by <a href="http://www.adatao.com" target="_blank">Adatao</a>
+      </div>
+    </footer>
+	<script src='assets/js/jquery-1.8.3.min.js'></script>
+<script src='assets/js/modernizr/modernizr.js'></script>
+<script src='assets/js/foundation/js/foundation.js'></script>
+<script src='assets/js/app.js'></script>
+<script src='assets/js/prismjs/prism.js'></script>
+	
+</body>
+</html>

@@ -1,76 +1,230 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js" lang="en">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>Ddf by ddf-project</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Distributed Data Frame</title>
+
+    
+        <!-- Hammer reload -->
+          <script>
+            setInterval(function(){
+              try {
+                if(typeof ws != 'undefined' && ws.readyState == 1){return true;}
+                ws = new WebSocket('ws://'+(location.host || 'localhost').split(':')[0]+':35353')
+                ws.onopen = function(){ws.onclose = function(){document.location.reload()}}
+                ws.onmessage = function(){
+                  var links = document.getElementsByTagName('link'); 
+                    for (var i = 0; i < links.length;i++) { 
+                    var link = links[i]; 
+                    if (link.rel === 'stylesheet' && !link.href.match(/typekit/)) { 
+                      href = link.href.replace(/((&|\?)hammer=)[^&]+/,''); 
+                      link.href = href + (href.indexOf('?')>=0?'&':'?') + 'hammer='+(new Date().valueOf());
+                    }
+                  }
+                }
+              }catch(e){}
+            }, 1000)
+          </script>
+        <!-- /Hammer reload -->
+      
+  
+    <link rel='stylesheet' href='assets/css/normalize.css'>
+<link rel='stylesheet' href='assets/js/modernizr/test/caniuse_files/style.css'>
+<link rel='stylesheet' href='assets/scss/app.css'>
+<link rel='stylesheet' href='assets/js/prismjs/prism.css'>
+<link rel='stylesheet' href='assets/css/extra.css'>
+    
+    <!-- <link href='http://fonts.googleapis.com/css?family=Arimo:400,700|Open+Sans:300|Roboto:400,900' rel='stylesheet' type='text/css'>
+ -->    
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400|Tenor+Sans' rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/favicon.ico" rel="shortcut icon">
+    <link href="assets/apple-touch-icon.png" rel="apple-touch-icon">
   </head>
+  <body class="home">
+    <div class="wrapper">
+    <header>
+      <ul>
+    <li class="logo"><a href="/">Home</a></li>
+    <li class="nav-tutorials"><a href="tutorial.html">Getting Started</a></li>
+    <li class="nav-intro"><a href="introduction.html">Introduction</a></li>
+    <li class="nav-design"><a href="design.html">Design Document</a></li>
+    <li class="nav-api"><a href="apidocs/index.html" target="_blank">API</a></li>
+    <li class="nav-people"><a href="people.html">People</a></li>
+    <li class="nav-plans"><a href="plans.html">Plans</a></li>
+    <li class="nav-contribute">
+    	<a href="http://adatao.com/forms/ddf.html" >Contribute</a>
+    </li>
+</ul>
+    </header>
 
-  <body>
-    <div id="container">
-      <div class="inner">
+<section class="row" id="ddf-intro">
+  <div class="content">
+  <h1>Distributed Data Frame</h1>
+      <h3>Maximize Productivity for Data Scientists &amp; Engineers, through Simplicity, without compromising Power &amp; Sophistication.</h3>
+    <div class="large-12 columns">
+      <div class="row" id="section1">
+       <div class="large-5 columns">
+          <ul class="benefits">
+          <font size="5">
+          DDF (Distributed DataFrame) is a table-like abstraction that wraps around a big data structure underneath.</font><br><br><br>
+            <!--<li class="fa fa-check"> Table-like abstraction on top of big data</li>-->
+            <li class="fa fa-check"> Native R data.frame experience</li>
+            <li class="fa fa-check"> Focus on analytics, not MapReduce</li>
+            <li class="fa fa-check"> Seamlessly integrate with external ML libraries</li>
+            <li class="fa fa-check"> Share DDFs via URIs</li>
+            <li class="fa fa-check"> Support multiple languages</li>
+          </ul>
 
-        <header>
-          <h1>Ddf</h1>
-          <h2>Distributed DataFrame: Productivity = Power x Simplicity For Big Data Scientists &amp; Engineers</h2>
-        </header>
+          <a href="/tutorial.html" class="call-to-action button radius expand">Get Started</a>
+        </div>
+        <div class="large-7 columns">
+          <div class="terminal">
+            <ul class="tabs" data-tab>
+              <li class="tab-title active"><a href="#ddf-java"><h5>DDF with Java</h5></a></li>
+              <li class="tab-title"><a href="#ddf-r"><h5>DDF with R</h5></a></li>
+              <li class="tab-title"><a href="#ddf-python"><h5>DDF Python</h5></a></li>
+            </ul>
+            <div class="tabs-content">
+              <div class="content active" id="ddf-java">
+                <pre class="language-clike">
+<code class="language-clike">//To start working with a DDF-on-Spark cluster:
+DDFMananager smanager = DDFManager.get("spark");
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/ddf-project/DDF/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/ddf-project/DDF/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/ddf-project/DDF" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+//Then, data can be loaded into a SparkDDF as follows:
+DDF table = smanager.sql2ddf("select * from airline");
 
-        <hr>
+/* Basic Statistic */
+Summary[] summary = table.summary()
 
-        <section id="main_content">
-          <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+/* ETL, transform */
+table = table.Transform.transformUDF("dist= round(distance/2, 2)");
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+/* Run Machine learning using MLlib */
+KMeansModel kmeansModel = (KMeansModel) ddf.ML.train("kmeans", 5, 5).getRawModel();
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+/* Run prediction */
+Int prediction = ddf.ML.applyModel(kmeansModel, false, true)</code>
+</pre>
+</div>
+              <div class="content" id="ddf-r">
+                <pre class="language-clike">
+<code class="language-clike">#Create DDF manager to run on Spark engine
+dm &lt;- DDFManager("spark")
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+#create DDF from table
+ddf &lt;- sql2ddf(dm, "select * from mtcars")
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+/*Basic Stats*/
+#return number of columns/rows
+ncol(ddf)
+nrow(ddf)
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+#run standard summary on ddf
+summary(ddf)</code>
+                </pre>
+              </div>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+              <div class="content" id="ddf-python">
+                <pre class="language-clike">
+<code class="language-clike">#Create DDF manager to run on Spark engine
+dm = DDFManager("spark")
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+#create DDF from table
+ddf = dm.sql2ddf("select * from airline_na")
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+/* Clean data */
+#drop NA
+ddf.dropNA()
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+/* Basic Stats */
+#get num rows and number of columns
+ddf.getNumRows()
+ddf.getNumColumns()</code>
+                </pre>
+              </div>
+            </div>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-        </section>
-
-        <footer>
-          Ddf is maintained by <a href="https://github.com/ddf-project">ddf-project</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-        
-      </div>
+          </div>
+        </div> 
+      </div>      
     </div>
-  </body>
+  </div>
+  </section>
+
+  <section class="row" id="ddf-principles">
+    <div class="content">
+
+      <div class="large-12 columns">
+        <h2>DDF Principles</h2>
+      </div>
+
+      <div class="large-4 columns">
+        <h4>The ease of app development on RDBMS</h4>
+
+        <p>
+          The SQL abstraction has boosted app developer productivity tremendously, hiding away all the complexity and diversity of the database engines underneath.
+        </p>
+      </div>
+
+      <div class="large-4 columns">
+        <h4>
+          The sophistication of R</h4>
+        <p>
+          For decades, data analysis idioms and packages have evolved around the powerful concept of the data.frame, from basic data transformation, filtering and projection, to advanced data mining and machine learning.
+        </p>
+      </div>
+
+      <div class="large-4 columns">
+        <h4>
+          The scale of parallel, distributed computing</h4>
+        <p>
+          Thanks to technologies like Hadoop MapReduce, <a href="http://spark.apache.org/" target="_blank">Apache Spark</a>, and other parallel computing frameworks, big compute capabilities have become widely available.
+        </p>
+      </div>
+      <br>
+    </div>    
+  </section>
+ <section class="row" id="ddf-principles">
+    <div class="content">
+
+      <div class="large-12 columns"> 
+        <div align="center">
+        <iframe width="560" height="315" src="//www.youtube.com/embed/460Easvl6pk?list=PL-x35fyliRwgNYIV1P9prgtKyiMrTKp5k" frameborder="0" allowfullscreen=""></iframe>
+        </div>
+      </div>    
+  </section>
+  
+  <section id="testimonials">
+    <div class="content">
+      <h2>What People Are Saying About DDF</h2>
+      <ul class="testimonials">
+        <li>
+          I'm working on making pandas work better with Spark, and it seems like  wrapping pandas around DDF would be really cool.<span>@holdenkarau</span>
+        </li>
+        <li><strong>@adataoinc</strong> is going to open-source their amazing work with distributed data frames, amazing! #sparksummit.<span>@davidbgonzalez</span></li>
+
+        <li>We are a team .. that would be very interested in getting this to open source release. We have ideas to build on top of a smoother abstraction than RDD and Schema RDD.<span>@siditweet</span></li>
+
+        <li>I really think that Spark (and in general Scala and Java) was lacking precisely the data frame concept that is so handy when you do R and data analysis.<span>@carlosfuertes</span></li>
+      </ul>
+    </div>
+  </section>
+  
+		<div class="push"></div>
+	</div>
+	<footer>
+      <div class="content">
+        Project supported by <a href="http://www.adatao.com" target="_blank">Adatao</a>
+      </div>
+    </footer>
+	<script src='assets/js/jquery-1.8.3.min.js'></script>
+<script src='assets/js/modernizr/modernizr.js'></script>
+<script src='assets/js/foundation/js/foundation.js'></script>
+<script src='assets/js/app.js'></script>
+<script src='assets/js/prismjs/prism.js'></script>
+	
+</body>
 </html>

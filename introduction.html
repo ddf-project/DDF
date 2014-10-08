@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Distributed Data Frame</title>
+
+    
+        <!-- Hammer reload -->
+          <script>
+            setInterval(function(){
+              try {
+                if(typeof ws != 'undefined' && ws.readyState == 1){return true;}
+                ws = new WebSocket('ws://'+(location.host || 'localhost').split(':')[0]+':35353')
+                ws.onopen = function(){ws.onclose = function(){document.location.reload()}}
+                ws.onmessage = function(){
+                  var links = document.getElementsByTagName('link'); 
+                    for (var i = 0; i < links.length;i++) { 
+                    var link = links[i]; 
+                    if (link.rel === 'stylesheet' && !link.href.match(/typekit/)) { 
+                      href = link.href.replace(/((&|\?)hammer=)[^&]+/,''); 
+                      link.href = href + (href.indexOf('?')>=0?'&':'?') + 'hammer='+(new Date().valueOf());
+                    }
+                  }
+                }
+              }catch(e){}
+            }, 1000)
+          </script>
+        <!-- /Hammer reload -->
+      
+  
+    <link rel='stylesheet' href='assets/css/normalize.css'>
+<link rel='stylesheet' href='assets/js/modernizr/test/caniuse_files/style.css'>
+<link rel='stylesheet' href='assets/scss/app.css'>
+<link rel='stylesheet' href='assets/js/prismjs/prism.css'>
+<link rel='stylesheet' href='assets/css/extra.css'>
+    
+    <!-- <link href='http://fonts.googleapis.com/css?family=Arimo:400,700|Open+Sans:300|Roboto:400,900' rel='stylesheet' type='text/css'>
+ -->    
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400|Tenor+Sans' rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/favicon.ico" rel="shortcut icon">
+    <link href="assets/apple-touch-icon.png" rel="apple-touch-icon">
+  </head>
+  <body class="introduction">
+    <div class="wrapper">
+    <header>
+      <ul>
+    <li class="logo"><a href="/">Home</a></li>
+    <li class="nav-tutorials"><a href="tutorial.html">Getting Started</a></li>
+    <li class="current nav-intro"><a class='current' href="introduction.html">Introduction</a></li>
+    <li class="nav-design"><a href="design.html">Design Document</a></li>
+    <li class="nav-api"><a href="apidocs/index.html" target="_blank">API</a></li>
+    <li class="nav-people"><a href="people.html">People</a></li>
+    <li class="nav-plans"><a href="plans.html">Plans</a></li>
+    <li class="nav-contribute">
+    	<a href="http://adatao.com/forms/ddf.html" >Contribute</a>
+    </li>
+</ul>
+    </header>
+
+<section>
+  <div class="content">
+    <div class="large-12 columns">
+      <h1>Introducing Distributed DataFrame (DDF)</h1>
+      <h3>Let’s face it: Big Data Analytics is too hard! Unreasonably hard.</h3>
+
+      <p>If you’re a data scientist or engineer, today to get anything done, you’re likely having to deal with HDFS, MapReduce, distributed parallel processing, directed acyclic graphs, monoids, monads, map, flatmap, etc. and on and on. Now, those things are all important tools and concepts to master, at some level. But too often, they get in the way of the data scientist/engineer’s analytic productivity. Fuel injectors and carburetors are important to the functioning of your car’s engine, but they shouldn’t get in the way each time you need to drive. It’s only that way because big data science technologies are newly introduced and evolving. And because we’re building them from the data storage layer bottom-up, you end up having to know a lot of things, bottom-up, to get stuff done.</p>
+
+      <h3>Can it be simpler and easier?</h3>
+      
+      <p>At Adatao, when in search for a big data science and engineering framework, we look for one key thing: productivity. Big data science and engineering need a framework for much better productivity. Instead of viewing things bottom-up, we take a top-down view of the big data stack, and ask what kind of API we would want to maximize data-engineering productivity. We ended up with developing the Distributed DataFrame (DDF) framework.</p>
+
+      <h3>Design principles</h3>
+
+      <p>The core idea of DDF is drawn from the valuable lessons that we have learned through the experience of adjacent technologies.</p>
+      
+      <div class="row">
+        <div class="large-5 columns">
+          <img src="http://blog.adatao.com/wp-content/uploads/2014/01/DDF-designprinciples1.png" alt="">
+        </div>
+
+        <div class="large-7 columns">
+          <ul>
+            <li><strong>The ease of app development on RDBMS:</strong> The SQL abstraction has boosted app developer productivity tremendously, hiding away all the complexity and diversity of the database engines underneath.</li>
+            <br/>
+            <li><strong>The sophistication of R:</strong> For decades, data analysis idioms and packages have evolved around the powerful concept of the data.frame, from basic data transformation, filtering and projection, to advanced data mining and machine learning.
+            </li>
+            <br/>
+            <li><strong>The scale of parallel, distributed computing:</strong> Thanks to technologies like Hadoop MapReduce, Apache Spark, and other parallel computing frameworks,  big compute capabilities have become widely available.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>
+        DDF combines those 3 paradigms into one unified, highly productive framework. Our goal is to make the Big-Data API as simple and accessible to data scientists and engineers as the equivalent “small-data” RDBMS API. DDF could be as transformative to Big Data as SQL was to RDBMS. It takes advantage of powerful data &amp; compute engines, hides away all their complexities, exposing them to the data scientist and engineer as a <strong>simple, productive, user-friendly development interface</strong>.
+      </p>
+
+      <h3>Key features and benefits</h3>
+      
+      <strong>1. Table-like abstraction on top of big data</strong>
+      <p>
+        DDF lets you think of your big data sources and in-memory structures as database tables. The underlying representation can be very big, very distributed, very complicated, but from above, you only have to think of a table. 
+      </p>
+
+      <strong>2. Native R data.frame experience</strong>
+      <p>If you’re familiar with R, it’s the concept of an <a href="http://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html" target="_blank">R data.frame</a>. R users get out-of-the-box familiar coding syntax &amp; patterns. Concepts like schema, filtering, projection, transformation, data mining &amp; machine learning support all built-in. DDF also borrows heavily from <a href="http://pandas.pydata.org/" target=_blank> pandas </a> and <a href="http://scikit-learn.org/stable/" target=_blank> scikit-learn </a>, for their well thought-through design with proven popular success from the Python community’s data mining and machine learning efforts.</p>
+
+      <strong>3. Focus on analytics, not MapReduce</strong>
+      <p>DDF nicely wraps the complicated MapReduce patterns in simple APIs with rich set of popular analytics idioms benefited from decades of wisdom in relational databases and data science. It allows users to perform the whole analytics pipeline, from ETL/data wrangling to model building and real-time scoring, with just few lines of code.</p>
+
+      <strong>4. Seamlessly integrate with external ML libraries</strong>
+      <p>DDF’s architecture is componentized and pluggable by design, even at run-time, making it easy for users to replace or extend any component (“handler”) at will without having to modify the API or ask for permission.</p>
+
+      <strong>5. Share DDFs via URIs</strong>
+      <p>DDF allows mutable transformations and can be shared via URIs, enabling seamless collaboration in client/server settings.</p>
+
+      <strong>6. Support multiple languages</strong>
+      <p>
+        The core DDF API is written in Java. Users will also enjoy using the DDF APIs with their familiar programming languages, including Java, Scala, R and Python. Followings is a brief demo of a flight info analysis in multiple languages, using our DDF implementation on Apache Spark.
+        
+        <br />
+        From a Scala shell:
+        <iframe class="iframe-class" frameborder="0" height="480" scrolling="no" src="http://showterm.io/8249d6f25f441f3212fed#fast" style="max-width: 100%;" width="100%"></iframe>
+        <br />
+        From R:
+        <iframe class="iframe-class" frameborder="0" height="480" scrolling="no" src="http://showterm.io/2899f27d8e8f40e2a4079#fast" style="max-width: 100%;" width="100%"></iframe>
+
+        <br />
+        From Python
+        <iframe class="iframe-class" frameborder="0" height="480" scrolling="no" src="http://showterm.io/ee8531e08914484a0aa9f#fast" style="max-width: 100%;" width="100%"></iframe>
+      </p>
+
+      <p>At Adatao, DDF has powered the rapid construction of applications like pInsights and pAnalytics, directly on top of Spark RDDs. This enables us to provide easy interfaces such as Natural Language, R, and Python for the underlying Spark/Shark engine. DDF is also extensible by design so that we can have DDF implemented on top of other big data engines, such as Impala, Presto, GraphLab.</p>
+      
+      <h3>DDF is being open sourced!</h3>
+
+      <p>We are currently open sourcing DDF to a seeding group of selected contributors and will make it publicly available within the next 3 months. We believe that the open-source development of DDF will help change the conversation in Big Data, toward a top-down focus of Simplifying Big Data For The Rest of Us.</p>
+
+    </div>
+  </div>
+</section>
+
+		<div class="push"></div>
+	</div>
+	<footer>
+      <div class="content">
+        Project supported by <a href="http://www.adatao.com" target="_blank">Adatao</a>
+      </div>
+    </footer>
+	<script src='assets/js/jquery-1.8.3.min.js'></script>
+<script src='assets/js/modernizr/modernizr.js'></script>
+<script src='assets/js/foundation/js/foundation.js'></script>
+<script src='assets/js/app.js'></script>
+<script src='assets/js/prismjs/prism.js'></script>
+	
+</body>
+</html>

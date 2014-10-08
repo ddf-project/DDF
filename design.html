@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Distributed Data Frame</title>
+
+    
+        <!-- Hammer reload -->
+          <script>
+            setInterval(function(){
+              try {
+                if(typeof ws != 'undefined' && ws.readyState == 1){return true;}
+                ws = new WebSocket('ws://'+(location.host || 'localhost').split(':')[0]+':35353')
+                ws.onopen = function(){ws.onclose = function(){document.location.reload()}}
+                ws.onmessage = function(){
+                  var links = document.getElementsByTagName('link'); 
+                    for (var i = 0; i < links.length;i++) { 
+                    var link = links[i]; 
+                    if (link.rel === 'stylesheet' && !link.href.match(/typekit/)) { 
+                      href = link.href.replace(/((&|\?)hammer=)[^&]+/,''); 
+                      link.href = href + (href.indexOf('?')>=0?'&':'?') + 'hammer='+(new Date().valueOf());
+                    }
+                  }
+                }
+              }catch(e){}
+            }, 1000)
+          </script>
+        <!-- /Hammer reload -->
+      
+  
+    <link rel='stylesheet' href='assets/css/normalize.css'>
+<link rel='stylesheet' href='assets/js/modernizr/test/caniuse_files/style.css'>
+<link rel='stylesheet' href='assets/scss/app.css'>
+<link rel='stylesheet' href='assets/js/prismjs/prism.css'>
+<link rel='stylesheet' href='assets/css/extra.css'>
+    
+    <!-- <link href='http://fonts.googleapis.com/css?family=Arimo:400,700|Open+Sans:300|Roboto:400,900' rel='stylesheet' type='text/css'>
+ -->    
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400|Tenor+Sans' rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/favicon.ico" rel="shortcut icon">
+    <link href="assets/apple-touch-icon.png" rel="apple-touch-icon">
+  </head>
+  <body class="design">
+    <div class="wrapper">
+    <header>
+      <ul>
+    <li class="logo"><a href="/">Home</a></li>
+    <li class="nav-tutorials"><a href="tutorial.html">Getting Started</a></li>
+    <li class="nav-intro"><a href="introduction.html">Introduction</a></li>
+    <li class="current nav-design"><a class='current' href="design.html">Design Document</a></li>
+    <li class="nav-api"><a href="apidocs/index.html" target="_blank">API</a></li>
+    <li class="nav-people"><a href="people.html">People</a></li>
+    <li class="nav-plans"><a href="plans.html">Plans</a></li>
+    <li class="nav-contribute">
+    	<a href="http://adatao.com/forms/ddf.html" >Contribute</a>
+    </li>
+</ul>
+    </header>
+
+<section>
+  <div class="content">
+    <div class="large-12 columns">
+      <h1>DDF Design and Architecture</h1>
+
+      <p>
+        The main driver for Distributed DataFrame is to have a cluster-based, big data representation that’s friendly to the RDBMSs and data science community. Specifically we leverage SQL’s table and R’s data.frame concepts, taking advantage of 30 years of  SQL development and R’s accumulated data science wisdom. In this sense it is targeted to the R community. At the same time, we want the API to be broadly usable by other communities and target languages such as Python, Scala, and Java.
+      </p>
+
+      <p>
+        This document details the design and architecture of the Distributed DataFrame abstraction and its implementation on top Apache Spark, which we are making available to the open-source community.
+      </p>
+
+      <p>
+        Key to the Distributed DataFrame concept is the idea that the big data materialization and transformation work should take place in the cluster, while the client side only handles command handling and “small-data” manipulations such as visualization of aggregates. This allows efficient and decoupled implementation and scaling of client/server according to specific use cases.
+      </p>
+
+      <p>
+        It is easy to work with DDF as most of the time users deal with a simple tabular data  abstraction. It is called Distributed DataFrame, however, the distributed part is hidden from the user facing API, giving users a “small-data” manipulation experience. The DDF API has three core abstractions: DDFManager, DDFs and Handlers. The class diagram is illustrated in Figure 1. 
+      </p>
+
+      <p>
+        <figure>
+          <img src="https://lh3.googleusercontent.com/_IQYUKfIKL8xpWSxf5XQupkAtvTdNGVZOuZ-s4iwm7Qo9ctjKugN9UrnXspRzLXNqVgFn8UrZXxjXijFhUl8tZ6Fw9on3a_ykOgPLlurFT2jr-smJBOr4VNGnwpYXEVaAg" alt="DDF Architecture" />
+          <br/>
+          <figcaption>Figure 1. - DDF class diagram.</figcaption>
+        </figure>
+      </p>
+      
+      <p>
+        A <strong>Distributed DataFrame</strong> (DDF) is a table-like abstraction that wraps around a big data structure underneath.  As a table-like representation, DDF has a number of key properties such as metadata, schema. Users can run SQL queries, perform data table filtering, projections, grpup by and join on DDFs. As a R’s Data.Frame, DDF provides a simple yet rich set of data science idioms such as transparent handling of missing data, easy transformation, quick access to machine-learning algorithms.
+      </p>
+
+      <p>
+        A <strong>DDFManager</strong> is basically a DDF implementor. It creates the entry point to the big data engine that DDF sits on top, supports loading data from big data sources into DDFs and book-keepings the DDF pool. 
+      </p>
+
+      <p>
+        <strong>Handlers</strong> are the functional components in the DDF framework. All the properties and capabilities of a DDF are provided through these components, called handlers or supporters, such as ETL handlers, statistics handlers, machine learning supporters. DDF's architecture is componentized and pluggable by design, even at run-time, making it easy for users to replace or extend any component ("handler") at will without having to modify the API or ask for permission.
+      </p>
+
+      <p>
+        We use the Dependency Injection, Delegation, and Composite patterns to make it easy for others to provide alternative (even snap-in replacements) support/implementation for DDF. The core DDF framework defines as a set of interfaces that are independent of the processing engine underneath. Therefore, there is a clean separation between the abstract concepts and the implementation so that the API can support multiple big data platforms under the same set of abstract concepts. 
+      </p>
+
+      <h2>DDF-on-Spark</h2>
+      
+      <p>
+        Spark is a powerful, in-memory parallel distributed compute engine.  DDF-on-Spark takes advantage of Spark's power, while exposing a simplified API for the data scientist/engineer to be extremely productive. At the same time, should you have a need to access Spark's RDD  for direct manipulation, that is also directly accessible via DDF as its underlying representation. 
+      </p>
+
+      <p>
+        As shown in Figure 2, DDF abstracts out the complexity of the Spark compute engine. DDF leverages the capabilities of Spark’s RDD and seamlessly integrates with Spark’s analytics components. Users will get to work with the powerful Spark engine but with more pleasant experience through the simple DDF API.
+      </p>
+
+      <p>
+        DDF provides interfaces in Java, Scala, R and Python so that users can easily interact with a distributed cluster running DDF-on-Spark using their favorite programming languages.
+      </p>
+
+      <p>
+        In a client/server setting, a client can connect to a DDF server via a web browser or R-studio and issue commands that will get executed in the clusters and get the results back in seconds.
+      </p>
+
+      <p>
+        With DDF-on-Spark, users can perform sophisticated machine-learning training on terabyte-scale DDFs interactively, with just one or two lines of code to iterate to the next step in the data science workflow.
+      </p>
+      
+      <p>
+        <figure>
+          <img src="https://lh5.googleusercontent.com/0AhJNBm8WEGh-i9LGsiXQTWr_0qsTx34bH92lpp_SiaoP9BXCl4H35--abJKcNe-t34kwTcTNMxEmXXD80ox4ELid0MSh60UEVxfxYf4a-915klB1Sjcvz07SvqcQbe-6w" alt="">
+        </figure>
+      </p>
+
+      <p>
+        Here are some code snippets showing how it is simple to work with DDF-on-Spark.
+
+        <pre class="language-clike">
+              <code class="language-clike">
+    //To start working with a DDF-on-Spark cluster, simply create a SparkDDFManager:
+    DDFMananager smanager = DDFManager.get("spark");
+
+    //Then, data can be loaded into a SparkDDF as follows:
+    DDF table = smanager.sql2ddf("select * from airline");
+
+    //DDF is very neat that it provides all these idioms for you:
+    long nrow = table.nrow()
+    Summary[] summary = table.summary()</code>
+            </pre>
+      </p>
+
+      <p>
+        By design, DDF is mutable even if it encapsulates an underlying implementation using immutable data sets, e.g., RDDs. Therefore, you can also perform mutable transformations on DDF if you like to just work with the same DDF:
+
+        <pre class="language-clike">
+              <code class="language-clike">
+    table.setMutable(true)
+    table.dropNA()</code>
+        </pre>
+      </p>
+
+      <p>
+        All the handlers in the Spark implementation of DDF are defined in ddf-conf/ddf.ini under engine [spark]. To use Mllib, simple config to use Mllib algorithm, e.g. KMeans, in  ddf-conf/ddf.in as follows:
+
+        <pre class="language-clike">
+              <code class="language-clike">
+    KMeans = org.apache.spark.mllib.clustering.KMeans</code>
+        </pre>
+      </p>
+
+      <p>
+        The DDF’s ML supporter can invoke an algorithm by name
+
+        <pre class="language-clike">
+              <code class="language-clike">
+    ddf.ML.train("KMeans")</code>
+        </pre>
+      </p>
+
+      <p>
+        The DDF’s RepresentationHandler has built-in retrieval for various RDD representations so you can get direct access to the low-level data representation when needed
+        
+        <pre class="language-clike">
+              <code class="language-clike">
+    ddf.getRepresentationHandler().get(RDD.class, LabeledPoint.class);</code>
+        </pre>
+      </p>
+
+    </div>
+  </div>
+</section>
+
+		<div class="push"></div>
+	</div>
+	<footer>
+      <div class="content">
+        Project supported by <a href="http://www.adatao.com" target="_blank">Adatao</a>
+      </div>
+    </footer>
+	<script src='assets/js/jquery-1.8.3.min.js'></script>
+<script src='assets/js/modernizr/modernizr.js'></script>
+<script src='assets/js/foundation/js/foundation.js'></script>
+<script src='assets/js/app.js'></script>
+<script src='assets/js/prismjs/prism.js'></script>
+	
+</body>
+</html>
