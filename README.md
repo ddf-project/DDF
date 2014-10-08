@@ -8,7 +8,7 @@ Source code for ddf.io website
 
 | Page        | Files             |
 | ------------- |:-------------:| 
-| index      | index.html |
+| Index      | index.html |
 | Getting started      | markup/tutorial.html      |
 | Introduction | introduction.html      |
 | Design document | design.html      |
