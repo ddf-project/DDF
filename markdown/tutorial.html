@@ -1,0 +1,144 @@
+<html>
+<xmp theme="united" style="display:none;">
+
+## Getting Started
+This tutorial provides a quick introduction to using DDF. We will introduce how to build DDF and run DDF example in Java, Scala, R and Python. See the introduction blog for more information about DDF.
+
+## Prerequisites
+Java 7, maven 3.x, git. First clone DDF from github
+
+```
+git clone https://github.com/ddf-project/DDF
+```
+
+## Compile and install DDF
+DDF is currently compatible with Spark 0.9. For first time installation, it is required to run bin/run-once to download dependencies and sbt.
+
+``` sh
+ bin/run-once.sh
+ ```
+If there is no error, you can can run unit tests
+```
+cd core; mvn test
+cd spark; mvn test
+```                
+If you use sbt
+``` sh
+ bin/sbt clean compile package 
+```
+At this point, it should pass all unit tests.
+
+## Running the example in Java
+Run this command in the DDF directory
+```
+ bin/run-example io.spark.ddf.examples.RowCount
+```
+
+## Interactive Analysis with DDF’s Shell
+DDF’s shell provides a simple way to learn the API, as well as a powerful tool to analyze data interactively. It’s available in Java, Scala and Python
+```
+bin/ddf-shell
+```
+Each DDF application has a DDFManager as an entry point to a big data engine. To DDFManager for the Spark engine: 
+Now, let’s create a DDFManager for the Spark engine.
+``` java
+import  io.ddf.DDFManager;
+DDFManager manager = DDFManager.get("spark");
+```
+
+Prepare data to run
+``` java
+manager.sql2txt("drop table if exists airline");
+manager.sql2txt("create table airline (Year int,Month int,DayofMonth int,DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int,TailNum string, ActualElapsedTime int, CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string,Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, ArcraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \',\'");
+manager.sql2txt("load data local inpath 'resources/test/airline.csv' into table airline");
+```
+
+Create DDF
+``` java
+DDF ddf = manager.sql2ddf("select * from airline");
+Get the number of rows/columns of the DDF:
+
+ddf.getNumRows();
+print(ddf.getColumnNames());
+```
+
+## Data ETL
+DDF allows mutable transformations, e.g., all NA values can be dropped from the same DDF, similar to a Pandas dataframe.
+``` java
+ddf.setMutable(true);
+ddf.dropNA();
+```
+
+## Basic Statistic
+DDF comes with a lot of R-like idioms, such as summary, fiveNum
+``` java
+s = ddf.getSummary();
+```
+Check the mean or NA count of the first column of the DDF:
+``` java
+print(s[0].mean());
+print(s[0].NAcount());
+```
+
+Project the DDF with specific columns:
+``` java
+newddf = ddf.VIEWS.project("deptime", "arrtime", "distance", "depdelay", "arrdelay");
+```
+View some data in newddf:
+
+``` java
+print(newddf.VIEWS.head(2));
+```
+## Machine learning
+Run Mllib’s KMeans on newddf:
+``` java
+import org.apache.spark.mllib.clustering.KMeansModel;
+kmeansModel = (KMeansModel) newddf.ML.train("kmeans", 5, 5).getRawModel();
+```
+Predict on the kmeansModel:
+``` java
+print(kmeansModel.predict(new double[] { 1232, 1341, 389, 100, 9 }));  
+```
+
+## Use Spark Java API
+You can also play with Spark’s Java API from the ddf-shell
+``` java
+sc = manager.getJavaSharkContext();
+JavaRDD logData = sc.textFile("README.md").cache();
+print("nrow=" +logData.count());
+```
+
+When done analysis, shutdown the DDFManager
+``` java
+manager.shutdown();
+```
+## Use DDF in R
+DDF can be used in R language with the same user experience. DDF on R is very powerful API that bring the R idioms into big data processing. You can install DDF on R using the following command in the R directory.
+
+``` sh
+install.sh
+```
+It will install DDF on R package to system repo. Before using the package, users have to setup rJava environment by running those commands
+```
+R CMD javareconf -e
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JAVA_LD_LIBRARY_PATH
+```
+After this step you can start running provided example by using this command
+``` R
+Rscript examples/basics.R.
+```
+
+## Use DDF in Python
+DDF can also be used in Python. Just go to python directory and either
+``` python
+bin/pyddf or IPYTHON=1 bin/pyddf
+bin/pyddf examples/basics.py
+```
+</xmp>
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+<link href="../assets/css/main.css" rel="stylesheet">
+ <p>
+</p>
+<br><br>
+</html>
