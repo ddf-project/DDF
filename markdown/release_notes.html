@@ -1,0 +1,104 @@
+<html>
+<xmp theme="united" style="display:none">
+## DDF 1.0 release notes
+
+DDF provides most popular tasks in data engineering and machine learning. 
+
+1. Basic statistics: Summary, FiveNum, VectorCorrelation, VectorCovariance, VectorHistogram, xtabs, nrow, as.factor
+
+2. Basic operations: Subset, FetchRows, Sample, projection. 
+
+3. Machine learning: DDF can work with Mllib algorithms. We have provides APIs for DDF to work with LinearRegression, LogisticRegression, Collaborative Filtering and Kmeans out-of-the-box. DDf has wide range of metrics: R2, Residual, ROC and BinaryConfusionMatrix. DDF also provides Cross Validation and model persistence. 
+
+4. Aggregation: Binning, aggregation, Groupby.
+
+5. ETL: Mutability, dropNA, fillNA, Joins, transform Hive/R
+
+6. Collaborative: Users can share DDF across multiple languages using our lightweight DDF REST server. 
+
+
+## DDF APIs cheatsheet
+
+### DDF on other engines
+
+DDF is created with engine independent goal since day one. We believe keeping the APIs consistent and intuitive help boosting user productivity. 
+
+```java 
+ddfManager = DDFManager.get("spark"); 
+```
+In the next release you can use other engine, for example cassandra
+```java 
+ddfManager = DDFManager.get("cassandra"); 
+```
+Once you create DDFManager, you can create DDF and use DDF with the the same APIs accross all languages. 
+
+### Share DDF
+[Click here to see example] (http://ddf.io/shareddf.html)
+
+
+### Basic statistic
+| API        | Example | Meaning           | 
+| ------------- |:-------------:|------------- |
+| Summary     |ddf.**getSummary**() | Return the basic summary of ddf |
+| FiveNum     |  ddf.**getFiveNumSummary**() |Return five num summary of ddf |
+| VectorCorrelation     |  ddf.**getVectorCor**(xColumn, yColumn) |Return vector correlation between x column and y column |
+| VectorCovariance     | ddf.**getVectorCovariance**(xColumn, yColumn) | Return vector correlation between x column and y column | 
+| VectorHistogram     | ddf.**getVectorHistogram**(columnName, numBins) |Return vector histogramfor column columnName|
+| xtabs     | ddf.**xtabs**(gcols) | Return xtabs for gcols |
+| nrow     | ddf.**nrow**() | Return number of rows |
+| as.factor     | ddf.**getSchemaHandler()**.setAsFactor(columnIndex) | Set columnIndex as factor column |
+
+
+### Basic operations
+| API        | Example | Meaning           | 
+| ------------- |:-------------:|------------- |
+| Subset     |ddf.VIEWS.**subset**(columns, filter) | Return new ddf with subset column and filter condition |
+| FetchRows     |ddf.VIEWS.**head**(limit) | Return first limit rows |
+| Sample     |ddf.VIEWS.**getRandomSample**(percent, replace, seed) | Return a sample DDF |
+| Projection     |ddf.VIEWS.**project**(columnList) | Return a new DDF with specified columns |
+
+
+### Aggregation
+| API        | Example | Meaning           | 
+| ------------- |:-------------:|------------- |
+| Binning     | ddf.binning("distance", "EQUALINTERVAL", 3, null, true, true) | Run binning ddf on distance column|
+| Aggregation     | ddf.aggregate("year, mean(depdelay), ") | Get mean of depdelay by year on DDF|
+| Group by     | ddf.groupBy(Arrays.asList("origin") | Run groupBy on column origin|
+
+### ETL
+| API        | Example | Meaning           | 
+| ------------- |:-------------:|------------- |
+| DropNA     | ddf.**dropNA()** | Drop all rows that contains NA value|
+| FillNA     | ddf1.**fillNA**(value) | Replace all NA values with specified value|
+| Joins    | ddf.**join**(rightddf, joinType, byColumns, byLeftColumns, byRightColumns) | Join ddf with right ddf|
+| Transform scale standard  | ddf.Transform.**transformScaleStandard**() | Transform ddf to scale [0,1] |
+| Transform UDF  | ddf.Transform.**transformUDF**("dist= round(distance/2, 2)") | Transform ddf using HiveUDF |
+| Transform R    | ddf.Transform.**transformNativeRserve**("newcol = deptime / arrtime") | Create new column using R expression|
+
+
+### Machine learning
+| API        | Example | Meaning           | 
+| ------------- |:-------------:|------------- |
+| LinearRegression     | ddf.ML.train("**linearRegressionWithSGD**", mIter, mstepSize, mminiBatchFraction) | Run linear regression on DDF using Amplab's MLlib |
+| LogisticRegression     |ddf.ML.train("**logisticRegressionWithGD**", mIter, mstepSize, mminiBatchFraction) | Run logistic regression on DDF using Amplab's MLlib |
+| Kmeans     |ddf.ML.train("**kmeans**", K, numIterations)| Run kmeans on DDF using Amplab's MLlib  |
+| Collaborative Filtering|ddf.ML.train("**collaborativeFiltering**", numFeatures, numIterations) | Run collaborative filtering using Amplab's MLlib |
+| R2 score | ddf.getMLMetricsSupporter.**r2score**(yMean) | Run r2 score on prediction ddf |
+| Residual score | ddf.getMLMetricsSupporter.**residuals**() | Run residuals score on prediction ddf |
+| ROC score | ddf.getMLMetricsSupporter().**roc**(predictionDDF, alpha_length) | Run ROC score on prediction ddf |
+| Binary confusion matrix | ddf.getMLSupporter.**getConfusionMatrix**(model, threshold) | Run binary confusion matrix prediction ddf |
+| Cross Validation K fold | ddf.ML.**CVKFold**(numSplits, seed) | Run cross validation kfold on ddf |
+| Cross Validation random splits | ddf.ML.**CVRandom**(numSplits, seed) | Run cross validation random split on ddf |
+| Persist model | model.persist() | Persist machine learning model to disk |
+
+
+
+
+</xmp>
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+<link href="../assets/css/main.css" rel="stylesheet">
+ <p>
+</p>
+<br><br>
+</html>
