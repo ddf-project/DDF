@@ -17,10 +17,9 @@ DDF provides most popular tasks in data engineering and machine learning.
 6. Collaborative: Users can share DDF across multiple languages using our lightweight DDF REST server. 
 
 
-## DDF APIs cheatsheet
+## DDF operations 
 
 ### DDF on other engines
-
 DDF is created with engine independent goal since day one. We believe keeping the APIs consistent and intuitive help boosting user productivity. 
 
 ```java 
@@ -33,7 +32,13 @@ ddfManager = DDFManager.get("cassandra");
 Once you create DDFManager, you can create DDF and use DDF with the the same APIs accross all languages. 
 
 ### Share DDF
-[Click here to see example] (http://ddf.io/shareddf.html)
+Each DDF has its unique URI. User can also assign name for each DDF. Users can share the same DDF accross languages using DDF's name. 
+
+```java
+ddfManager.setDDFByName(dataContainerId, aliasName)
+```
+
+[You can see more detail here](http://ddf.io/shareddf.html)
 
 
 ### Basic statistic
