@@ -66,9 +66,9 @@ ddfManager.setDDFByName(dataContainerId, aliasName)
 ### Aggregation
 | API        | Example | Meaning           | 
 | ------------- |:-------------:|------------- |
-| Binning     | ddf.binning("distance", "EQUALINTERVAL", 3, null, true, true) | Run binning ddf on distance column|
-| Aggregation     | ddf.aggregate("year, mean(depdelay), ") | Get mean of depdelay by year on DDF|
-| Group by     | ddf.groupBy(Arrays.asList("origin") | Run groupBy on column origin|
+| Binning     | ddf.**binning**("distance", "EQUALINTERVAL", 3, null, true, true) | Run binning ddf on distance column|
+| Aggregation     | ddf.**aggregate**("year, mean(depdelay), ") | Get mean of depdelay by year on DDF|
+| Group by     | ddf.**groupBy**(Arrays.asList("origin") | Run groupBy on column origin|
 
 ### ETL
 | API        | Example | Meaning           | 
