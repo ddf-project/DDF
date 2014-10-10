@@ -5,13 +5,14 @@
 This tutorial provides a quick introduction to using DDF. We will introduce how to build DDF and run DDF example in Java, Scala, R and Python. See the introduction blog for more information about DDF.
 
 ## Prerequisites
-Java 7, maven 3.x, git. First clone DDF from github
+Java 7, maven 3.x, git. 
+First clone DDF from github
 
 ```
 git clone https://github.com/ddf-project/DDF
 ```
 
-## Compile and install DDF
+## Building DDF
 DDF is currently compatible with Spark 0.9. For first time installation, it is required to run bin/run-once to download dependencies and sbt.
 
 ``` sh
@@ -28,7 +29,7 @@ If you use sbt
 ```
 At this point, it should pass all unit tests.
 
-## Running the example in Java
+## Running a Java example
 Run this command in the DDF directory
 ```
  bin/run-example io.spark.ddf.examples.RowCount
@@ -69,7 +70,7 @@ ddf.setMutable(true);
 ddf.dropNA();
 ```
 
-## Basic Statistic
+## Basic Statistics
 DDF comes with a lot of R-like idioms, such as summary, fiveNum
 ``` java
 s = ddf.getSummary();
@@ -100,7 +101,7 @@ Predict on the kmeansModel:
 print(kmeansModel.predict(new double[] { 1232, 1341, 389, 100, 9 }));  
 ```
 
-## Use Spark Java API
+## Use Spark's Java API
 You can also play with Spark’s Java API from the ddf-shell
 ``` java
 sc = manager.getJavaSharkContext();
