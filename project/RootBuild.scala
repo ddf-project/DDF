@@ -15,23 +15,25 @@ object RootBuild extends Build {
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
-  lazy val hadoopVersion = env("HADOOP_VERSION") getOrElse
-    DEFAULT_HADOOP_VERSION
+//  lazy val hadoopVersion = env("HADOOP_VERSION") getOrElse
+//    DEFAULT_HADOOP_VERSION
+//
+//  lazy val MAIN_SHARK_VERSION = "0.9.2"
+//  var SHARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SHARK_VERSION+"-adatao"
+//  else MAIN_SHARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
+//
+//  lazy val MAIN_SPARK_VERSION = "0.9.2"
+//  var SPARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SPARK_VERSION+"-adatao"
+//  else MAIN_SPARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
 
-  lazy val MAIN_SHARK_VERSION = "0.9.2"
-  var SHARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SHARK_VERSION+"-adatao"
-  else MAIN_SHARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
-  
-  lazy val MAIN_SPARK_VERSION = "0.9.2"
-  var SPARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SPARK_VERSION+"-adatao"
-  else MAIN_SPARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
+  val SPARK_VERSION = "1.1.1-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
-  if(!YARN_ENABLED) {
-    SPARK_VERSION = SPARK_VERSION + "-mesos"
-    SHARK_VERSION = SHARK_VERSION + "-mesos"
-  }
+//  if(!YARN_ENABLED) {
+//    SPARK_VERSION = SPARK_VERSION + "-mesos"
+//    SHARK_VERSION = SHARK_VERSION + "-mesos"
+//  }
 
   // Target JVM version
   val SCALAC_JVM_VERSION = "jvm-1.6"
@@ -45,13 +47,13 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-  val rootVersion = if(YARN_ENABLED) {
-    "0.9"
-  } else {
-    "0.9-mesos"
-  }
+//  val rootVersion = if(YARN_ENABLED) {
+//    "0.9"
+//  } else {
+//    "0.9-mesos"
+//  }
 
-  //val rootVersion = "0.9"
+  val rootVersion = "1.0"
 
   val projectOrganization = rootOrganization + "." + projectName
 
@@ -142,12 +144,18 @@ object RootBuild extends Build {
     //"commons-dbcp" % "commons-dbcp" % "1.4",
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
-    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION excludeAll(excludeJets3t) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
+    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION excludeAll(excludeJets3t) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all")
+      exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
-    "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
-    "org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION,
+    "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
+    "org.apache.spark" % "spark-sql_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
+      exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
+    "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
+      exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
+    "org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
+      exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"edu.berkeley.cs.amplab" % "shark_2.9.3" % SHARK_VERSION excludeAll(excludeSpark)
-    "edu.berkeley.cs.shark" %% "shark" % SHARK_VERSION exclude("org.apache.avro", "avro-ipc") exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all"),
+    //"edu.berkeley.cs.shark" %% "shark" % SHARK_VERSION exclude("org.apache.avro", "avro-ipc") exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all"),
     "com.google.protobuf" % "protobuf-java" % "2.5.0"
   )
 
@@ -181,6 +189,7 @@ object RootBuild extends Build {
     resolvers ++= Seq(
       //"BetaDriven Repository" at "http://nexus.bedatadriven.com/content/groups/public/",
       "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository",
+      //"Local ivy Repository" at "file://"+Path.userHome.absolutePath+"/.ivy2/local",
       "Adatao Mvnrepos Snapshots" at "https://raw.github.com/adatao/mvnrepos/master/snapshots",
       "Adatao Mvnrepos Releases" at "https://raw.github.com/adatao/mvnrepos/master/releases",
       "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
@@ -201,13 +210,14 @@ object RootBuild extends Build {
       "com.google.guava" % "guava" % "14.0.1",
       "com.google.code.gson"% "gson" % "2.2.2",
       //"org.scalatest" % "scalatest_2.10" % "2.1.0" % "test",
-      "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
-      "org.scalacheck"   %% "scalacheck" % "1.10.0" % "test",
+      "org.scalatest" % "scalatest_2.10" % "2.1.5" % "test",
+      "org.scalacheck"   %% "scalacheck" % "1.11.3" % "test",
       "com.novocode" % "junit-interface" % "0.10" % "test",	
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
       "com.googlecode.matrix-toolkits-java" % "mtj" % "0.9.14",
       "commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
+
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
       "mysql" % "mysql-connector-java" % "5.1.25"
     ),
@@ -241,6 +251,7 @@ object RootBuild extends Build {
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-xc" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-jaxrs" % "1.8.8",
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.3.1",
     dependencyOverrides += "com.thoughtworks.paranamer" % "paranamer" % "2.4.1", //net.liftweb conflict with avro
     dependencyOverrides += "org.xerial.snappy" % "snappy-java" % "1.0.5", //spark-core conflicts with avro
     dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.1.4",
@@ -267,7 +278,13 @@ object RootBuild extends Build {
     dependencyOverrides += "com.sun.jersey" % "jersey-core" % "1.9",
     dependencyOverrides += "javax.xml.bind" % "jaxb-api" % "2.2.2",
     dependencyOverrides += "commons-collections" % "commons-collections" % "3.2.1",
+    dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
+    dependencyOverrides += "commons-net" % "commons-net" % "3.1",
     dependencyOverrides += "org.mockito" % "mockito-all" % "1.8.5",
+    dependencyOverrides += "org.apache.commons" % "commons-math3" % "3.1.1",
+    dependencyOverrides += "com.sun.jersey" % "jersey-json" % "1.9",
+    dependencyOverrides += "com.sun.jersey" % "jersey-server" % "1.9",
+    dependencyOverrides += "org.scalamacros" % "quasiquotes_2.10" % "2.0.0",
     pomExtra := (
       <!--
       **************************************************************************************************
@@ -484,7 +501,11 @@ object RootBuild extends Build {
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch core/" + targetDir + "/*timestamp") },
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.7.2",
-    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.2.0",
+//    libraryDependencies += "org.apache.hadoop" % "hadoop-core" % "1.0.4" exclude("commons-httpclient", "commons-httpclient")
+//      exclude("tomcat", "jasper-compiler") exclude("tomcat", "jasper-runtime") exclude("org.mortbay.jetty", "servlet-api-2.5")
+//      exclude("org.mortbay.jetty", "jetty"),
+    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.2.0" exclude("org.mortbay.jetty", "servlet-api")
+      exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
     libraryDependencies ++= scalaDependencies,
     testOptions in Test += Tests.Argument("-oI")

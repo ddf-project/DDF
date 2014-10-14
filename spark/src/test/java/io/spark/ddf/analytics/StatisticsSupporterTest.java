@@ -1,24 +1,21 @@
 package io.spark.ddf.analytics;
 
 
-import java.util.Map;
-
+import io.ddf.DDF;
+import io.ddf.DDFManager;
+import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
+import io.ddf.analytics.AStatisticsSupporter.HistogramBin;
+import io.ddf.exception.DDFException;
+import io.spark.ddf.SparkDDF;
+import io.spark.ddf.SparkDDFManager;
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import io.ddf.DDF;
-import io.ddf.DDFManager;
-import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
-import io.ddf.exception.DDFException;
-import io.spark.ddf.SparkDDF;
-import io.spark.ddf.SparkDDFManager;
 
 import java.util.List;
-
-import io.ddf.analytics.AStatisticsSupporter.HistogramBin;
+import java.util.Map;
 
 
 

@@ -1,9 +1,6 @@
 package io.spark.ddf.analytics
 
-import io.ddf.DDFManager
 import scala.collection.JavaConversions._
-import org.apache.spark.rdd.RDD
-import java.util.HashMap
 import io.spark.ddf.{ATestSuite, SparkDDF}
 
 /**
@@ -32,8 +29,9 @@ class MLlibIntegrationSuite extends ATestSuite {
 
     //for regression, need to add ONE for bias-term
     val initialWeight = for {
-      x ← 0 until (ddfTrain3.getNumColumns - 1)
+      x <- 0 until (ddfTrain3.getNumColumns - 1)
     } yield (math.random)
+
 
     val regressionModel = ddfTrain3.ML.train("linearRegressionWithSGD", 10: java.lang.Integer,
       0.1: java.lang.Double, 0.1: java.lang.Double, initialWeight.toArray)
@@ -41,7 +39,7 @@ class MLlibIntegrationSuite extends ATestSuite {
     val yPred = ddfPredict2.ML.applyModel(kmeansModel, false, true)
     val nrows = yTrueYpred.VIEWS.head(10)
     println("YTrue YPred")
-    for (x ← nrows) println(x)
+    for (x <- nrows) println(x)
 
     // numIterations = 10, stepSize = 0.1
     val logRegModel = ddfTrain4.ML.train("logisticRegressionWithSGD", 10: java.lang.Integer, 0.1: java.lang.Double)

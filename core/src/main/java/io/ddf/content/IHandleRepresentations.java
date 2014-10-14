@@ -1,9 +1,10 @@
 package io.ddf.content;
 
 
-import java.util.Map;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -28,13 +29,12 @@ import io.ddf.misc.IHandleDDFFunctionalGroup;
  * this DDF, but the underlying data is constantly being updated, such that each query against this DDF would result in
  * different data being returned/aggregated.
  * </p>
- * 
  */
 public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
 
   /**
    * Converts a representation type specification to a unique String key
-   * 
+   *
    * @param typeSpecs
    * @return
    */
@@ -46,27 +46,25 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
 
   /**
    * Retrieves a representation of the specified type specs.
-   * 
-   * @param typeSpecs
-   *          a variable-length array of specifications to identify the exact data representation type, e.g.,
-   *          RDD<List<Double>> would be (RDD.class, List.class, Double.class)
+   *
+   * @param typeSpecs a variable-length array of specifications to identify the exact data representation type, e.g.,
+   *                  RDD<List<Double>> would be (RDD.class, List.class, Double.class)
    * @return a pointer to the specified
    */
   Object get(Class<?>... typeSpecs) throws DDFException;
 
   /**
    * Retrieves a representation of the specified type specs.
-   * 
-   * @param typeSpecs
-   *          the String representation of the type specs, produced by
-   *          {@link IHandleRepresentations#getSpecsAsString(Class...)}
+   *
+   * @param typeSpecs the String representation of the type specs, produced by
+   *                  {@link IHandleRepresentations#getSpecsAsString(Class...)}
    * @return a pointer to the specified
    */
   Object get(String typeSpecs) throws DDFException;
 
   /**
    * Allows client to specify a list of acceptable type specs
-   * 
+   *
    * @param acceptableTypeSpecs
    * @return a representation matching one of the acceptable type specs
    */
@@ -74,7 +72,7 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
 
   /**
    * Allows client to specify a list of acceptable type specs
-   * 
+   *
    * @param acceptableTypeSpecs
    * @return a representation matching one of the acceptable type specs
    */
@@ -85,7 +83,6 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
    */
   public void addConvertFunction(Representation fromRepresentation, Representation toRepresentation,
       ConvertFunction convertFunction);
-
 
   interface IGetResult {
     String getTypeSpecsString();
@@ -103,32 +100,29 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
 
   /**
    * Clears all current representations and set it to the supplied one.
-   * 
+   *
    * @param data
-   * @param typeSpecs
-   *          a variable-length array of specifications to identify the exact data representation type, e.g.,
-   *          RDD<List<Double>> would be (RDD.class, List.class, Double.class). If not provided, the handler should do
-   *          its best to infer from the data object.
+   * @param typeSpecs a variable-length array of specifications to identify the exact data representation type, e.g.,
+   *                  RDD<List<Double>> would be (RDD.class, List.class, Double.class). If not provided, the handler should do
+   *                  its best to infer from the data object.
    */
   void set(Object data, Class<?>... typeSpecs);
 
   /**
    * Adds a representation to the set of existing representations.
-   * 
+   *
    * @param data
-   * @param typeSpecs
-   *          a variable-length array of specifications to identify the exact data representation type, e.g.,
-   *          RDD<List<Double>> would be (RDD.class, List.class, Double.class). If not provided, the handler should do
-   *          its best to infer from the data object.
+   * @param typeSpecs a variable-length array of specifications to identify the exact data representation type, e.g.,
+   *                  RDD<List<Double>> would be (RDD.class, List.class, Double.class). If not provided, the handler should do
+   *                  its best to infer from the data object.
    */
   void add(Object data, Class<?>... typeSpecs);
 
   /**
    * Removes a representation from the set of existing representations.
-   * 
-   * @param typeSpecs
-   *          a variable-length array of specifications to identify the exact data representation type, e.g.,
-   *          RDD<List<Double>> would be (RDD.class, List.class, Double.class)
+   *
+   * @param typeSpecs a variable-length array of specifications to identify the exact data representation type, e.g.,
+   *                  RDD<List<Double>> would be (RDD.class, List.class, Double.class)
    */
   void remove(Class<?>... typeSpecs);
 
@@ -144,7 +138,7 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
 
   /**
    * Returns the default representation for this engine
-   * 
+   *
    * @return
    */
   Object getDefault() throws DDFException;

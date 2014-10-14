@@ -1,10 +1,8 @@
 package io.ddf.ml;
 
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
@@ -13,8 +11,11 @@ import io.ddf.misc.Config;
 import io.ddf.ml.MLClassMethods.TrainMethod;
 import io.ddf.util.Utils.MethodInfo;
 import io.ddf.util.Utils.MethodInfo.ParamInfo;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  */
@@ -63,7 +64,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
 
   /**
    * Runs a training algorithm on the entire DDF dataset.
-   * 
+   *
    * @param trainMethodName
    * @param args
    * @return
@@ -85,7 +86,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
      * <code>
      * LogisticRegressionWithSGD.train(input: RDD[LabeledPoint], numIterations: Int, stepSize: Double, miniBatchFraction:
      * Double, initialWeights: Array[Double])
-     * 
+     *
      * SVM.train(input: RDD[LabeledPoint], numIterations: Int, stepSize: Double, regParam: Double, miniBatchFraction:
      * Double)
      * </code>
@@ -151,7 +152,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
   /**
    * Override this to return the appropriate DDF representation matching that specified in {@link ParamInfo}. The base
    * implementation simply returns the DDF.
-   * 
+   *
    * @param paramInfo
    * @return
    */
@@ -163,7 +164,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
 
   /**
    * Base implementation does nothing
-   * 
+   *
    * @return the original, unmodified DDF
    */
   @Override

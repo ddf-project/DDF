@@ -1,22 +1,23 @@
 package io.ddf.util;
 
 
-import java.util.Map;
 import io.ddf.util.ConfigHandler.Configuration;
 import io.ddf.util.ConfigHandler.Configuration.Section;
+
+import java.util.Map;
 
 public interface IHandleConfig {
 
   /**
    * Returns a file name, URI, or some other description of where the configuration info comes from.
-   * 
+   *
    * @return
    */
   public String getSource();
 
   /**
    * Loads/reloads the config file
-   * 
+   *
    * @param configDirectory
    * @return the loaded {@link Configuration} object
    * @throws Exception

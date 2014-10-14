@@ -1,42 +1,38 @@
 package io.spark.ddf.content
 
-import shark.api.Row
-import shark.memstore2.TablePartition
+//import shark.api.Row
+//import shark.memstore2.TablePartition
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.junit.Assert.assertEquals
 import scala.collection.JavaConversions._
-import io.ddf.exception.DDFException
 import io.spark.ddf.{ATestSuite, SparkDDF}
+import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.mllib.linalg.Vector
+import org.apache.spark.sql.SchemaRDD
+import org.rosuda.REngine.REXP
+import io.ddf.etl.IHandleMissingData.Axis
 
 /**
   */
 class RepresentationHandlerSuite extends ATestSuite {
   createTableAirline()
 
-  test("Can get RDD[Row] and RDD[TablePartition]") {
-    val ddf = manager.sql2ddf("select * from airline").asInstanceOf[SparkDDF]
-    val rddRow = ddf.getRDD(classOf[Row])
-    val rddTablePartition = ddf.getRDD(classOf[TablePartition])
-    assert(rddRow != null, "Can get RDD[Row]")
-    assert(rddTablePartition != null, "Can get RDD[TablePartition]")
-    assert(rddTablePartition.first().isInstanceOf[TablePartition])
-    assert(rddRow.first().isInstanceOf[Row])
-  }
+  test("Can get SchemaRDD and RDD[Vector]") {
+    val ddf = manager.sql2ddf("select month, year, dayofmonth from airline").asInstanceOf[SparkDDF]
+    val rddVector = ddf.getRDD(classOf[Vector])
+    assert(rddVector != null, "Can get RDD[Vector]")
+    assert(rddVector.count == 295)
 
-  test("Can get RDD[TablePartition] from RDD[Row]") {
-    val ddf = manager.sql2ddf("select * from airline").asInstanceOf[SparkDDF]
-    ddf.getRepresentationHandler.remove(classOf[RDD[_]], classOf[TablePartition])
-    assert(!ddf.getRepresentationHandler.has(classOf[RDD[_]], classOf[TablePartition]))
-
-    val numRows = ddf.sql2txt("select count(*) from @this", "Error")
-    LOG.info(">>>> numRows = " + numRows)
-    assert(numRows.get(0) == "301")
+    val schemaRDD = ddf.getRepresentationHandler.get(classOf[SchemaRDD])
+    assert(schemaRDD != null, "Can get SchemaRDD")
   }
 
   test("Can get RDD[Array[Double]] and RDD[Array[Object]]") {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline").asInstanceOf[SparkDDF]
     val rddArrObj = ddf.getRDD(classOf[Array[Object]])
+
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
 
     assert(rddArrDouble != null, "Can get RDD[Array[Double]]")
@@ -49,8 +45,8 @@ class RepresentationHandlerSuite extends ATestSuite {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline").asInstanceOf[SparkDDF]
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
     val repHandler = ddf.getRepresentationHandler
-    repHandler.remove(classOf[RDD[_]], classOf[Row])
-    repHandler.remove(classOf[RDD[_]], classOf[TablePartition])
+    //    repHandler.remove(classOf[RDD[_]], classOf[Row])
+    //    repHandler.remove(classOf[RDD[_]], classOf[TablePartition])
     val keys = ddf.getRepresentationHandler.getAllRepresentations.keySet()
     LOG.info(">>>> keys = " + keys.mkString(", "))
     ddf.VIEWS.head(10)
@@ -76,11 +72,9 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(rddArrObj != null)
     assert(rddArrLP != null)
 
-    assert(repHandler.has(classOf[RDD[_]], classOf[TablePartition]))
     assert(repHandler.has(classOf[RDD[_]], classOf[Array[Double]]))
     assert(repHandler.has(classOf[RDD[_]], classOf[Array[Object]]))
     assert(repHandler.has(classOf[RDD[_]], classOf[LabeledPoint]))
-    assert(repHandler.has(classOf[RDD[_]], classOf[Row]))
   }
 
   test("Can handle null value") {
@@ -92,7 +86,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     val ArrArrDouble = rddArrDouble.collect()
 
     ArrArrDouble.foreach {
-      row ⇒ assert(row(0) != 0.0, "row(0) == %s, expecting not 0.0".format(row(0)))
+      row => assert(row(0) != 0.0, "row(0) == %s, expecting not 0.0".format(row(0)))
     }
     val count = rddArrLP.count()
 
@@ -102,14 +96,9 @@ class RepresentationHandlerSuite extends ATestSuite {
 
   test("Can do sql queries after CrossValidation ") {
     val ddf = manager.sql2ddf("select * from airline").asInstanceOf[SparkDDF]
-    val tableName = ddf.getTableName
-    for (split ← ddf.ML.CVKFold(5, 10)) {
+    for (split <- ddf.ML.CVKFold(5, 10)) {
       val train = split(0).asInstanceOf[SparkDDF]
       val test = split(1).asInstanceOf[SparkDDF]
-
-      assert(!train.getRepresentationHandler.has(classOf[RDD[_]], classOf[TablePartition]))
-      assert(!test.getRepresentationHandler.has(classOf[RDD[_]], classOf[TablePartition]))
-
       val ddf1 = train.sql2ddf("select month, year, dayofmonth from @this")
       val ddf2 = test.sql2ddf("select * from @this")
 
@@ -122,7 +111,7 @@ class RepresentationHandlerSuite extends ATestSuite {
 
   test("Handle empty DDF") {
     val ddf = manager.newDDF();
-    val rdd = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[TablePartition])
+    val rdd = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row])
     assert(rdd == null)
   }
 
@@ -132,7 +121,8 @@ class RepresentationHandlerSuite extends ATestSuite {
     val newDDF = ddf.Transform.transformNativeRserve("z1 = mpg / cyl, " +
       "z2 = disp * 0.4251437075, " +
       "z3 = rpois(nrow(df.partition), 1000)")
-
+    val rddREXP = newDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
+    assert(newDDF != null)
     val st = newDDF.VIEWS.head(32)
     val ddf1 = newDDF.sql2ddf("select * from @this")
 

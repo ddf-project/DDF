@@ -1,4 +1,5 @@
 package io.ddf.misc;
 
 
-public interface IHandleMiscellany extends IHandleDDFFunctionalGroup {}
+public interface IHandleMiscellany extends IHandleDDFFunctionalGroup {
+}

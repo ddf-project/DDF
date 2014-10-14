@@ -4,7 +4,6 @@ package io.ddf.ml;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
-import io.ddf.misc.ALoggable;
 
 public class AMLMetricsSupporter extends ADDFFunctionalGroupHandler implements ISupportMLMetrics {
 
@@ -13,7 +12,8 @@ public class AMLMetricsSupporter extends ADDFFunctionalGroupHandler implements I
   }
 
   @Override
-  public double r2score(double meanYTrue) throws DDFException {
+  public double r2score(double meanYTrue)
+      throws DDFException {
     // TODO Auto-generated method stub
     return 0;
   }
@@ -25,7 +25,8 @@ public class AMLMetricsSupporter extends ADDFFunctionalGroupHandler implements I
   }
 
   @Override
-  public RocMetric roc(DDF predictionDDF, int alpha_length) throws DDFException {
+  public RocMetric roc(DDF predictionDDF, int alpha_length)
+      throws DDFException {
     // TODO Auto-generated method stub
     return null;
   }

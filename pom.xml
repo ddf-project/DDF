@@ -11,7 +11,7 @@
 	<artifactId>ddf</artifactId>
 	<packaging>pom</packaging>
 	<description>Adatao Distributed DataFrame</description>
-	<version>0.9</version>
+	<version>1.0</version>
 	<name>ddf</name>
 	<organization>
 		<name>com.adatao</name>

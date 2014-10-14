@@ -30,53 +30,55 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
 
     // 1. map!
-    val rMapped = dfrdd.map { partdf ⇒
-      try {
-        TransformationHandler.preShuffleMapper(partdf, mapFuncDef, reduceFuncDef, mapsideCombine)
-      }
-      catch {
-        case e: Exception ⇒ {
+    val rMapped = dfrdd.map {
+      partdf ⇒
+        try {
+          TransformationHandler.preShuffleMapper(partdf, mapFuncDef, reduceFuncDef, mapsideCombine)
+        } catch {
+          case e: Exception ⇒ {
 
-          e match {
-            case aExc: DDFException ⇒ throw aExc
-            case rserveExc: org.rosuda.REngine.Rserve.RserveException ⇒ {
-              throw new DDFException(rserveExc.getMessage, null)
+            e match {
+              case aExc: DDFException ⇒ throw aExc
+              case rserveExc: org.rosuda.REngine.Rserve.RserveException ⇒ {
+                throw new DDFException(rserveExc.getMessage, null)
+              }
+              case _ ⇒ throw new DDFException(e.getMessage, null)
             }
-            case _ ⇒ throw new DDFException(e.getMessage, null)
           }
         }
-      }
     }
 
     // 2. extract map key and shuffle!
     val groupped = TransformationHandler.doShuffle(rMapped)
 
     // 3. reduce!
-    val rReduced = groupped.mapPartitions { partdf ⇒
-      try {
-        TransformationHandler.postShufflePartitionMapper(partdf, reduceFuncDef)
-      }
-      catch {
-        case e: Exception ⇒ {
-          e match {
-            case aExc: DDFException ⇒ throw aExc
-            case rserveExc: org.rosuda.REngine.Rserve.RserveException ⇒ {
-              throw new DDFException(rserveExc.getMessage, null)
+    val rReduced = groupped.mapPartitions {
+      partdf ⇒
+        try {
+          TransformationHandler.postShufflePartitionMapper(partdf, reduceFuncDef)
+        } catch {
+          case e: Exception ⇒ {
+            e match {
+              case aExc: DDFException ⇒ throw aExc
+              case rserveExc: org.rosuda.REngine.Rserve.RserveException ⇒ {
+                throw new DDFException(rserveExc.getMessage, null)
 
+              }
+              case _ ⇒ throw new DDFException(e.getMessage, null)
             }
-            case _ ⇒ throw new DDFException(e.getMessage, null)
           }
         }
-      }
-    }.filter { partdf ⇒
-      // mapPartitions after groupByKey may cause some empty partitions,
-      // which will result in empty data.frame
-      val dflist = partdf.asList()
-      dflist.size() > 0 && dflist.at(0).length() > 0
+    }.filter {
+      partdf ⇒
+        // mapPartitions after groupByKey may cause some empty partitions,
+        // which will result in empty data.frame
+        val dflist = partdf.asList()
+        dflist.size() > 0 && dflist.at(0).length() > 0
     }
 
     // convert R-processed DF partitions back to BigR DataFrame
     val columnArr = TransformationHandler.RDataFrameToColumnList(rReduced)
+
 
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList);
 
@@ -92,37 +94,37 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
 
     // process each DF partition in R
-    val rMapped = dfrdd.map { partdf ⇒
-      try {
-        // one connection for each compute job
-        val rconn = new RConnection()
+    val rMapped = dfrdd.map {
+      partdf ⇒
+        try {
+          // one connection for each compute job
+          val rconn = new RConnection()
 
-        // send the df.partition to R process environment
-        val dfvarname = "df.partition"
-        rconn.assign(dfvarname, partdf)
+          // send the df.partition to R process environment
+          val dfvarname = "df.partition"
+          rconn.assign(dfvarname, partdf)
 
-        val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpression)
+          val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpression)
 
-        //        mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
+          //        mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
 
-        // compute!
-        TransformationHandler.tryEval(rconn, expr, errMsgHeader = "failed to eval transform expression")
+          // compute!
+          TransformationHandler.tryEval(rconn, expr, errMsgHeader = "failed to eval transform expression")
 
-        // transfer data to JVM
-        val partdfres = rconn.eval(dfvarname)
+          // transfer data to JVM
+          val partdfres = rconn.eval(dfvarname)
 
-        // uncomment this to print whole content of the df.partition for debug
-        // rconn.voidEval(String.format("print(%s)", dfvarname))
-        rconn.close()
+          // uncomment this to print whole content of the df.partition for debug
+          // rconn.voidEval(String.format("print(%s)", dfvarname))
+          rconn.close()
 
-        partdfres
-      }
-      catch {
-        case e: DDFException ⇒ {
-          throw new DDFException("Unable to perform NativeRserve transformation", e)
+          partdfres
+        } catch {
+          case e: DDFException ⇒ {
+            throw new DDFException("Unable to perform NativeRserve transformation", e)
 
+          }
         }
-      }
     }
 
     // convert R-processed data partitions back to RDD[Array[Object]]
@@ -165,13 +167,13 @@ object TransformationHandler {
     val names = firstdf.getAttribute("names").asStrings()
     val columns = new Array[Column](firstdf.length)
     for (j ← 0 until firstdf.length()) {
-      val bigrType = firstdf.asList().at(j) match {
-        case v: REXPDouble ⇒ "double"
-        case v: REXPInteger ⇒ "int"
-        case v: REXPString ⇒ "string"
+      val ddfType = firstdf.asList().at(j) match {
+        case v: REXPDouble ⇒ "DOUBLE"
+        case v: REXPInteger ⇒ "INT"
+        case v: REXPString ⇒ "STRING"
         case _ ⇒ throw new DDFException("Only support atomic vectors of type int|double|string!")
       }
-      columns(j) = new Column(names(j), bigrType)
+      columns(j) = new Column(names(j), ddfType)
     }
     columns
   }
@@ -305,15 +307,18 @@ object TransformationHandler {
    * we both have each partition as a list of list(key=..., val=...)
    */
   //  def doShuffle(rMapped: RDD[REXP]): RDD[(String, Iterable[REXP])] = {
-  def doShuffle(rMapped: RDD[REXP]): RDD[(String, Seq[REXP])] = {
-    val groupped = rMapped.flatMap { rexp ⇒
-      rexp.asList().iterator.map { kv ⇒
-        val kvl = kv.asInstanceOf[REXP].asList()
-        val (k, v) = (kvl.at("key").asString(), kvl.at("val"))
-        (k, v)
-      }
-    }.groupByKey()
+  def doShuffle(rMapped: RDD[REXP]): RDD[(String, Iterable[REXP])] = {
+    val groupped = rMapped.flatMap {
+      rexp ⇒
+        rexp.asList().iterator.map {
+          kv ⇒
+            val kvl = kv.asInstanceOf[REXP].asList
 
+            val (k, v) = (kvl.at("key").asString(), kvl.at("val"))
+            (k, v)
+        }
+    }.groupByKey()
+    //TODO
     groupped
   }
 
@@ -321,7 +326,7 @@ object TransformationHandler {
    * serialize data to R, perform reduce,
    * then assemble each resulting partition as a data.frame of REXP in Java
    */
-  def postShufflePartitionMapper(input: Iterator[(String, Seq[REXP])], reduceFuncDef: String): Iterator[REXP] = {
+  def postShufflePartitionMapper(input: Iterator[(String, Iterable[REXP])], reduceFuncDef: String): Iterator[REXP] = {
     val rconn = new RConnection()
 
     // pre-amble

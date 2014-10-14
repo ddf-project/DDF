@@ -18,7 +18,6 @@ import io.ddf.DDFManager
 abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
   val LOG: Logger = LoggerFactory.getLogger(this.getClass())
   val manager = DDFManager.get("spark").asInstanceOf[SparkDDFManager]
-  val sharkctx = manager.getSharkContext
 
   def truncate(x: Double, n: Int) = {
     def p10(n: Int, pow: Long = 10): Long = if (n == 0) pow else p10(n - 1, pow * 10)
@@ -33,27 +32,27 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
   }
 
   def createTableMtcars() {
-    sharkctx.sql("set shark.test.data.path=../resources")
-    sharkctx.sql("drop table if exists mtcars")
-    sharkctx.sql("CREATE TABLE mtcars ("
+    manager.sql2txt("set shark.test.data.path=../resources")
+    manager.sql2txt("drop table if exists mtcars")
+    manager.sql2txt("CREATE TABLE mtcars ("
       + "mpg double,cyl int, disp double, hp int, drat double, wt double, qsec double, vs int, am int, gear int, carb int"
       + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '")
-    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/mtcars' INTO TABLE mtcars")
+    manager.sql2txt("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/mtcars' INTO TABLE mtcars")
   }
 
   def createTableAdmission() = {
-    sharkctx.sql("set shark.test.data.path=../resources")
-    sharkctx.sql("drop table if exists admission")
-    sharkctx.sql("create table admission (v1 int, v2 int, v3 double, v4 int)" +
+    manager.sql2txt("set shark.test.data.path=../resources")
+    manager.sql2txt("drop table if exists admission")
+    manager.sql2txt("create table admission (v1 int, v2 int, v3 double, v4 int)" +
       " row format delimited fields terminated by ' '")
-    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/admission.csv' " +
+    manager.sql2txt("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/admission.csv' " +
       "INTO TABLE admission")
   }
 
   def createTableAirlineSmall() {
-    sharkctx.sql("set shark.test.data.path=../resources")
-    sharkctx.sql("drop table if exists airline")
-    sharkctx.sql("create table airline (Year int,Month int,DayofMonth int," +
+    manager.sql2txt("set shark.test.data.path=../resources")
+    manager.sql2txt("drop table if exists airline")
+    manager.sql2txt("create table airline (Year int,Month int,DayofMonth int," +
       "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
       "CRSArrTime int,UniqueCarrier string, FlightNum int, " +
       "TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
@@ -62,14 +61,14 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
       "CancellationCode string, Diverted string, CarrierDelay int, " +
       "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
     )
-    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airline.csv' " +
+    manager.sql2txt("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airline.csv' " +
       "INTO TABLE airline")
   }
 
   def createTableAirline() {
-    sharkctx.sql("set shark.test.data.path=../resources")
-    sharkctx.sql("drop table if exists airline")
-    sharkctx.sql("create table airline (Year int,Month int,DayofMonth int," +
+    manager.sql2txt("set shark.test.data.path=../resources")
+    manager.sql2txt("drop table if exists airline")
+    manager.sql2txt("create table airline (Year int,Month int,DayofMonth int," +
       "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
       "CRSArrTime int,UniqueCarrier string, FlightNum int, " +
       "TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
@@ -78,14 +77,14 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
       "CancellationCode string, Diverted string, CarrierDelay int, " +
       "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
     )
-    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineBig.csv' " +
+    manager.sql2txt("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineBig.csv' " +
       "INTO TABLE airline")
   }
 
   def createTableAirlineWithNA() {
-    sharkctx.sql("set shark.test.data.path=../resources")
-    sharkctx.sql("drop table if exists airlineWithNA")
-    sharkctx.sql("create table airlineWithNA (Year int,Month int,DayofMonth int," +
+    manager.sql2txt("set shark.test.data.path=../resources")
+    manager.sql2txt("drop table if exists airlineWithNA")
+    manager.sql2txt("create table airlineWithNA (Year int,Month int,DayofMonth int," +
       "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
       "CRSArrTime int,UniqueCarrier string, FlightNum int, " +
       "TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
@@ -94,7 +93,7 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
       "CancellationCode string, Diverted string, CarrierDelay int, " +
       "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
     )
-    sharkctx.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineWithNA.csv' " +
+    manager.sql2txt("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineWithNA.csv' " +
       "INTO TABLE airlineWithNA")
   }
 }

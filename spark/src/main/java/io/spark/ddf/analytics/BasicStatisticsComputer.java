@@ -1,17 +1,17 @@
 package io.spark.ddf.analytics;
 
 
+import io.ddf.DDF;
+import io.ddf.analytics.AStatisticsSupporter;
+import io.ddf.analytics.Summary;
 import io.ddf.exception.DDFException;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.ddf.DDF;
-import io.ddf.analytics.AStatisticsSupporter;
-import io.ddf.analytics.Summary;
-import org.apache.commons.lang.math.NumberUtils;
 
 /**
  * Compute the basic statistics for each column in a RDD-based DDF
@@ -32,14 +32,12 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
     return stats;
   }
 
-
   /**
    * Mapper function to accumulate summary data from each row
    */
   @SuppressWarnings("serial")
-  public static class GetSummaryMapper extends Function<Object[], Summary[]> {
+  public static class GetSummaryMapper implements Function<Object[], Summary[]> {
     private final Logger mLog = LoggerFactory.getLogger(this.getClass());
-
 
     @Override
     public Summary[] call(Object[] p) {
@@ -85,7 +83,7 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
 
 
   @SuppressWarnings("serial")
-  public static class GetSummaryReducer extends Function2<Summary[], Summary[], Summary[]> {
+  public static class GetSummaryReducer implements Function2<Summary[], Summary[], Summary[]> {
     @Override
     public Summary[] call(Summary[] a, Summary[] b) {
       int dim = a.length;

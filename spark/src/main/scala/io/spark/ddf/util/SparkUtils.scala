@@ -1,9 +1,9 @@
 package io.spark.ddf.util
 
-import java.util.{Map ⇒ JMap}
+import java.util.{Map => JMap}
 import scala.collection.JavaConverters._
-import shark.{KryoRegistrator, SharkContext}
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, SparkContext}
+
 
 /**
   */
@@ -20,14 +20,18 @@ object SparkUtils {
    */
   def createSparkConf(master: String, jobName: String, sparkHome: String, jars: Array[String],
                       environment: JMap[String, String]): SparkConf = {
-    val conf = SharkContext.createSparkConf(master, jobName, sparkHome, jars, environment.asScala)
-
+    //val conf = SharkContext.createSparkConf(master, jobName, sparkHome, jars, environment.asScala)
+    val conf = new SparkConf()
+      .setMaster(master)
+      .setAppName(jobName)
+      .setJars(jars)
+      .setExecutorEnv(environment.asScala.toSeq)
     conf.set("spark.kryo.registrator", System.getProperty("spark.kryo.registrator", "io.spark.content.KryoRegistrator"))
   }
 
-  def createSharkContext(master: String, jobName: String, sparkHome: String, jars: Array[String],
-                         environment: JMap[String, String]): SharkContext = {
+  def createSparkContext(master: String, jobName: String, sparkHome: String, jars: Array[String],
+                         environment: JMap[String, String]): SparkContext = {
     val conf = createSparkConf(master, jobName, sparkHome, jars, environment)
-    new SharkContext(conf)
+    new SparkContext(conf)
   }
 }

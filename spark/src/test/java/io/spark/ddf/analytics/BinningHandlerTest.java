@@ -1,19 +1,19 @@
 package io.spark.ddf.analytics;
 
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
+import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
-import com.google.common.base.Strings;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class BinningHandlerTest {
 
@@ -41,23 +41,33 @@ public class BinningHandlerTest {
         .sql2ddf(
             "select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
 
-    DDF newddf = ddf.binning("dayofweek", "EQUALINTERVAL", 2, null, true, true);
+    DDF newddf = ddf.binning("dayofweek", "EQUALINTERVAL", 2, null, true,
+        true);
 
-    Assert.assertEquals(ColumnClass.FACTOR, newddf.getSchemaHandler().getColumn("dayofweek").getColumnClass());
+    Assert.assertEquals(ColumnClass.FACTOR, newddf.getSchemaHandler()
+        .getColumn("dayofweek").getColumnClass());
 
-    Assert.assertEquals(2, newddf.getSchemaHandler().getColumn("dayofweek").getOptionalFactor().getLevelMap().size());
+    Assert.assertEquals(2, newddf.getSchemaHandler().getColumn("dayofweek")
+        .getOptionalFactor().getLevelMap().size());
 
 
-    DDF ddf1 = ddf.binning("month", "custom", 0, new double[] { 2, 4, 6, 8 }, true, true);
-    Assert.assertTrue(ddf1.getSchemaHandler().getColumn("month").getColumnClass() == ColumnClass.FACTOR);
+    DDF ddf1 = ddf.binning("month", "custom", 0,
+        new double[] { 2, 4, 6, 8 }, true, true);
+    Assert.assertTrue(ddf1.getSchemaHandler().getColumn("month")
+        .getColumnClass() == ColumnClass.FACTOR);
     // {'[2,4]'=1, '(4,6]'=2, '(6,8]'=3}
-    Assert.assertTrue(ddf1.getSchemaHandler().getColumn("month").getOptionalFactor().getLevelMap().get("[2,4]") == 1);
+    Assert.assertTrue(ddf1.getSchemaHandler().getColumn("month")
+        .getOptionalFactor().getLevelMap().get("[2,4]") == 1);
 
-    Assert.assertFalse(Strings.isNullOrEmpty(newddf.sql2txt("select dayofweek from @this", "").get(0)));
-    Assert.assertFalse(Strings.isNullOrEmpty(ddf1.sql2txt("select month from @this", "").get(0)));
+    Assert.assertFalse(Strings.isNullOrEmpty(newddf
+        .sql2txt("select dayofweek from @this", "").get(0)));
+    Assert.assertFalse(Strings.isNullOrEmpty(ddf1.sql2txt(
+        "select month from @this", "")
+        .get(0)));
 
     Column col = ddf1.getSchemaHandler().getColumn("month");
-    MetaInfo mi = new MetaInfo(col.getName(), col.getType().toString().toLowerCase());
+    MetaInfo mi = new MetaInfo(col.getName(), col.getType().toString()
+        .toLowerCase());
     mi = mi.setFactor(col.getOptionalFactor().getLevelMap());
     Assert.assertTrue(mi.hasFactor());
 
@@ -69,34 +79,35 @@ public class BinningHandlerTest {
       }
     }
 
-    // test mutable binning
+    //test mutable binning
     ddf.setMutable(true);
     ddf.binning("distance", "EQUALINTERVAL", 3, null, true, true);
-    Assert.assertEquals(ColumnClass.FACTOR, ddf.getSchemaHandler().getColumn("distance").getColumnClass());
+    Assert.assertEquals(ColumnClass.FACTOR, ddf.getSchemaHandler()
+        .getColumn("distance").getColumnClass());
 
-    Assert.assertEquals(3, ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().size());
+    Assert.assertEquals(3, ddf.getSchemaHandler().getColumn("distance")
+        .getOptionalFactor().getLevelMap().size());
     Assert.assertEquals("[162,869]", ddf.VIEWS.head(3).get(0).split("\t")[6]);
-    System.out.println(">>>>>NEW 1st ROW"
-        + ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().keySet()
-        .toString());// [162,869],
-    // (869,1576],
-    // (1576,2283]
+    System.out.println(">>>>>NEW 1st ROW" + ddf.getSchemaHandler().getColumn("distance")
+        .getOptionalFactor().getLevelMap().keySet().toString());//[162,869], (869,1576], (1576,2283]
 
     manager.shutdown();
   }
 
-  public static MetaInfo[] generateMetaInfo(Schema schema) throws DDFException {
+  public static MetaInfo[] generateMetaInfo(Schema schema)
+      throws DDFException {
     List<Column> columns = schema.getColumns();
     MetaInfo[] metaInfo = new MetaInfo[columns.size()];
     for (int i = 0; i < columns.size(); i++) {
-      metaInfo[i] = new MetaInfo(columns.get(i).getName(), columns.get(i).getType().toString().toLowerCase());
+      metaInfo[i] = new MetaInfo(columns.get(i).getName(), columns.get(i)
+          .getType().toString().toLowerCase());
       if (columns.get(i).getColumnClass() == ColumnClass.FACTOR) {
-        metaInfo[i] = metaInfo[i].setFactor(columns.get(i).getOptionalFactor().getLevelMap());
+        metaInfo[i] = metaInfo[i].setFactor(columns.get(i)
+            .getOptionalFactor().getLevelMap());
       }
     }
     return metaInfo;
   }
-
 
   public static class MetaInfo implements Serializable {
 
@@ -107,7 +118,6 @@ public class BinningHandlerTest {
     // does this belongs to metainfo? should belong to DataContainer
     // this is really a cached result of some computation
     Map<String, Integer> factor;
-
 
     public MetaInfo(String header, String type) {
       this.header = header;
@@ -148,7 +158,8 @@ public class BinningHandlerTest {
 
     @Override
     public String toString() {
-      return "MetaInfo [header=" + header + ", type=" + type + ", columnNo=" + columnNo + ", hasFactor=" + hasFactor()
+      return "MetaInfo [header=" + header + ", type=" + type
+          + ", columnNo=" + columnNo + ", hasFactor=" + hasFactor()
           + "]";
     }
 

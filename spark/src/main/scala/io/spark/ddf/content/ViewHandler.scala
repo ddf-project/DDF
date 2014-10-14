@@ -8,8 +8,7 @@ import io.ddf.content.IHandleViews
 import scala.collection.JavaConverters._
 import io.ddf.content.Schema
 import io.spark.ddf.SparkDDF
-import org.apache.spark.rdd.RDD
-import shark.api.Row
+import org.apache.spark.sql.catalyst.expressions.Row
 
 /**
  * RDD-based ViewHandler
@@ -31,19 +30,19 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
    *
    * @param columns
    * @param format
-	 * A scala.Enumeration that will be converted to an integer by calling
+   * A scala.Enumeration that will be converted to an integer by calling
    * formatEnum.toString()
    * @return
    */
   def get(columns: Array[Int], format: ViewFormat): DDF = {
     format match {
-      case ViewFormat.DEFAULT ⇒ ViewHandler.getDefault(columns, mDDF)
-      case ViewFormat.ARRAY_OBJECT ⇒ ViewHandler.getArrayObject(columns, mDDF)
-      case ViewFormat.ARRAY_DOUBLE ⇒ ViewHandler.getArrayDouble(columns, mDDF)
-      case ViewFormat.TABLE_PARTITION ⇒ ViewHandler.getTablePartition(columns, mDDF)
-      case ViewFormat.LABELED_POINT ⇒ ViewHandler.getLabeledPoint(columns, mDDF)
-      case ViewFormat.LABELED_POINTS ⇒ ViewHandler.getLabeledPoints(columns, mDDF)
-      case _ ⇒ {}
+      case ViewFormat.DEFAULT => ViewHandler.getDefault(columns, mDDF)
+      case ViewFormat.ARRAY_OBJECT => ViewHandler.getArrayObject(columns, mDDF)
+      case ViewFormat.ARRAY_DOUBLE => ViewHandler.getArrayDouble(columns, mDDF)
+      case ViewFormat.TABLE_PARTITION => ViewHandler.getTablePartition(columns, mDDF)
+      case ViewFormat.LABELED_POINT => ViewHandler.getLabeledPoint(columns, mDDF)
+      case ViewFormat.LABELED_POINTS => ViewHandler.getLabeledPoints(columns, mDDF)
+      case _ => {}
     }
     null
   }
@@ -58,8 +57,7 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
 
     if (numSamples > MAX_SAMPLE_SIZE) {
       throw new IllegalArgumentException("Number of samples is currently limited to %d".format(MAX_SAMPLE_SIZE))
-    }
-    else {
+    } else {
       val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
       val sampleData = rdd.takeSample(withReplacement, numSamples, seed).toList.asJava
       sampleData

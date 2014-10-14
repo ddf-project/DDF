@@ -1,0 +1,22 @@
+package io.spark.ddf.content
+
+import io.ddf.content.{Representation, ConvertFunction}
+import io.ddf.DDF
+import org.apache.spark.sql.SchemaRDD
+import io.ddf.content.Schema.Column
+
+/**
+  */
+class SchemaRDD2ArrayDouble(@transient ddf: DDF) extends ConvertFunction(ddf) with RowToArray {
+
+  override def apply(representation: Representation): Representation = {
+    val columns = ddf.getSchemaHandler.getColumns
+    representation.getValue match {
+      case rdd: SchemaRDD =>
+        val rddArrDouble = rdd.map {
+          row => rowToArrayDouble(row, columns.toArray(new Array[Column](columns.size())))
+        }.filter(row => row != null)
+        new Representation(rddArrDouble, RepresentationHandler.RDD_ARR_DOUBLE.getTypeSpecsString)
+    }
+  }
+}

@@ -1,13 +1,14 @@
 package io.ddf.util;
 
 
-import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
 import io.ddf.DDFManager;
 import io.ddf.misc.Config;
 import io.ddf.util.ConfigHandler.Configuration;
 import io.ddf.util.ConfigHandler.Configuration.Section;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Map;
 
 public class ConfigHandlerTests {
 

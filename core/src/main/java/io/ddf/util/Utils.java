@@ -1,16 +1,21 @@
 package io.ddf.util;
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-//import java.io.*;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.gson.*;
+import io.ddf.content.ISerializable;
+import io.ddf.exception.DDFException;
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -22,32 +27,16 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import io.ddf.content.ISerializable;
-import io.ddf.exception.DDFException;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+
+//import java.io.*;
 
 /**
- * 
+ *
  */
 
 public class Utils {
 
   public static Logger sLog = LoggerFactory.getLogger(Utils.class);
-
 
   public static List<String> listFiles(String directory) {
     return listDirectory(directory, true, false);
@@ -85,7 +74,7 @@ public class Utils {
   /**
    * Locates the given dirName as a full path, in the current directory or in successively higher parent directory
    * above.
-   * 
+   *
    * @param dirName
    * @return
    * @throws IOException
@@ -115,7 +104,7 @@ public class Utils {
 
   /**
    * Same as locateDirectory(dirName), but also creates it if it doesn't exist.
-   * 
+   *
    * @param dirName
    * @return
    * @throws IOException
@@ -133,7 +122,6 @@ public class Utils {
   }
 
   /**
-   * 
    * @param path
    * @return true if "path" exists and is a file (and not a directory)
    */
@@ -150,7 +138,6 @@ public class Utils {
   }
 
   /**
-   * 
    * @param path
    * @return true if "path" exists and is a directory (and not a file)
    */
@@ -222,9 +209,8 @@ public class Utils {
   }
 
   /**
-   * 
-   * @param str
-   *          e.g., "a, b, c" Add a comment to this line
+   * @param str e.g., "a, b, c"
+   *            Add a comment to this line
    * @return {"a","b","c"}
    */
   public static List<String> parseStringList(String str) {
@@ -237,7 +223,6 @@ public class Utils {
 
     return res;
   }
-
 
   public static class JsonSerDes {
 
@@ -436,7 +421,7 @@ public class Utils {
 
     /**
      * Allow subclasses to override this to do their own method matching logic
-     * 
+     *
      * @param theClass
      * @param methodName
      * @param argTypes
@@ -476,7 +461,7 @@ public class Utils {
 
   /**
    * Returns the first element, if any, of an object that may be an {@link Iterable}
-   * 
+   *
    * @param maybeIterable
    * @return
    */

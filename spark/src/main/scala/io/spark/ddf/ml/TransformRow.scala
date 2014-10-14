@@ -1,13 +1,11 @@
 package io.spark.ddf.ml
 
-import java.util.HashMap
+import java.util.{HashMap => JMap}
 import org.jblas.DoubleMatrix
 import io.ddf.types.Matrix
 import io.ddf.types.Vector
-import java.util.Arrays
-import io.ddf.content.AMetaDataHandler.ICustomMetaData
 
-class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMap[String, java.lang.Double]]) extends Serializable {
+class TransformRow(xCols: Array[Int], mapping: JMap[java.lang.Integer, JMap[String, java.lang.Double]]) extends Serializable {
 
   var numNewColumns: Int = 0
   var iterator2 = mapping.keySet().iterator()
@@ -24,20 +22,18 @@ class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMa
   }
 
   /*
-   * input column value "String"
-   * output: the mapping, double value
-   */
+	 * input column value "String"
+	 * output: the mapping, double value
+	 */
   def transform(columnIndex: Int, columnValue: String): Double = {
     if (mapping.containsKey(columnIndex)) {
       var v = mapping.get(columnIndex)
       if (v.containsKey(columnValue)) {
         v.get(columnValue)
-      }
-      else {
+      } else {
         -1.0
       }
-    }
-    else {
+    } else {
       -1.0
     }
   }
@@ -50,7 +46,7 @@ class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMa
   def transform(row: Matrix): DoubleMatrix = {
     var oldNumColumns = row.data.length
 
-    //new columns = bias term + old columns + new dummy columns
+    //new columns = bias term + old columns + new dummy columns 
     var newRow = new Vector(xCols.length + 1 + numNewColumns)
 
     //bias term
@@ -77,8 +73,7 @@ class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMa
       if (!mapping.containsKey(originalColumnIndex)) {
         newRow.put(newColumnIndex, originalColumnValue) // x-feature #i
         newColumnIndex += 1
-      }
-      else {
+      } else {
         //bitmap vector
         bitmap = getNewRowFromCategoricalRow(originalColumnValue, originalColumnIndex)
 
@@ -98,12 +93,12 @@ class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMa
   }
 
   /*
-   * from double column value to dummy vector
-   * 		input: column value in double
-   * 		input: dummy column length, #number of dummy column
-   *
-   * return bitmap vector with i th index wi ll be 1 if column value = i
-   */
+	 * from double column value to dummy vector
+	 * 		input: column value in double
+	 * 		input: dummy column length, #number of dummy column
+	 *   
+	 * return bitmap vector with i th index wi ll be 1 if column value = i 
+	 */
   def getNewRowFromCategoricalRow(columnValue: Double, originalColumnIndex: Int): Vector = {
     //k-1 level
     var dummyCodingLength = mapping.get(originalColumnIndex).size - 1
@@ -114,12 +109,10 @@ class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMa
       if (colVal != 0) {
         if (j == colVal - 1) {
           ret.put(j, 1.0)
-        }
-        else {
+        } else {
           ret.put(j, 0.0)
         }
-      }
-      else {
+      } else {
         ret.put(j, 0.0)
       }
       j += 1
@@ -127,7 +120,7 @@ class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMa
     ret
   }
 
-  def instrument[InputType](oldX: Matrix, dummyColumnMapping: HashMap[Integer, HashMap[String, java.lang.Double]], xCols: Array[Int]): Matrix = {
+  def instrument[InputType](oldX: Matrix, xCols: Array[Int]): Matrix = {
 
     //so we need to do minus one for original column
 
@@ -145,8 +138,6 @@ class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMa
     var newColumnMap = new Array[Int](numCols)
 
     //row transformer
-    var trRow = new TransformRow(xCols, dummyColumnMapping)
-
     //for each row
     var indexRow = 0
     var currentRow = null.asInstanceOf[Matrix]
@@ -156,14 +147,13 @@ class TransformRow(xCols: Array[Int], mapping: HashMap[java.lang.Integer, HashMa
       //for each rows
       currentRow = Matrix(oldX.getRow(indexRow))
 
-      newRowValues = trRow.transform(currentRow)
+      newRowValues = this.transform(currentRow)
       //add new row
       oldX.putRow(indexRow, newRowValues)
 
       //convert oldX to new X
       indexRow += 1
     }
-
     oldX
   }
 }

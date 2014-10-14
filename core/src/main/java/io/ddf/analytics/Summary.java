@@ -1,15 +1,16 @@
 package io.ddf.analytics;
 
 
-import java.io.Serializable;
-import io.ddf.util.Utils;
 import com.google.common.base.Joiner;
+import io.ddf.util.Utils;
+
+import java.io.Serializable;
 
 /**
- * Basic statistics for a set of double numbers including min, max, count, NAcount, mean, variance and stdev
- * 
+ * Basic statistics for a set of double numbers including min, max, count,
+ * NAcount, mean, variance and stdev
+ *
  * @author bhan
- * 
  */
 @SuppressWarnings("serial")
 public class Summary implements Serializable {
@@ -21,14 +22,15 @@ public class Summary implements Serializable {
   private double mMin = Double.MAX_VALUE;
   private double mMax = Double.MIN_VALUE;
 
-
-  public Summary() {}
+  public Summary() {
+  }
 
   public Summary(double[] numbers) {
     this.merge(numbers);
   }
 
-  public Summary(long mCount, double mMean, double mSS, long mNACount, double mMin, double mMax) {
+  public Summary(long mCount, double mMean, double mSS, long mNACount,
+      double mMin, double mMax) {
     super();
     this.mCount = mCount;
     this.mMean = mMean;
@@ -51,7 +53,8 @@ public class Summary implements Serializable {
   }
 
   public double mean() {
-    if (mCount == 0) return Double.NaN;
+    if (mCount == 0)
+      return Double.NaN;
     return this.mMean;
   }
 
@@ -68,12 +71,14 @@ public class Summary implements Serializable {
   }
 
   public double min() {
-    if (this.mCount == 0) return Double.NaN;
+    if (this.mCount == 0)
+      return Double.NaN;
     return this.mMin;
   }
 
   public double max() {
-    if (this.mCount == 0) return Double.NaN;
+    if (this.mCount == 0)
+      return Double.NaN;
     return this.mMax;
   }
 
@@ -150,8 +155,9 @@ public class Summary implements Serializable {
   @Override
   public String toString() {
     Joiner joiner = Joiner.on("");
-    return joiner.join("mean:", Utils.roundUp(mean()), " stdev:", Utils.roundUp(stdev()), " var:",
-        Utils.roundUp(variance()), " cNA:", mNACount, " count:", mCount, " min:", Utils.roundUp(min()), " max:",
+    return joiner.join("mean:", Utils.roundUp(mean()), " stdev:",
+        Utils.roundUp(stdev()), " var:", Utils.roundUp(variance()), " cNA:",
+        mNACount, " count:", mCount, " min:", Utils.roundUp(min()), " max:",
         Utils.roundUp(max()));
   }
 }

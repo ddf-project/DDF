@@ -15,7 +15,7 @@ public interface IHandleDDFFunctionalGroup {
 
   /**
    * Sets the DDF that we are a handler for
-   * 
+   *
    * @param theDDF
    */
   public abstract void setDDF(DDF theDDF);

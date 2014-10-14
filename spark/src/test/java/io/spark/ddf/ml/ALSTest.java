@@ -5,10 +5,6 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
 import org.apache.spark.mllib.recommendation.MatrixFactorizationModel;
-import org.apache.spark.mllib.recommendation.ALS;
-import org.apache.spark.mllib.recommendation.Rating;
-import org.apache.spark.rdd.RDD;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class ALSTest {

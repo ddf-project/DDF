@@ -1,22 +1,24 @@
 package io.spark.ddf;
 
 
+import com.google.gson.Gson;
+import io.ddf.DDF;
+import io.ddf.DDFManager;
+import io.ddf.exception.DDFException;
+import io.spark.ddf.util.SparkUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.hive.HiveContext;
+
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.spark.ddf.util.SparkUtils;
-import com.google.gson.Gson;
-import org.apache.commons.lang.StringUtils;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
-import shark.SharkContext;
-import shark.SharkEnv;
-import shark.api.JavaSharkContext;
-import io.ddf.DDF;
-import io.ddf.DDFManager;
-import io.ddf.exception.DDFException;
+//import shark.SharkEnv;
+//import shark.api.JavaSharkContext;
 
 /**
  * An Apache-Spark-based implementation of DDFManager
@@ -53,14 +55,9 @@ public class SparkDDFManager extends DDFManager {
 
   private void initialize(SparkContext sparkContext, Map<String, String> params) throws DDFException {
     this.setSparkContext(sparkContext == null ? this.createSparkContext(params) : sparkContext);
-
-    // it will never go here
-    // TODO remove later
-    if (sparkContext instanceof SharkContext) {
-      this.setSharkContext((SharkContext) sparkContext);
-
-      mLog.info(">>>>>>>>>>>>> setting Kryo for mSharkContext: " + mSharkContext.conf().get("spark.kryo.registrator"));
-    }
+    this.mHiveContext = new HiveContext(this.mSparkContext);
+    this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true");
+    this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.batchSize", "1000000");
   }
 
 
@@ -72,6 +69,7 @@ public class SparkDDFManager extends DDFManager {
 
   private SparkContext mSparkContext;
 
+  private JavaSparkContext mJavaSparkContext;
 
   public SparkContext getSparkContext() {
     return mSparkContext;
@@ -81,35 +79,38 @@ public class SparkDDFManager extends DDFManager {
     this.mSparkContext = sparkContext;
   }
 
+  private HiveContext mHiveContext;
 
-  private SharkContext mSharkContext;
-
-
-  public SharkContext getSharkContext() {
-    return mSharkContext;
+  public HiveContext getHiveContext() {
+    return mHiveContext;
   }
+  //  private SparkUtils.createSharkContext mSharkContext;
+  //
+  //
+  //  public SharkContext getSharkContext() {
+  //    return mSharkContext;
+  //  }
 
+  //  private JavaSharkContext mJavaSharkContext;
+  //
+  //
+  //  public JavaSharkContext getJavaSharkContext() {
+  //    return mJavaSharkContext;
+  //  }
 
-  private JavaSharkContext mJavaSharkContext;
-
-
-  public JavaSharkContext getJavaSharkContext() {
-    return mJavaSharkContext;
-  }
-
-  public void setJavaSharkContext(JavaSharkContext javaSharkContext) {
-    this.mJavaSharkContext = javaSharkContext;
-  }
+  //  public void setJavaSharkContext(JavaSharkContext javaSharkContext) {
+  //    this.mJavaSharkContext = javaSharkContext;
+  //  }
 
   /**
    * Also calls setSparkContext() to the same sharkContext
    *
    * @param sharkContext
    */
-  private void setSharkContext(SharkContext sharkContext) {
-    this.mSharkContext = sharkContext;
-    this.setSparkContext(sharkContext);
-  }
+  //  private void setSharkContext(SharkContext sharkContext) {
+  //    this.mSharkContext = sharkContext;
+  //    this.setSparkContext(sharkContext);
+  //  }
 
 
   private Map<String, String> mSparkContextParams;
@@ -126,9 +127,7 @@ public class SparkDDFManager extends DDFManager {
 
 
   public void shutdown() {
-    if (this.getSharkContext() != null) {
-      this.getSharkContext().stop();
-    } else if (this.getSparkContext() != null) {
+    if (this.getSparkContext() != null) {
       this.getSparkContext().stop();
     }
   }
@@ -192,24 +191,28 @@ public class SparkDDFManager extends DDFManager {
     String ddfSparkJar = params.get("DDFSPARK_JAR");
     String[] jobJars = ddfSparkJar != null ? ddfSparkJar.split(",") : new String[] { };
     mLog.info(">>>>> ddfSparkJar = " + ddfSparkJar);
-    SharkContext context = SparkUtils.createSharkContext(params.get("SPARK_MASTER"), params.get("SPARK_APPNAME"),
+
+    for (String key : params.keySet()) {
+      mLog.info(">>>> key = " + key + ", value = " + params.get(key));
+    }
+
+    SparkContext context = SparkUtils.createSparkContext(params.get("SPARK_MASTER"), params.get("SPARK_APPNAME"),
         params.get("SPARK_HOME"), jobJars, params);
-
-    mJavaSharkContext = new JavaSharkContext(context);
-    this.setSharkContext(SharkEnv.initWithJavaSharkContext(mJavaSharkContext).sharkCtx());
-
+    this.mSparkContext = context;
+    this.mJavaSparkContext = new JavaSparkContext(context);
     return this.getSparkContext();
   }
 
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
-    JavaRDD<String> fileRDD = mJavaSharkContext.textFile(fileURL);
+    JavaRDD<String> fileRDD = mJavaSparkContext.textFile(fileURL);
     String[] metaInfos = getMetaInfo(fileRDD, fieldSeparator);
     SecureRandom rand = new SecureRandom();
     String tableName = "tbl" + String.valueOf(Math.abs(rand.nextLong()));
     String cmd = "CREATE TABLE " + tableName + "(" + StringUtils.join(metaInfos, ", ")
         + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY '" + fieldSeparator + "'";
     sql2txt(cmd);
-    sql2txt("LOAD DATA LOCAL INPATH '" + fileURL + "' " + "INTO TABLE " + tableName);
+    sql2txt("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
+        "INTO TABLE " + tableName);
     return sql2ddf("SELECT * FROM " + tableName);
   }
 

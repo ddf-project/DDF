@@ -1,11 +1,15 @@
 /**
- * 
+ *
  */
 package io.basic.ddf.content;
 
 
-import java.io.IOException;
-import java.util.List;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import io.basic.ddf.BasicDDF;
 import io.ddf.DDF;
 import io.ddf.content.APersistenceHandler;
@@ -17,12 +21,9 @@ import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.IGloballyAddressable;
 import io.ddf.util.Utils;
 import io.ddf.util.Utils.JsonSerDes;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * This {@link PersistenceHandler} loads and saves from/to a designated storage area.
@@ -137,8 +138,8 @@ public class PersistenceHandler extends APersistenceHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see io.ddf.content.IHandlePersistence#copy(java.lang.String, java.lang.String, java.lang.String, java.lang.String,
-   * boolean)
+   * @see io.ddf.content.IHandlePersistence#copy(java.lang.String, java.lang.String, java.lang.String,
+   * java.lang.String, boolean)
    */
   @Override
   public void duplicate(String fromNamespace, String fromName, String toNamespace, String toName, boolean doOverwrite)
@@ -266,8 +267,7 @@ public class PersistenceHandler extends APersistenceHandler {
     }
 
     /**
-     * @param namespace
-     *          the namespace to set
+     * @param namespace the namespace to set
      */
     @Override
     public void setNamespace(String namespace) {
@@ -283,8 +283,7 @@ public class PersistenceHandler extends APersistenceHandler {
     }
 
     /**
-     * @param name
-     *          the name to set
+     * @param name the name to set
      */
     @Override
     public void setName(String name) {
@@ -306,7 +305,6 @@ public class PersistenceHandler extends APersistenceHandler {
 
   /**
    * Base class for objects that can persist themselves (e.g, Models) via the BasicObjectDDF persistence mechanism
-   * 
    */
   public static class BasicPersistible extends APersistible {
 
@@ -330,15 +328,15 @@ public class PersistenceHandler extends APersistenceHandler {
      * object as a result of the deserialization, instead of this DDF itself. This makes it possible for clients to do
      * things like<br/>
      * <code>
-     *   PersistenceUri uri = model.persist();
-     *   Model model = (Model) ddfManager.load(uri);
+     * PersistenceUri uri = model.persist();
+     * Model model = (Model) ddfManager.load(uri);
      * </code> instead of having to do this:<br/>
      * <code>
-     *   PersistenceUri uri = model.persist();
-     *   BasicDDF ddf = (BasicDDF) ddfManager.load(uri);
-     *   Model model = (Model) ddf.getList().get(0);
+     * PersistenceUri uri = model.persist();
+     * BasicDDF ddf = (BasicDDF) ddfManager.load(uri);
+     * Model model = (Model) ddf.getList().get(0);
      * </code>
-     * 
+     *
      * @throws DDFException
      */
     public static ISerializable unwrapDeserializedObject(//
@@ -356,8 +354,8 @@ public class PersistenceHandler extends APersistenceHandler {
 
             if (objectClass instanceof JsonPrimitive) {
               try {
-                Object embeddedObject = new Gson()
-                    .fromJson(object.toString(), Class.forName(objectClass.getAsString()));
+                Object embeddedObject = new Gson().fromJson(object.toString(),
+                    Class.forName(objectClass.getAsString()));
 
                 if (embeddedObject instanceof ISerializable) {
                   // Yep, it's an ISerializable that we need to unwrap

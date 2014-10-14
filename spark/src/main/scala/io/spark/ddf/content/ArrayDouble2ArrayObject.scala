@@ -13,11 +13,11 @@ class ArrayDouble2ArrayObject(@transient ddf: DDF) extends ConvertFunction(ddf) 
 
   override def apply(representation: Representation): Representation = {
     val mappers = ddf.getSchemaHandler.getColumns.map {
-      column ⇒ this.getDouble2ObjectMapper(column.getType)
+      column => this.getDouble2ObjectMapper(column.getType)
     }
     val rddArrObj = representation.getValue match {
-      case rdd: RDD[Array[Double]] ⇒ rdd.map {
-        row ⇒ {
+      case rdd: RDD[Array[Double]] => rdd.map {
+        row => {
           var i = 0
           val arrObj = new Array[Object](row.size)
           while (i < row.size) {
@@ -31,13 +31,13 @@ class ArrayDouble2ArrayObject(@transient ddf: DDF) extends ConvertFunction(ddf) 
     new Representation(rddArrObj, RepresentationHandler.RDD_ARR_OBJECT.getTypeSpecsString)
   }
 
-  private def getDouble2ObjectMapper(colType: ColumnType): Double ⇒ Object = {
+  private def getDouble2ObjectMapper(colType: ColumnType): Double => Object = {
     colType match {
-      case ColumnType.DOUBLE ⇒ {
-        case double ⇒ double.asInstanceOf[Object]
+      case ColumnType.DOUBLE => {
+        case double => double.asInstanceOf[Object]
       }
-      case ColumnType.INT ⇒ {
-        case double ⇒ double.toInt.asInstanceOf[Object]
+      case ColumnType.INT => {
+        case double => double.toInt.asInstanceOf[Object]
       }
     }
   }

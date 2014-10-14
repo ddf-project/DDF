@@ -1,19 +1,15 @@
 package io.spark.ddf.etl;
 
 
-import java.util.List;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.analytics.Summary;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
-import com.google.common.collect.Lists;
+import org.junit.*;
+
+import java.util.List;
 
 public class TransformationHandlerTest {
   private DDFManager manager;
@@ -86,7 +82,7 @@ public class TransformationHandlerTest {
   }
 
 
-  @Test
+  @Ignore
   public void testTransformSql() throws DDFException {
 
     ddf.setMutable(true);
@@ -97,13 +93,13 @@ public class TransformationHandlerTest {
     Assert.assertEquals("dist", ddf.getColumnName(8));
     Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
 
-    // udf without assigning column name
+    //udf without assigning column name
     ddf.Transform.transformUDF("arrtime-deptime");
     Assert.assertEquals(31, ddf.getNumRows());
     Assert.assertEquals(10, ddf.getNumColumns());
     Assert.assertEquals(10, ddf.getSummary().length);
 
-    // specifying selected column list
+    //specifying selected column list
     List<String> cols = Lists.newArrayList("distance", "arrtime", "deptime");
 
     ddf = ddf.Transform.transformUDF("speed = distance/(arrtime-deptime)", cols);
@@ -113,7 +109,7 @@ public class TransformationHandlerTest {
 
     ddf.setMutable(false);
 
-    // multiple expressions, column name with special characters
+    //multiple expressions, column name with special characters
     DDF ddf3 = ddf.Transform.transformUDF("arrtime-deptime, (speed^*- = distance/(arrtime-deptime)", cols);
     Assert.assertEquals(31, ddf3.getNumRows());
     Assert.assertEquals(5, ddf3.getNumColumns());

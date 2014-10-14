@@ -1,25 +1,23 @@
 /**
  * Copyright 2014 Adatao, Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *    
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package io.ddf;
 
 
-import java.lang.reflect.Constructor;
-import java.util.*;
-import scala.tools.jline.internal.Log;
+import com.google.common.base.Strings;
 import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.IHandlePersistence.IPersistible;
 import io.ddf.content.IHandleRepresentations;
@@ -35,8 +33,11 @@ import io.ddf.ml.IModel;
 import io.ddf.ml.ISupportML;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
-import com.google.common.base.Strings;
+import scala.tools.jline.internal.Log;
+
+import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * <p>
@@ -47,7 +48,7 @@ import java.text.SimpleDateFormat;
  * We use the Dependency Injection, Delegation, and Composite patterns to make it easy for others to provide alternative
  * (even snap-in replacements), support/implementation for DDF. The class diagram is as follows:
  * </p>
- * 
+ * <p/>
  * <pre>
  * ------------------   -------------------------
  * |     DDFManager |-->|         DDF           |
@@ -68,8 +69,6 @@ import java.text.SimpleDateFormat;
  * </p>
  * DDFManager implements {@link IHandleSqlLike} because we want to expose those methods as directly to the API user as
  * possible, in an engine-dependent manner.
- * 
- * 
  */
 public abstract class DDFManager extends ALoggable implements IDDFManager, IHandleSqlLike, ISupportPhantomReference {
 
@@ -111,14 +110,16 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   /*
-   * return list of DDFs infomation only return DDF with alias
+   * return list of DDFs infomation
+   * only return DDF with alias
    */
   public DDF.DDFInformation[] listDDFs() {
     Collection<DDF> ddfs = this.mDDFs.values();
     List<DDF.DDFInformation> ddfInformationList = new ArrayList<DDF.DDFInformation>();
     for (DDF ddf : ddfs) {
       SimpleDateFormat dateformat = new SimpleDateFormat("MM.d.yyyy 'at' HH:mm a");
-      DDF.DDFInformation information = new DDF.DDFInformation(ddf.getUri(), dateformat.format(ddf.getCreatedTime()));
+      DDF.DDFInformation information = new DDF.DDFInformation(
+          ddf.getUri(), dateformat.format(ddf.getCreatedTime()));
       ddfInformationList.add(information);
     }
     return ddfInformationList.toArray(new DDF.DDFInformation[ddfInformationList.size()]);
@@ -181,7 +182,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   /**
    * Returns a new instance of {@link DDFManager} for the given engine name
-   * 
+   *
    * @param engineName
    * @return
    * @throws Exception
@@ -214,7 +215,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   /**
    * Instantiates a new DDF of the type specified in ddf.ini as "DDF".
-   * 
+   *
    * @param manager
    * @param data
    * @param typeSpecs
@@ -250,9 +251,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   /**
    * Instantiates a new DDF of the type specified in ddf.ini as "DDF", using the constructor that requires only
    * {@link DDFManager} as an argument.
-   * 
-   * @param manager
-   *          the {@link DDFManager} to assign
+   *
+   * @param manager the {@link DDFManager} to assign
    * @return the newly instantiated DDF
    * @throws DDFException
    */
@@ -262,7 +262,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   /**
    * Instantiates a new DDF of the type specified in ddf.ini as "DDF", passing in this DDFManager as the sole argument
-   * 
+   *
    * @return the newly instantiated DDF
    * @throws DDFException
    */

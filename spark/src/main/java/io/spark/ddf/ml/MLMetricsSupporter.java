@@ -1,29 +1,23 @@
 package io.spark.ddf.ml;
 
 
-import io.ddf.content.IHandleRepresentations;
-import io.ddf.ml.AMLMetricsSupporter;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.rdd.RDD;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
-import io.ddf.content.IHandleRepresentations.IGetResult;
 import io.ddf.exception.DDFException;
 import io.ddf.ml.AMLMetricsSupporter;
 import io.ddf.ml.RocMetric;
 import io.spark.ddf.SparkDDF;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.mllib.recommendation.Rating;
 import org.apache.spark.mllib.regression.LabeledPoint;
-import io.spark.ddf.content.RepresentationHandler;
-import shark.api.Row;
+import org.apache.spark.rdd.RDD;
 
 public class MLMetricsSupporter extends AMLMetricsSupporter {
 
   private Boolean sIsNonceInitialized = false;
-
 
   @Override
   /*
@@ -54,7 +48,7 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
   }
 
 
-  public static class MetricsMapperR2 extends Function<double[], double[]> {
+  public static class MetricsMapperR2 implements Function<double[], double[]> {
     private static final long serialVersionUID = 1L;
     public double meanYTrue = -1.0;
 
@@ -81,7 +75,7 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
   }
 
 
-  public static class MetricsReducerR2 extends Function2<double[], double[], double[]> {
+  public static class MetricsReducerR2 implements Function2<double[], double[], double[]> {
     private static final long serialVersionUID = 1L;
 
 
@@ -118,8 +112,9 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
 
     Schema schema = new Schema("residuals double");
     DDFManager manager = this.getDDF().getManager();
-    DDF residualDDF = manager.newDDF(manager, result.rdd(), new Class<?>[] { RDD.class, double[].class },
-        predictionDDF.getNamespace(), null, schema);
+    DDF residualDDF = manager
+        .newDDF(manager, result.rdd(), new Class<?>[] { RDD.class, double[].class }, predictionDDF.getNamespace(), null,
+            schema);
 
     if (residualDDF == null) mLog.error(">>>>>>>>>>>.residualDDF is null");
 
@@ -127,10 +122,8 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
     return residualDDF;
   }
 
-
-  public static class MetricsMapperResiduals extends Function<double[], double[]> {
+  public static class MetricsMapperResiduals implements Function<double[], double[]> {
     private static final long serialVersionUID = 1L;
-
 
     public MetricsMapperResiduals() throws DDFException {
     }
@@ -149,17 +142,16 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
     }
   }
 
-
   @Override
   /*
-   * input expected RDD[double[][]] (non-Javadoc)
-   * 
+   * input expected RDD[double[][]]
+   * (non-Javadoc)
    * @see io.ddf.ml.AMLMetricsSupporter#roc(io.ddf.DDF, int)
    */
   public RocMetric roc(DDF predictionDDF, int alpha_length) throws DDFException {
 
-    RDD<LabeledPoint> rddLabeledPoint = (RDD<LabeledPoint>) predictionDDF.getRepresentationHandler().get(RDD.class,
-        LabeledPoint.class);
+    RDD<LabeledPoint> rddLabeledPoint = (RDD<LabeledPoint>) predictionDDF.getRepresentationHandler()
+        .get(RDD.class, LabeledPoint.class);
     ROCComputer rc = new ROCComputer();
 
     return (rc.ROC(rddLabeledPoint, alpha_length));

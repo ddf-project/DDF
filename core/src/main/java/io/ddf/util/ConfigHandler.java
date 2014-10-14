@@ -1,8 +1,15 @@
 /**
- * 
+ *
  */
 package io.ddf.util;
 
+
+import com.google.common.base.Strings;
+import io.ddf.misc.ALoggable;
+import io.ddf.util.ConfigHandler.Configuration.Section;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.HierarchicalINIConfiguration;
+import org.apache.commons.configuration.SubnodeConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,17 +17,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.HierarchicalINIConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
-import io.ddf.misc.ALoggable;
-import io.ddf.util.ConfigHandler.Configuration.Section;
-import com.google.common.base.Strings;
 
 
 /**
  * @author ctn
- * 
  */
 public class ConfigHandler extends ALoggable implements IHandleConfig {
 
@@ -144,12 +144,10 @@ public class ConfigHandler extends ALoggable implements IHandleConfig {
 
   /**
    * Load configuration from ddf.ini, or the file name specified by the environment variable DDF_INI.
-   * 
-   * @throws Exception
-   * 
+   *
    * @return the {@link Configuration} object loaded
-   * @throws ConfigurationException
-   *           , {@link IOException}
+   * @throws Exception
+   * @throws ConfigurationException , {@link IOException}
    */
   @Override
   public Configuration loadConfig() throws ConfigurationException, IOException {
@@ -197,7 +195,7 @@ public class ConfigHandler extends ALoggable implements IHandleConfig {
 
   /**
    * Search in current dir and working up, looking for the config file
-   * 
+   *
    * @return
    * @throws IOException
    */

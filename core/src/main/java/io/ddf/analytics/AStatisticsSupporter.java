@@ -1,24 +1,20 @@
 package io.ddf.analytics;
 
 
-import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Pattern;
-import org.apache.commons.lang.StringUtils;
-import io.ddf.DDF;
-import io.ddf.content.Schema.ColumnType;
-import io.ddf.exception.DDFException;
-import io.ddf.misc.ADDFFunctionalGroupHandler;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.ddf.DDF;
+import io.ddf.content.Schema.ColumnType;
+import io.ddf.exception.DDFException;
+import io.ddf.misc.ADDFFunctionalGroupHandler;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler implements ISupportStatistics {
 
@@ -71,7 +67,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
           fivenums[i] = new FiveNumSummary(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
         } else {
           fivenums[i] = new FiveNumSummary(parseDouble(rs[5 * k]), parseDouble(rs[5 * k + 1]),
-              parseDouble(rs[5 * k + 2]), parseDouble(rs[5 * k + 3]), parseDouble(rs[5 * k + 4]));
+              parseDouble(rs[5 * k + 2]),
+              parseDouble(rs[5 * k + 3]), parseDouble(rs[5 * k + 4]));
           k++;
         }
       }
@@ -88,8 +85,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
     String command = String.format("select var_samp(%s) from @this", columnName);
     if (!Strings.isNullOrEmpty(command)) {
-      List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute the variance of the given column from table %%s"));
+      List<String> result = this.getDDF()
+          .sql2txt(command, String.format("Unable to compute the variance of the given column from table %%s"));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         Double a = Double.parseDouble(result.get(0));
         sd[0] = a;
@@ -106,8 +103,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("select avg(%s) from @this", columnName);
 
     if (!Strings.isNullOrEmpty(command)) {
-      List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute the mean of the given column from table %%s"));
+      List<String> result = this.getDDF()
+          .sql2txt(command, String.format("Unable to compute the mean of the given column from table %%s"));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         mean = Double.parseDouble(result.get(0));
         return mean;
@@ -150,14 +147,16 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
   public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
     String command = String.format("select histogram_numeric(%s,%s) from @this", columnName, numBins);
     if (!Strings.isNullOrEmpty(command)) {
-      List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute histogram of %s from table %%s", columnName));
+      List<String> result = this.getDDF()
+          .sql2txt(command, String.format("Unable to compute histogram of %s from table %%s", columnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         List<HistogramBin> bins = Lists.newArrayList();
         Gson gson = new Gson();
         for (String rs : result) {
-          Type typeOfT = new TypeToken<List<HistogramBin>>() {}.getType();
-          List<HistogramBin> tmpbins = gson.fromJson((String) rs, typeOfT);
+          Type typeOfT = new TypeToken<List<HistogramBin>>() {
+          }.getType();
+          List<HistogramBin> tmpbins = gson
+              .fromJson((String) rs, typeOfT);
           for (HistogramBin bin : tmpbins)
             bins.add(bin);
         }
@@ -190,11 +189,9 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
   }
 
-
   public static class HistogramBin {
     private double x; // Bin center
     private double y; // Bin weight
-
 
     public double getX() {
       return x;
@@ -278,7 +275,6 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
   }
 
-
   public Double[] getVectorQuantiles(String columnName, Double[] percentiles) throws DDFException {
     return getVectorQuantiles(columnName, percentiles, 10000);
   }
@@ -321,8 +317,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       if (p1.matcher(colType).matches()) {
         pParams = "percentile(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "))";
       } else if (p2.matcher(colType).matches()) {
-        pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), "
-            + B.toString() + ")";
+        pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), " + B.toString()
+            + ")";
       } else {
         throw new DDFException("Only support numeric verctors!!!");
       }
@@ -350,8 +346,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     if (rs == null || rs.size() == 0) {
       throw new DDFException("Cannot get vector quantiles from SQL queries");
     }
-    String[] convertedResults = rs.get(0).replace("[", "").replace("]", "").replaceAll("\t", ",")
-        .replace("null", "NULL, NULL, NULL").split(",");
+    String[] convertedResults = rs.get(0)
+        .replace("[", "").replace("]", "").replaceAll("\t", ",").replace("null", "NULL, NULL, NULL").split(",");
     mLog.info("Raw info " + StringUtils.join(rs, "\n"));
 
     Double[] result = new Double[percentiles.length];
