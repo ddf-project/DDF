@@ -1,0 +1,131 @@
+<html>
+<xmp theme="united" style="display:none;">
+
+## How to set up environment
+
+### Use Eclipse/IntelliJ
+
+First you need to follow all steps describe in [Getting started](quickstart.html). You can import DDF project as Maven project or as existing project. Similarly you can import to IntelliJ version 12.x+
+
+After importing there are two maven projects: core and spark. Core project contains all core APIs which are engine-independent. Spark project contains all implementation APIs using Spark engine. 
+
+
+## How to verify your build
+You can use mvn test to verify your build. 
+```sh
+#to verify core project
+cd core; mvn test
+
+#to verify spark project
+cd spark; mvn test
+```
+
+## How to write stand alone application
+In this section we will walk you through how to write a standalone application on DDF. 
+
+### DDFManager
+A DDFManager is basically a DDF implementor. It creates the entry point to the big data engine that DDF sits on top, supports loading data from big data sources into DDFs and book-keepings the DDF pool.
+Create a new instance of DDFManager for the given engine name. 
+
+```java
+DDFManager manager = DDFManager.get("spark");
+```
+
+
+### Create data table in DDF
+A Distributed DataFrame (DDF) is a table-like abstraction, each DDF instance is backed by a table, in this example it's a Shark table. You can create table by using sql2txt command. 
+
+``` java
+manager.sql2txt("drop TABLE if exists mtcars");
+manager.sql2txt(
+        "CREATE TABLE mtcars (mpg double,cyl int,disp double,hp int,drat double,wt double,qsec double,vs int,am int,gear int,carb int) ROW FORMAT DELIMITED FIELDS TERMINATED BY ' ' ");
+manager.sql2txt("LOAD DATA LOCAL INPATH 'resources/mtcars' INTO TABLE mtcars");
+```
+### DDF
+To create a DDF instance from an existing table, you can use sql2ddf function. 
+```java
+DDF ddf = manager.sql2ddf("select * from mtcars");
+```
+DDF has basic properties of a table-like, for example: rows, columns and schema. 
+
+```java
+//Get basic info
+System.out.println("Number of rows: " + ddf.getNumRows());
+System.out.println("Number of columns: " + ddf.getNumColumns());
+System.out.println("Column names: " + ddf.getColumnNames());
+```
+You can choose to project a subset of column in DDF. 
+```java
+//run projection
+DDF ddf2 = ddf.VIEWS.project("mpg", "disp", "hp", "drat", "qsec");
+```
+
+### ViewHandler
+In this section you will see how Handler works. Handlers are the functional components in the DDF framework. ViewHandler capture all functions relating to view of DDF, select first few records, projection, subset. 
+
+```java
+//get first 10 record from ddf2
+List<String> result = ddf2.VIEWS.head(10);
+```
+
+
+### Basic statistic
+FiveNum returns Tukey's five number summary (minimum, lower-hinge, median, upper-hinge, maximum) for the input data.
+```java
+//get standard summary
+ddf2.getSummary();
+ddf2.getFiveNumSummary();
+```
+
+### Mutability
+In some case mutability helps users write less code. You can set a ddf to be mutable. 
+```java
+//you can set DDF to mutable
+ddf2.setMutable(true);
+```
+
+### Missing data handling 
+User can exclude rows that contains missing data columns. To do that you can use dropNA method. 
+```java
+//dropNA drop all rows that contain NA values
+ddf2.dropNA();
+```
+
+
+### ETL
+User can group by and aggregate data by a group of columns
+```java
+List<String> aggcol = new ArrayList<String>();
+aggcol.add("m=mean(mpg)");
+
+List<String> grcol = new ArrayList<String>();
+grcol.add("mpg");
+
+//aggregate ddf2
+DDF ddf4 = ddf2.groupBy(grcol).agg(aggcol);
+//get first 10 record from aggregated ddf, ddf4
+ddf4.VIEWS.top(10, "mpg", "asc");
+```
+
+### Machine learning
+DDF user can build machine learning model out-of-the-box. We use Spark Mllib machine learning implementation to build model. Users can get rich functionalities in machine learning from Spark's Mllib. 
+```java
+//build kmeans model on ddf2
+IModel kmeans = ddf2.ML.KMeans(3, 5, 1);
+
+//run prediction on new data point
+double[] point = {24.0, 22.0, 1.0, 3.0, 5.0};
+kmeans.predict(point);
+
+manager.shutdown();
+```
+
+</xmp>
+
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+<link href="../assets/css/main.css" rel="stylesheet">
+ <p>
+</p>
+<br><br>
+</html>
