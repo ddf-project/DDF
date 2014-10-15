@@ -1,0 +1,16 @@
+.iframe-links{
+	position: relative;
+	z-index: 999;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0;
+	margin-bottom: 0;
+	max-width: 62.5rem;
+	text-align: left;
+	position: relative;
+	top: -5px;
+	padding-top: 5px;
+}
+
+.iframe-links li{ list-style: none; display: inline-block; margin-right: 20px; }
