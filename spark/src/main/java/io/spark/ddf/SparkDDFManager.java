@@ -56,8 +56,10 @@ public class SparkDDFManager extends DDFManager {
   private void initialize(SparkContext sparkContext, Map<String, String> params) throws DDFException {
     this.setSparkContext(sparkContext == null ? this.createSparkContext(params) : sparkContext);
     this.mHiveContext = new HiveContext(this.mSparkContext);
-    this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true");
-    this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.batchSize", "1000000");
+    String compression = System.getProperty("spark.sql.inMemoryColumnarStorage.compressed", "true");
+    String batchSize = System.getProperty("spark.sql.inMemoryColumnarStorage.batchSize", "1000");
+    this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", compression);
+    this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.batchSize", batchSize);
   }
 
 
