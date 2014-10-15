@@ -155,7 +155,7 @@ object CrossValidation {
 
       val trainSchema = new Schema(null, schema.getColumns)
 
-      val trainDDF = manager.newDDF(manager, test, Array(classOf[RDD[_]], unitType), nameSpace, null, trainSchema)
+      val trainDDF = manager.newDDF(manager, train, Array(classOf[RDD[_]], unitType), nameSpace, null, trainSchema)
       val tableName1 = trainDDF.getSchemaHandler.newTableName()
       trainDDF.getSchema.setTableName(tableName1)
 
