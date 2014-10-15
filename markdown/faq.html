@@ -1,0 +1,68 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="../assets/css/iframe.css">
+</head>
+<div class="gh-header-actions container">
+          <a href="https://github.com/ddf-project/DDF/edit/gh-pages/markdown/faq.html" class="minibutton " target="_blank">Edit</a>
+</div>
+
+<xmp theme="united" style="display:none;">
+
+### Java issues
+1.Q: How do I fix OutOfMemory while building DDF ? 
+
+A: DDF uses maven to build project, you can set MAVEN memory to higher values, for example: 
+```sh
+export MAVEN_OPTS=-XX:MaxPermSize=128m
+```
+
+
+2.Q: I don't have Java on my machine, how to install Java 7 on Mac ? 
+
+A: Apple and Oracle do not support Java 1.7 out of the box, you need to install [manually](http://stackoverflow.com/questions/8826881/maven-install-on-mac-os-x)
+
+3.Q: I have this error JAVA_HOME is not set properly, how to fix that ?
+
+A: You need to set JAVA_HOME properly, for example: ```sh export JAVA_HOME=`/usr/libexec/java_home` ```
+
+4.Q: I saw this error message "You must build DDF's Java core and spark package firstly" 
+
+A:You need to run ```bin/run-once.sh``` successfully. 
+
+### R issues
+1.Q: How to fix ClassNotFound exception while using R-DDF ? 
+
+A: R-DDF use rJava to invoke DDF Java class, make sure you're using Java 1.7, R 3.x and you have installed rJava. This error happens mostly on MacOS X. 
+
+- First you need to set JAVA PATH properly, in Mac it looks something like this
+```sh
+JAVA_LD_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.7.0_67.jdk/Contents/Home/jre/lib/server
+JAVA_LIBS='-L/Library/Java/JavaVirtualMachines/jdk1.7.0_67.jdk/Contents/Home/jre/lib/server -ljvm' 
+JAVA_CPPFLAGS='-I/Library/Java/JavaVirtualMachines/jdk1.7.0_67.jdk/Contents/Home/include -I/Library/Java/JavaVirtualMachines/jdk1.7.0_67.jdk/Contents/Home/include/darwin'
+```
+
+- Secondly
+```
+sh R CMD javareconf -e
+```
+
+- Then export 
+```sh
+DYLD_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.7.0_67.jdk/Contents/Home/jre/lib/server/
+```
+
+2.Q: I have this error while running ```R CMD javareconf -e```
+> make: llvm-gcc-4.2: No such file or directory
+
+A: This error occurs mostly on MacOSX. It happens because you can't install rJava. Please follow this [instruction](http://stackoverflow.com/questions/19533220/cannot-install-r-package-from-source-in-mac-osx-maverick)
+
+
+</xmp>
+<br>
+<br>
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+<link href="../assets/css/main.css" rel="stylesheet">
+ <p>
+</p>
+<br><br>
+</html>
