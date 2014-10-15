@@ -154,17 +154,14 @@ object CrossValidation {
       val aSet = new util.ArrayList[DDF]();
 
       val trainSchema = new Schema(null, schema.getColumns)
-      val trainDDF = new SparkDDF(manager, train, unitType, nameSpace,
-        null, trainSchema)
 
+      val trainDDF = manager.newDDF(manager, test, Array(classOf[RDD[_]], unitType), nameSpace, null, trainSchema)
       val tableName1 = trainDDF.getSchemaHandler.newTableName()
       trainDDF.getSchema.setTableName(tableName1)
 
 
       val testSchema = new Schema(null, schema.getColumns)
-      val testDDF = new SparkDDF(manager, test, unitType, nameSpace,
-        null, testSchema)
-
+      val testDDF = manager.newDDF(manager, test, Array(classOf[RDD[_]], unitType), nameSpace, null, testSchema)
       val tableName2 = testDDF.getSchemaHandler.newTableName()
       testDDF.getSchema.setTableName(tableName2)
 

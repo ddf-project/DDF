@@ -141,7 +141,6 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
           .newDDF(this.getManager(), result.rdd(), new Class<?>[] { RDD.class, double[].class },
               this.getManager().getNamespace(), null, schema);
 
-      //DDF resultDDF = new SparkDDF(this.getManager(), (RDD<double[]>) result.rdd(), double[].class, null, null, schema);
       IHandleSchema schemaHandler = resultDDF.getSchemaHandler();
       resultDDF.getSchema().setTableName(schemaHandler.newTableName());
       this.getManager().addDDF(resultDDF);
@@ -151,8 +150,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
       DDF resultDDF = this.getManager()
           .newDDF(this.getManager(), result.rdd(), new Class<?>[] { RDD.class, Object[].class },
               this.getManager().getNamespace(), null, schema);
-      //      DDF resultDDF = new SparkDDF(this.getManager(), (RDD<Object[]>) result.rdd(), Object[].class, this.getManager()
-      //          .getNamespace(), null, schema);
+
       IHandleSchema schemaHandler = resultDDF.getSchemaHandler();
       resultDDF.getSchema().setTableName(schemaHandler.newTableName());
       this.getManager().addDDF(resultDDF);
