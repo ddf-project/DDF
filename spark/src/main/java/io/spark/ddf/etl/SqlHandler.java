@@ -53,9 +53,7 @@ public class SqlHandler extends ASqlHandler {
         if (rdd == null) {
           throw new DDFException("Error getting SchemaRDD");
         }
-        ((SparkDDF) ddf).saveAsTable();
-        //((SparkDDF) ddf).cacheTable();
-        //((SparkDDF) ddf).saveAsTable();
+        ((SparkDDF) ddf).cacheTable();
       }
     } catch (Exception e) {
       throw new DDFException(String.format("Can not create table for DDF %s", tableName), e);
@@ -118,18 +116,19 @@ public class SqlHandler extends ASqlHandler {
       // TODO
     }
     if (schema == null) schema = SchemaHandler.getSchemaFromSchemaRDD(rdd);
-    /*
-    String tableName = (schema != null ? schema.getTableName() : null);
 
-    if (Strings.isNullOrEmpty(tableName)) tableName = (rdd != null ? rdd.name() : null);
-    if (Strings.isNullOrEmpty(tableName)) tableName = this.getDDF().getSchemaHandler().newTableName();
-    i*/
     if (tableName != null) {
       schema.setTableName(tableName);
     }
-    DDF ddf = new SparkDDF(this.getManager(), rdd, this.getManager().getNamespace(), tableName, schema);
-    ddf.getRepresentationHandler().add(rdd, RDD.class, Row.class);
-    ((SparkDDF) ddf).saveAsTable();
+
+    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {SchemaRDD.class}, null,
+        tableName, schema);
+    ((SparkDDF) ddf).cacheTable();
+
+    //get RDD<Row> from the cacheTable SchemaRDD is faster than recompute from reading from disk.
+    //and more memory efficient than cache the original SchemaRDD
+    RDD<Row> rddRow = this.getHiveContext().sql(String.format("select * from %s", ddf.getTableName()));
+    ddf.getRepresentationHandler().add(rddRow, RDD.class, Row.class);
     this.getManager().addDDF(ddf);
     return ddf;
   }
