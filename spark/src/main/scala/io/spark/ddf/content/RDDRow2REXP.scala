@@ -5,7 +5,6 @@ import io.ddf.content.{Representation, ConvertFunction}
 import org.apache.spark.rdd.RDD
 import io.spark.ddf.{SparkDDFManager, SparkDDF}
 import org.apache.spark.sql.catalyst.expressions.Row
-import org.apache.spark.sql.SchemaRDD
 import io.ddf.content.Schema.{ColumnType, Column}
 import org.apache.spark.sql.catalyst.types.StructField
 import scala.collection.JavaConversions._
@@ -14,13 +13,13 @@ import org.rosuda.REngine._
 
 /**
   */
-class SchemaRDD2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
+class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
 
   override def apply(representation: Representation): Representation = {
     val columnList = ddf.getSchemaHandler.getColumns
 
     representation.getValue match {
-      case rdd: SchemaRDD => {
+      case rdd: RDD[Row] => {
         val rddREXP = rdd.mapPartitions {
           iterator => {
             val arrayBufferColumns: List[ArrayBuffer[_]] = columnList.map {
