@@ -9,6 +9,8 @@ import scala.collection.JavaConverters._
 import io.ddf.content.Schema
 import io.spark.ddf.SparkDDF
 import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.catalyst.expressions.Row
 
 /**
  * RDD-based ViewHandler
@@ -58,22 +60,30 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     if (numSamples > MAX_SAMPLE_SIZE) {
       throw new IllegalArgumentException("Number of samples is currently limited to %d".format(MAX_SAMPLE_SIZE))
     } else {
-      val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
-      val sampleData = rdd.takeSample(withReplacement, numSamples, seed).toList.asJava
-      sampleData
+      if(mDDF.getRepresentationHandler.has(classOf[RDD[_]], classOf[Array[Object]])) {
+        val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
+        val sampleData = rdd.takeSample(withReplacement, numSamples, seed).toList.asJava
+        sampleData
+      } else {
+        val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
+        rdd.takeSample(withReplacement, numSamples, seed).map {
+          row => {
+            row.toArray.asInstanceOf[Array[Object]]
+          }
+        }.toList.asJava
+      }
     }
   }
 
   override def getRandomSample(percent: Double, withReplacement: Boolean, seed: Int): DDF = {
-    val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
-    val sampleRdd = rdd.sample(withReplacement, percent, seed)
     val columns = mDDF.getSchema.getColumns
     val schema = new Schema(mDDF.getSchemaHandler.newTableName(), columns)
     val manager = this.getManager
-    val sampleDFF = new SparkDDF(manager, sampleRdd, classOf[Array[Object]], manager.getNamespace, null, schema)
-    mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDFF.getName)
-    manager.addDDF(sampleDFF)
-    sampleDFF
+    val sampleRdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row]).sample(withReplacement, percent, seed)
+    val sampleDDF = manager.newDDF(manager, sampleRdd, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
+    mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
+    manager.addDDF(sampleDDF)
+    sampleDDF
   }
 }
 
