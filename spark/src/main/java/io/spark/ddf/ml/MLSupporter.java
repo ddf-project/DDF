@@ -93,7 +93,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
   @Override
   public DDF applyModel(IModel model, boolean hasLabels, boolean includeFeatures) throws DDFException {
     SparkDDF ddf = (SparkDDF) this.getDDF();
-    IGetResult gr = ddf.getJavaRDD(double[].class, Vector.class, LabeledPoint.class, Object[].class);
+    IGetResult gr = ddf.getJavaRDD(Vector.class, double[].class, LabeledPoint.class, Object[].class);
 
     // Apply appropriate mapper
     JavaRDD<?> result = null;
