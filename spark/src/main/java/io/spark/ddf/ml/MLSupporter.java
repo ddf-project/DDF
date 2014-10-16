@@ -93,7 +93,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
   @Override
   public DDF applyModel(IModel model, boolean hasLabels, boolean includeFeatures) throws DDFException {
     SparkDDF ddf = (SparkDDF) this.getDDF();
-    IGetResult gr = ddf.getJavaRDD(Vector.class, double[].class, LabeledPoint.class, Object[].class);
+    IGetResult gr = ddf.getJavaRDD(double[].class, Vector.class, LabeledPoint.class, Object[].class);
 
     // Apply appropriate mapper
     JavaRDD<?> result = null;
@@ -207,6 +207,14 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
               label = s.label();
               features = s.features().toArray();
 
+            } else if(sample instanceof Vector) {
+              Vector vector = (Vector) sample;
+              if(mHasLabels) {
+                label = vector.apply(vector.size() - 1);
+                features = Arrays.copyOf(vector.toArray(), vector.size() - 1);
+              } else {
+                features = vector.toArray();
+              }
             } else {
               double[] s = (double[]) sample;
               if (mHasLabels) {
@@ -216,7 +224,6 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
                 features = s;
               }
             }
-
 
             if (double[].class.equals(mOutputType)) {
               if (mHasLabels) {
