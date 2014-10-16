@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
 import io.ddf.content.IHandleSchema;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.spark.api.java.JavaRDD;
@@ -40,7 +41,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
   /**
    * Override this to return the approriate DDF representation matching that specified in {@link ParamInfo}. The base
    * implementation simply returns the DDF.
-   * 
+   *
    * @param paramInfo
    * @return
    */

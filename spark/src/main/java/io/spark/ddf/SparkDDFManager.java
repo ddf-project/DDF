@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import io.spark.ddf.util.SparkUtils;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +40,7 @@ public class SparkDDFManager extends DDFManager {
 
   /**
    * Use system environment variables to configure the SparkContext creation.
-   * 
+   *
    * @throws DDFException
    */
   public SparkDDFManager() throws DDFException {
@@ -102,7 +103,7 @@ public class SparkDDFManager extends DDFManager {
 
   /**
    * Also calls setSparkContext() to the same sharkContext
-   * 
+   *
    * @param sharkContext
    */
   private void setSharkContext(SharkContext sharkContext) {
@@ -133,8 +134,8 @@ public class SparkDDFManager extends DDFManager {
   }
 
 
-  private static final String[][] SPARK_ENV_VARS = new String[][] { 
-    // @formatter:off
+  private static final String[][] SPARK_ENV_VARS = new String[][] {
+      // @formatter:off
     { "SPARK_APPNAME", "spark.appname" },
     { "SPARK_MASTER", "spark.master" }, 
     { "SPARK_HOME", "spark.home" }, 
@@ -150,7 +151,7 @@ public class SparkDDFManager extends DDFManager {
    * Takes an existing params map, and reads both environment as well as system property settings to merge into it. The
    * merge priority is as follows: (1) already set in params, (2) in system properties (e.g., -Dspark.home=xxx), (3) in
    * environment variables (e.g., export SPARK_HOME=xxx)
-   * 
+   *
    * @param params
    * @return
    */
@@ -181,7 +182,7 @@ public class SparkDDFManager extends DDFManager {
 
   /**
    * Side effect: also sets SharkContext and SparkContextParams in case the client wants to examine or use those.
-   * 
+   *
    * @param params
    * @return
    * @throws DDFException
@@ -189,7 +190,7 @@ public class SparkDDFManager extends DDFManager {
   private SparkContext createSparkContext(Map<String, String> params) throws DDFException {
     this.setSparkContextParams(this.mergeSparkParamsFromSettings(params));
     String ddfSparkJar = params.get("DDFSPARK_JAR");
-    String[] jobJars = ddfSparkJar != null ? ddfSparkJar.split(",") : new String[] {};
+    String[] jobJars = ddfSparkJar != null ? ddfSparkJar.split(",") : new String[] { };
     mLog.info(">>>>> ddfSparkJar = " + ddfSparkJar);
     SharkContext context = SparkUtils.createSharkContext(params.get("SPARK_MASTER"), params.get("SPARK_APPNAME"),
         params.get("SPARK_HOME"), jobJars, params);
@@ -214,16 +215,16 @@ public class SparkDDFManager extends DDFManager {
 
   /**
    * Given a String[] vector of data values along one column, try to infer what the data type should be.
-   * 
+   * <p/>
    * TODO: precompile regex
-   * 
+   *
    * @param vector
    * @return string representing name of the type "integer", "double", "character", or "logical" The algorithm will
-   *         first scan the vector to detect whether the vector contains only digits, ',' and '.', <br>
-   *         if true, then it will detect whether the vector contains '.', <br>
-   *         &nbsp; &nbsp; if true then the vector is double else it is integer <br>
-   *         if false, then it will detect whether the vector contains only 'T' and 'F' <br>
-   *         &nbsp; &nbsp; if true then the vector is logical, otherwise it is characters
+   * first scan the vector to detect whether the vector contains only digits, ',' and '.', <br>
+   * if true, then it will detect whether the vector contains '.', <br>
+   * &nbsp; &nbsp; if true then the vector is double else it is integer <br>
+   * if false, then it will detect whether the vector contains only 'T' and 'F' <br>
+   * &nbsp; &nbsp; if true then the vector is logical, otherwise it is characters
    */
   public static String determineType(String[] vector, Boolean doPreferDouble) {
     boolean isNumber = true;
@@ -280,7 +281,7 @@ public class SparkDDFManager extends DDFManager {
 
   /**
    * TODO: check more than a few lines in case some lines have NA
-   * 
+   *
    * @param fileRDD
    * @return
    */
@@ -308,7 +309,7 @@ public class SparkDDFManager extends DDFManager {
     } else {
       headers = new String[firstSplit.length];
       int size = headers.length;
-      for (int i = 0; i < size;) {
+      for (int i = 0; i < size; ) {
         headers[i] = "V" + (++i);
       }
     }

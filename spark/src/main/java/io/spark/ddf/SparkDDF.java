@@ -3,6 +3,7 @@ package io.spark.ddf;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import io.ddf.DDF;
@@ -37,7 +38,7 @@ public class SparkDDF extends DDF {
 
   /**
    * Signature without RDD, useful for creating a dummy DDF used by DDFManager
-   * 
+   *
    * @param manager
    */
   public SparkDDF(DDFManager manager) throws DDFException {
@@ -46,7 +47,7 @@ public class SparkDDF extends DDF {
 
   /**
    * Available for run-time instantiation only.
-   * 
+   *
    * @throws DDFException
    */
   protected SparkDDF() throws DDFException {
