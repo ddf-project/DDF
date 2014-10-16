@@ -207,14 +207,6 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
               label = s.label();
               features = s.features().toArray();
 
-            } else if (sample instanceof Vector) {
-              Vector vector = (Vector) sample;
-              if (mHasLabels) {
-                label = vector.apply(vector.size() - 1);
-                features = Arrays.copyOf(vector.toArray(), vector.size() - 1);
-              } else {
-                features = vector.toArray();
-              }
             } else {
               double[] s = (double[]) sample;
               if (mHasLabels) {
@@ -240,7 +232,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
               if (mHasLabels) {
                 outputRow = (O) new Object[] { label, this.mModel.predict(features) };
               } else {
-                outputRow = (O) new Object[] { this.mModel.predict(features) };
+                outputRow = (O) new Object[] { this.mModel.predict(features)};
               }
 
               if (mIncludeFeatures) {
