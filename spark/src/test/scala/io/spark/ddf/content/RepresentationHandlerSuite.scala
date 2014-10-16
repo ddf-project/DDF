@@ -38,7 +38,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(rddLabeledPoint != null)
     assert(rddLabeledPoint.count() === 301)
 
-    val ddf2 = manager.sql2ddf("selecy month, year, dayofmonth from airline_delayed").asInstanceOf[SparkDDF]
+    val ddf2 = manager.sql2ddf("select month, year, dayofmonth from airline_delayed").asInstanceOf[SparkDDF]
     val rddLabeledPoint2 = ddf2.getRDD(classOf[LabeledPoint])
     assert(rddLabeledPoint2 != null)
     assert(rddLabeledPoint2.count() === 295)
