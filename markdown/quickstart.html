@@ -6,9 +6,26 @@
           <a href="https://github.com/ddf-project/DDF/edit/gh-pages/markdown/quickstart.html" class="minibutton " target="_blank">Edit</a>
 </div>
 <xmp theme="united" style="display:none;">
+
+---
+
+* <a href="#getting-started">Getting started!</a>
+* <a href="#prerequisites">Prerequisites</a>
+* <a href="#building-ddf">Building DDF</a>
+* <a href="#java-example">Running a Java example</a>
+* <a href="#ddf-shell">Interactive Analysis with DDF’s Shell</a>
+* <a href="#spark-api">Use Spark's Java API</a>
+* <a href="#ddf-R">Use DDF in R</a>
+* <a href="#ddf-R">Use DDF in Python</a>
+
+---
+
+<a name="getting-started"></a>
+
 ## Getting Started
 This tutorial provides a quick introduction to using DDF. We will introduce how to build DDF and run DDF example in Java, Scala, R and Python. See the introduction page for more information about DDF.
 
+<a name="prerequisites"></a>
 ## Prerequisites
 Java 7, maven 3.x, git. 
 
@@ -17,7 +34,7 @@ First clone DDF from github
 ```
 git clone https://github.com/ddf-project/DDF
 ```
-
+<a name="building-ddf"></a>
 ## Building DDF
 DDF is currently compatible with Spark 0.9. For first time installation, it is required to run bin/run-once to download dependencies and sbt.
 
@@ -35,12 +52,14 @@ If you use sbt
 ```
 At this point, it should pass all unit tests.
 
+<a name="java-example"></a>
 ## Running a Java example
 Run this command in the DDF directory
 ```
  bin/run-example io.spark.ddf.examples.RowCount
 ```
 
+<a name="ddf-shell"></a>
 ## Interactive Analysis with DDF’s Shell
 DDF’s shell provides a simple way to learn the API, as well as a powerful tool to analyze data interactively. It’s available in Java, Scala and Python
 ```
@@ -69,14 +88,14 @@ ddf.getNumRows();
 print(ddf.getColumnNames());
 ```
 
-## Data ETL
+### Data ETL
 DDF allows mutable transformations, e.g., all NA values can be dropped from the same DDF, similar to a Pandas dataframe.
 ``` java
 ddf.setMutable(true);
 ddf.dropNA();
 ```
 
-## Basic Statistics
+### Basic Statistics
 DDF comes with a lot of R-like idioms, such as summary, fiveNum
 ``` java
 s = ddf.getSummary();
@@ -96,7 +115,7 @@ View some data in newddf:
 ``` java
 print(newddf.VIEWS.head(2));
 ```
-## Machine learning
+### Machine learning
 Run Mllib’s KMeans on newddf:
 ``` java
 import org.apache.spark.mllib.clustering.KMeansModel;
@@ -106,7 +125,7 @@ Predict on the kmeansModel:
 ``` java
 print(kmeansModel.predict(new double[] { 1232, 1341, 389, 100, 9 }));  
 ```
-
+<a name="spark-api"></a>
 ## Use Spark's Java API
 You can also play with Spark’s Java API from the ddf-shell
 ``` java
@@ -119,6 +138,8 @@ When done analysis, shutdown the DDFManager
 ``` java
 manager.shutdown();
 ```
+
+<a name="ddf-R"></a>
 ## Use DDF in R
 DDF can be used in R language with the same user experience. DDF on R is very powerful API that bring the R idioms into big data processing. You can install DDF on R using the following command in the R directory.
 
@@ -135,6 +156,7 @@ After this step you can start running provided example by using this command
 Rscript examples/basics.R.
 ```
 
+<a name="ddf-python"></a>
 ## Use DDF in Python
 DDF can also be used in Python. Just go to python directory and either
 ``` python
