@@ -12,6 +12,7 @@ import io.ddf.ml.MLClassMethods.TrainMethod;
 import io.ddf.util.Utils.MethodInfo;
 import io.ddf.util.Utils.MethodInfo.ParamInfo;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,7 +123,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
       mLog.info(">>>>>> trainedCol = " + col);
     }
 
-    IModel model = new Model(rawModel);
+    IModel model = this.newModel(rawModel);
     model.setTrainedColumns(trainedColumns);
     mLog.info(">>>> modelID = " + model.getName());
     this.getManager().addModel(model);
@@ -180,6 +181,29 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
   @Override
   public DDF applyModel(IModel model, boolean hasLabels, boolean includeFeatures) throws DDFException {
     return this.getDDF();
+  }
+
+  public IModel newModel(Object rawModel) throws DDFException {
+    return this.newModel(new Class<?>[]{rawModel.getClass()}, new Object[]{rawModel});
+  }
+
+  @SuppressWarnings("unchecked")
+  private IModel newModel(Class<?>[] argTypes, Object[] argValues) throws DDFException {
+    String className = Config.getValue(this.getEngine(), "Model");
+    if(Strings.isNullOrEmpty(className)) throw new DDFException(String.format(
+        "Cannot determine class name for [%s] %s", this.getEngine(), "Model"));
+    try {
+      Constructor<IModel> cons = (Constructor<IModel>) Class.forName(className).getDeclaredConstructor(argTypes);
+      if(cons == null) throw new DDFException("Cannot get constructor for " + className);
+      cons.setAccessible(true);
+      IModel model = cons.newInstance(argValues);
+      if(model == null) throw new DDFException("Cannot instantiate a new instance of " + className);
+      return model;
+    } catch (Exception e) {
+      throw new DDFException(String.format(
+          "While instantiating a new %s DDF of class %s with argTypes %s and argValues %s", this.getEngine(),
+          className, Arrays.toString(argTypes), Arrays.toString(argValues)), e);
+    }
   }
 
   @Override
