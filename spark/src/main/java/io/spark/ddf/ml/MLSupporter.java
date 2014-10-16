@@ -100,14 +100,17 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
     Class<?> resultUnitType = double[].class;
 
     if (LabeledPoint.class.equals(gr.getTypeSpecs()[0])) {
+      mLog.info(">>> applyModel, inputClass= LabeledPoint");
       result = ((JavaRDD<LabeledPoint>) gr.getObject()).mapPartitions(new PredictMapper<LabeledPoint, double[]>(
           LabeledPoint.class, double[].class, model, hasLabels, includeFeatures));
 
     } else if (double[].class.equals(gr.getTypeSpecs()[0])) {
+      mLog.info(">>> applyModel, inputClass= double[]");
       result = ((JavaRDD<double[]>) gr.getObject()).mapPartitions(new PredictMapper<double[], double[]>(double[].class,
           double[].class, model, hasLabels, includeFeatures));
 
     } else if (Vector.class.equals(gr.getTypeSpecs()[0])) {
+      mLog.info(">>> applyModel, inputClass= Vector");
       result = ((JavaRDD<Vector>) gr.getObject()).mapPartitions(new PredictMapper<Vector, double[]>(Vector.class,
           double[].class, model, hasLabels, includeFeatures));
 
