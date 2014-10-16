@@ -207,9 +207,9 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
               label = s.label();
               features = s.features().toArray();
 
-            } else if(sample instanceof Vector) {
+            } else if (sample instanceof Vector) {
               Vector vector = (Vector) sample;
-              if(mHasLabels) {
+              if (mHasLabels) {
                 label = vector.apply(vector.size() - 1);
                 features = Arrays.copyOf(vector.toArray(), vector.size() - 1);
               } else {
@@ -256,6 +256,28 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
             }
 
 
+          } else if (sample instanceof Vector) {
+            Double label = 0.0;
+            double[] features;
+            Vector vector = (Vector) sample;
+            if (mHasLabels) {
+              label = vector.apply(vector.size() - 1);
+              features = Arrays.copyOf(vector.toArray(), vector.size() - 1);
+            } else {
+              features = vector.toArray();
+            }
+
+            if (double[].class.equals(mOutputType)) {
+              if (mHasLabels) {
+                outputRow = (O) new double[] { label, (Double) this.mModel.predict(features) };
+              } else {
+                outputRow = (O) new double[] { (Double) this.mModel.predict(features) };
+              }
+
+              if (mIncludeFeatures) {
+                outputRow = (O) ArrayUtils.addAll(features, (double[]) outputRow);
+              }
+            }
           } else if (sample instanceof Object[]) {
             Object label = null;
             Object[] features;
