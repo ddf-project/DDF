@@ -440,7 +440,7 @@ public class Utils {
       try {
         return this.getMethod().invoke(null, args);
       } catch (Exception e) {
-        throw new DDFException(e.getCause());
+        throw new DDFException(e.getMessage(), e.getCause());
       }
     }
 
