@@ -18,8 +18,6 @@ class ArrayObject2ArrayDouble(@transient ddf: DDF) extends ConvertFunction(ddf) 
             val arr = new Array[Double](array.size)
             var i = 0
             var isNULL = false
-
-
             while ((i < array.size) && !isNULL) {
               mappers(i)(array(i)) match {
                 case Some(number) => arr(i) = number

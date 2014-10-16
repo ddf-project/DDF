@@ -36,7 +36,12 @@ class RepresentationHandlerSuite extends ATestSuite {
       "distance/1000, arrdelay/100, depdelay/100, delayed from airline_delayed").asInstanceOf[SparkDDF]
     val rddLabeledPoint = ddf.getRDD(classOf[LabeledPoint])
     assert(rddLabeledPoint != null)
-    assert(rddLabeledPoint.count() === 295)
+    assert(rddLabeledPoint.count() === 301)
+
+    val ddf2 = manager.sql2ddf("selecy month, year, dayofmonth from airline_delayed").asInstanceOf[SparkDDF]
+    val rddLabeledPoint2 = ddf2.getRDD(classOf[LabeledPoint])
+    assert(rddLabeledPoint2 != null)
+    assert(rddLabeledPoint2.count() === 295)
   }
 
 //  test("Can get RDD[Array[Double]] and RDD[Array[Object]]") {
