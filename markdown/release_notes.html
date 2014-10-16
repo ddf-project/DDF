@@ -6,6 +6,25 @@
           <a href="https://github.com/ddf-project/DDF/edit/gh-pages/markdown/release_notes.html" class="minibutton " target="_blank">Edit</a>
 </div>
 <xmp theme="united" style="display:none">
+
+# DDF release notes
+
+This document summarizes all information about latest DDF release. 
+
+
+---
+
+* <a href="#release-notes">DDF 1.0 release notes</a>
+	* <a href="#ddf-engines">DDF on other engines</a>
+	* <a href="#basic-statistic">Basic statistic</a>
+	* <a href="#basic-operations">Basic operations</a>
+	* <a href="#etl">ETL</a>
+	* <a href="#aggregation">Aggregation</a>
+	* <a href="#machinelearning">Machine learning</a>
+
+---
+
+<a name="release-notes"></a>
 ## DDF 1.0 release notes
 
 DDF provides most popular tasks in data engineering and machine learning. 
@@ -22,7 +41,7 @@ DDF provides most popular tasks in data engineering and machine learning.
 
 6. Collaborative: Users can share DDF across multiple languages using our lightweight DDF REST server. 
 
-
+<a name="ddf-engines"></a>
 ### DDF on other engines
 DDF is created with engine independent goal since day one. We believe keeping the APIs consistent and intuitive help boosting user productivity. 
 
@@ -35,7 +54,7 @@ ddfManager = DDFManager.get("cassandra");
 ```
 Once you create DDFManager, you can create DDF and use DDF with the the same APIs.
 
-
+<a name="basic-statistic"></a>
 ### Basic statistic
 | API        | Example | Meaning           | 
 | ------------- |:-------------:|------------- |
@@ -48,7 +67,7 @@ Once you create DDFManager, you can create DDF and use DDF with the the same API
 | nrow     | ddf.**nrow**() | Return number of rows |
 | as.factor     | ddf.**getSchemaHandler()**.setAsFactor(columnIndex) | Set columnIndex as factor column |
 
-
+<a name="basic-operations"></a>
 ### Basic operations
 | API        | Example | Meaning           | 
 | ------------- |:-------------:|------------- |
@@ -57,14 +76,7 @@ Once you create DDFManager, you can create DDF and use DDF with the the same API
 | Sample     |ddf.VIEWS.**getRandomSample**(percent, replace, seed) | Return a sample DDF |
 | Projection     |ddf.VIEWS.**project**(columnList) | Return a new DDF with specified columns |
 
-
-### Aggregation
-| API        | Example | Meaning           | 
-| ------------- |:-------------:|------------- |
-| Binning     | ddf.**binning**("distance", "EQUALINTERVAL", 3, null, true, true) | Run binning ddf on distance column|
-| Aggregation     | ddf.**aggregate**("year, mean(depdelay), ") | Get mean of depdelay by year on DDF|
-| Group by     | ddf.**groupBy**(Arrays.asList("origin") | Run groupBy on column origin|
-
+<a name="etl"></a>
 ### ETL
 | API        | Example | Meaning           | 
 | ------------- |:-------------:|------------- |
@@ -75,7 +87,15 @@ Once you create DDFManager, you can create DDF and use DDF with the the same API
 | Transform UDF  | ddf.Transform.**transformUDF**("dist= round(distance/2, 2)") | Transform ddf using HiveUDF |
 | Transform R    | ddf.Transform.**transformNativeRserve**("newcol = deptime / arrtime") | Create new column using R expression|
 
+<a name="aggregation"></a>
+### Aggregation
+| API        | Example | Meaning           | 
+| ------------- |:-------------:|------------- |
+| Binning     | ddf.**binning**("distance", "EQUALINTERVAL", 3, null, true, true) | Run binning ddf on distance column|
+| Aggregation     | ddf.**aggregate**("year, mean(depdelay), ") | Get mean of depdelay by year on DDF|
+| Group by     | ddf.**groupBy**(Arrays.asList("origin") | Run groupBy on column origin|
 
+<a name="machinelearning"></a>
 ### Machine learning
 | API        | Example | Meaning           | 
 | ------------- |:-------------:|------------- |
@@ -92,8 +112,6 @@ Once you create DDFManager, you can create DDF and use DDF with the the same API
 | Persist model | model.persist() | Persist machine learning model to disk |
 
 
-
-[Next we will demonstrate how to write simple application on DDF. ](tutorial.html)
 </xmp>
 
 <script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
