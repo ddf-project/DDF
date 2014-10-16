@@ -6,6 +6,29 @@
           <a href="https://github.com/ddf-project/DDF/edit/gh-pages/markdown/tutorial.html" class="minibutton " target="_blank">Edit</a>
 </div>
 <xmp theme="united" style="display:none;">
+
+# Tutorial
+
+This document will guide you step by step how to use DDF.
+
+
+---
+
+* <a href="#ide">How to set up environment</a>
+* <a href="#build">How to verify DDF buildt</a>
+* <a href="#write-app">How to write stand alone application</a>
+	* <a href="#ddf-manager">Create DDF Manager</a>
+	* <a href="#ddf-table">Create data table in DDFr</a>
+	* <a href="#ddf">Create DDF</a>
+	* <a href="#viewhandler">View Handler</a>
+	* <a href="#basicstats">Basic statistic</a>
+	* <a href="#mutability">Mutability</a>
+	* <a href="#missing-data">Missing Data Handling</a>
+	* <a href="#etl">ETL</a>
+	* <a href="#machinelearning">Machine learning</a>
+
+---
+<a name="ide"></a>
 ## How to set up environment
 ### Use Eclipse/IntelliJ
 
@@ -13,7 +36,7 @@ First you need to follow all steps describe in [Getting started](quickstart.html
 
 After importing there are two maven projects: core and spark. Core project contains all core APIs which are engine-independent. Spark project contains all implementation APIs using Spark engine. 
 
-
+<a name="build"></a>
 ## How to verify your build
 You can use mvn test to verify your build. 
 ```sh
@@ -24,9 +47,11 @@ cd core; mvn test
 cd spark; mvn test
 ```
 
+<a name="write-app"></a>
 ## How to write stand alone application
 In this section we will walk you through how to write a standalone application on DDF. 
 
+<a name="ddf-manager"></a>
 ### DDFManager
 A DDFManager is basically a DDF implementor. It creates the entry point to the big data engine that DDF sits on top, supports loading data from big data sources into DDFs and book-keepings the DDF pool.
 Create a new instance of DDFManager for the given engine name. 
@@ -35,7 +60,7 @@ Create a new instance of DDFManager for the given engine name.
 DDFManager manager = DDFManager.get("spark");
 ```
 
-
+<a name="ddf-table"></a>
 ### Create data table in DDF
 A Distributed DataFrame (DDF) is a table-like abstraction, each DDF instance is backed by a table, in this example it's a Shark table. You can create table by using sql2txt command. 
 
@@ -45,6 +70,8 @@ manager.sql2txt(
         "CREATE TABLE mtcars (mpg double,cyl int,disp double,hp int,drat double,wt double,qsec double,vs int,am int,gear int,carb int) ROW FORMAT DELIMITED FIELDS TERMINATED BY ' ' ");
 manager.sql2txt("LOAD DATA LOCAL INPATH 'resources/mtcars' INTO TABLE mtcars");
 ```
+
+<a name="ddf"></a>
 ### DDF
 To create a DDF instance from an existing table, you can use sql2ddf function. 
 ```java
@@ -64,6 +91,7 @@ You can choose to project a subset of column in DDF.
 DDF ddf2 = ddf.VIEWS.project("mpg", "disp", "hp", "drat", "qsec");
 ```
 
+<a name="viewhandler"></a>
 ### ViewHandler
 In this section you will see how Handler works. Handlers are the functional components in the DDF framework. ViewHandler capture all functions relating to view of DDF, select first few records, projection, subset. 
 
@@ -72,7 +100,7 @@ In this section you will see how Handler works. Handlers are the functional comp
 List<String> result = ddf2.VIEWS.head(10);
 ```
 
-
+<a name="basicstats"></a>
 ### Basic statistic
 FiveNum returns Tukey's five number summary (minimum, lower-hinge, median, upper-hinge, maximum) for the input data.
 ```java
@@ -81,6 +109,7 @@ ddf2.getSummary();
 ddf2.getFiveNumSummary();
 ```
 
+<a name="mutability"></a>
 ### Mutability
 In some case mutability helps users write less code. You can set a ddf to be mutable. 
 ```java
@@ -88,6 +117,7 @@ In some case mutability helps users write less code. You can set a ddf to be mut
 ddf2.setMutable(true);
 ```
 
+<a name="missing-data"></a>
 ### Missing data handling 
 User can exclude rows that contains missing data columns. To do that you can use dropNA method. 
 ```java
@@ -95,7 +125,7 @@ User can exclude rows that contains missing data columns. To do that you can use
 ddf2.dropNA();
 ```
 
-
+<a name="etl"></a>
 ### ETL
 User can group by and aggregate data by a group of columns
 ```java
@@ -110,7 +140,7 @@ DDF ddf4 = ddf2.groupBy(grcol).agg(aggcol);
 //get first 10 record from aggregated ddf, ddf4
 ddf4.VIEWS.top(10, "mpg", "asc");
 ```
-
+<a name="machinelearning"></a>
 ### Machine learning
 DDF user can build machine learning model out-of-the-box. We use Spark Mllib machine learning implementation to build model. Users can get rich functionalities in machine learning from Spark's Mllib. 
 ```java
