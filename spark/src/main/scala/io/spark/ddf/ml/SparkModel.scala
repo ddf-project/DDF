@@ -8,7 +8,7 @@ import io.ddf.exception.DDFException
 /**
   */
 class SparkModel(rawModel: Object) extends Model(rawModel) {
-  override def predict(point: Array[Double]): Double = {
+  override def predict(point: Array[java.lang.Double]): Double = {
 
     val predictMethod = new PredictMethod(this.getRawModel, MLClassMethods.DEFAULT_PREDICT_METHOD_NAME
       , Array(classOf[Vector]))
@@ -16,11 +16,16 @@ class SparkModel(rawModel: Object) extends Model(rawModel) {
     if (predictMethod.getMethod == null) {
       throw new DDFException((String.format("Cannot locate method specified by %s", MLClassMethods.DEFAULT_PREDICT_METHOD_NAME)))
     }
-
+    val scalaPoint = Array[Double](point.length)
+    var i = 0
+    while(i < point.length) {
+      scalaPoint(i) = point(i)
+      i += 1
+    }
     val prediction = predictMethod.instanceInvoke(Vectors.dense(point));
-    if (prediction isInstanceOf Double) {
+    if (prediction.isInstanceOf[Double]) {
       prediction.asInstanceOf[Double]
-    } else if (prediction isInstanceOf Int) {
+    } else if (prediction.isInstanceOf[Int]) {
       (prediction.asInstanceOf[Int]).toDouble
     } else {
       throw new DDFException(String.format("Error getting prediction from model %s", this.getRawModel.getClass.getName))
