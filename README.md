@@ -14,5 +14,5 @@ Source code for ddf.io website
 | Introduction | [introduction.html] (https://github.com/ddf-project/DDF/blob/gh-pages/introduction.html "Introduction page")      |
 | Design document | [design.html] (https://github.com/ddf-project/DDF/blob/gh-pages/design.html "Design document")     |
 | API | apidocs      |
-| People | [markdown/people.html] (https://github.com/ddf-project/DDF/blob/gh-pages/markdown/people.html "People page")      | 
+| People | [markdown/developers.html] (https://github.com/ddf-project/DDF/blob/gh-pages/markdown/people.html "People page")      | 
 | Plan | [plans.html] (https://github.com/ddf-project/DDF/blob/gh-pages/plans.html "Plan page")      | 
