@@ -184,7 +184,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
   }
 
   public IModel newModel(Object rawModel) throws DDFException {
-    return this.newModel(new Class<?>[]{rawModel.getClass()}, new Object[]{rawModel});
+    return this.newModel(new Class<?>[]{Object.class}, new Object[]{rawModel});
   }
 
   @SuppressWarnings("unchecked")
