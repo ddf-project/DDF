@@ -3,7 +3,7 @@ package io.spark.ddf.ml;
 
 import io.ddf.exception.DDFException;
 import io.ddf.ml.MLClassMethods;
-import org.apache.spark.mllib.linalg.Vector$class;
+import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 /**
  * author: daoduchuan
@@ -17,7 +17,7 @@ public class Model extends io.ddf.ml.Model {
   @Override
   public Double predict(double[] point) throws DDFException {
     MLClassMethods.PredictMethod predictMethod= new MLClassMethods.PredictMethod(this.getRawModel(), MLClassMethods.DEFAULT_PREDICT_METHOD_NAME,
-      new Class<?>[]{Vector$class.class});
+      new Class<?>[]{Vector.class});
     if(predictMethod.getMethod() == null) {
       throw new DDFException(String.format("Cannot locate method specified by %s", MLClassMethods.DEFAULT_PREDICT_METHOD_NAME));
 
