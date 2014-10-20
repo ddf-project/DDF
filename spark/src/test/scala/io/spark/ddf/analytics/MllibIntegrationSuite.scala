@@ -7,7 +7,7 @@ import io.spark.ddf.{ATestSuite, SparkDDF}
   */
 class MLlibIntegrationSuite extends ATestSuite {
 
-  test("Test MLLib integation") {
+  test("test Kmeans") {
 
     createTableAirlineWithNA()
     createTableAirline()
@@ -26,7 +26,6 @@ class MLlibIntegrationSuite extends ATestSuite {
     val yPred = ddfPredict2.ML.applyModel(kmeansModel, false, true)
     val nrows = yPred.VIEWS.head(10)
     assert(nrows != null)
-    manager.shutdown()
   }
 
   test("test LinearRegressionWithSGD") {
