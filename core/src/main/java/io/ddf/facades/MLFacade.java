@@ -86,7 +86,7 @@ public class MLFacade implements ISupportML {
   }
 
   public IModel als(int rank, int iteration, double lamda) throws DDFException {
-    return this.train("collaborateFiltering", rank, iteration, lamda);
+    return this.train("collaborativeFiltering", rank, iteration, lamda);
   }
 
 }
