@@ -348,7 +348,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       throw new DDFException("Cannot get vector quantiles from SQL queries");
     }
     String[] convertedResults = rs.get(0)
-        .replace("[", "").replace("]", "").replaceAll("\t", ",").replace("null", "NULL, NULL, NULL").split(",");
+        .replace(" ", "").replace("(", "").replace(")", "").replace("ArrayBuffer", "")
+        .replace("null", "NULL, NULL, NULL").split(",");
     mLog.info("Raw info " + StringUtils.join(rs, "\n"));
 
     Double[] result = new Double[percentiles.length];
