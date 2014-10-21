@@ -26,7 +26,7 @@ object RootBuild extends Build {
 //  var SPARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SPARK_VERSION+"-adatao"
 //  else MAIN_SPARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
 
-  val SPARK_VERSION = "1.1.1-adatao"
+  val SPARK_VERSION = "1.2.0-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -53,7 +53,7 @@ object RootBuild extends Build {
 //    "0.9-mesos"
 //  }
 
-  val rootVersion = "1.0"
+  val rootVersion = "1.2.0"
 
   val projectOrganization = rootOrganization + "." + projectName
 

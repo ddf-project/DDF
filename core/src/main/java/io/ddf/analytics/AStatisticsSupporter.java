@@ -58,7 +58,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       // or "min \t max \t null"s
       String[] rs = this.getDDF()
           .sql2txt(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).get(0)
-          .replace("[", "").replace("]", "").replaceAll("\t", ",").replace("null", "NULL, NULL, NULL").split(",");
+          .replace(" ", "").replace("(", "").replace(")", "").replace("ArrayBuffer", "")
+          .replace("null", "NULL, NULL, NULL").split(",");
 
 
       int k = 0;
