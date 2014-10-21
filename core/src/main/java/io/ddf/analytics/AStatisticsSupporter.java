@@ -52,6 +52,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("SELECT %s FROM %%s", StringUtils.join(specs.toArray(new String[0]), ','));
 
     if (!Strings.isNullOrEmpty(command)) {
+    mLog.info(">>>> command = " + command);
       // a fivenumsummary of an Int/Long column is in the format "[min, max, 1st_quantile, median, 3rd_quantile]"
       // each value can be a NULL
       // a fivenumsummary of an Double/Float column is in the format "min \t max \t[1st_quantile, median, 3rd_quantile]"
@@ -137,6 +138,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       List<String> result = this.getDDF().sql2txt(command,
           String.format("Unable to compute covariance of %s and %s from table %%s", xColumnName, yColumnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
+        System.out.println(">>>>> parseDouble: " + result.get(0));
         cov = Double.parseDouble(result.get(0));
         return cov;
       }
@@ -168,6 +170,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
   }
 
   private double parseDouble(String s) {
+    mLog.info(">>>> parseDouble: " + s);
     return ("NULL".equalsIgnoreCase(s.trim())) ? Double.NaN : Double.parseDouble(s);
   }
 
