@@ -150,6 +150,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
   public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
     String command = String.format("select histogram_numeric(%s,%s) from @this", columnName, numBins);
     if (!Strings.isNullOrEmpty(command)) {
+      mLog.info(">>>> getVectorHistogram command = " + command);
       List<String> result = this.getDDF()
           .sql2txt(command, String.format("Unable to compute histogram of %s from table %%s", columnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
