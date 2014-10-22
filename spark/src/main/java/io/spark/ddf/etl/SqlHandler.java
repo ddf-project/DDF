@@ -56,7 +56,8 @@ public class SqlHandler extends ASqlHandler {
         ((SparkDDF) ddf).cacheTable();
       }
     } catch (Exception e) {
-      throw new DDFException(String.format("Can not create table for DDF %s", tableName), e);
+      mLog.info(">>>> Exception e.message = " + e.getMessage());
+      throw new DDFException(String.format("Can not create table for DDF %s, " + e.getMessage(), tableName), e);
     }
   }
 
