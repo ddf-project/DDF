@@ -156,7 +156,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     pArray.foreach(x ⇒ cmd = cmd + x.toString + ",")
     cmd = cmd.take(cmd.length - 1)
     cmd = String.format("min(%s), percentile_approx(%s, array(%s)), max(%s)", colName, colName, cmd, colName)
-    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replaceAll("ArrayBuffer|\\(|\\)|,", "").split("\t").
+    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replaceAll("ArrayBuffer|\\(|\\)|,", "").split("\t| ").
       map(x ⇒ x.toDouble)
   }
 
