@@ -31,7 +31,7 @@ public abstract class ADDFFunctionalGroupHandler extends ALoggable implements IH
   /*
    * (non-Javadoc)
    * 
-   * @see com.adatao.ddf.IHandleDDFFunctionalGroup#getDDF()
+   * @see io.ddf.IHandleDDFFunctionalGroup#getDDF()
    */
   @Override
   public DDF getDDF() {
