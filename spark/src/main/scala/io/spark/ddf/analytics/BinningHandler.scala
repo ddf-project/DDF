@@ -122,7 +122,8 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
   def getIntervalsFromNumBins(colName: String, bins: Int): Array[Double] = {
     val cmd = "SELECT min(%s), max(%s) FROM %s".format(colName, colName, mDDF.getTableName)
-    val res: Array[Double] = mDDF.sql2txt(cmd, "").get(0).split("\t").map(x ⇒ x.toDouble)
+    val res: Array[Double] = mDDF.sql2txt(cmd, "").get(0).replace("ArrayBuffer", "").
+      replace("(", "").replace(")", "").replace(", ", "\t").split("\t").map(x ⇒ x.toDouble)
     val (min, max) = (res(0), res(1))
     val eachInterval = (max - min) / bins
     val probs: Array[Double] = Array.fill[Double](bins + 1)(0)
