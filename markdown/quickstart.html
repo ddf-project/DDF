@@ -86,7 +86,7 @@ manager.sql2txt("load data local inpath 'resources/test/airline.csv' into table 
 Create DDF
 ``` java
 DDF ddf = manager.sql2ddf("select * from airline");
-Get the number of rows/columns of the DDF:
+#Get the number of rows/columns of the DDF:
 
 ddf.getNumRows();
 print(ddf.getColumnNames());
@@ -157,7 +157,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JAVA_LD_LIBRARY_PATH
 ```
 After this step you can start running provided example by using this command
 ``` R
-Rscript examples/basics.R.
+Rscript examples/basics.R
 ```
 
 <a name="ddf-python"></a>
