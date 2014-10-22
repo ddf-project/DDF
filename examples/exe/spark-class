@@ -25,11 +25,6 @@ FWDIR="$(cd `dirname $0`; pwd)"
 # Export this as SPARK_HOME
 export SPARK_HOME="$FWDIR"
 
-# Load environment variables from conf/spark-env.sh, if it exists
-# Adatao
-if [ -e $FWDIR/../conf/pa-env.sh ] ; then
-  . $FWDIR/../conf/pa-env.sh
-fi
 
 if [ -z "$1" ]; then
   echo "Usage: spark-class <class> [<args>]" >&2
