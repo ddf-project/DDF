@@ -156,8 +156,8 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     pArray.foreach(x ⇒ cmd = cmd + x.toString + ",")
     cmd = cmd.take(cmd.length - 1)
     cmd = String.format("min(%s), percentile_approx(%s, array(%s)), max(%s)", colName, colName, cmd, colName)
-    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replace("[", "").
-      replace("]", "").replace(",", "\t").split("\t").map(x ⇒ x.toDouble)
+    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replaceAll("ArrayBuffer|\\(|\\)|,", "").split("\t").
+      map(x ⇒ x.toDouble)
   }
 
   val MAX_LEVEL_SIZE = Integer.parseInt(System.getProperty("factor.max.level.size", "1024"))
