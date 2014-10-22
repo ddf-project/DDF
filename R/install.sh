@@ -20,4 +20,6 @@ cp $TARGET_DIR/ddf_spark_$SCALA_VERSION-$SPARK_VERSION.jar package/inst/java/
 cp $TARGET_DIR/lib/*.jar package/inst/java/
 
 # Install R
+export JAVA_HOME=${JAVA_HOME:-`readlink -f /usr/bin/javac | sed "s:/bin/javac::"`}
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${JAVA_HOME}/jre/lib/amd64/server
 R CMD INSTALL package/
