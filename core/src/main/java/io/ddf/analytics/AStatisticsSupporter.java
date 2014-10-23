@@ -154,8 +154,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
           .sql2txt(command, String.format("Unable to compute histogram of %s from table %%s", columnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         List<HistogramBin> bins = Lists.newArrayList();
-
-        String[] arrayString = result.get(0).replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|,", "").split("\t| ");
+        mLog.info(">>>> Histogram result = " + result.get(0));
+        String[] arrayString = result.get(0).replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|", "").split(",");
         for(String str : arrayString) {
           HistogramBin bin = new HistogramBin();
           String[] xy = str.split(",");
