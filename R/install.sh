@@ -19,6 +19,10 @@ rm -r package/inst/java/* || mkdir package/inst/java
 cp $TARGET_DIR/ddf_spark_$SCALA_VERSION-$SPARK_VERSION.jar package/inst/java/
 cp $TARGET_DIR/lib/*.jar package/inst/java/
 
+# log4j
+rm -r package/inst/conf/local/* || mkdir -p package/inst/conf/local
+cp $FWDIR/../core/conf/local/ddf-local-log4j.properties package/inst/conf/local/ddf-local-log4j.properties
+
 # Install R
 export JAVA_HOME=${JAVA_HOME:-`readlink -f /usr/bin/javac | sed "s:/bin/javac::"`}
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${JAVA_HOME}/jre/lib/amd64/server
