@@ -22,6 +22,8 @@ In our next version DDF 1.1 you will get all benefits from Spark 1.1.0. You can 
 	* <a href="#etl">ETL</a>
 	* <a href="#aggregation">Aggregation</a>
 	* <a href="#machinelearning">Machine learning</a>
+* <a href="#python-notes">Python users</a>
+* <a href="#R-notes">R users</a>	
 
 ---
 
@@ -113,10 +115,53 @@ Once you create DDFManager, you can create DDF and use DDF with the the same API
 | Persist model | model.persist() | Persist machine learning model to disk |
 
 
+<a name="python-notes"></a>
+## Python APIs
+
+<a name="python-ddf-engines"></a>
+### Create DDFManager 
+
+```python 
+from ddf.DDFManager import DDFManager
+dm = DDFManager("spark")
+
+#set up table
+dm.sql("set hive.metastore.warehouse.dir=/tmp/hive/warehouse")
+dm.sql("drop table if exists mtcars")
+dm.sql("CREATE TABLE mtcars (mpg double, cyl int, disp double, hp int, drat double, wt double, qesc double, vs int, am int, gear int, carb string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '")
+dm.sql("LOAD DATA LOCAL INPATH '" + DDF_HOME  + "/resources/test/mtcars' INTO TABLE mtcars")
+
+#create DDF
+ddf = dm.sql2ddf("select * from mtcars")
+```
+
+
+<a name="python-basic-statistic"></a>
+### Basic statistic
+| API        | Example | Meaning           | 
+| ------------- |:-------------:|------------- |
+| Summary     |ddf.**getSummary**() | Return the basic summary of ddf |
+| GetColumnNames     |ddf.**getColumnNames**() | Return column names of ddf |
+| FiveNum     |  ddf.**getFiveNumSummary**() |Return five num summary of ddf |
+| NumRow     | ddf.**getNumRows**() | Return number of rows |
+| FirstNRows     | ddf.**firstNRows**() | Get the first N rows |
+| Sample     | ddf.**sample**() | Get sample of DDF |
+| Aggreation     | ddf.**aggregate**() | Aggregate on DDF |
+
+
+
+<a name="R-notes"></a>
+## R APIs
+We're building a new beautiful APIs and rich functionalities for R. We'll release the new API in the next version. 
+
 </xmp>
 
 <script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
 <link href="../assets/css/main.css" rel="stylesheet">
+ <p>
+</p>
+ <p>
+</p>
  <p>
 </p>
 <br><br>
