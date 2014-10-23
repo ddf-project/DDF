@@ -59,8 +59,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       // or "min \t max \t null"s
       String[] rs = this.getDDF()
           .sql2txt(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).get(0)
-          .replace(" ", "").replace("(", "").replace(")", "").replace("ArrayBuffer", "").replace("\t", ",")
-          .replace("null", "NULL, NULL, NULL").split(",");
+          .replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|,", "").split("\t| ");
 
 
       int k = 0;
@@ -156,7 +155,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         List<HistogramBin> bins = Lists.newArrayList();
 
-        String[] arrayString = result.get(0).replaceAll("ArrayBuffer|\\(|\\)|,", "").split("\t| ");
+        String[] arrayString = result.get(0).replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|,", "").split("\t| ");
         for(String str : arrayString) {
           HistogramBin bin = new HistogramBin();
           String[] xy = str.split(",");
@@ -352,7 +351,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       throw new DDFException("Cannot get vector quantiles from SQL queries");
     }
     String[] convertedResults = rs.get(0)
-        .replaceAll("ArrayBuffer|\\(|\\)|,", "")
+        .replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|,", "")
         .replace("null", "NULL, NULL, NULL").split("\t| ");
     mLog.info("Raw info " + StringUtils.join(rs, "\n"));
 
