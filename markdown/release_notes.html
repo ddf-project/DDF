@@ -152,7 +152,37 @@ ddf = dm.sql2ddf("select * from mtcars")
 
 <a name="R-apis"></a>
 ## R APIs
-We're building a new beautiful APIs and rich functionalities for R package. We'll release the new API in the next version. 
+### Create DDFManager 
+
+```R 
+dm <- DDFManager("spark")
+
+write.table(mtcars, "/tmp/mtcars", row.names=F, col.names=F)
+#set up table
+sql(dm, 'set hive.metastore.warehouse.dir=/tmp/hive/warehouse')
+sql(dm, "drop table if exists mtcars")
+sql(dm, "CREATE TABLE mtcars (mpg double, cyl int, disp double, hp int, drat double, wt double, qesc double, vs int, am int, gear int, carb string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '")
+sql(dm, paste0("LOAD DATA LOCAL INPATH '/tmp/mtcars' INTO TABLE mtcars"))
+
+
+#create DDF
+ddf <- sql2ddf(dm, "select * from mtcars")
+```
+### Basic statistics
+| API        | Example | Meaning           | 
+| ------------- |:-------------:|------------- |
+| Summary     |summary(ddf) | Return the basic summary of ddf |
+| GetColumnNames     |colnames(ddf) | Return column names of ddf |
+| FiveNum     |  fivenum(ddf) |Return five num summary of ddf |
+| NumRow     | nrow(ddf) | Return number of rows |
+| NumCol     | ncol(ddf) | Return number of columns |
+| Head     | head(ddf) | Get the first N rows |
+| Sample     | sample(ddf, 10) | Get sample of DDF |
+| Aggreation     | daggr(mpg ~ vs + carb, ddf, FUN=mean) | Aggregate on DDF |
+
+
+We're working a new beautilful API with rich functionalities. 
+
 <br>
 <br>
 <br>
