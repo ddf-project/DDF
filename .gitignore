@@ -38,3 +38,6 @@ R/package/inst/java
 .Rhistory
 .RData
 R.Rproj
+
+# python stuffs
+*.pyc
