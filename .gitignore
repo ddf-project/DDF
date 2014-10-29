@@ -1,5 +1,6 @@
 *.class
 *.swp
+*.iml
 *.log
 target/
 .idea
