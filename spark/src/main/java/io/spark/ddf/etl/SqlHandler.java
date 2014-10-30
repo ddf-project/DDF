@@ -173,8 +173,11 @@ public class SqlHandler extends ASqlHandler {
       }
     }
     SchemaRDD rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
+    Long size = rdd.count();
+    Row row = rdd.first();
 //    Row[] arrRow = (Row[]) rdd.collect();
     List<String> lsString = new ArrayList<String>();
+    lsString.add(row.mkString("\t"));
 //    for (Row row : arrRow) {
 //      lsString.add(row.mkString("\t"));
 //    }
