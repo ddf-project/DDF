@@ -1019,8 +1019,6 @@ public abstract class DDF extends ALoggable //
 
     private String createdTime;
 
-
-
     public String getUri() {
       return this.uri;
     }

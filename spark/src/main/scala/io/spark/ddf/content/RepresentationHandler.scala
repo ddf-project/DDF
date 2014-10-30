@@ -39,7 +39,7 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   this.addConvertFunction(RDD_ROW, RDD_REXP, new RDDROW2REXP(this.mDDF))
   this.addConvertFunction(SCHEMARDD, RDD_MATRIX_VECTOR, new SchemaRDD2MatrixVector(this.mDDF))
   this.addConvertFunction(RDD_ROW, SCHEMARDD, new Row2SchemaRDD(this.mDDF))
-
+  this.addConvertFunction(SCHEMARDD, RDD_ROW, new SchemaRDD2RDDRow(this.mDDF))
   //this.addConvertFunction(RDD_ROW, RDD_RATING, new Row2Rating(this.mDDF))
 
   override def getDefaultDataType: Array[Class[_]] = Array(classOf[RDD[_]], classOf[Array[Object]])
