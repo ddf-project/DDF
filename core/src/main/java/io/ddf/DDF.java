@@ -950,7 +950,11 @@ public abstract class DDF extends ALoggable //
 
 
   public DDF dropNA() throws DDFException {
-    return this.getMissingDataHandler().dropNA(Axis.ROW, NAChecking.ANY, 0, null);
+    return dropNA(Axis.ROW);
+  }
+
+  public DDF dropNA(Axis pattern) throws DDFException {
+    return this.getMissingDataHandler().dropNA(pattern, NAChecking.ANY, 0, null);
   }
 
   public DDF fillNA(String value) throws DDFException {
