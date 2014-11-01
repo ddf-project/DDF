@@ -10,7 +10,6 @@ import java.io.Serializable;
  * Basic statistics for a set of double numbers including min, max, count,
  * NAcount, mean, variance and stdev
  *
- * @author bhan
  */
 @SuppressWarnings("serial")
 public class Summary implements Serializable {

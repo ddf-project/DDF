@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 //import org.apache.hadoop.hive.ql.metadata.HiveException;
 
 /**
- * @author ctn
  */
 public class SqlHandler extends ASqlHandler {
 

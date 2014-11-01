@@ -15,7 +15,6 @@ import org.apache.spark.sql.catalyst.expressions.Row
 /**
  * RDD-based ViewHandler
  *
- * @author ctn
  *
  */
 class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHandleViews {

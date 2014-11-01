@@ -7,7 +7,6 @@ public class MissingDataTypes {
   /**
    * Abstract base type for support of missing values (NAs) in the data
    *
-   * @author ctn
    */
   public abstract class AMissingValue<T> {
     protected T mValue;

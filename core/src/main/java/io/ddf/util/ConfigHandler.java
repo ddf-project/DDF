@@ -20,7 +20,6 @@ import java.util.Set;
 
 
 /**
- * @author ctn
  */
 public class ConfigHandler extends ALoggable implements IHandleConfig {
 

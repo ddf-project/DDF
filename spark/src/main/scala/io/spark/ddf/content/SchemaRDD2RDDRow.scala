@@ -7,7 +7,6 @@ import org.apache.spark.sql.catalyst.expressions.Row
 import org.apache.spark.rdd.RDD
 
 /**
- * author: daoduchuan
  */
 class SchemaRDD2RDDRow(@transient ddf: DDF) extends ConvertFunction(ddf){
 

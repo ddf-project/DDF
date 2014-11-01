@@ -6,7 +6,6 @@ import org.apache.spark.rdd.RDD
 import org.rosuda.REngine.{REXPString, REXPInteger, REXPDouble, REXP}
 
 /**
- * author: daoduchuan
  */
 class REXP2ArrayObject(@transient ddf: DDF) extends ConvertFunction(ddf) {
 

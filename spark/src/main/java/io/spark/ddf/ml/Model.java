@@ -6,7 +6,6 @@ import io.ddf.ml.MLClassMethods;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 /**
- * author: daoduchuan
  */
 public class Model extends io.ddf.ml.Model {
 
