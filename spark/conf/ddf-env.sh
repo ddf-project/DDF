@@ -94,12 +94,9 @@ then
         export SPARK_MASTER="yarn-client"
         SPARK_CLASSPATH+=:"${DDF_HOME}/conf/"
         export SPARK_CLASSPATH
-        export SPARK_WORKER_INSTANCES=2
-        export SPARK_WORKER_CORES=8
         export SPARK_WORKER_MEMORY=$SPARK_MEM
         export SPARK_JAR=`find ${DDF_HOME}/ -name ddf_spark-assembly-*.jar`
-        export HADOOP_NAMENODE=`cat ${HADOOP_CONF_DIR}/masters`
-        export SPARK_YARN_APP_JAR=hdfs://${HADOOP_NAMENODE}:9000/user/root/ddf_spark-assembly-0.9.jar
+        export SPARK_YARN_APP_JAR=hdfs:///user/root/ddf_spark-assembly-0.9.jar
         [ "X$SPARK_YARN_APP_JAR" == "X" ] && echo "Please define SPARK_YARN_APP_JAR" && exit 1
         [ "X$HADOOP_CONF_DIR" == "X" ] && echo "Please define HADOOP_CONF_DIR" && exit 1
         [ "X$SPARK_WORKER_INSTANCES" == "X" ] && echo "Notice! SPARK_WORKER_INSTANCES is not defined, the default value will be used instead"
