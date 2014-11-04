@@ -1,4 +1,4 @@
-### ATTENTION: files in this directory are automatically copied from git@github.com:adatao/projects/docs/code-convention. If you have modifications, make them there. Modifications made here will be overwritten.
+### ATTENTION: files in this directory are automatically copied from git@github.com:ddf-project/DDF/tree/master/style. If you have modifications, make them there. Modifications made here will be overwritten.
 
 Generated: Sun Jun 30 18:24:10 PDT 2013 by ctn@ctnu
 

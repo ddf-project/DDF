@@ -1,5 +1,6 @@
 *.class
 *.swp
+*.iml
 *.log
 target/
 .idea
@@ -38,3 +39,7 @@ R/package/inst/java
 .Rproj.user
 .Rhistory
 .RData
+R.Rproj
+
+# python stuffs
+*.pyc

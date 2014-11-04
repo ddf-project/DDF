@@ -12,7 +12,7 @@ setMethod("initialize",
           signature(.Object="DDF"),
           function(.Object, jddf) {
             if (is.null(jddf) || !inherits(jddf, "jobjRef") || !(jddf %instanceof% "io.ddf.DDF"))
-              stop('DDF needs a Java object of class "com.adatao.ddf.DDF"')
+              stop('DDF needs a Java object of class "io.ddf.DDF"')
             .Object@jddf = jddf
             .Object
           })

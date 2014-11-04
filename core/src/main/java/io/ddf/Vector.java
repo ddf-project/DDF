@@ -54,8 +54,8 @@ public class Vector<T> implements Serializable {
    * @param theColumnName
    * @throws DDFException
    */
-  public Vector(String name, T[] data) throws DDFException {
-    this.initialize(name, data, null);
+  public Vector(String theColumnName, T[] data) throws DDFException {
+    this.initialize(theColumnName, data, null);
   }
 
   /**
@@ -66,8 +66,8 @@ public class Vector<T> implements Serializable {
    * @param engineName
    * @throws DDFException
    */
-  public Vector(String name, T[] data, String engineName) throws DDFException {
-    this.initialize(name, data, engineName);
+  public Vector(String theColumnName, T[] data, String engineName) throws DDFException {
+    this.initialize(theColumnName, data, engineName);
   }
 
   private void initialize(String name, T[] data, String engineName) throws DDFException {

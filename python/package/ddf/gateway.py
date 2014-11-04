@@ -14,8 +14,15 @@ def preexec_func():
 
 def start_gateway_server():
     classPath = compute_classpath(DDF_HOME)
-    command = ["java", "-cp", classPath, "py4j.GatewayServer", "--die-on-broken-pipe", "0"]
-    print command
+    # launch GatewayServer in a new process
+    javaopts = os.getenv('JAVA_OPTS')
+    if javaopts is not None:
+        javaopts = javaopts.split()
+    else:
+        javaopts = []
+    #command = ["java", "-classpath", classPath] + ["-Dlog4j.configuration=file:"+ DDF_HOME + "/core/conf/local/ddf-local-log4j.properties"] + ["py4j.GatewayServer", "--die-on-broken-pipe", "0"]
+    command = ["java", "-classpath", classPath] + javaopts + ["py4j.GatewayServer", "--die-on-broken-pipe", "0"]
+    
     proc = Popen(command, stdout = PIPE, stdin = PIPE, preexec_fn = preexec_func)
     # get the port of the GatewayServer
     port = int(proc.stdout.readline())

@@ -3,8 +3,11 @@
 FWDIR="$(cd `dirname $0`/..; pwd)"
 
 export DDF_HOME=$FWDIR/..
+echo $DDF_HOME
 export PYTHONPATH=$PYTHONPATH:$FWDIR/package:$FWDIR/lib/py4j0.8.2.1.jar:$FWDIR/lib/py4j-0.8.2.1-src.zip
 echo $PYTHONPATH
+
+export JAVA_OPTS="-Dlog4j.configuration=file:${DDF_HOME}/core/conf/local/ddf-local-log4j.properties"
 
 if [[ "$1" =~ \.py$ ]]; then
   exec python $1
