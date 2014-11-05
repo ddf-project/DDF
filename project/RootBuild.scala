@@ -15,25 +15,10 @@ object RootBuild extends Build {
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
-//  lazy val hadoopVersion = env("HADOOP_VERSION") getOrElse
-//    DEFAULT_HADOOP_VERSION
-//
-//  lazy val MAIN_SHARK_VERSION = "0.9.2"
-//  var SHARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SHARK_VERSION+"-adatao"
-//  else MAIN_SHARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
-//
-//  lazy val MAIN_SPARK_VERSION = "0.9.2"
-//  var SPARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SPARK_VERSION+"-adatao"
-//  else MAIN_SPARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
 
-  val SPARK_VERSION = "1.2.0-adatao"
+  val SPARK_VERSION = "1.2.0-SNAPSHOT"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
-
-//  if(!YARN_ENABLED) {
-//    SPARK_VERSION = SPARK_VERSION + "-mesos"
-//    SHARK_VERSION = SHARK_VERSION + "-mesos"
-//  }
 
   // Target JVM version
   val SCALAC_JVM_VERSION = "jvm-1.6"
@@ -47,11 +32,6 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-//  val rootVersion = if(YARN_ENABLED) {
-//    "0.9"
-//  } else {
-//    "0.9-mesos"
-//  }
 
   val rootVersion = "1.2.0"
 
