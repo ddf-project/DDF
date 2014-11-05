@@ -132,8 +132,8 @@ object RootBuild extends Build {
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
-    "org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
-      exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
+    //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
+    //  exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"edu.berkeley.cs.amplab" % "shark_2.9.3" % SHARK_VERSION excludeAll(excludeSpark)
     //"edu.berkeley.cs.shark" %% "shark" % SHARK_VERSION exclude("org.apache.avro", "avro-ipc") exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all"),
     "com.google.protobuf" % "protobuf-java" % "2.5.0"
