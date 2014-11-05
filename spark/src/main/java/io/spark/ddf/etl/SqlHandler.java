@@ -116,9 +116,7 @@ public class SqlHandler extends ASqlHandler {
       tableRdd = this.getSharkContext().sql2rdd(String.format("SELECT * FROM %s", tableName));
       rddRow = (RDD<Row>) tableRdd;
 
-    } else {
-      // TODO
-    }
+    } 
 
     if (schema == null) schema = SchemaHandler.getSchemaFrom(tableRdd.schema());
     /*
