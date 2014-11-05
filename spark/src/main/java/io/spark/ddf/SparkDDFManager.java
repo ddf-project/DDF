@@ -53,14 +53,6 @@ public class SparkDDFManager extends DDFManager {
 
   private void initialize(SparkContext sparkContext, Map<String, String> params) throws DDFException {
     this.setSparkContext(sparkContext == null ? this.createSparkContext(params) : sparkContext);
-
-    // it will never go here
-    // TODO remove later
-    if (sparkContext instanceof SharkContext) {
-      this.setSharkContext((SharkContext) sparkContext);
-
-      mLog.info(">>>>>>>>>>>>> setting Kryo for mSharkContext: " + mSharkContext.conf().get("spark.kryo.registrator"));
-    }
   }
 
 
