@@ -1,16 +1,31 @@
+#' @export
 src_DDF <- function(...) {
   ddfm <- DDFManager()
   src_sql("DDF", ddfm)
 }
 
+#' @export
 src_desc.src_DDF <- function(src) {
   capture.output(print(src$con))
 }
 
-db_list_tables.src_DDF =
-  function(src)
-    ddf::sql(src$con, sql = "SHOW TABLES")
+#' @export
+db_list_tables <- function(con) UseMethod("db_list_tables")
 
+#' @export
+db_list_tables.DDFManager <- function(con) {
+            ddf::sql(con, sql = "SHOW TABLES")
+}
+
+#' @export
+db_has_table <- function(con, table) UseMethod("db_has_table")
+
+#' @export
+db_has_table.DDFManager <- function(con, table) {
+            table %in% db_list_tables(con)
+}
+
+#' @export
 db_data_type.src_DDF =
   function(src, fields) {
     mapping =
@@ -23,10 +38,7 @@ db_data_type.src_DDF =
     mapping[sapply(fields, class)]
   }
 
-db_has_table.src_DDF =
-  function(con, table)
-    table %in% db_list_tables(con)
-
+#' @export
 tbl.src_DDF <- function(src, from, ...) {
   tbl_sql("DDF", src = src, from = from, ...)
 }
@@ -95,7 +107,7 @@ copy_to.src_DDF =
               collapse = ", "),
         ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '"))
     ddf::sql(dest$con, paste0("LOAD DATA LOCAL INPATH '", data_tmp$path, "' INTO TABLE ", name))
-    tbl(sql2ddf(dest$con, paste("select * from ", name))}
+    tbl(sql2ddf(dest$con, paste("select * from ", name)))}
 
 # At this point, all the basic verbs (summarise(), filter(), arrange(), mutate() etc) should also work, but it's hard to test without some data.
 #
