@@ -85,6 +85,18 @@ public class SparkDDFManager extends DDFManager {
 
   private HiveContext mHiveContext;
 
+  private static final String[][] SPARK_ENV_VARS = new String[][] {
+    // @formatter:off
+    { "SPARK_APPNAME", "spark.appname" },
+    { "SPARK_MASTER", "spark.master" },
+    { "SPARK_HOME", "spark.home" },
+    { "SPARK_SERIALIZER", "spark.kryo.registrator" },
+    { "HIVE_HOME", "hive.home" },
+    { "HADOOP_HOME", "hadoop.home" },
+    { "DDFSPARK_JAR", "ddfspark.jar" }
+    // @formatter:on
+  };
+
   public HiveContext getHiveContext() {
     return mHiveContext;
   }
@@ -125,7 +137,9 @@ public class SparkDDFManager extends DDFManager {
   }
 
   private void setSparkContextParams(Map<String, String> mSparkContextParams) {
-   * merge priority is as follows: (1) already set in params, (2) in system properties (e.g., -Dspark.home=xxx), (3) in
+    this.mSparkContextParams = mSparkContextParams;
+  }
+   /* merge priority is as follows: (1) already set in params, (2) in system properties (e.g., -Dspark.home=xxx), (3) in
    * environment variables (e.g., export SPARK_HOME=xxx)
    *
    * @param params
@@ -155,6 +169,7 @@ public class SparkDDFManager extends DDFManager {
 
     return params;
   }
+
 
   /**
    * Side effect: also sets SharkContext and SparkContextParams in case the client wants to examine or use those.
