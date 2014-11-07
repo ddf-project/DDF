@@ -346,7 +346,6 @@ setGeneric("ddfKmeans",
 setMethod("ddfKmeans",
           signature("DDF"),
           function(x,centers=2,runs=5,maxIters=10) {
-            # only numeric columns have those fivenum numbers
             col.names <- colnames(x)
             numeric.col.indices <- which(sapply(col.names, function(cn) {x@jddf$getColumn(cn)$isNumeric()})==TRUE)
 
