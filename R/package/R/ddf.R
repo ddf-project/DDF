@@ -161,17 +161,17 @@ setMethod("head",
 #' Return all the of a DistributedDataFrame as a R datafrme
 #'
 #' @details
-#' \code{dataFrame} for a DistributedDataFrame returns all the data of that DistributedDataFrame as an R native data.frame.
+#' \code{as.data.frame} for a DistributedDataFrame returns all the data of that DistributedDataFrame as an R native data.frame.
 #' @param x a DistributedDataFrame
 #' @return an R native data.frame
 #' @export
-setGeneric("dataFrame",
+setGeneric("as.data.frame",
            function(x, ...) {
              standardGeneric("dataFrame")
            }
 )
 
-setMethod("dataFrame",
+setMethod("as.data.frame",
           signature("DDF"),
           function(x,i,...) {
             head(x[,i, ...],nrow(x))
