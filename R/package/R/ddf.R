@@ -150,8 +150,25 @@ setMethod("head",
           signature("DDF"),
           function(x, n=6L) {
             res <- x@jddf$VIEWS$head(as.integer(n))
-            res <- t(sapply(res, function(x){x$split("\t")}))
+            if(ncol(x)>1)
+                res <- t(sapply(res, function(x){x$split("\t")}))
+            else
+                res <- as.matrix(sapply(res, function(x){x$split("\t")}))
             get.data.frame(x, res)
+          }
+)
+
+#' Return all the of a DistributedDataFrame as a R datafrme
+#'
+#' @details
+#' \code{as.data.frame} for a DistributedDataFrame returns all the data of that DistributedDataFrame as an R native data.frame.
+#' @param x a DistributedDataFrame
+#' @return an R native data.frame
+#' @export
+setMethod("as.data.frame",
+          signature("DDF"),
+          function(x) {
+            head(x,nrow(x))
           }
 )
 
@@ -326,8 +343,6 @@ setMethod("fivenum",
             ret
           }
 )
-
-
 
 #----------------------- Helper methods ----------------------------------------------
 get.data.frame <- function(ddf, res) {

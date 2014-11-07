@@ -18,7 +18,8 @@
 #
 
 SCALA_VERSION=2.10
-SPARK_VERSION=1.2.0-SNAPSHOT
+DDF_VERSION=1.0
+
 
 FWDIR="$(cd `dirname $0`/..; pwd)"
 
@@ -32,9 +33,9 @@ fi
 EXAMPLES_DIR="$FWDIR"/examples
 
 if [ -f "$FWDIR/RELEASE" ]; then
-  export SPARK_EXAMPLES_JAR=`ls "$FWDIR"/lib/ddf_examples_$SCALA_VERSION-$SPARK_VERSION.jar`
-elif [ -e "$EXAMPLES_DIR"/target/scala-$SCALA_VERSION/ddf_examples_$SCALA_VERSION-$SPARK_VERSION.jar ]; then
-  export SPARK_EXAMPLES_JAR=`ls "$EXAMPLES_DIR"/target/scala-$SCALA_VERSION/ddf_examples_$SCALA_VERSION-$SPARK_VERSION.jar`
+  export SPARK_EXAMPLES_JAR=`ls "$FWDIR"/lib/ddf_examples_$SCALA_VERSION-$DDF_VERSION.jar`
+elif [ -e "$EXAMPLES_DIR"/target/scala-$SCALA_VERSION/ddf_examples_$SCALA_VERSION-$DDF_VERSION.jar ]; then
+  export SPARK_EXAMPLES_JAR=`ls "$EXAMPLES_DIR"/target/scala-$SCALA_VERSION/ddf_examples_$SCALA_VERSION-$DDF_VERSION.jar`
 fi
 
 if [[ -z $SPARK_EXAMPLES_JAR ]]; then

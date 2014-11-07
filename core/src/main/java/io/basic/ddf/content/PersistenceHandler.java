@@ -36,7 +36,7 @@ public class PersistenceHandler extends APersistenceHandler {
 
 
   protected String locateOrCreatePersistenceDirectory() throws DDFException {
-    String result = null, path = null;
+    String result, path = null;
 
     try {
       result = Utils.locateOrCreateDirectory(Config.getBasicPersistenceDir());
@@ -183,7 +183,7 @@ public class PersistenceHandler extends APersistenceHandler {
    */
   @Override
   public IPersistible load(String namespace, String name) throws DDFException {
-    Object loadedObject = null, schema = null;
+    Object loadedObject, schema = null;
 
 
     loadedObject = JsonSerDes.loadFromFile(this.getFilePath(namespace, name, ".dat"));
