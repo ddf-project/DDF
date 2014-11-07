@@ -54,6 +54,12 @@ test_that("basic statistics works", {
   
   spl <- sample(ddf, 10L)
   expect_equivalent(spl[,1], c(15.2, 15.5, 33.9, 21, 21, 19.2, 18.7, 17.8, 30.4, 14.7))
+
+  newddf =  ddf[,c("mpg","wt")]
+  km <- ddfKmeans(newddf)
+  clu <- predict(km,c(2,6))
+  expect_equal(clu, 0)
+
 })
 
 
