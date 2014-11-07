@@ -13,19 +13,18 @@ object RootBuild extends Build {
   //////// Project definitions/configs ///////
   //////// Project definitions/configs ///////
   val OBSELETE_HADOOP_VERSION = "1.0.4"
-  val DEFAULT_HADOOP_VERSION = "2.2.0"
+  val DEFAULT_HADOOP_VERSION = "2.4.0"
 
   lazy val hadoopVersion = env("HADOOP_VERSION") getOrElse
     DEFAULT_HADOOP_VERSION
 
   lazy val MAIN_SHARK_VERSION = "0.9.2"
   var SHARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SHARK_VERSION+"-adatao"
-  else MAIN_SHARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
+  else MAIN_SHARK_VERSION+"-hadoop"+hadoopVersion+"-adatao"
   
   lazy val MAIN_SPARK_VERSION = "0.9.2"
   var SPARK_VERSION = if (hadoopVersion == OBSELETE_HADOOP_VERSION) MAIN_SPARK_VERSION+"-adatao"
-  else MAIN_SPARK_VERSION+"-hadoop"+hadoopVersion.split("\\.")(0)
-
+  else MAIN_SPARK_VERSION+"-hadoop"+hadoopVersion+"-adatao"
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
   if(!YARN_ENABLED) {
@@ -209,7 +208,8 @@ object RootBuild extends Build {
       "commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
-      "mysql" % "mysql-connector-java" % "5.1.25"
+      "mysql" % "mysql-connector-java" % "5.1.25",
+      "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
     ),
 
 
@@ -227,7 +227,7 @@ object RootBuild extends Build {
     //dependencyOverrides += "org.scala-lang" % "scala-library" % theScalaVersion,
     //dependencyOverrides += "org.scala-lang" % "scala-compiler" % theScalaVersion,
     // dependencyOverrides += "commons-configuration" % "commons-configuration" % "1.6",
-    // dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.1",
+    dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.1",
     dependencyOverrides += "commons-lang" % "commons-lang" % "2.6",
     dependencyOverrides += "it.unimi.dsi" % "fastutil" % "6.4.4",
     dependencyOverrides += "log4j" % "log4j" % "1.2.17",
@@ -236,6 +236,7 @@ object RootBuild extends Build {
     dependencyOverrides += "commons-io" % "commons-io" % "2.4", //tachyon 0.2.1
     dependencyOverrides += "org.apache.httpcomponents" % "httpclient" % "4.1.3", //libthrift
     //dependencyOverrides += "org.apache.commons" % "commons-math" % "2.1", //hadoop-core, renjin newer use a newer version but we prioritize hadoop
+    dependencyOverrides += "org.apache.commons" % "commons-math3" % "3.1.1",
     dependencyOverrides += "com.google.guava" % "guava" % "14.0.1", //spark-core
     dependencyOverrides += "org.codehaus.jackson" % "jackson-core-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
@@ -484,7 +485,7 @@ object RootBuild extends Build {
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch core/" + targetDir + "/*timestamp") },
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.7.2",
-    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.2.0",
+    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion,
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
     libraryDependencies ++= scalaDependencies,
     testOptions in Test += Tests.Argument("-oI")
