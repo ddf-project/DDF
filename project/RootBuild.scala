@@ -46,12 +46,11 @@ object RootBuild extends Build {
   val projectName = "ddf"
   val rootProjectName = projectName
   val rootVersion = if(YARN_ENABLED) {
-    "0.9"
+    "1.0"
   } else {
-    "0.9-mesos"
+    "1.0-mesos"
   }
 
-  //val rootVersion = "0.9"
 
   val projectOrganization = rootOrganization + "." + projectName
 
