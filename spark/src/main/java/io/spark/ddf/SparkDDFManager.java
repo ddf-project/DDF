@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//import shark.SharkEnv;
+//import shark.api.JavaSharkContext;
 
 /**
  * An Apache-Spark-based implementation of DDFManager
@@ -86,6 +88,34 @@ public class SparkDDFManager extends DDFManager {
   public HiveContext getHiveContext() {
     return mHiveContext;
   }
+  //  private SparkUtils.createSharkContext mSharkContext;
+  //
+  //
+  //  public SharkContext getSharkContext() {
+  //    return mSharkContext;
+  //  }
+
+  //  private JavaSharkContext mJavaSharkContext;
+  //
+  //
+  //  public JavaSharkContext getJavaSharkContext() {
+  //    return mJavaSharkContext;
+  //  }
+
+  //  public void setJavaSharkContext(JavaSharkContext javaSharkContext) {
+  //    this.mJavaSharkContext = javaSharkContext;
+  //  }
+
+  /**
+   * Also calls setSparkContext() to the same sharkContext
+   *
+   * @param sharkContext
+   */
+  //  private void setSharkContext(SharkContext sharkContext) {
+  //    this.mSharkContext = sharkContext;
+  //    this.setSparkContext(sharkContext);
+  //  }
+
 
   private Map<String, String> mSparkContextParams;
 
@@ -95,33 +125,6 @@ public class SparkDDFManager extends DDFManager {
   }
 
   private void setSparkContextParams(Map<String, String> mSparkContextParams) {
-    this.mSparkContextParams = mSparkContextParams;
-  }
-
-
-
-  public void shutdown() {
-    if (this.getSparkContext() != null) {
-      this.getSparkContext().stop();
-    }
-  }
-
-
-  private static final String[][] SPARK_ENV_VARS = new String[][] {
-      // @formatter:off
-    { "SPARK_APPNAME", "spark.appname" },
-    { "SPARK_MASTER", "spark.master" }, 
-    { "SPARK_HOME", "spark.home" }, 
-    { "SPARK_SERIALIZER", "spark.kryo.registrator" },
-    { "HIVE_HOME", "hive.home" },
-    { "HADOOP_HOME", "hadoop.home" },
-    { "DDFSPARK_JAR", "ddfspark.jar" } 
-    // @formatter:on
-  };
-
-
-  /**
-   * Takes an existing params map, and reads both environment as well as system property settings to merge into it. The
    * merge priority is as follows: (1) already set in params, (2) in system properties (e.g., -Dspark.home=xxx), (3) in
    * environment variables (e.g., export SPARK_HOME=xxx)
    *
@@ -311,4 +314,5 @@ public class SparkDDFManager extends DDFManager {
 
     return metaInfoArray;
   }
-}
+}  
+

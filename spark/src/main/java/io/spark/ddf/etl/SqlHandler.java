@@ -111,6 +111,7 @@ public class SqlHandler extends ASqlHandler {
     }
 
     if (dataSource == null) {
+
       rdd = this.getHiveContext().sql(command);
     } else {
       // TODO
