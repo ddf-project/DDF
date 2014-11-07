@@ -165,16 +165,10 @@ setMethod("head",
 #' @param x a DistributedDataFrame
 #' @return an R native data.frame
 #' @export
-setGeneric("as.data.frame",
-           function(x, ...) {
-             standardGeneric("dataFrame")
-           }
-)
-
 setMethod("as.data.frame",
           signature("DDF"),
-          function(x,i,...) {
-            head(x[,i, ...],nrow(x))
+          function(x) {
+            head(x,nrow(x))
           }
 )
 
