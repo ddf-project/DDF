@@ -91,8 +91,6 @@ object RepresentationHandler {
    */
   val RDD_ARR_DOUBLE = new Representation(classOf[RDD[_]], classOf[Array[Double]])
   val RDD_ARR_OBJECT = new Representation(classOf[RDD[_]], classOf[Array[Object]])
-  //  val RDD_ROW = new Representation(classOf[RDD[_]], classOf[Row])
-  //  val RDD_TABLE_PARTITION = new Representation(classOf[RDD[_]], classOf[TablePartition])
   val RDD_LABELED_POINT = new Representation(classOf[RDD[_]], classOf[LabeledPoint])
   val RDD_MATRIX_VECTOR = new Representation(classOf[RDD[_]], classOf[TupleMatrixVector])
   val RDD_REXP = new Representation(classOf[RDD[_]], classOf[REXP])
