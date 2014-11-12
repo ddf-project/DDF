@@ -1,3 +1,5 @@
+import _root_.sbt.Keys._
+import _root_.sbt.Keys._
 import sbt._
 import sbt.Classpaths.publishTask
 import Keys._
@@ -16,7 +18,7 @@ object RootBuild extends Build {
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
 
-  val SPARK_VERSION = "1.2.0-SNAPSHOT"
+  val SPARK_VERSION = "1.2.0-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -53,14 +55,14 @@ object RootBuild extends Build {
 //  } else {
 //    rootVersion + "-mesos"
 //  }
-  val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + sparkVersion + ".jar"
-  val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + sparkVersion + "-tests.jar"
+  val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + ".jar"
+  val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + "-tests.jar"
   
 
   val examplesProjectName = projectName + "_examples"
   val examplesVersion = rootVersion
-  val examplesJarName = examplesProjectName + "-" + sparkVersion + ".jar"
-  val examplesTestJarName = examplesProjectName + "-" + sparkVersion + "-tests.jar"
+  val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
+  val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
   
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
@@ -268,6 +270,9 @@ object RootBuild extends Build {
     dependencyOverrides += "com.sun.jersey" % "jersey-json" % "1.9",
     dependencyOverrides += "com.sun.jersey" % "jersey-server" % "1.9",
     dependencyOverrides += "org.scalamacros" % "quasiquotes_2.10" % "2.0.0",
+    dependencyOverrides += "commons-httpclient" % "commons-httpclient" % "3.1",
+    dependencyOverrides += "org.apache.avro" % "avro-mapred" % "1.7.6",
+    dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
     pomExtra := (
       <!--
       **************************************************************************************************
