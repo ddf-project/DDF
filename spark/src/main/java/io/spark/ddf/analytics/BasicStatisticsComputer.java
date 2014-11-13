@@ -55,6 +55,9 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
             } else if (p[i] instanceof Integer) {
               Double a = Double.parseDouble(p[i].toString());
               result[i] = s.merge(a);
+            } else if (p[i] instanceof Float) {
+              Double a = Double.parseDouble(p[i].toString());
+              result[i] = s.merge(a);
             } else if (p[i] != null) {
               String str = p[i].toString();
               if (str.trim().equalsIgnoreCase("NA")) {
