@@ -59,4 +59,13 @@ public class BaseTest {
 
     manager.sql2txt("load data local inpath '../resources/test/airlineWithNA.csv' into table airline");
   }
+  
+  public void createTableRatings() throws DDFException {
+    manager.sql2txt("drop table if exists ratings");
+
+    manager.sql2txt("create table ratings (userid int,movieid int,score double ) "
+        + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','");
+
+    manager.sql2txt("load data local inpath '../resources/test/ratings.data' into table ratings");
+  }
 }
