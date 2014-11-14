@@ -17,10 +17,7 @@ import org.junit.Test;
 
 
 public class StatisticsSupporterTest extends BaseTest {
-
-  private DDFManager manager;
   private DDF ddf, ddf1;
-
 
   @Before
   public void setUp() throws Exception {
