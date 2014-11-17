@@ -344,6 +344,33 @@ setMethod("fivenum",
           }
 )
 
+#' Drop NA values
+#'
+#' Return a ddf instance with no NAs.
+#' @param x a Distributed Data Frame.
+#' @param by the axis by which to drop if NA value exits, Row represents by Row as default, COLUMN is column.
+#' @param inplace whether to treat the ddf inplace, default is FALSE.
+#' @return a data.frame with no NA values.
+#' @export
+ 
+setMethod("na.omit",
+          signature("DDF"),
+          function(object, by="ROW", inplace=FALSE) {
+			pattern = J("io.ddf.etl.IHandleMissingData")$Axis$ROW
+            if(by=="COLUMN")
+                pattern = J("io.ddf.etl.IHandleMissingData")$Axis$COLUMN
+ 
+            if(!inplace)
+                return (new("DDF", object@jddf$dropNA(pattern)))
+            else
+            {
+                object@jddf$setMutable(inplace)
+                object@jddf$dropNA(pattern)
+                return (object)
+            }
+          }
+)
+
 #----------------------- Helper methods ----------------------------------------------
 get.data.frame <- function(ddf, res) {
   df <- as.data.frame(res, stringsAsFactors=F)
