@@ -30,14 +30,16 @@ public class StatisticsSupporterTest extends BaseTest {
 
   @Test
   public void testSummary() throws DDFException {
-
     Assert.assertEquals(14, ddf.getSummary().length);
     Assert.assertEquals(31, ddf.getNumRows());
-    Assert.assertEquals(5, ddf1.getFiveNumSummary().length);
-    Assert.assertEquals(FiveNumSummary.class, ddf1.getFiveNumSummary()[0].getClass());
-    // manager.shutdown();
   }
-
+  
+//  @Test
+//  public void testFiveNum() throws DDFException {
+//    Assert.assertEquals(5, ddf1.getFiveNumSummary().length);
+//    Assert.assertEquals(FiveNumSummary.class, ddf1.getFiveNumSummary()[0].getClass());
+//  }
+  
   @Test
   public void testSampling() throws DDFException {
     DDF ddf2 = manager.sql2ddf("select * from airline");
@@ -77,15 +79,15 @@ public class StatisticsSupporterTest extends BaseTest {
     System.out.println(">>>>> testVectorCovariance = " + a);
   }
 
-  @Test
-  public void testVectorQuantiles() throws DDFException {
-    // Double[] quantiles = ddf1.getVectorQuantiles("deptime", {0.3, 0.5, 0.7});
-    Double[] pArray = { 0.3, 0.5, 0.7 };
-    Double[] expectedQuantiles = { 801.0, 1416.0, 1644.0 };
-    Double[] quantiles = ddf1.getVectorQuantiles("deptime", pArray);
-    System.out.println("Quantiles: " + StringUtils.join(quantiles, ", "));
-    Assert.assertArrayEquals(expectedQuantiles, quantiles);
-  }
+//  @Test
+//  public void testVectorQuantiles() throws DDFException {
+//    // Double[] quantiles = ddf1.getVectorQuantiles("deptime", {0.3, 0.5, 0.7});
+//    Double[] pArray = { 0.3, 0.5, 0.7 };
+//    Double[] expectedQuantiles = { 801.0, 1416.0, 1644.0 };
+//    Double[] quantiles = ddf1.getVectorQuantiles("deptime", pArray);
+//    System.out.println("Quantiles: " + StringUtils.join(quantiles, ", "));
+//    Assert.assertArrayEquals(expectedQuantiles, quantiles);
+//  }
 
   @Test
   public void testVectorHistogram() throws DDFException {
