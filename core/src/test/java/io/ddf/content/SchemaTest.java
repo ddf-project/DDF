@@ -1,14 +1,14 @@
 package io.ddf.content;
 
 
-import java.util.HashMap;
 import org.junit.Test;
+
+import java.util.HashMap;
 
 public class SchemaTest {
   class Panda {
     int legs;
     String name;
-
 
     public void setName(String name) {
       this.name = name;
@@ -24,7 +24,6 @@ public class SchemaTest {
       return String.format("%s has %s legs", name, legs);
     }
   }
-
 
   @Test
   public void testCreateSchema() {

@@ -7,15 +7,13 @@ import io.ddf.etl.IHandleMissingData.NAChecking;
 import io.ddf.exception.DDFException;
 import io.ddf.types.AggregateTypes.AggregateFunction;
 import io.spark.ddf.BaseTest;
-
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import java.lang.AssertionError;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 public class MissingDataHandlerTest extends BaseTest {
   private DDF ddf;
@@ -30,11 +28,11 @@ public class MissingDataHandlerTest extends BaseTest {
 
   @Test
   public void testDropNA() throws DDFException {
-    DDF newddfDropRow    = ddf.dropNA();
+    DDF newddfDropRow = ddf.dropNA();
     DDF newddfDropColumn = ddf.dropNA(Axis.COLUMN);
 
     Assert.assertEquals(9, newddfDropRow.getNumRows());
-    Assert.assertEquals(22,newddfDropColumn.getNumColumns());
+    Assert.assertEquals(22, newddfDropColumn.getNumColumns());
 
     Assert.assertEquals(29, ddf.getMissingDataHandler().dropNA(Axis.COLUMN, NAChecking.ALL, 0, null).getNumColumns());
   }

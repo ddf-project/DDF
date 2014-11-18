@@ -1,15 +1,15 @@
 package io.spark.ddf.etl;
 
 
-import java.util.HashSet;
-import java.util.List;
-
 import io.ddf.DDF;
-import io.ddf.etl.Types.JoinType;
 import io.ddf.content.Schema.Column;
 import io.ddf.etl.IHandleJoins;
+import io.ddf.etl.Types.JoinType;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+
+import java.util.HashSet;
+import java.util.List;
 
 public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJoins {
 
@@ -79,9 +79,7 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
       return resultDDF;
     } catch (Exception e) {
       e.printStackTrace();
-      if (e instanceof shark.api.QueryExecutionException) {
-        throw new DDFException(String.format("Error while executing query QueryExecutionException"), e);
-      } else throw new DDFException(String.format("Error while executing query QueryExecutionException"), e);
+      throw new DDFException(String.format("Error while executing query QueryExecutionException"), e);
     }
 
   }

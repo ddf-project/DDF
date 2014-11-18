@@ -1,12 +1,13 @@
 /**
- * 
+ *
  */
 package io.basic.ddf;
 
 
+import io.ddf.DDF;
+
 import java.lang.reflect.Array;
 import java.util.List;
-import io.ddf.DDF;
 
 /**
  *

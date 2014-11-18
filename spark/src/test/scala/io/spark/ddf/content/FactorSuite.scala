@@ -1,7 +1,5 @@
 package io.spark.ddf.content
 
-import shark.memstore2.TablePartition
-import org.apache.spark.rdd.RDD
 import io.spark.ddf.ATestSuite
 
 /**
@@ -14,11 +12,11 @@ class FactorSuite extends ATestSuite {
     val ddf = manager.sql2ddf("select * from mtcars")
     val schemaHandler = ddf.getSchemaHandler
     Array(7, 8, 9, 10).foreach {
-      idx ⇒ schemaHandler.setAsFactor(idx)
+      idx => schemaHandler.setAsFactor(idx)
     }
     schemaHandler.computeFactorLevelsAndLevelCounts()
     val cols = Array(7, 8, 9, 10).map {
-      idx ⇒ schemaHandler.getColumn(schemaHandler.getColumnName(idx))
+      idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
     }
     assert(cols(0).getOptionalFactor.getLevelCounts.get("1") === 14)
     assert(cols(0).getOptionalFactor.getLevelCounts.get("0") === 18)
@@ -33,17 +31,17 @@ class FactorSuite extends ATestSuite {
 
   test("test get factors for DDF with RDD[Array[Object]]") {
     val ddf = manager.sql2ddf("select * from mtcars")
-    ddf.getRepresentationHandler.remove(classOf[RDD[_]], classOf[TablePartition])
+    //    ddf.getRepresentationHandler.remove(classOf[RDD[_]], classOf[TablePartition])
 
     val schemaHandler = ddf.getSchemaHandler
 
     Array(7, 8, 9, 10).foreach {
-      idx ⇒ schemaHandler.setAsFactor(idx)
+      idx => schemaHandler.setAsFactor(idx)
     }
     schemaHandler.computeFactorLevelsAndLevelCounts()
 
     val cols2 = Array(7, 8, 9, 10).map {
-      idx ⇒ schemaHandler.getColumn(schemaHandler.getColumnName(idx))
+      idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
     }
 
     assert(cols2(0).getOptionalFactor.getLevelCounts.get("1") === 14)
@@ -62,12 +60,12 @@ class FactorSuite extends ATestSuite {
     val schemaHandler = ddf.getSchemaHandler
 
     Array(0, 8, 16, 17, 24, 25).foreach {
-      idx ⇒ schemaHandler.setAsFactor(idx)
+      idx => schemaHandler.setAsFactor(idx)
     }
     schemaHandler.computeFactorLevelsAndLevelCounts()
 
     val cols = Array(0, 8, 16, 17, 24, 25).map {
-      idx ⇒ schemaHandler.getColumn(schemaHandler.getColumnName(idx))
+      idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
     }
     assert(cols(0).getOptionalFactor.getLevels.contains("2008"))
     assert(cols(0).getOptionalFactor.getLevels.contains("2010"))
@@ -90,16 +88,16 @@ class FactorSuite extends ATestSuite {
     assert(cols(4).getOptionalFactor.getLevelCounts.get("3") === 1.0)
 
     val ddf2 = manager.sql2ddf("select * from airlineWithNA")
-    ddf2.getRepresentationHandler.remove(classOf[RDD[_]], classOf[TablePartition])
+    //    ddf2.getRepresentationHandler.remove(classOf[RDD[_]], classOf[TablePartition])
 
     val schemaHandler2 = ddf2.getSchemaHandler
     Array(0, 8, 16, 17, 24, 25).foreach {
-      idx ⇒ schemaHandler2.setAsFactor(idx)
+      idx => schemaHandler2.setAsFactor(idx)
     }
     schemaHandler2.computeFactorLevelsAndLevelCounts()
 
     val cols2 = Array(0, 8, 16, 17, 24, 25).map {
-      idx ⇒ schemaHandler2.getColumn(schemaHandler2.getColumnName(idx))
+      idx => schemaHandler2.getColumn(schemaHandler2.getColumnName(idx))
     }
 
     assert(cols2(0).getOptionalFactor.getLevelCounts.get("2008") === 28.0)

@@ -1,15 +1,16 @@
 package io.ddf.etl;
 
 
-import java.util.List;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.analytics.Summary;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
+
+import java.util.List;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
 
@@ -113,9 +114,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
   /**
    * Parse R transform expression to Hive equivalent
-   * 
-   * @param transformExpr
-   *          : e.g: "foobar = arrtime - crsarrtime, speed = distance / airtime"
+   *
+   * @param transformExpr : e.g: "foobar = arrtime - crsarrtime, speed = distance / airtime"
    * @return "(arrtime - crsarrtime) as foobar, (distance / airtime) as speed
    */
 

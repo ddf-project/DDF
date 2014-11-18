@@ -64,7 +64,7 @@ export JAVA_OPTS+=" -Dlog4j.configuration=ddf-local-log4j.properties"
 
 CLASSPATH="$EXAMPLES_DIR"/target/scala-2.10/lib/*
 CLASSPATH="$SHELL_JAR:$CLASSPATH:$FWDIR/core/conf/local/"
-echo $CLASSPATH
+#echo $CLASSPATH
 
 exec "$RUNNER" $JAVA_OPTS -cp "$CLASSPATH" $CONSOLE_CLASS "$MAIN_CLASS"
 #exec "$RUNNER" $JAVA_OPTS -cp "$CLASSPATH" "$MAIN_CLASS" 

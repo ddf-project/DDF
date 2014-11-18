@@ -1,10 +1,8 @@
 package io.ddf.ml;
 
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
@@ -13,8 +11,12 @@ import io.ddf.misc.Config;
 import io.ddf.ml.MLClassMethods.TrainMethod;
 import io.ddf.util.Utils.MethodInfo;
 import io.ddf.util.Utils.MethodInfo.ParamInfo;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  */
@@ -63,7 +65,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
 
   /**
    * Runs a training algorithm on the entire DDF dataset.
-   * 
+   *
    * @param trainMethodName
    * @param args
    * @return
@@ -85,7 +87,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
      * <code>
      * LogisticRegressionWithSGD.train(input: RDD[LabeledPoint], numIterations: Int, stepSize: Double, miniBatchFraction:
      * Double, initialWeights: Array[Double])
-     * 
+     *
      * SVM.train(input: RDD[LabeledPoint], numIterations: Int, stepSize: Double, regParam: Double, miniBatchFraction:
      * Double)
      * </code>
@@ -121,7 +123,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
       mLog.info(">>>>>> trainedCol = " + col);
     }
 
-    IModel model = new Model(rawModel);
+    IModel model = this.newModel(rawModel);
     model.setTrainedColumns(trainedColumns);
     mLog.info(">>>> modelID = " + model.getName());
     this.getManager().addModel(model);
@@ -151,7 +153,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
   /**
    * Override this to return the appropriate DDF representation matching that specified in {@link ParamInfo}. The base
    * implementation simply returns the DDF.
-   * 
+   *
    * @param paramInfo
    * @return
    */
@@ -163,7 +165,7 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
 
   /**
    * Base implementation does nothing
-   * 
+   *
    * @return the original, unmodified DDF
    */
   @Override
@@ -179,6 +181,29 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
   @Override
   public DDF applyModel(IModel model, boolean hasLabels, boolean includeFeatures) throws DDFException {
     return this.getDDF();
+  }
+
+  public IModel newModel(Object rawModel) throws DDFException {
+    return this.newModel(new Class<?>[]{Object.class}, new Object[]{rawModel});
+  }
+
+  @SuppressWarnings("unchecked")
+  private IModel newModel(Class<?>[] argTypes, Object[] argValues) throws DDFException {
+    String className = Config.getValue(this.getEngine(), "Model");
+    if(Strings.isNullOrEmpty(className)) throw new DDFException(String.format(
+        "Cannot determine class name for [%s] %s", this.getEngine(), "Model"));
+    try {
+      Constructor<IModel> cons = (Constructor<IModel>) Class.forName(className).getDeclaredConstructor(argTypes);
+      if(cons == null) throw new DDFException("Cannot get constructor for " + className);
+      cons.setAccessible(true);
+      IModel model = cons.newInstance(argValues);
+      if(model == null) throw new DDFException("Cannot instantiate a new instance of " + className);
+      return model;
+    } catch (Exception e) {
+      throw new DDFException(String.format(
+          "While instantiating a new %s DDF of class %s with argTypes %s and argValues %s", this.getEngine(),
+          className, Arrays.toString(argTypes), Arrays.toString(argValues)), e);
+    }
   }
 
   @Override

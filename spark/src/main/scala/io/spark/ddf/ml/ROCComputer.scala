@@ -32,8 +32,7 @@ class ROCComputer extends Serializable {
         }
         c = c + 1
       }
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Please try to run on binary classification model or contact system operators for assistance");
     }
 
@@ -76,8 +75,7 @@ class ROCComputer extends Serializable {
         //false positive rate
         if (N != 0) {
           result(i)(2) = (accumulatefp / N).asInstanceOf[Double]
-        }
-        else {
+        } else {
           result(i)(2) = accumulatefp
         }
 
@@ -124,7 +122,7 @@ class ROCComputer extends Serializable {
         previousFpr = result2(j)(2)
         j = j + 1
       } //in case some threshold data points are null, we just automatically repeated the lastNonNull metrics
-      //the purpose is to make the data much more comprehensive for users
+      //the purpose is to make the data much more comprehensive for users 
       else if (i >= lastNotNullIndex + 1) {
         result2(j) = new Array[Double](result(lastNotNullIndex).length)
         var t: Int = 1
@@ -162,6 +160,8 @@ class ROCComputer extends Serializable {
     var index: Int = 0
     var threshold: Double = 0.0
 
+
+
     while (input.hasNext) {
       val point = input.next()
       yTrue = point.features(0)
@@ -172,14 +172,13 @@ class ROCComputer extends Serializable {
 
       threshold = getThreshold(predict, alpha_length)
 
-      //update
+      //update 
       if (output(index) != null) {
         output(index)(0) = threshold
         if (yTrue == 1.0) {
           //positve_frequency++
           output(index)(1) = output(index)(1) + 1.0
-        }
-        else {
+        } else {
           //negative_frequency++
           output(index)(2) = output(index)(2) + 1.0
         }
@@ -190,8 +189,7 @@ class ROCComputer extends Serializable {
         if (yTrue == 1.0) {
           //positve_frequency++
           output(index)(1) = 1.0
-        }
-        else {
+        } else {
           //negative_frequency++
           output(index)(2) = 1.0
         }
@@ -225,10 +223,11 @@ class ROCComputer extends Serializable {
   //  }
 
   def computeRmse(data: RDD[Rating], predictions: RDD[Rating], implicitPrefs: Boolean): Double = {
-    val predictionsAndRatings = predictions.map { x ⇒
-      ((x.user, x.product), mapPredictedRating(x.rating, implicitPrefs))
-    }.join(data.map(x ⇒ ((x.user, x.product), x.rating))).values
-    math.sqrt(predictionsAndRatings.map(x ⇒ (x._1 - x._2) * (x._1 - x._2)).mean())
+    val predictionsAndRatings = predictions.map {
+      x =>
+        ((x.user, x.product), mapPredictedRating(x.rating, implicitPrefs))
+    }.join(data.map(x => ((x.user, x.product), x.rating))).values
+    math.sqrt(predictionsAndRatings.map(x => (x._1 - x._2) * (x._1 - x._2)).mean())
   }
 
   def mapPredictedRating(r: Double, implicitPrefs: Boolean) = if (implicitPrefs) math.max(math.min(r, 1.0), 0.0) else r

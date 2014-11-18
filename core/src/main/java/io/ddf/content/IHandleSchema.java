@@ -1,11 +1,12 @@
 package io.ddf.content;
 
 
-import java.util.List;
 import io.ddf.Factor;
 import io.ddf.content.Schema.Column;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
+
+import java.util.List;
 
 
 public interface IHandleSchema extends IHandleDDFFunctionalGroup {
@@ -26,7 +27,7 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
 
   /**
    * The name will reflect the class name of the given forObject
-   * 
+   *
    * @param forObject
    * @return
    */

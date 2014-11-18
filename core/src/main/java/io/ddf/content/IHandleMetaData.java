@@ -1,8 +1,9 @@
 package io.ddf.content;
 
 
-import java.util.UUID;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
+
+import java.util.UUID;
 
 public interface IHandleMetaData extends IHandleDDFFunctionalGroup {
 

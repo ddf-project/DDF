@@ -4,6 +4,7 @@ package io.ddf.ml;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
+
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public interface ISupportML extends IHandleDDFFunctionalGroup {
   /**
    * Runs a training algorithm on the entire DDF dataset. If the algorithm is unsupervised, all columns are considered
    * to be features. If the algorithm is supervised, the last column is considered to be the target column
-   * 
+   *
    * @param trainMethodName
    * @param args
    * @return
@@ -24,7 +25,7 @@ public interface ISupportML extends IHandleDDFFunctionalGroup {
 
   /**
    * The DDF is assumed not to have a label column, and the output should not include the feature columns.
-   * 
+   *
    * @param model
    * @return
    * @throws DDFException
@@ -33,7 +34,7 @@ public interface ISupportML extends IHandleDDFFunctionalGroup {
 
   /**
    * The output by default will not include the feature columns.
-   * 
+   *
    * @param model
    * @param hasLabels
    * @return
@@ -42,12 +43,9 @@ public interface ISupportML extends IHandleDDFFunctionalGroup {
   DDF applyModel(IModel model, boolean hasLabels) throws DDFException;
 
   /**
-   * 
    * @param model
-   * @param hasLabels
-   *          if true, then the DDF does include a label column
-   * @param includeFeatures
-   *          if true, then the output should include all the feature columns
+   * @param hasLabels       if true, then the DDF does include a label column
+   * @param includeFeatures if true, then the output should include all the feature columns
    * @return
    * @throws DDFException
    */
@@ -55,7 +53,7 @@ public interface ISupportML extends IHandleDDFFunctionalGroup {
 
   /*
    * Compute the binary confusion matrix of this DDF based on the given model.
-   */
+  */
   long[][] getConfusionMatrix(IModel model, double threshold) throws DDFException;
 
   List<List<DDF>> CVKFold(int k, Long seed) throws DDFException;

@@ -1,14 +1,15 @@
 package io.ddf.etl;
 
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Strings;
+import com.google.gson.annotations.SerializedName;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
 import io.ddf.types.AggregateTypes.AggregateFunction;
-import com.google.common.base.Strings;
-import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+import java.util.Map;
 
 public interface IHandleMissingData extends IHandleDDFFunctionalGroup {
 
@@ -20,6 +21,7 @@ public interface IHandleMissingData extends IHandleDDFFunctionalGroup {
 
   public enum Axis {
     ROW, COLUMN;
+
     public static Axis fromString(String s) {
       if (Strings.isNullOrEmpty(s)) return null;
 
@@ -31,8 +33,10 @@ public interface IHandleMissingData extends IHandleDDFFunctionalGroup {
     }
   }
 
+
   public enum NAChecking {
     ANY, ALL;
+
     public static NAChecking fromString(String s) {
       if (Strings.isNullOrEmpty(s)) return null;
 
@@ -44,8 +48,11 @@ public interface IHandleMissingData extends IHandleDDFFunctionalGroup {
     }
   }
 
+
   public enum FillMethod {
-    @SerializedName("bfill") BFILL, @SerializedName("ffill") FFILL;
+    @SerializedName("bfill")
+    BFILL, @SerializedName("ffill")
+    FFILL;
 
     public static FillMethod fromString(String s) {
       if (Strings.isNullOrEmpty(s)) return null;

@@ -1,16 +1,17 @@
 /**
- * 
+ *
  */
 package io.ddf.util;
 
 
-import java.lang.ref.ReferenceQueue;
-import java.util.LinkedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.ReferenceQueue;
+import java.util.LinkedList;
+
 /**
- * 
+ *
  */
 public class PhantomReference extends java.lang.ref.PhantomReference<ISupportPhantomReference> {
   private static Logger LOG = LoggerFactory.getLogger(PhantomReference.class);

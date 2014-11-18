@@ -1,13 +1,14 @@
 package io.ddf;
 
 
-import java.util.Collection;
 import io.ddf.exception.DDFException;
 import io.ddf.types.IGloballyAddressable;
 
+import java.util.Collection;
+
 
 /**
- 
+
  */
 public interface IDDFManager {
   void startup();
@@ -16,7 +17,7 @@ public interface IDDFManager {
 
   /**
    * Returns the DDF engine name of a particular implementation, e.g., "spark".
-   * 
+   *
    * @return
    */
   String getEngine();

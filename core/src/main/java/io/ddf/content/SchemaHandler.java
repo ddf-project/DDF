@@ -1,11 +1,9 @@
 /**
- * 
+ *
  */
 package io.ddf.content;
 
 
-import java.sql.Timestamp;
-import java.util.List;
 import io.ddf.DDF;
 import io.ddf.Factor;
 import io.ddf.content.Schema.Column;
@@ -13,17 +11,19 @@ import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.util.DDFUtils;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 /**
  */
-public class SchemaHandler extends ADDFFunctionalGroupHandler implements IHandleSchema {
+public class SchemaHandler extends ADDFFunctionalGroupHandler implements
+    IHandleSchema {
 
   public SchemaHandler(DDF theDDF) {
     super(theDDF);
   }
 
-
   private Schema mSchema;
-
 
   @Override
   public Schema getSchema() {
@@ -80,13 +80,15 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements IHandle
 
   @Override
   public Schema generateSchema() throws DDFException {
-    if (this.getSchema() != null) return this.getSchema();
+    if (this.getSchema() != null)
+      return this.getSchema();
 
     // Try to infer from the DDF's data
     Object data = this.getDDF().getRepresentationHandler().getDefault();
 
     // TODO: for now, we'll just support the "null" case
-    if (data == null) return new Schema(null, "null BLOB");
+    if (data == null)
+      return new Schema(null, "null BLOB");
 
     return null;
   }
@@ -105,7 +107,8 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements IHandle
 
   @Override
   public Factor<?> setAsFactor(String columnName) {
-    if (this.getSchema() == null) return null;
+    if (this.getSchema() == null)
+      return null;
 
     Factor<?> factor = null;
 
@@ -143,7 +146,8 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements IHandle
     return factor;
   }
 
-  public void generateDummyCoding() throws NumberFormatException, DDFException {
+  public void generateDummyCoding() throws NumberFormatException,
+      DDFException {
     this.getSchema().generateDummyCoding();
   }
 
@@ -159,7 +163,8 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements IHandle
 
   @Override
   public void unsetAsFactor(int columnIndex) {
-    if (this.getSchema() != null) this.getSchema().getColumn(columnIndex).unsetAsFactor();
+    if (this.getSchema() != null)
+      this.getSchema().getColumn(columnIndex).unsetAsFactor();
   }
 
   public void computeFactorLevelsForAllStringColumns() throws DDFException {
