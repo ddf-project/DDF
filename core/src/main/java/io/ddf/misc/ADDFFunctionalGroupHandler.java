@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package io.ddf.misc;
 
@@ -12,9 +12,7 @@ import io.ddf.util.PhantomReference;
 /**
  * Abstract base class for a handler of a group of DDF functionality, e.g., {@link IHandleMetadata}, or
  * {@link IHandleViews}.
- * 
- * @author ctn
- * 
+ *
  */
 public abstract class ADDFFunctionalGroupHandler extends ALoggable implements IHandleDDFFunctionalGroup,
     ISupportPhantomReference {

@@ -1,19 +1,19 @@
 /**
- * 
+ *
  */
 package io.ddf.content;
 
 
+import com.google.common.base.Strings;
+import com.google.gson.annotations.Expose;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.IGloballyAddressable;
-import com.google.common.base.Strings;
-import com.google.gson.annotations.Expose;
 
 /**
- * 
+ *
  */
 public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler implements IHandlePersistence {
 
@@ -24,17 +24,17 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
   /**
    * The URI format should be:
-   * 
+   * <p/>
    * <pre>
    * <engine>://<path>
    * </pre>
-   * 
+   * <p/>
    * e.g.,
-   * 
+   * <p/>
    * <pre>
    * basic:///root/ddf/ddf-runtime/basic-ddf-db/com.example/MyDDF.dat
    * </pre>
-   * 
+   *
    * @param uri
    * @return
    */
@@ -50,9 +50,7 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
       String[] parts = uri.split("://");
       if (parts.length == 1) {
         mPath = parts[0];
-      }
-
-      else if (parts.length == 2) {
+      } else if (parts.length == 2) {
         mEngine = parts[0];
         mPath = parts[1];
       }
@@ -88,7 +86,6 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
   /**
    * Base class for objects that can persist themselves, via the DDF persistence mechanism
-   * 
    */
   public static abstract class APersistible extends AGloballyAddressable implements IGloballyAddressable, IPersistible {
 
@@ -98,7 +95,7 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
     /**
      * Each subclass is expected to instantiate a new DDF, put this {@link APersistible} object inside of it, and return
      * that DDF for persistence.
-     * 
+     *
      * @return
      * @throws DDFException
      */
@@ -150,19 +147,23 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
     }
 
     @Override
-    public void beforePersisting() {}
+    public void beforePersisting() {
+    }
 
 
     @Override
-    public void afterPersisting() {}
+    public void afterPersisting() {
+    }
 
 
     @Override
-    public void beforeUnpersisting() {}
+    public void beforeUnpersisting() {
+    }
 
 
     @Override
-    public void afterUnpersisting() {}
+    public void afterUnpersisting() {
+    }
 
 
 
@@ -200,10 +201,12 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
 
     @Override
-    public void afterSerialization() throws DDFException {}
+    public void afterSerialization() throws DDFException {
+    }
 
     @Override
-    public void beforeSerialization() throws DDFException {}
+    public void beforeSerialization() throws DDFException {
+    }
 
     @Override
     public ISerializable afterDeserialization(ISerializable deserializedObject, Object serializationData)

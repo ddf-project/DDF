@@ -8,13 +8,13 @@ import io.ddf.content.IHandleViews
 import scala.collection.JavaConverters._
 import io.ddf.content.Schema
 import io.spark.ddf.SparkDDF
+import org.apache.spark.sql.catalyst.expressions.Row
 import org.apache.spark.rdd.RDD
-import shark.api.Row
+import org.apache.spark.sql.catalyst.expressions.Row
 
 /**
  * RDD-based ViewHandler
  *
- * @author ctn
  *
  */
 class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHandleViews {
@@ -31,19 +31,19 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
    *
    * @param columns
    * @param format
-	 * A scala.Enumeration that will be converted to an integer by calling
+   * A scala.Enumeration that will be converted to an integer by calling
    * formatEnum.toString()
    * @return
    */
   def get(columns: Array[Int], format: ViewFormat): DDF = {
     format match {
-      case ViewFormat.DEFAULT ⇒ ViewHandler.getDefault(columns, mDDF)
-      case ViewFormat.ARRAY_OBJECT ⇒ ViewHandler.getArrayObject(columns, mDDF)
-      case ViewFormat.ARRAY_DOUBLE ⇒ ViewHandler.getArrayDouble(columns, mDDF)
-      case ViewFormat.TABLE_PARTITION ⇒ ViewHandler.getTablePartition(columns, mDDF)
-      case ViewFormat.LABELED_POINT ⇒ ViewHandler.getLabeledPoint(columns, mDDF)
-      case ViewFormat.LABELED_POINTS ⇒ ViewHandler.getLabeledPoints(columns, mDDF)
-      case _ ⇒ {}
+      case ViewFormat.DEFAULT => ViewHandler.getDefault(columns, mDDF)
+      case ViewFormat.ARRAY_OBJECT => ViewHandler.getArrayObject(columns, mDDF)
+      case ViewFormat.ARRAY_DOUBLE => ViewHandler.getArrayDouble(columns, mDDF)
+      case ViewFormat.TABLE_PARTITION => ViewHandler.getTablePartition(columns, mDDF)
+      case ViewFormat.LABELED_POINT => ViewHandler.getLabeledPoint(columns, mDDF)
+      case ViewFormat.LABELED_POINTS => ViewHandler.getLabeledPoints(columns, mDDF)
+      case _ => {}
     }
     null
   }
@@ -58,24 +58,31 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
 
     if (numSamples > MAX_SAMPLE_SIZE) {
       throw new IllegalArgumentException("Number of samples is currently limited to %d".format(MAX_SAMPLE_SIZE))
-    }
-    else {
-      val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
-      val sampleData = rdd.takeSample(withReplacement, numSamples, seed).toList.asJava
-      sampleData
+    } else {
+      if(mDDF.getRepresentationHandler.has(classOf[RDD[_]], classOf[Array[Object]])) {
+        val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
+        val sampleData = rdd.takeSample(withReplacement, numSamples, seed).toList.asJava
+        sampleData
+      } else {
+        val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
+        rdd.takeSample(withReplacement, numSamples, seed).map {
+          row => {
+            row.toArray.asInstanceOf[Array[Object]]
+          }
+        }.toList.asJava
+      }
     }
   }
 
   override def getRandomSample(percent: Double, withReplacement: Boolean, seed: Int): DDF = {
-    val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
-    val sampleRdd = rdd.sample(withReplacement, percent, seed)
     val columns = mDDF.getSchema.getColumns
     val schema = new Schema(mDDF.getSchemaHandler.newTableName(), columns)
     val manager = this.getManager
-    val sampleDFF = new SparkDDF(manager, sampleRdd, classOf[Array[Object]], manager.getNamespace, null, schema)
-    mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDFF.getName)
-    manager.addDDF(sampleDFF)
-    sampleDFF
+    val sampleRdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row]).sample(withReplacement, percent, seed)
+    val sampleDDF = manager.newDDF(manager, sampleRdd, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
+    mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
+    manager.addDDF(sampleDDF)
+    sampleDDF
   }
 }
 

@@ -12,7 +12,6 @@ public class ConvertFunctionFactory implements EdgeFactory<Representation, Conve
   private DDF mDDF;
   private Table<Representation, Representation, ConvertFunction> mMap;
 
-
   public ConvertFunctionFactory(DDF ddf) {
     this.mDDF = ddf;
     this.mMap = HashBasedTable.create();

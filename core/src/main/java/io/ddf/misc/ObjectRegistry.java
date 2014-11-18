@@ -1,12 +1,13 @@
 package io.ddf.misc;
 
 
+import com.google.common.base.Strings;
+import io.ddf.IDDFManager.IGloballyAddressableObjectRegistry;
+import io.ddf.types.IGloballyAddressable;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import io.ddf.IDDFManager.IGloballyAddressableObjectRegistry;
-import io.ddf.types.IGloballyAddressable;
-import com.google.common.base.Strings;
 
 /**
  * Convenience class to hold a global registry of all registered objects in our system. TODO: Provide some kind of

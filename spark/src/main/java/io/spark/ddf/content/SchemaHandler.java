@@ -4,20 +4,22 @@
 package io.spark.ddf.content;
 
 
-import java.util.*;
-
+import com.google.common.collect.Lists;
+import io.ddf.DDF;
 import io.ddf.Factor;
 import io.ddf.content.IHandleRepresentations;
-import io.ddf.exception.DDFException;
-import io.spark.ddf.SparkDDF;
-import org.apache.spark.rdd.RDD;
-import shark.api.ColumnDesc;
-import io.ddf.DDF;
 import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnType;
-import com.google.common.collect.Lists;
-import shark.memstore2.TablePartition;
+import io.ddf.exception.DDFException;
+import io.spark.ddf.SparkDDF;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.SchemaRDD;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 
 public class SchemaHandler extends io.ddf.content.SchemaHandler {
 
@@ -25,15 +27,47 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
     super(theDDF);
   }
 
-  public static Schema getSchemaFrom(ColumnDesc[] sharkColumns) {
+  public static Schema getSchemaFromSchemaRDD(SchemaRDD rdd) {
     List<Column> cols = Lists.newArrayList();
-    for (ColumnDesc sharkColumn : sharkColumns) {
-      cols.add(new Column(sharkColumn.name(), sharkColumn.dataType().name));
-    }
 
+    String schema = rdd.schemaString().replace("root", "").replace("|--", "").trim();
+    String[] columns = schema.split("\n");
+    for (String colString : columns) {
+      String[] colNameNType = colString.trim().split(":");
+      String colName = colNameNType[0];
+      String colType = colNameNType[1].trim().split("\\(")[0].trim();
+      cols.add(new Column(colName, spark2DDFType(colType)));
+    }
     return new Schema(null, cols);
   }
 
+  public static String spark2DDFType(String colType) {
+    String typeString = null;
+    switch (colType) {
+      case "integer":
+        typeString = "INT";
+        break;
+      case "string":
+        typeString = "STRING";
+        break;
+      case "float":
+        typeString = "FLOAT";
+        break;
+      case "double":
+        typeString = "DOUBLE";
+        break;
+      case "timestamp":
+        typeString = "TIMESTAMP";
+        break;
+      case "long":
+        typeString = "LONG";
+        break;
+      case "boolean":
+        typeString = "BOOLEAN";
+        break;
+    }
+    return typeString;
+  }
 
   @Override
   public void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
@@ -61,22 +95,19 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
           }
           columnIndexes.add(this.getColumnIndex(col.getName()));
           columnTypes.add(col.getType());
-          // factors.add(colFactor);
+          //factors.add(colFactor);
         }
       }
     }
 
     Map<Integer, Map<String, Integer>> listLevelCounts;
-
     IHandleRepresentations repHandler = this.getDDF().getRepresentationHandler();
     if (columnIndexes.size() > 0) {
       try {
-        if (repHandler.has(RDD.class, TablePartition.class)) {
-          RDD<TablePartition> rdd = ((SparkDDF) this.getDDF()).getRDD(TablePartition.class);
-          listLevelCounts = GetMultiFactor.getFactorCounts(rdd, columnIndexes, columnTypes, TablePartition.class);
-        } else if (repHandler.has(RDD.class, Object[].class)) {
+        if (repHandler.has(RDD.class, Object[].class)) {
           RDD<Object[]> rdd = ((SparkDDF) this.getDDF()).getRDD(Object[].class);
-          listLevelCounts = GetMultiFactor.getFactorCounts(rdd, columnIndexes, columnTypes, Object[].class);
+          listLevelCounts = GetMultiFactor.getFactorCounts(rdd,
+              columnIndexes, columnTypes, Object[].class);
         } else {
           RDD<Object[]> rdd = ((SparkDDF) this.getDDF()).getRDD(Object[].class);
           if (rdd == null) {
@@ -105,3 +136,4 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
     }
   }
 }
+

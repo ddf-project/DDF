@@ -17,7 +17,7 @@ class ListDDFSuite extends ATestSuite {
     val listDDF = manager.listDDFs()
 
     listDDF.foreach {
-      ddfinfo ⇒ println(s"uri = ${ddfinfo.getUri}; createdTime = ${ddfinfo.getCreatedTime}")
+      ddfinfo => println(s"uri = ${ddfinfo.getUri}; createdTime = ${ddfinfo.getCreatedTime}")
     }
 
     assert(listDDF.size > 0)

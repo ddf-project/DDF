@@ -1,19 +1,16 @@
 package io.ddf.content;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import junit.framework.Assert;
-import com.google.common.collect.HashBasedTable;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
+import junit.framework.Assert;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -43,6 +40,7 @@ public class RepresentationHandlerTests {
     }
   }
 
+
   public class ObjectToInt extends ConvertFunction {
 
     public ObjectToInt(DDF ddf) {
@@ -59,6 +57,7 @@ public class RepresentationHandlerTests {
       return new Representation(list.toArray(new Integer[list.size()]), Integer[].class);
     }
   }
+
 
   public class IntToString extends ConvertFunction {
 
@@ -77,6 +76,7 @@ public class RepresentationHandlerTests {
     }
   }
 
+
   public class DummyRepresentationHandler extends RepresentationHandler {
     public DummyRepresentationHandler(DDF ddf) {
       super(ddf);
@@ -90,7 +90,6 @@ public class RepresentationHandlerTests {
     }
   }
 
-
   @BeforeClass
   public static void setupFixture() {
     list.add("a");
@@ -99,7 +98,8 @@ public class RepresentationHandlerTests {
   }
 
   @AfterClass
-  public static void shutdownFixture() {}
+  public static void shutdownFixture() {
+  }
 
 
   @Test

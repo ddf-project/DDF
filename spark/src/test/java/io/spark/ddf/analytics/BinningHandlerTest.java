@@ -1,45 +1,28 @@
 package io.spark.ddf.analytics;
 
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
 import io.ddf.DDF;
-import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
+import io.spark.ddf.BaseTest;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import org.junit.Assert;
+import org.junit.Test;
 import com.google.common.base.Strings;
 
-public class BinningHandlerTest {
+public class BinningHandlerTest extends BaseTest {
 
   @Test
   public void testBinning() throws DDFException {
 
-    DDFManager manager = DDFManager.get("spark");
-    manager.sql2txt("drop table if exists airline");
-
-    manager.sql2txt("create table airline (Year int,Month int,DayofMonth int,"
-        + "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,"
-        + "CRSArrTime int,UniqueCarrier string, FlightNum int, "
-        + "TailNum string, ActualElapsedTime int, CRSElapsedTime int, "
-        + "AirTime int, ArrDelay int, DepDelay int, Origin string, "
-        + "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, "
-        + "CancellationCode string, Diverted string, CarrierDelay int, "
-        + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
-        + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','");
-
-    manager.sql2txt("load data local inpath '../resources/test/airline.csv' into table airline");
-    // ddf =
-    // manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, distance, arrdelay, depdelay from airline");
+    createTableAirline();
 
     DDF ddf = manager
-        .sql2ddf(
-            "select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
+        .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
 
     DDF newddf = ddf.binning("dayofweek", "EQUALINTERVAL", 2, null, true, true);
 
@@ -77,12 +60,10 @@ public class BinningHandlerTest {
     Assert.assertEquals(3, ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().size());
     Assert.assertEquals("[162,869]", ddf.VIEWS.head(3).get(0).split("\t")[6]);
     System.out.println(">>>>>NEW 1st ROW"
-        + ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().keySet()
-        .toString());// [162,869],
-    // (869,1576],
-    // (1576,2283]
+        + ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().keySet().toString());// [162,869],
+                                                                                                              // (869,1576],
+                                                                                                              // (1576,2283]
 
-    manager.shutdown();
   }
 
   public static MetaInfo[] generateMetaInfo(Schema schema) throws DDFException {
@@ -104,8 +85,6 @@ public class BinningHandlerTest {
     String type;
     int columnNo = -1; // unset, base-1
 
-    // does this belongs to metainfo? should belong to DataContainer
-    // this is really a cached result of some computation
     Map<String, Integer> factor;
 
 

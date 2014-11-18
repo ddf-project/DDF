@@ -1,22 +1,22 @@
 package io.ddf.etl;
 
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.apache.commons.collections.MapUtils;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.types.AggregateTypes.AggregateFunction;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import org.apache.commons.collections.MapUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handle missing data, based on NA handling methods in Pandas DataFrame
- * 
  */
 public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IHandleMissingData {
 
@@ -26,17 +26,13 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
   }
 
   /**
-   * This function filters out rows or columns that contain NA values, Default: axis=0, how='any', thresh=0,
-   * columns=null, inplace=false
-   * 
-   * @param axis
-   *          = 0: drop by row, 1: drop by column, default 0
-   * @param how
-   *          = 'any' or 'all', default 'any'
-   * @param thresh
-   *          = required number of non-NA values to skip, default 0
-   * @param columns
-   *          = only consider NA dropping on the given columns, set to null for all columns of the DDF, default null
+   * This function filters out rows or columns that contain NA values, Default: axis=0, how='any', thresh=0, columns=null,
+   * inplace=false
+   *
+   * @param axis    = 0: drop by row, 1: drop by column, default 0
+   * @param how     = 'any' or 'all', default 'any'
+   * @param thresh  = required number of non-NA values to skip, default 0
+   * @param columns = only consider NA dropping on the given columns, set to null for all columns of the DDF, default null
    * @return a DDF with NAs filtered
    */
   @Override
@@ -140,26 +136,20 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
   /**
    * This function fills NA with given values. Default using a scalar value fillNA(value,null, 0, null, null, null,
    * false)
-   * 
-   * @param value
-   *          a scalar value to fill all NAs
-   * @param method
-   *          = 'ffill' for forward fill or 'bfill' for backward fill
-   * @param limit
-   *          = maximum size gap for forward or backward fill
-   * @param function
-   *          aggregate function to generate the filled value for a column
-   * @param columnsToValues
-   *          = a map to provide different values to fill for different columns
-   * @param columns
-   *          = only consider NA filling on the given columns, set to null for all columns of the DDF
-   * @param inplace
-   *          = false: result in new DDF, true: update on the same DDF
+   *
+   * @param value           a scalar value to fill all NAs
+   * @param method          = 'ffill' for forward fill or 'bfill' for backward fill
+   * @param limit           = maximum size gap for forward or backward fill
+   * @param function        aggregate function to generate the filled value for a column
+   * @param columnsToValues = a map to provide different values to fill for different columns
+   * @param columns         = only consider NA filling on the given columns, set to null for all columns of the DDF
+   * @param inplace         = false: result in new DDF, true: update on the same DDF
    * @return a DDF with NAs filled
    */
   @Override
   public DDF fillNA(String value, FillMethod method, long limit, AggregateFunction function,
-      Map<String, String> columnsToValues, List<String> columns) throws DDFException {
+      Map<String, String> columnsToValues,
+      List<String> columns) throws DDFException {
 
     DDF newddf = null;
     if (columns == null) {

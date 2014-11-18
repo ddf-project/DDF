@@ -1,11 +1,12 @@
 package io.ddf.analytics;
 
 
-import static org.junit.Assert.assertTrue;
+import io.ddf.facades.RFacade;
+import io.ddf.types.AggregateTypes.AggregateField;
 import org.junit.Assert;
 import org.junit.Test;
-import io.ddf.types.AggregateTypes.AggregateField;
-import io.ddf.facades.RFacade;
+
+import static org.junit.Assert.assertTrue;
 
 public class AggregationTest {
 

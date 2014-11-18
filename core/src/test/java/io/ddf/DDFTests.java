@@ -1,13 +1,14 @@
 package io.ddf;
 
 
+import io.ddf.util.Utils.MethodInfo;
+import io.ddf.util.Utils.MethodInfo.ParamInfo;
+import junit.framework.Assert;
+import org.junit.Test;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import junit.framework.Assert;
-import org.junit.Test;
-import io.ddf.util.Utils.MethodInfo;
-import io.ddf.util.Utils.MethodInfo.ParamInfo;
 
 ;
 
@@ -34,5 +35,6 @@ public class DDFTests {
     Assert.assertTrue("Second parameter must match ?<String>", paramInfos.get(1).paramMatches("String"));
   }
 
-  public static void testDummy2(String arg1, ArrayList<String> arg2) {}
+  public static void testDummy2(String arg1, ArrayList<String> arg2) {
+  }
 }

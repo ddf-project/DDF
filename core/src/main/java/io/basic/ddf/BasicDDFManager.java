@@ -1,14 +1,15 @@
 /**
- * 
+ *
  */
 package io.basic.ddf;
 
 
-import java.util.List;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
+
+import java.util.List;
 
 /**
  * An implementation of DDFManager with local memory and local storage
@@ -22,7 +23,8 @@ public class BasicDDFManager extends DDFManager {
 
 
 
-  public BasicDDFManager() {}
+  public BasicDDFManager() {
+  }
 
 
   public <T> DDF newDDF(List<T> rows, Class<T> unitType, String namespace, String name, Schema schema)

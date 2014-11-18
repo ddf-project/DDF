@@ -1,24 +1,24 @@
 /**
- * 
+ *
  */
 package io.basic.ddf;
 
 
-import java.util.List;
+import com.google.common.base.Strings;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
 import io.basic.ddf.content.PersistenceHandler.BasicPersistible;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.ISerializable;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
-import com.google.common.base.Strings;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.annotations.Expose;
+
+import java.util.List;
 
 /**
  * An implementation of DDF with local memory and local storage
- * 
  */
 public class BasicDDF extends DDF {
 
@@ -30,7 +30,6 @@ public class BasicDDF extends DDF {
   private Class<?> mUnitType;
   @Expose private List<?> mData; // only needed during serialization
   @Expose private String mUnitTypeName; // only needed during serialization
-
 
   public BasicDDF(List<?> rows, Class<?> unitType, String namespace, String name, Schema schema) throws DDFException {
     this((DDFManager) null, (List<?>) rows, unitType, namespace, name, schema);
@@ -48,7 +47,7 @@ public class BasicDDF extends DDF {
 
   /**
    * This signature is needed to support {@link DDFManager#newDDF(DDFManager, Object, Class[], String, String, Schema)}
-   * 
+   *
    * @param manager
    * @param rows
    * @param typeSpecs
@@ -68,7 +67,7 @@ public class BasicDDF extends DDF {
 
   /**
    * Signature without List, useful for creating a dummy DDF used by DDFManager
-   * 
+   *
    * @param manager
    * @throws DDFException
    */
@@ -78,7 +77,7 @@ public class BasicDDF extends DDF {
 
   /**
    * For serdes only
-   * 
+   *
    * @throws DDFException
    */
   protected BasicDDF() throws DDFException {
@@ -122,13 +121,13 @@ public class BasicDDF extends DDF {
    * object as a result of the deserialization, instead of this DDF itself. This makes it possible for clients to do
    * things like<br/>
    * <code>
-   *   PersistenceUri uri = model.persist();
-   *   Model model = (Model) ddfManager.load(uri);
+   * PersistenceUri uri = model.persist();
+   * Model model = (Model) ddfManager.load(uri);
    * </code> instead of having to do this:<br/>
    * <code>
-   *   PersistenceUri uri = model.persist();
-   *   BasicDDF ddf = (BasicDDF) ddfManager.load(uri);
-   *   Model model = (Model) ddf.getList().get(0);
+   * PersistenceUri uri = model.persist();
+   * BasicDDF ddf = (BasicDDF) ddfManager.load(uri);
+   * Model model = (Model) ddf.getList().get(0);
    * </code>
    */
   @Override
@@ -145,7 +144,7 @@ public class BasicDDF extends DDF {
 
         // See if we need to "unwrap" this object and return the wrapped object instead
         JsonElement deserializedWrappedObject = (serializationData instanceof JsonObject ? //
-        ((JsonObject) serializationData).get("mData")
+            ((JsonObject) serializationData).get("mData")
             : null);
 
         deserializedObject = BasicPersistible.unwrapDeserializedObject(mData, deserializedObject,

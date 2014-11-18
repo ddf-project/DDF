@@ -1,15 +1,16 @@
 /**
- * 
+ *
  */
 package io.ddf.misc;
 
 
-import java.io.IOException;
+import com.google.common.base.Strings;
 import io.ddf.util.ConfigHandler;
-import io.ddf.util.Utils;
 import io.ddf.util.ConfigHandler.Configuration;
 import io.ddf.util.IHandleConfig;
-import com.google.common.base.Strings;
+import io.ddf.util.Utils;
+
+import java.io.IOException;
 
 
 /**
@@ -19,7 +20,7 @@ public class Config {
 
   /**
    * Returns the runtime basic-storage directory path name, creating one if necessary.
-   * 
+   *
    * @return
    * @throws IOException
    */
@@ -47,7 +48,7 @@ public class Config {
 
   /**
    * If the named section does not have the value, then try the same key from the "global" section
-   * 
+   *
    * @param section
    * @param key
    * @return
@@ -59,7 +60,7 @@ public class Config {
 
   /**
    * If the named section does not have the value, then try the same key from the "global" section
-   * 
+   *
    * @param section
    * @param key
    * @return
@@ -71,7 +72,7 @@ public class Config {
 
   /**
    * If the named section does not have the value, then try the same key from the "global" section
-   * 
+   *
    * @param section
    * @param key
    * @return

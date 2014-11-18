@@ -1,18 +1,21 @@
 package io.ddf.analytics;
 
 
-import java.io.Serializable;
-import java.util.List;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+import io.ddf.types.AggregateTypes.AggregateField;
+import io.ddf.types.AggregateTypes.AggregateFunction;
+import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.util.Utils;
-import io.ddf.types.AggregateTypes.*;
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
- * 
+ *
  */
 public class AggregationHandler extends ADDFFunctionalGroupHandler implements IHandleAggregation {
 
@@ -62,10 +65,9 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
   /**
    * Performs the equivalent of a SQL aggregation statement like "SELECT year, month, AVG(depdelay), MIN(arrdelay) FROM
    * airline GROUP BY year, month"
-   * 
-   * @param fields
-   *          {@link AggregateField}s representing a list of column specs, some of which may be aggregated, while other
-   *          non-aggregated fields are the GROUP BY keys
+   *
+   * @param fields {@link AggregateField}s representing a list of column specs, some of which may be aggregated, while other
+   *               non-aggregated fields are the GROUP BY keys
    * @return
    * @throws DDFException
    */
@@ -105,14 +107,14 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
         .sql2txt(String.format("SELECT %s from %s", function.toString(column), this.getDDF().getTableName())).get(0));
   }
 
-  // dplyr-like
+  //dplyr-like
   @Override
   public DDF groupBy(List<String> groupedColumns, List<String> aggregateFunctions) throws DDFException {
     mGroupedColumns = groupedColumns;
     return agg(aggregateFunctions);
   }
 
-  // pandas-like
+  //pandas-like
   @Override
   public DDF groupBy(List<String> groupedColumns) {
     mGroupedColumns = groupedColumns;
