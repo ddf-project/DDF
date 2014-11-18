@@ -359,7 +359,7 @@ setMethod("na.omit",
             axis <- match.arg(axis)
 	    by <- J("io.ddf.etl.IHandleMissingData")$Axis$ROW			
 	    if(axis=="COLUMN")
-                by <- J("io.ddf.etl.IHandleMissingData")$Axis$COLUMN
+            	by <- J("io.ddf.etl.IHandleMissingData")$Axis$COLUMN
 
             if(!inplace)
                 return (new("DDF", object@jddf$dropNA(by)))
