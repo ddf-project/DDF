@@ -357,19 +357,18 @@ setMethod("na.omit",
           signature("DDF"),
           function(object, axis=c("ROW","COLUMN"), inplace=FALSE) {
             axis <- match.arg(axis)
-	    by <- J("io.ddf.etl.IHandleMissingData")$Axis$ROW			
-	    if(axis=="COLUMN")
+	     by <- J("io.ddf.etl.IHandleMissingData")$Axis$ROW			
+	     if(axis=="COLUMN")
             	by <- J("io.ddf.etl.IHandleMissingData")$Axis$COLUMN
 
-            if(!inplace)
+             if(!inplace)
                 return (new("DDF", object@jddf$dropNA(by)))
-            else
-            {
+             else{
                 object@jddf$setMutable(inplace)
                 object@jddf$dropNA(by)
                 return (object)
-            }
-          }
+             }
+           }
 )
 
 #----------------------- Helper methods ----------------------------------------------
