@@ -4,6 +4,12 @@ DDF
 Distributed DataFrame: Productivity = Power x Simplicity
 For Big Data Scientists & Engineers
 
+DDF website: http://ddf.io
+
+Issues: https://github.com/ddf-project/DDF/issues
+
+Discussion: https://groups.google.com/forum/#!forum/ddf-project
+
 # DDF - Distributed DataFrame 
 
 DDF aims to make Big Data easy yet powerful, by bringing together
