@@ -50,12 +50,22 @@ To report a bug you need to create an issue on <a href="https://github.com/ddf-p
 <a name="contributing-code"></a>
 ## Contributing code
 
+<a name="open-issue"></a>
+### Open a new issue
+Issue can cover anything, a bug, a new feature, an enhancement, in code or documentation. In addition to that, provide a problem statement or feature description and proposed solution. The issue number should be present in each commit aimed at resolving that issue, which allows to see all the related commit together. Even if you develop in a feature branch (more on this later) the information is lost if a fast forward merge is performed, so it's better to comment with issue number. If the development is substantial wait for somebody to comment on the issue. No point in getting axed later. Normally for bug fix you don't need this, unless the fix is complex.
+<a name="open-branch"
+### Open branch for a new feature, named after the feature, or for any more substantial or risky development (that you may have to give up on), otherwise you can develop in master (fixes) or dev (new features)
+<a name="develop-test"></a>  
+### Develop test 
+Development of a new feature starts with one or more tests. Ideally, they define what the feature. If fixing bug, we hopefully have a test case for it. Or we may be just adding a test for an existing feature
+<a name="develop-feature"></a>
+###  Develop feature or fix bug or docs
 <a name="create-a-pull-request"></a>
 ### Create a Pull Request
-You should create a pull request on the DDF project repository. Please follow the instructions on <a href="https://help.github.com/articles/creating-a-pull-request" target="_blank">github</a>. In addition to that, we request that you provide a description on the Pull Request about the problem statement or goals for the request  and the provided solution. If you want to test the waters before embarking in a development effort, please enter a issue in the issue tracker (see [Report a bug](#report-bug) above, it's the same process). Submitting a pull request is no guarantee of acceptance, so if it's a lot of work it's nice to know that it goes in a direction the committers support.
+You should create a pull request on the DDF project repository. Please follow the instructions on <a href="https://help.github.com/articles/creating-a-pull-request" target="_blank">github</a>. Please mention the issue number in your puill request.  Submitting a pull request is no guarantee of acceptance, albeit we the committers want to work with you to merge your contribution. Hopefully a healthi discussion when the issue was created will prevent bad surprises later on.
 
 ### Approval process
-All Pull Requests will be reviewed by a committer. He or she will review, test it and respond in a timely manner. In general all pull requests need to satisfy the following criteria:
+All Pull Requests will be reviewed by a committer, even those created by a committer. We want to have two intelligent beings involved in each change. He or she will review, test it and respond in a timely manner. In general all pull requests need to satisfy the following criteria:
 
  1. Pass all unit tests.
  2. Conform to formatting standard (we will strive to provide an automated solution for this)
@@ -63,7 +73,7 @@ All Pull Requests will be reviewed by a committer. He or she will review, test i
 <a name="request-feature"></a>
 ## Request a new feature
 
-We welcome all ideas and comments. Before you request feature, please take a look at our current <a href="../plans.html" target="_blank">roadmap</a>.
+We welcome all ideas and comments. Before you request feature, please take a look at our current <a href="../plans.html" target="_blank">roadmap</a> and current open issues.
 
 To request a new feature you should open an issue in our <a href="https://github.com/ddf-project/DDF/issues" target="_blank">issue tracker</a> and summarize the desired functionality.
 You can also send a message to <a href="https://groups.google.com/forum/#!forum/ddf-project" target="_blank"> DDF google group</a>.
