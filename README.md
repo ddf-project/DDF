@@ -4,11 +4,13 @@ DDF
 Distributed DataFrame: Productivity = Power x Simplicity
 For Big Data Scientists & Engineers
 
-DDF website: http://ddf.io
+* [Visit DDF Website!](http://ddf.io)
 
-Issues: https://github.com/ddf-project/DDF/issues
+* [Wiki](https://github.com/ddf-project/DDF/wiki)
 
-Discussion: https://groups.google.com/forum/#!forum/ddf-project
+* [Issues tracker](https://github.com/ddf-project/DDF/issues)
+
+* [Questions/Comments/Feature Requests](https://groups.google.com/forum/#!forum/ddf-project)
 
 # DDF - Distributed DataFrame 
 
