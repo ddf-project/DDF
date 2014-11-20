@@ -2,22 +2,15 @@ package io.spark.ddf.ml;
 
 
 import io.ddf.DDF;
-import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
+import io.spark.ddf.BaseTest;
 import org.apache.spark.mllib.recommendation.MatrixFactorizationModel;
 import org.junit.Test;
 
-public class ALSTest {
+public class ALSTest extends BaseTest {
   @Test
   public void TestALS() throws DDFException {
-    DDFManager manager = DDFManager.get("spark");
-
-    manager.sql2txt("drop table if exists ratings");
-
-    manager.sql2txt("create table ratings (userid int,movieid int,score double ) "
-        + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','");
-
-    manager.sql2txt("load data local inpath '../resources/test/ratings.data' into table ratings");
+    createTableRatings();
 
     DDF ratings = manager.sql2ddf("select userid, movieid, score from ratings");
     int rank = 3;
