@@ -1,15 +1,16 @@
 /**
- * 
+ *
  */
 package io.ddf.content;
 
 
-import java.util.List;
 import io.ddf.DDF;
 import io.ddf.content.ViewHandler.Column;
 import io.ddf.content.ViewHandler.Expression;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
+
+import java.util.List;
 
 /**
  *

@@ -12,7 +12,7 @@ setMethod("initialize",
           signature(.Object="DDF"),
           function(.Object, jddf) {
             if (is.null(jddf) || !inherits(jddf, "jobjRef") || !(jddf %instanceof% "io.ddf.DDF"))
-              stop('DDF needs a Java object of class "com.adatao.ddf.DDF"')
+              stop('DDF needs a Java object of class "io.ddf.DDF"')
             .Object@jddf = jddf
             .Object
           })
@@ -150,8 +150,25 @@ setMethod("head",
           signature("DDF"),
           function(x, n=6L) {
             res <- x@jddf$VIEWS$head(as.integer(n))
-            res <- t(sapply(res, function(x){x$split("\t")}))
+            if(ncol(x)>1)
+                res <- t(sapply(res, function(x){x$split("\t")}))
+            else
+                res <- as.matrix(sapply(res, function(x){x$split("\t")}))
             get.data.frame(x, res)
+          }
+)
+
+#' Return all the of a DistributedDataFrame as a R datafrme
+#'
+#' @details
+#' \code{as.data.frame} for a DistributedDataFrame returns all the data of that DistributedDataFrame as an R native data.frame.
+#' @param x a DistributedDataFrame
+#' @return an R native data.frame
+#' @export
+setMethod("as.data.frame",
+          signature("DDF"),
+          function(x) {
+            head(x,nrow(x))
           }
 )
 
@@ -327,7 +344,32 @@ setMethod("fivenum",
           }
 )
 
+#' Drop NA values
+#'
+#' Return a DDF instance with no NAs.
+#' @param object a Distributed Data Frame.
+#' @param axis the axis by which to drop if NA value exits, ROW represents by Row as default, COLUMN is column.
+#' @param inplace whether to treat the ddf inplace, default is FALSE.
+#' @return a DDF with no NA values.
+#' @export
 
+setMethod("na.omit",
+          signature("DDF"),
+          function(object, axis=c("ROW","COLUMN"), inplace=FALSE) {
+            axis <- match.arg(axis)
+	     by <- J("io.ddf.etl.IHandleMissingData")$Axis$ROW			
+	     if(axis=="COLUMN")
+            	by <- J("io.ddf.etl.IHandleMissingData")$Axis$COLUMN
+
+            if(!inplace)
+               return (new("DDF", object@jddf$dropNA(by)))
+            else{
+               object@jddf$setMutable(inplace)
+               object@jddf$dropNA(by)
+               return (object)
+            }
+          }
+)
 
 #----------------------- Helper methods ----------------------------------------------
 get.data.frame <- function(ddf, res) {

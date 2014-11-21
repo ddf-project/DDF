@@ -5,7 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Types {
   static public enum JoinType {
-    @SerializedName("inner") INNER, @SerializedName("left") LEFT, @SerializedName("right") RIGHT, @SerializedName("full") FULL, @SerializedName("leftsemi") LEFTSEMI;
+    @SerializedName("inner")INNER, @SerializedName("left")LEFT, @SerializedName("right")RIGHT, @SerializedName(
+        "full")FULL, @SerializedName("leftsemi")LEFTSEMI;
 
     public String getStringRepr() throws Exception {
       if (this == LEFTSEMI) return "LEFT SEMI";
@@ -15,6 +16,9 @@ public class Types {
       else if (this == FULL) return "FULL OUTER";
       return null;
     }
-  };
+  }
+
+
+  ;
 
 }

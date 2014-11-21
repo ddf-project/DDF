@@ -1,24 +1,20 @@
 package io.ddf.analytics;
 
 
-import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Pattern;
-import org.apache.commons.lang.StringUtils;
-import io.ddf.DDF;
-import io.ddf.content.Schema.ColumnType;
-import io.ddf.exception.DDFException;
-import io.ddf.misc.ADDFFunctionalGroupHandler;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.ddf.DDF;
+import io.ddf.content.Schema.ColumnType;
+import io.ddf.exception.DDFException;
+import io.ddf.misc.ADDFFunctionalGroupHandler;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler implements ISupportStatistics {
 
@@ -56,13 +52,14 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("SELECT %s FROM %%s", StringUtils.join(specs.toArray(new String[0]), ','));
 
     if (!Strings.isNullOrEmpty(command)) {
+    mLog.info(">>>> command = " + command);
       // a fivenumsummary of an Int/Long column is in the format "[min, max, 1st_quantile, median, 3rd_quantile]"
       // each value can be a NULL
       // a fivenumsummary of an Double/Float column is in the format "min \t max \t[1st_quantile, median, 3rd_quantile]"
       // or "min \t max \t null"s
       String[] rs = this.getDDF()
           .sql2txt(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).get(0)
-          .replace("[", "").replace("]", "").replaceAll("\t", ",").replace("null", "NULL, NULL, NULL").split(",");
+          .replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|,", "").split("\t| ");
 
 
       int k = 0;
@@ -71,7 +68,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
           fivenums[i] = new FiveNumSummary(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
         } else {
           fivenums[i] = new FiveNumSummary(parseDouble(rs[5 * k]), parseDouble(rs[5 * k + 1]),
-              parseDouble(rs[5 * k + 2]), parseDouble(rs[5 * k + 3]), parseDouble(rs[5 * k + 4]));
+              parseDouble(rs[5 * k + 2]),
+              parseDouble(rs[5 * k + 3]), parseDouble(rs[5 * k + 4]));
           k++;
         }
       }
@@ -88,8 +86,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
     String command = String.format("select var_samp(%s) from @this", columnName);
     if (!Strings.isNullOrEmpty(command)) {
-      List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute the variance of the given column from table %%s"));
+      List<String> result = this.getDDF()
+          .sql2txt(command, String.format("Unable to compute the variance of the given column from table %%s"));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         Double a = Double.parseDouble(result.get(0));
         sd[0] = a;
@@ -106,8 +104,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("select avg(%s) from @this", columnName);
 
     if (!Strings.isNullOrEmpty(command)) {
-      List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute the mean of the given column from table %%s"));
+      List<String> result = this.getDDF()
+          .sql2txt(command, String.format("Unable to compute the mean of the given column from table %%s"));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         mean = Double.parseDouble(result.get(0));
         return mean;
@@ -139,6 +137,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       List<String> result = this.getDDF().sql2txt(command,
           String.format("Unable to compute covariance of %s and %s from table %%s", xColumnName, yColumnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
+        System.out.println(">>>>> parseDouble: " + result.get(0));
         cov = Double.parseDouble(result.get(0));
         return cov;
       }
@@ -150,16 +149,21 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
   public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
     String command = String.format("select histogram_numeric(%s,%s) from @this", columnName, numBins);
     if (!Strings.isNullOrEmpty(command)) {
-      List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute histogram of %s from table %%s", columnName));
+      mLog.info(">>>> getVectorHistogram command = " + command);
+      List<String> result = this.getDDF()
+          .sql2txt(command, String.format("Unable to compute histogram of %s from table %%s", columnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         List<HistogramBin> bins = Lists.newArrayList();
-        Gson gson = new Gson();
-        for (String rs : result) {
-          Type typeOfT = new TypeToken<List<HistogramBin>>() {}.getType();
-          List<HistogramBin> tmpbins = gson.fromJson((String) rs, typeOfT);
-          for (HistogramBin bin : tmpbins)
-            bins.add(bin);
+        mLog.info(">>>> Histogram result = " + result.get(0));
+        String[] arrayString = result.get(0).replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|", "").split(",");
+
+        int i = 0;
+        while(i < numBins) {
+          HistogramBin bin = new HistogramBin();
+          bin.setX(Double.parseDouble(arrayString[i*2 + 0]));
+          bin.setX(Double.parseDouble(arrayString[i*2 + 1]));
+          i += 1;
+          bins.add(bin);
         }
         return bins;
       }
@@ -168,6 +172,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
   }
 
   private double parseDouble(String s) {
+    mLog.info(">>>> parseDouble: " + s);
     return ("NULL".equalsIgnoreCase(s.trim())) ? Double.NaN : Double.parseDouble(s);
   }
 
@@ -190,11 +195,9 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
   }
 
-
   public static class HistogramBin {
     private double x; // Bin center
     private double y; // Bin weight
-
 
     public double getX() {
       return x;
@@ -278,7 +281,6 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
   }
 
-
   public Double[] getVectorQuantiles(String columnName, Double[] percentiles) throws DDFException {
     return getVectorQuantiles(columnName, percentiles, 10000);
   }
@@ -321,8 +323,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       if (p1.matcher(colType).matches()) {
         pParams = "percentile(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "))";
       } else if (p2.matcher(colType).matches()) {
-        pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), "
-            + B.toString() + ")";
+        pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), " + B.toString()
+            + ")";
       } else {
         throw new DDFException("Only support numeric verctors!!!");
       }
@@ -350,8 +352,9 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     if (rs == null || rs.size() == 0) {
       throw new DDFException("Cannot get vector quantiles from SQL queries");
     }
-    String[] convertedResults = rs.get(0).replace("[", "").replace("]", "").replaceAll("\t", ",")
-        .replace("null", "NULL, NULL, NULL").split(",");
+    String[] convertedResults = rs.get(0)
+        .replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|,", "")
+        .replace("null", "NULL, NULL, NULL").split("\t| ");
     mLog.info("Raw info " + StringUtils.join(rs, "\n"));
 
     Double[] result = new Double[percentiles.length];

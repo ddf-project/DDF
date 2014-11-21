@@ -9,9 +9,9 @@ import io.ddf.exception.DDFException
  */
 trait ObjectToDoubleMapper {
 
-  def getMapper(columns: java.util.List[Column]): Array[Object ⇒ Option[Double]] = {
+  def getMapper(columns: java.util.List[Column]): Array[Object => Option[Double]] = {
     columns.map(
-      column ⇒ getDoubleMapper(column.getType)
+      column => getDoubleMapper(column.getType)
     ).toArray
   }
 

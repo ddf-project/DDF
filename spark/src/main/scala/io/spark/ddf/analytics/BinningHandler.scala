@@ -56,11 +56,12 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     val decimalPlaces: Int = 2
     val formatter = new DecimalFormat("#." + Iterator.fill(decimalPlaces)("#").mkString(""))
     var intervals: Array[String] = null
-    intervals = (0 to breaks.length - 2).map { i ⇒
-      if (right)
-        "'(%s,%s]'".format(formatter.format(breaks(i)), formatter.format(breaks(i + 1)))
-      else
-        "'[%s,%s)'".format(formatter.format(breaks(i)), formatter.format(breaks(i + 1)))
+    intervals = (0 to breaks.length - 2).map {
+      i ⇒
+        if (right)
+          "'(%s,%s]'".format(formatter.format(breaks(i)), formatter.format(breaks(i + 1)))
+        else
+          "'[%s,%s)'".format(formatter.format(breaks(i)), formatter.format(breaks(i + 1)))
     }.toArray
     if (includeLowest) {
       if (right)
@@ -73,41 +74,46 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
   }
 
   def createTransformSqlCmd(col: String, intervals: Array[String], includeLowest: Boolean, right: Boolean): String = {
-    val sqlCmd = "SELECT " + mDDF.getSchemaHandler().getColumns.map { ddfcol ⇒
-      if (!col.equals(ddfcol.getName)) {
-        ddfcol.getName
-      } else {
-        val b = breaks.map(_.asInstanceOf[Object])
-
-        val caseLowest = if (right) {
-          if (includeLowest)
-            String.format("when ((%s >= %s) and (%s <= %s)) then %s ", col, b(0), col, b(1), intervals(0))
-          else
-            String.format("when ((%s > %s) and (%s <= %s)) then %s ", col, b(0), col, b(1), intervals(0))
-        } else {
-          String.format("when ((%s >= %s) and (%s < %s)) then %s ", col, b(0), col, b(1), intervals(0))
+    val sqlCmd = "SELECT " + mDDF.getSchemaHandler().getColumns.map {
+      ddfcol ⇒
+        if (!col.equals(ddfcol.getName)) {
+          ddfcol.getName
         }
+        else {
+          val b = breaks.map(_.asInstanceOf[Object])
 
-        // all the immediate breaks
-        val cases = (1 to breaks.length - 3).map { i ⇒
-          if (right)
-            String.format("when ((%s > %s) and (%s <= %s)) then %s ", col, b(i), col, b(i + 1), intervals(i))
-          else
-            String.format("when ((%s >= %s) and (%s < %s)) then %s ", col, b(i), col, b(i + 1), intervals(i))
-        }.mkString(" ")
+          val caseLowest = if (right) {
+            if (includeLowest)
+              String.format("when ((%s >= %s) and (%s <= %s)) then %s ", col, b(0), col, b(1), intervals(0))
+            else
+              String.format("when ((%s > %s) and (%s <= %s)) then %s ", col, b(0), col, b(1), intervals(0))
+          }
+          else {
+            String.format("when ((%s >= %s) and (%s < %s)) then %s ", col, b(0), col, b(1), intervals(0))
+          }
 
-        val caseHighest = if (right) {
-          String.format("when ((%s > %s) and (%s <= %s)) then %s ", col, b(b.length - 2), col, b(b.length - 1), intervals(intervals.length - 1))
-        } else {
-          if (includeLowest)
-            String.format("when ((%s >= %s) and (%s <= %s)) then %s ", col, b(b.length - 2), col, b(b.length - 1), intervals(intervals.length - 1))
-          else
-            String.format("when ((%s >= %s) and (%s < %s)) then %s ", col, b(b.length - 2), col, b(b.length - 1), intervals(intervals.length - 1))
+          // all the immediate breaks
+          val cases = (1 to breaks.length - 3).map {
+            i ⇒
+              if (right)
+                String.format("when ((%s > %s) and (%s <= %s)) then %s ", col, b(i), col, b(i + 1), intervals(i))
+              else
+                String.format("when ((%s >= %s) and (%s < %s)) then %s ", col, b(i), col, b(i + 1), intervals(i))
+          }.mkString(" ")
+
+          val caseHighest = if (right) {
+            String.format("when ((%s > %s) and (%s <= %s)) then %s ", col, b(b.length - 2), col, b(b.length - 1), intervals(intervals.length - 1))
+          }
+          else {
+            if (includeLowest)
+              String.format("when ((%s >= %s) and (%s <= %s)) then %s ", col, b(b.length - 2), col, b(b.length - 1), intervals(intervals.length - 1))
+            else
+              String.format("when ((%s >= %s) and (%s < %s)) then %s ", col, b(b.length - 2), col, b(b.length - 1), intervals(intervals.length - 1))
+          }
+
+          // the full case expression under select
+          "case " + caseLowest + cases + caseHighest + " else null end as " + col
         }
-
-        // the full case expression under select
-        "case " + caseLowest + cases + caseHighest + " else null end as " + col
-      }
     }.mkString(", ") + " FROM " + mDDF.getTableName
     mLog.info("Transform sql = {}", sqlCmd)
 
@@ -116,7 +122,8 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
   def getIntervalsFromNumBins(colName: String, bins: Int): Array[Double] = {
     val cmd = "SELECT min(%s), max(%s) FROM %s".format(colName, colName, mDDF.getTableName)
-    val res: Array[Double] = mDDF.sql2txt(cmd, "").get(0).split("\t").map(x ⇒ x.toDouble)
+    val res: Array[Double] = mDDF.sql2txt(cmd, "").get(0).replace("ArrayBuffer", "").
+      replace("(", "").replace(")", "").replace(", ", "\t").split("\t").map(x ⇒ x.toDouble)
     val (min, max) = (res(0), res(1))
     val eachInterval = (max - min) / bins
     val probs: Array[Double] = Array.fill[Double](bins + 1)(0)
@@ -149,8 +156,8 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     pArray.foreach(x ⇒ cmd = cmd + x.toString + ",")
     cmd = cmd.take(cmd.length - 1)
     cmd = String.format("min(%s), percentile_approx(%s, array(%s)), max(%s)", colName, colName, cmd, colName)
-    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replace("[", "").
-      replace("]", "").replace(",", "\t").split("\t").map(x ⇒ x.toDouble)
+    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replaceAll("ArrayBuffer|\\(|\\)|,", "").split("\t| ").
+      map(x ⇒ x.toDouble)
   }
 
   val MAX_LEVEL_SIZE = Integer.parseInt(System.getProperty("factor.max.level.size", "1024"))
@@ -189,7 +196,9 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     }
 
     def findInterval(aNum: Double): Option[String] = {
-      intervals.find { case (f, y) ⇒ f(aNum)} match {
+      intervals.find {
+        case (f, y) ⇒ f(aNum)
+      } match {
         case Some((x, y)) ⇒ Option(y)
         case None ⇒ Option(null)
       }

@@ -1,12 +1,14 @@
 package io.ddf.analytics;
 
 
-import java.util.List;
 import io.ddf.DDF;
-import io.ddf.types.AggregateTypes.AggregateFunction;
-import io.ddf.types.AggregateTypes.*;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
+import io.ddf.types.AggregateTypes.AggregateField;
+import io.ddf.types.AggregateTypes.AggregateFunction;
+import io.ddf.types.AggregateTypes.AggregationResult;
+
+import java.util.List;
 
 public interface IHandleAggregation extends IHandleDDFFunctionalGroup {
 
@@ -25,3 +27,4 @@ public interface IHandleAggregation extends IHandleDDFFunctionalGroup {
   public DDF groupBy(List<String> groupedColumns);
 
 }
+

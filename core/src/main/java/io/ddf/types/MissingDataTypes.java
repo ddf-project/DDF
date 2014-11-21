@@ -6,9 +6,7 @@ import com.google.common.base.Strings;
 public class MissingDataTypes {
   /**
    * Abstract base type for support of missing values (NAs) in the data
-   * 
-   * @author ctn
-   * 
+   *
    */
   public abstract class AMissingValue<T> {
     protected T mValue;
@@ -40,15 +38,26 @@ public class MissingDataTypes {
     }
   }
 
-  public class DoubleOrNA extends AMissingValue<Double> {}
 
-  public class IntegerOrNA extends AMissingValue<Integer> {}
+  public class DoubleOrNA extends AMissingValue<Double> {
+  }
 
-  public class LongOrNA extends AMissingValue<Long> {}
 
-  public class FloatOrNA extends AMissingValue<Float> {}
+  public class IntegerOrNA extends AMissingValue<Integer> {
+  }
 
-  public class ObjectOrNA extends AMissingValue<Object> {}
+
+  public class LongOrNA extends AMissingValue<Long> {
+  }
+
+
+  public class FloatOrNA extends AMissingValue<Float> {
+  }
+
+
+  public class ObjectOrNA extends AMissingValue<Object> {
+  }
+
 
   public class NA extends AMissingValue<Byte> {
 
@@ -63,6 +72,7 @@ public class MissingDataTypes {
       mValue = null;
     }
   }
+
 
   public enum NAString {
     NAN, NA, NONE, NULL;

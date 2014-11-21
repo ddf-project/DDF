@@ -1,5 +1,6 @@
 *.class
 *.swp
+*.iml
 *.log
 target/
 .idea
@@ -33,9 +34,11 @@ core/target/streams
 project/target/streams
 spark/target/streams
 R/package/inst/java
-# R stuffs
+# R stuff
 .Rproj.user
 .Rhistory
 .RData
-
 *.Rproj
+
+# python stuffs
+*.pyc

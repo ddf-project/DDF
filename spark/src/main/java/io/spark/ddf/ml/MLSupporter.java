@@ -1,35 +1,32 @@
 package io.spark.ddf.ml;
 
 
+import io.ddf.DDF;
+import io.ddf.content.IHandleRepresentations.IGetResult;
+import io.ddf.content.IHandleSchema;
+import io.ddf.content.Schema;
+import io.ddf.exception.DDFException;
+import io.ddf.ml.IModel;
+import io.ddf.types.TupleMatrixVector;
+import io.ddf.util.Utils.MethodInfo.ParamInfo;
+import io.spark.ddf.SparkDDF;
+import io.spark.ddf.analytics.CrossValidation;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.mllib.linalg.Vector;
+import org.apache.spark.mllib.recommendation.Rating;
+import org.apache.spark.mllib.regression.LabeledPoint;
+import org.apache.spark.rdd.RDD;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import io.ddf.content.IHandleSchema;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.mllib.regression.LabeledPoint;
-import org.apache.spark.mllib.recommendation.Rating;
-import org.apache.spark.rdd.RDD;
-import io.ddf.DDF;
-import io.ddf.content.IHandleRepresentations.IGetResult;
-import io.ddf.content.Schema;
-import io.ddf.exception.DDFException;
-import io.ddf.ml.IModel;
-import io.ddf.types.Matrix;
-import io.ddf.types.Vector;
-import io.ddf.types.TupleMatrixVector;
-import io.ddf.util.Utils.MethodInfo.ParamInfo;
-import io.spark.ddf.SparkDDF;
-import io.spark.ddf.analytics.CrossValidation;
-import shark.api.Row;
-import shark.memstore2.TablePartition;
-import scala.Tuple2;
 
 public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
 
@@ -56,15 +53,22 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
       if (paramInfo.paramMatches(LabeledPoint.class)) {
         rdd = (RDD<LabeledPoint>) this.getDDF().getRepresentationHandler().get(RDD.class, LabeledPoint.class);
 
+      } else if (paramInfo.paramMatches(Vector.class)) {
+        rdd = (RDD<Vector>) this.getDDF().getRepresentationHandler().get(RDD.class, Vector.class);
       } else if (paramInfo.paramMatches(double[].class)) {
         rdd = (RDD<double[]>) this.getDDF().getRepresentationHandler().get(RDD.class, double[].class);
+      } else if (paramInfo.paramMatches(io.ddf.types.Vector.class)) {
+        rdd = (RDD<io.ddf.types.Vector>) this.getDDF().getRepresentationHandler()
+            .get(RDD.class, io.ddf.types.Vector.class);
       } else if (paramInfo.paramMatches(TupleMatrixVector.class)) {
         rdd = (RDD<TupleMatrixVector>) this.getDDF().getRepresentationHandler().get(RDD.class, TupleMatrixVector.class);
       } else if (paramInfo.paramMatches(Rating.class)) {
         rdd = (RDD<Rating>) this.getDDF().getRepresentationHandler().get(RDD.class, Rating.class);
-      } else if (paramInfo.paramMatches(TablePartition.class)) {
-        rdd = (RDD<TablePartition>) this.getDDF().getRepresentationHandler().get(RDD.class, TablePartition.class);
-      } else if (paramInfo.paramMatches(Object.class)) {
+      }
+      //      else if (paramInfo.paramMatches(TablePartition.class)) {
+      //        rdd = (RDD<TablePartition>) this.getDDF().getRepresentationHandler().get(RDD.class, TablePartition.class);
+      //      }
+      else if (paramInfo.paramMatches(Object.class)) {
         rdd = (RDD<Object[]>) this.getDDF().getRepresentationHandler().get(RDD.class, Object[].class);
       }
 
@@ -89,18 +93,25 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
   @Override
   public DDF applyModel(IModel model, boolean hasLabels, boolean includeFeatures) throws DDFException {
     SparkDDF ddf = (SparkDDF) this.getDDF();
-    IGetResult gr = ddf.getJavaRDD(double[].class, LabeledPoint.class, Object[].class);
+    IGetResult gr = ddf.getJavaRDD(Vector.class, double[].class, LabeledPoint.class, Object[].class);
 
     // Apply appropriate mapper
     JavaRDD<?> result = null;
     Class<?> resultUnitType = double[].class;
 
     if (LabeledPoint.class.equals(gr.getTypeSpecs()[0])) {
+      mLog.info(">>> applyModel, inputClass= LabeledPoint");
       result = ((JavaRDD<LabeledPoint>) gr.getObject()).mapPartitions(new PredictMapper<LabeledPoint, double[]>(
           LabeledPoint.class, double[].class, model, hasLabels, includeFeatures));
 
     } else if (double[].class.equals(gr.getTypeSpecs()[0])) {
+      mLog.info(">>> applyModel, inputClass= double[]");
       result = ((JavaRDD<double[]>) gr.getObject()).mapPartitions(new PredictMapper<double[], double[]>(double[].class,
+          double[].class, model, hasLabels, includeFeatures));
+
+    } else if (Vector.class.equals(gr.getTypeSpecs()[0])) {
+      mLog.info(">>> applyModel, inputClass= Vector");
+      result = ((JavaRDD<Vector>) gr.getObject()).mapPartitions(new PredictMapper<Vector, double[]>(Vector.class,
           double[].class, model, hasLabels, includeFeatures));
 
     } else if (Object[].class.equals(gr.getTypeSpecs()[0])) {
@@ -124,27 +135,25 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
     } else if (!includeFeatures && hasLabels) {
       outputColumns.add(new Schema.Column("ytrue", "double"));
     }
-
     outputColumns.add(new Schema.Column("yPredict", "double"));
 
     Schema schema = new Schema(null, outputColumns);
 
     if (double[].class.equals(resultUnitType)) {
-      DDF resultDDF = this.getManager().newDDF(this.getManager(), result.rdd(),
-          new Class<?>[] { RDD.class, double[].class }, this.getManager().getNamespace(), null, schema);
+      DDF resultDDF = this.getManager()
+          .newDDF(this.getManager(), result.rdd(), new Class<?>[] { RDD.class, double[].class },
+              this.getManager().getNamespace(), null, schema);
 
-      // DDF resultDDF = new SparkDDF(this.getManager(), (RDD<double[]>) result.rdd(), double[].class, null, null,
-      // schema);
       IHandleSchema schemaHandler = resultDDF.getSchemaHandler();
       resultDDF.getSchema().setTableName(schemaHandler.newTableName());
       this.getManager().addDDF(resultDDF);
 
       return resultDDF;
     } else if (Object[].class.equals(resultUnitType)) {
-      DDF resultDDF = this.getManager().newDDF(this.getManager(), result.rdd(),
-          new Class<?>[] { RDD.class, Object[].class }, this.getManager().getNamespace(), null, schema);
-      // DDF resultDDF = new SparkDDF(this.getManager(), (RDD<Object[]>) result.rdd(), Object[].class, this.getManager()
-      // .getNamespace(), null, schema);
+      DDF resultDDF = this.getManager()
+          .newDDF(this.getManager(), result.rdd(), new Class<?>[] { RDD.class, Object[].class },
+              this.getManager().getNamespace(), null, schema);
+
       IHandleSchema schemaHandler = resultDDF.getSchemaHandler();
       resultDDF.getSchema().setTableName(schemaHandler.newTableName());
       this.getManager().addDDF(resultDDF);
@@ -154,7 +163,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
   }
 
 
-  private static class PredictMapper<I, O> extends FlatMapFunction<Iterator<I>, O> {
+  private static class PredictMapper<I, O> implements FlatMapFunction<Iterator<I>, O> {
 
     private static final long serialVersionUID = 1L;
     private IModel mModel;
@@ -196,7 +205,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
             if (sample instanceof LabeledPoint) {
               LabeledPoint s = (LabeledPoint) sample;
               label = s.label();
-              features = s.features();
+              features = s.features().toArray();
 
             } else {
               double[] s = (double[]) sample;
@@ -207,7 +216,6 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
                 features = s;
               }
             }
-
 
             if (double[].class.equals(mOutputType)) {
               if (mHasLabels) {
@@ -224,7 +232,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
               if (mHasLabels) {
                 outputRow = (O) new Object[] { label, this.mModel.predict(features) };
               } else {
-                outputRow = (O) new Object[] { this.mModel.predict(features) };
+                outputRow = (O) new Object[] { this.mModel.predict(features)};
               }
 
               if (mIncludeFeatures) {
@@ -240,6 +248,28 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
             }
 
 
+          } else if (sample instanceof Vector) {
+            Double label = 0.0;
+            double[] features;
+            Vector vector = (Vector) sample;
+            if (mHasLabels) {
+              label = vector.apply(vector.size() - 1);
+              features = Arrays.copyOf(vector.toArray(), vector.size() - 1);
+            } else {
+              features = vector.toArray();
+            }
+
+            if (double[].class.equals(mOutputType)) {
+              if (mHasLabels) {
+                outputRow = (O) new double[] { label, (Double) this.mModel.predict(features) };
+              } else {
+                outputRow = (O) new double[] { (Double) this.mModel.predict(features) };
+              }
+
+              if (mIncludeFeatures) {
+                outputRow = (O) ArrayUtils.addAll(features, (double[]) outputRow);
+              }
+            }
           } else if (sample instanceof Object[]) {
             Object label = null;
             Object[] features;

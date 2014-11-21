@@ -1,12 +1,12 @@
 package io.spark.ddf.analytics;
 
 
-import junit.framework.Assert;
-import org.junit.Test;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
 import io.ddf.ml.IModel;
+import junit.framework.Assert;
+import org.junit.Test;
 
 public class MetricsTests {
 
@@ -31,7 +31,8 @@ public class MetricsTests {
 
     manager.sql2txt("load data local inpath '../resources/test/airline.csv' into table airline");
 
-    DDF ddf = manager.sql2ddf("select " + "distance, depdelay, if (arrdelay > 10.89, 1, 0) as delayed from airline");
+    DDF ddf = manager.sql2ddf("select " +
+        "distance, depdelay, if (arrdelay > 10.89, 1, 0) as delayed from airline");
     Assert.assertEquals(3, ddf.getSummary().length);
     IModel logModel = ddf.ML.train("logisticRegressionWithSGD", 10, 0.1);
     long[][] cm = ddf.ML.getConfusionMatrix(logModel, 0.5);

@@ -1,7 +1,6 @@
 package io.ddf.content;
 
 
-import io.ddf.exception.DDFException;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
@@ -10,7 +9,6 @@ public class Representation {
   private Class<?>[] mTypeSpecs;
   private String mTypeSpecsString;
   private Object mValue;
-
 
   public Representation(Object value, Class<?>... typeSpecs) {
     this(typeSpecs);

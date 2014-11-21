@@ -1,10 +1,10 @@
 package io.ddf.etl;
 
 
-import org.junit.Assert;
-import org.junit.Test;
 import io.ddf.etl.IHandleMissingData.Axis;
 import io.ddf.etl.IHandleMissingData.NAChecking;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class MissingDataHandlerTest {
 

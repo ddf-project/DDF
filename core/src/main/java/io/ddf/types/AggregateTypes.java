@@ -1,13 +1,14 @@
 package io.ddf.types;
 
 
-import java.util.HashMap;
-import java.util.List;
-import org.apache.commons.lang.StringUtils;
-import io.ddf.exception.DDFException;
-import io.ddf.util.Utils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import io.ddf.exception.DDFException;
+import io.ddf.util.Utils;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class AggregateTypes {
   public enum AggregateFunction {
@@ -70,6 +71,7 @@ public class AggregateTypes {
 
   }
 
+
   /**
    * Represents a field in the aggregation statement "SELECT a, b, SUM(c), MIN(c), MAX(d), COUNT(*) GROUP BY a, b"
    */
@@ -81,7 +83,7 @@ public class AggregateTypes {
 
     /**
      * An unaggregated column
-     * 
+     *
      * @param column
      */
     public AggregateField(String column) {
@@ -90,10 +92,9 @@ public class AggregateTypes {
 
     /**
      * An aggregated column
-     * 
+     *
      * @param column
-     * @param aggregationFunction
-     *          if null, then this is an unaggregated column
+     * @param aggregationFunction if null, then this is an unaggregated column
      */
     public AggregateField(String aggregateFunction, String column) {
       this(AggregateFunction.fromString(aggregateFunction), column);
@@ -134,7 +135,7 @@ public class AggregateTypes {
     /**
      * Helper method to convert an array of {@link AggregateField}s into a single SELECT statement like
      * "SELECT a, b, SUM(c), MIN(c), MAX(d), COUNT(*) GROUP BY a, b"
-     * 
+     *
      * @param fields
      * @return
      * @throws DDFException
@@ -155,7 +156,7 @@ public class AggregateTypes {
     /**
      * Converts from a SQL String specs like "a, b, SUM(c), MIN(c)" into an array of SQL {@link AggregateField}s. This
      * is useful for constructing arguments to the {@link aggregate} function.
-     * 
+     *
      * @param sqlFieldSpecs
      * @return null if sqlFieldSpecs is null or empty
      */
@@ -194,10 +195,8 @@ public class AggregateTypes {
     }
 
     /**
-     * 
      * @param fields
-     * @param isFieldSpecs
-     *          If true, include all fields. If false, include only unaggregated fields.
+     * @param isFieldSpecs If true, include all fields. If false, include only unaggregated fields.
      * @return
      */
     private static String toSqlSpecs(List<AggregateField> fields, boolean isFieldSpecs) {

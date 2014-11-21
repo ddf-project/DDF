@@ -1,15 +1,15 @@
 package io.basic.ddf;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import io.basic.ddf.BasicDDFManager;
-import junit.framework.Assert;
-import org.junit.Test;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
+import junit.framework.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BasicDDFTests {
 

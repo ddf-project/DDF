@@ -1,21 +1,20 @@
 /**
- * 
+ *
  */
 package io.ddf.content;
 
 
-import org.jgrapht.graph.DirectedWeightedMultigraph;
-import java.util.*;
-import org.jgrapht.GraphPath;
-import org.jgrapht.alg.DijkstraShortestPath;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
-import java.util.HashMap;
-import java.util.Map;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.IGloballyAddressable;
+import org.jgrapht.GraphPath;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -26,7 +25,6 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
   protected HashMap<String, Representation> mReps = new HashMap<String, Representation>();
 
   private RepresentationsGraph mGraph;
-
 
   public RepresentationHandler(DDF theDDF) {
     super(theDDF);
@@ -55,14 +53,13 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
 
   /**
    * Gets an existing representation for our {@link DDF} matching the given dataType, if any.
-   * 
+   *
    * @param typeSpecs
-   * 
    * @return null if no matching representation available
    */
   @Override
   public Object get(Class<?>... typeSpecs) throws DDFException {
-    // return this.get(this.getSpecsAsString(typeSpecs), true);
+    //    return this.get(this.getSpecsAsString(typeSpecs), true);
     return this.get(Representation.typeSpecsToString(typeSpecs), true);
   }
 
@@ -153,7 +150,7 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
 
   /**
    * Returns the default dataType for this engine. The base implementation returns Object[][].class.
-   * 
+   *
    * @return
    */
   @Override
@@ -187,18 +184,17 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
 
   /**
    * Converts from existing representation(s) to the desired representation, which has the specified dataType.
-   * 
+   * <p/>
    * The base representation returns only the default representation if the dataType matches the default type. Otherwise
    * it returns null.
-   * 
+   *
    * @param dataType
    * @return
    */
   private Representation createRepresentation(Representation representation) throws DDFException {
 
     Collection<Representation> vertices = this.mReps.values();
-    // List<GraphPath<Representation<?>, ConvertFunction<?, ?>>> pathList = new ArrayList<GraphPath<Representation<?>,
-    // ConvertFunction<?, ?>>>();
+    //List<GraphPath<Representation<?>, ConvertFunction<?, ?>>> pathList = new ArrayList<GraphPath<Representation<?>, ConvertFunction<?, ?>>>();
     double minWeight = Double.MAX_VALUE;
     GraphPath<Representation, ConvertFunction> minPath = null;
     for (Representation vertex : vertices) {
@@ -245,7 +241,6 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
 
   /**
    * Sets a new and unique representation for our {@link DDF}, clearing out any existing ones
-   * 
    */
   @Override
   public void set(Object data, Class<?>... typeSpecs) {
@@ -260,25 +255,25 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
    */
   @Override
   public void add(Object data, Class<?>... typeSpecs) {
-    // if (data == null) return;
+    //    if (data == null) return;
     //
-    // typeSpecs = determineTypeSpecs(data, typeSpecs);
-    // if (this.getDefaultDataType() == null) this.setDefaultDataType(typeSpecs);
+    //    typeSpecs = determineTypeSpecs(data, typeSpecs);
+    //    if (this.getDefaultDataType() == null) this.setDefaultDataType(typeSpecs);
     //
-    // mReps.put(this.getSpecsAsString(typeSpecs), data);
+    //    mReps.put(this.getSpecsAsString(typeSpecs), data);
     Representation representation = new Representation(data, typeSpecs);
     mReps.put(representation.getTypeSpecsString(), representation);
   }
 
   /**
    * Removes a representation from the set of existing representations.
-   * 
+   *
    * @param dataType
    */
   @Override
   public void remove(Class<?>... typeSpecs) {
     mReps.remove(this.getSpecsAsString(typeSpecs));
-    // if (this.equalsDefaultDataType(typeSpecs)) this.reset();
+    //if (this.equalsDefaultDataType(typeSpecs)) this.reset();
   }
 
   /**
@@ -367,7 +362,7 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
 
     /**
      * Internal use only. Don't encourage external use, since we want to require the Class<?>... typeSpecs format.
-     * 
+     *
      * @param obj
      * @param typeSpecsString
      */

@@ -1,12 +1,13 @@
 package io.ddf.facades;
 
 
-import java.util.List;
 import io.ddf.DDF;
 import io.ddf.content.IHandleViews;
 import io.ddf.content.ViewHandler.Column;
 import io.ddf.content.ViewHandler.Expression;
 import io.ddf.exception.DDFException;
+
+import java.util.List;
 
 public class ViewsFacade implements IHandleViews {
   private DDF mDDF;

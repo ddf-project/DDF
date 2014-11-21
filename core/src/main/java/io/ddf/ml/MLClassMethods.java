@@ -3,6 +3,7 @@ package io.ddf.ml;
 
 import io.ddf.exception.DDFException;
 import io.ddf.util.Utils.ClassMethod;
+
 import java.lang.reflect.Method;
 
 /**
@@ -16,7 +17,7 @@ public class MLClassMethods {
 
 
   /**
-   * 
+   *
    */
   public static class TrainMethod extends ClassMethod {
 
@@ -72,7 +73,7 @@ public class MLClassMethods {
 
 
   /**
-   * 
+   *
    */
   public static class PredictMethod extends ClassMethod {
 

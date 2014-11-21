@@ -1,17 +1,18 @@
 package io.ddf.ml;
 
 
-import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.*;
+import com.google.gson.*;
 import io.basic.ddf.BasicDDF;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
-import com.google.gson.*;
 import io.ddf.exception.DDFException;
 import io.ddf.ml.MLClassMethods.PredictMethod;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.*;
 
 /**
  */
@@ -28,8 +29,7 @@ public class Model implements IModel, Serializable {
 
   private String[] mTrainedColumns;
 
-  private String mClass = this.getClass().getName(); // for serialization
-
+  private String mClass = this.getClass().getName(); //for serialization
 
   public Model(Object rawModel) {
     mRawModel = rawModel;
@@ -98,7 +98,6 @@ public class Model implements IModel, Serializable {
       throw new DDFException(String.format("Error getting prediction from model %s", this.getRawModel().getClass()
           .getName()));
     }
-
   }
 
   @Override
@@ -186,10 +185,8 @@ public class Model implements IModel, Serializable {
     return model;
   }
 
-
   static class ModelDeserializer implements JsonDeserializer<Model> {
     private Gson _gson = new Gson();
-
 
     @Override
     public Model deserialize(JsonElement jElement, Type theType, JsonDeserializationContext context) {

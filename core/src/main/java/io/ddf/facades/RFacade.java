@@ -1,15 +1,18 @@
 package io.ddf.facades;
 
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import io.ddf.DDF;
+import io.ddf.analytics.IHandleAggregation;
+import io.ddf.exception.DDFException;
+import io.ddf.types.AggregateTypes.AggregateField;
+import io.ddf.types.AggregateTypes.AggregateFunction;
+import io.ddf.types.AggregateTypes.AggregationResult;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import io.ddf.DDF;
-import io.ddf.types.AggregateTypes.*;
-import io.ddf.analytics.IHandleAggregation;
-import io.ddf.exception.DDFException;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 public class RFacade implements IHandleAggregation {
 

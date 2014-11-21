@@ -7,9 +7,9 @@ SPARK_JAVA_OPTS+=" -Dlog4j.configuration=ddf-local-log4j.properties"
 SPARK_CLASSPATH+=:"${DDF_HOME}/conf/local"
 export SPARK_MASTER=local
 
-if [[ -z "$SPARK_MEM" ]]; then
-    . ${DDF_HOME}/exe/mem-size-detection.sh
-fi
+#if [[ -z "$SPARK_MEM" ]]; then
+#    . ${DDF_HOME}/exe/mem-size-detection.sh
+#fi
 #echo "SPARK_MEM = "$SPARK_MEM
 
 OUR_JAVA_OPTS="$SPARK_JAVA_OPTS"

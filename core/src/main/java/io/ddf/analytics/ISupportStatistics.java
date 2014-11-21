@@ -5,6 +5,7 @@ import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
 import io.ddf.analytics.AStatisticsSupporter.HistogramBin;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
+
 import java.util.List;
 
 public interface ISupportStatistics extends IHandleDDFFunctionalGroup {

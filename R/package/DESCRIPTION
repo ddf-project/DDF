@@ -6,7 +6,7 @@ Version: 0.1
 License: Apache License (== 2.0)
 Title: Distributed Data Frame's R interface
 Description: This package is the R interface to DDF library. It
-    allows R users to work on data reside on a Hadoop cluster 
+    allows R users to work on data reside on a Hadoop cluster
     in a fast, easy and transparent way.
 Depends:
     R (>= 3.0),

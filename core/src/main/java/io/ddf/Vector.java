@@ -1,34 +1,37 @@
 /**
- * 
+ *
  */
 package io.ddf;
 
 
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.lang.reflect.ParameterizedType;
+
 /**
  * A one-dimensional array of values of the same type, e.g., Integer or Double or String.
- * <p>
+ * <p/>
  * We implement a Vector as simply a reference to a column in a DDF. The DDF may have a single column, or multiple
  * columns.
- * <p>
+ * <p/>
  * The column is referenced by name.
- * 
+ * <p/>
  * TODO: Vector operations
  */
-public class Vector<T> {
+public class Vector<T> implements Serializable {
 
   /**
    * TODO: test this
-   * 
+   *
    * @return
    */
   @SuppressWarnings("unchecked")
   protected Class<T> getParameterizedType() {
-    Class<T> clazz = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    Class<T> clazz = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass())
+        .getActualTypeArguments()[0];
     return clazz;
   }
 
@@ -36,7 +39,7 @@ public class Vector<T> {
   /**
    * Instantiate a new Vector based on an existing DDF, given a column name. The column name is not verified for
    * correctness; any errors would only show up on actual usage.
-   * 
+   *
    * @param theDDF
    * @param theColumnName
    */
@@ -46,25 +49,25 @@ public class Vector<T> {
 
   /**
    * Instantiate a new Vector with the given T array. Uses the default engine.
-   * 
+   *
    * @param data
    * @param theColumnName
    * @throws DDFException
    */
-  public Vector(String name, T[] data) throws DDFException {
-    this.initialize(name, data, null);
+  public Vector(String theColumnName, T[] data) throws DDFException {
+    this.initialize(theColumnName, data, null);
   }
 
   /**
    * Instantiate a new Vector with the given T array. Uses the default engine.
-   * 
+   *
    * @param data
    * @param theColumnName
    * @param engineName
    * @throws DDFException
    */
-  public Vector(String name, T[] data, String engineName) throws DDFException {
-    this.initialize(name, data, engineName);
+  public Vector(String theColumnName, T[] data, String engineName) throws DDFException {
+    this.initialize(theColumnName, data, engineName);
   }
 
   private void initialize(String name, T[] data, String engineName) throws DDFException {
@@ -87,7 +90,8 @@ public class Vector<T> {
   /**
    * The DDF that contains this vector
    */
-  private DDF mDDF;
+
+  private transient DDF mDDF;
 
   /**
    * The name of the DDF column we are pointing to
@@ -103,8 +107,7 @@ public class Vector<T> {
   }
 
   /**
-   * @param mDDF
-   *          the mDDF to set
+   * @param mDDF the mDDF to set
    */
   public void setDDF(DDF mDDF) {
     this.mDDF = mDDF;
@@ -118,8 +121,7 @@ public class Vector<T> {
   }
 
   /**
-   * @param mDDFColumnName
-   *          the mDDFColumnName to set
+   * @param mDDFColumnName the mDDFColumnName to set
    */
   public void setDDFColumnName(String mDDFColumnName) {
     this.mDDFColumnName = mDDFColumnName;

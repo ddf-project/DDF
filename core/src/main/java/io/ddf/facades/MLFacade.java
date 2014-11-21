@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package io.ddf.facades;
 
@@ -8,6 +8,7 @@ import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.ml.IModel;
 import io.ddf.ml.ISupportML;
+
 import java.util.List;
 
 /**
@@ -65,7 +66,8 @@ public class MLFacade implements ISupportML {
 
   // //// Convenient facade ML algorithm names //////
 
-  public IModel KMeans(int numCentroids, int maxIters, int runs, String initMode) throws DDFException {
+  public IModel KMeans(int numCentroids, int maxIters, int runs, String initMode)
+      throws DDFException {
     return this.train("kmeans", numCentroids, maxIters, runs, initMode);
   }
 
@@ -86,7 +88,7 @@ public class MLFacade implements ISupportML {
   }
 
   public IModel als(int rank, int iteration, double lamda) throws DDFException {
-    return this.train("collaborateFiltering", rank, iteration, lamda);
+    return this.train("collaborativeFiltering", rank, iteration, lamda);
   }
 
 }

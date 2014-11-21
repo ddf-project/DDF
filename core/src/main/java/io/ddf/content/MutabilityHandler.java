@@ -12,9 +12,7 @@ public class MutabilityHandler extends ADDFFunctionalGroupHandler implements IHa
     // TODO Auto-generated constructor stub
   }
 
-
   private boolean isMutable = false;
-
 
   @Override
   public boolean isMutable() {
@@ -32,19 +30,14 @@ public class MutabilityHandler extends ADDFFunctionalGroupHandler implements IHa
     curDDF.getRepresentationHandler().reset();
     curDDF.getRepresentationHandler().setRepresentations(newddf.getRepresentationHandler().getAllRepresentations());
 
-    String oldname = curDDF.getSchemaHandler().getTableName().replace("-", "_");
-
-    this.getManager().sql2txt(String.format("DROP TABLE IF EXISTS %s", oldname));
-
-
-    String sqlCmdNew = String
-        .format(
-            "CREATE TABLE %s TBLPROPERTIES (\"shark.cache\"=\"true\", \"shark.cache.storageLevel\"=\"MEMORY_AND_DISK\") AS SELECT * FROM %s",
-            oldname, newddf.getTableName());
-    this.getManager().sql2txt(sqlCmdNew);
+//    String oldname = curDDF.getSchemaHandler().getTableName();
+//
+//    this.getManager().sql2txt(String.format("DROP TABLE IF EXISTS %s", oldname));
 
     curDDF.getSchemaHandler().setSchema(newddf.getSchema());
-    curDDF.getSchema().setTableName(oldname);
     return curDDF;
   }
 }
+  
+  
+

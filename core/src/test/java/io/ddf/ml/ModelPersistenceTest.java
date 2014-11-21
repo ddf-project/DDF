@@ -8,13 +8,12 @@ import io.ddf.DDFManager;
 import io.ddf.content.APersistenceHandler;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import junit.framework.Assert;
 import org.junit.Test;
+
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  */
@@ -24,7 +23,6 @@ public class ModelPersistenceTest {
   class DummyModel {
     private double mNumber;
     private String mName;
-
 
     public DummyModel(double number, String name) {
       this.mNumber = number;
@@ -39,7 +37,6 @@ public class ModelPersistenceTest {
       return mName;
     }
   }
-
 
   @Test
   public void testModelSerializationTest() throws DDFException {

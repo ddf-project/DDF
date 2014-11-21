@@ -1,19 +1,20 @@
 /**
- * 
+ *
  */
 package io.ddf.content;
 
 
+import com.google.common.base.Joiner;
+import io.ddf.DDF;
+import io.ddf.exception.DDFException;
+import io.ddf.misc.ADDFFunctionalGroupHandler;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import io.ddf.misc.ADDFFunctionalGroupHandler;
-import io.ddf.DDF;
-import io.ddf.exception.DDFException;
-import com.google.common.base.Joiner;
 
 /**
- * 
+ *
  */
 public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleViews {
 
@@ -46,7 +47,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   @Override
   public List<String> head(int numRows) throws DDFException {
     return this.getDDF().sql2txt(String.format("SELECT * FROM @this LIMIT %d", numRows),
-        String.format("Unable to fetch %d row(s) from table %%s", numRows), numRows);
+        String.format("Unable to fetch %d row(s) from table %%s", numRows));
   }
 
   public List<String> top(int numRows, String orderColumns, String mode) throws DDFException {
@@ -114,7 +115,6 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   /**
    * Base class for any Expression node in the AST, could be either an Operator or a Value
-   * 
    */
   static public class Expression implements Serializable {
     String type;
@@ -133,13 +133,14 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
   }
 
+
   public enum OperationName {
     lt, le, eq, ge, gt, ne, and, or, neg, isnull, isnotnull
   }
 
+
   /**
    * Base class for unary operations and binary operations
-   * 
    */
   static public class Operator extends Expression {
     OperationName name;
@@ -203,9 +204,11 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
   }
 
+
   public abstract static class Value extends Expression {
     public abstract Object getValue();
   }
+
 
   static public class IntVal extends Value {
     int value;
@@ -227,6 +230,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
   }
 
+
   static public class DoubleVal extends Value {
     double value;
 
@@ -247,9 +251,9 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
   }
 
+
   static public class StringVal extends Value {
     String value;
-
 
     public void setValue(String val) {
       this.value = val;
@@ -271,6 +275,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
   }
 
+
   static public class BooleanVal extends Value {
     Boolean value;
 
@@ -290,6 +295,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
       return Boolean.toString(value);
     }
   }
+
 
   static public class Column extends Expression {
     String id;

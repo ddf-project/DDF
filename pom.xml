@@ -10,35 +10,35 @@
 	<groupId>io</groupId>
 	<artifactId>ddf</artifactId>
 	<packaging>pom</packaging>
-	<description>Adatao Distributed DataFrame</description>
-	<version>0.9</version>
+	<description>Distributed DataFrame</description>
+	<version>1.1</version>
 	<name>ddf</name>
 	<organization>
-		<name>com.adatao</name>
+		<name>io.ddf</name>
 	</organization>
-	<url>http://adatao.com/</url>
+	<url>http://ddf.io</url>
 
 	<licenses>
 		<license>
-			<name>Copyright Adatao, Inc.</name>
-			<url>https://github.com/adatao/ddf/blob/master/LICENSE</url>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
 
 	<scm>
-		<connection>scm:git:git@github.com:adatao/ddf</connection>
-		<url>scm:git:git@github.com:adatao/ddf.git</url>
+		<connection>scm:git:git@github.com:ddf-project/DDF.git</connection>
+		<url>scm:git:git@github.com:ddf-project/DDF.git</url>
 	</scm>
 
 	<developers>
 		<developer>
-			<id>adatao</id>
-			<name>Adatao, Inc.</name>
-			<email>info@adatao.com</email>
-			<url>http://adatao.com/</url>
-			<organization>Adatao, Inc.</organization>
-			<organizationUrl>http://adatao.com/</organizationUrl>
+			<id>ddf.io</id>
+			<name>DDF.io</name>
+			<email>ddf@adatao.com</email>
+			<url>http://ddf.io/</url>
+			<organization>DDF project</organization>
+			<organizationUrl>http://ddf.io/</organizationUrl>
 		</developer>
 	</developers>
 

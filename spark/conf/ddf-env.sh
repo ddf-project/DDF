@@ -22,7 +22,7 @@ function define {
 
 usage() {
         echo "
-        Usage: pa-env.sh
+        Usage: ddf-env.sh
             [--cluster (default: mesos; other options is:
             yarn (for yarn cluster),
             spark (for distributed standalone spark),
@@ -52,7 +52,6 @@ export DDF_HOME="$(cd `dirname ${BASH_SOURCE[0]}`/../ >/dev/null 2>&1; echo $PWD
 export TMP_DIR=/tmp # this where pAnalytics server stores temporarily files
 export LOG_DIR=/tmp # this where pAnalytics server stores log files
 export SPARK_HOME=${DDF_HOME}/exe/
-export PA_PORT=7911
 export RLIBS="${DDF_HOME}/rlibs"
 export RSERVE_LIB_DIR="${RLIBS}/Rserve/libs/"
 export DDF_CORE_JAR=`find ${DDF_HOME}/../core -name ddf_core_*.jar | grep -v '\-tests.jar'`
@@ -64,6 +63,10 @@ SPARK_CLASSPATH+=:"$DDF_SPARK_JAR"
 SPARK_CLASSPATH+=:"${DDF_HOME}/../lib_managed/jars/*"
 SPARK_CLASSPATH+=:"${DDF_HOME}/../lib_managed/bundles/*"
 SPARK_CLASSPATH+=:"${DDF_HOME}/../lib_managed/orbits/*"
+
+#make sure you set HADOOP_CONF_DIR
+#export HADOOP_CONF_DIR=
+#export HIVE_CONF_DIR=
 
 #The order of the following two lines is important please dont change
 SPARK_CLASSPATH+=":${HIVE_CONF_DIR}"
@@ -91,14 +94,9 @@ then
         export SPARK_MASTER="yarn-client"
         SPARK_CLASSPATH+=:"${DDF_HOME}/conf/"
         export SPARK_CLASSPATH
-        export SPARK_WORKER_INSTANCES=2
-        export SPARK_WORKER_CORES=8
         export SPARK_WORKER_MEMORY=$SPARK_MEM
         export SPARK_JAR=`find ${DDF_HOME}/ -name ddf_spark-assembly-*.jar`
-        export HADOOP_NAMENODE=`cat /root/spark-ec2/masters`
-        export HADOOP_CONF_DIR=/mnt/hadoop-2.2.0.2.0.6.0-101/conf
-        export HIVE_CONF_DIR=/root/hive-0.9.0-bin/conf
-        export SPARK_YARN_APP_JAR=hdfs://smaster.adatao.com:9000/user/root/ddf_spark-assembly-0.9.jar
+        export SPARK_YARN_APP_JAR=hdfs:///user/root/ddf_spark-assembly-0.9.jar
         [ "X$SPARK_YARN_APP_JAR" == "X" ] && echo "Please define SPARK_YARN_APP_JAR" && exit 1
         [ "X$HADOOP_CONF_DIR" == "X" ] && echo "Please define HADOOP_CONF_DIR" && exit 1
         [ "X$SPARK_WORKER_INSTANCES" == "X" ] && echo "Notice! SPARK_WORKER_INSTANCES is not defined, the default value will be used instead"

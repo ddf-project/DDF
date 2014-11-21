@@ -1,13 +1,14 @@
 package io.ddf.misc;
 
 
-import java.util.Collection;
-import junit.framework.Assert;
-import org.junit.Test;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
 import io.ddf.types.IGloballyAddressable;
+import junit.framework.Assert;
+import org.junit.Test;
+
+import java.util.Collection;
 
 
 public class ObjectRegistryTests {

@@ -1,21 +1,50 @@
 /**
  * Copyright 2014 Adatao, Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *    
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package io.ddf;
 
+
+import com.google.common.base.Strings;
+import com.google.gson.annotations.Expose;
+import io.basic.ddf.BasicDDFManager;
+import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
+import io.ddf.analytics.AStatisticsSupporter.HistogramBin;
+import io.ddf.analytics.IHandleAggregation;
+import io.ddf.analytics.IHandleBinning;
+import io.ddf.analytics.ISupportStatistics;
+import io.ddf.analytics.Summary;
+import io.ddf.content.APersistenceHandler.PersistenceUri;
+import io.ddf.content.*;
+import io.ddf.content.IHandlePersistence.IPersistible;
+import io.ddf.content.Schema.Column;
+import io.ddf.etl.*;
+import io.ddf.etl.IHandleMissingData.Axis;
+import io.ddf.etl.IHandleMissingData.NAChecking;
+import io.ddf.etl.Types.JoinType;
+import io.ddf.exception.DDFException;
+import io.ddf.facades.*;
+import io.ddf.misc.*;
+import io.ddf.ml.ISupportML;
+import io.ddf.ml.ISupportMLMetrics;
+import io.ddf.types.AGloballyAddressable;
+import io.ddf.types.AggregateTypes.AggregateField;
+import io.ddf.types.AggregateTypes.AggregationResult;
+import io.ddf.types.IGloballyAddressable;
+import io.ddf.util.ISupportPhantomReference;
+import io.ddf.util.PhantomReference;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -24,53 +53,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import io.basic.ddf.BasicDDFManager;
-import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
-import io.ddf.types.AggregateTypes.*;
-import io.ddf.analytics.AStatisticsSupporter.HistogramBin;
-import io.ddf.analytics.IHandleBinning;
-import io.ddf.analytics.ISupportStatistics;
-import io.ddf.analytics.IHandleAggregation;
-import io.ddf.analytics.Summary;
-import io.ddf.content.APersistenceHandler.PersistenceUri;
-import io.ddf.content.ISerializable;
-import io.ddf.content.IHandleIndexing;
-import io.ddf.content.IHandleMetaData;
-import io.ddf.content.IHandleMutability;
-import io.ddf.content.IHandlePersistence;
-import io.ddf.content.IHandlePersistence.IPersistible;
-import io.ddf.content.IHandleRepresentations;
-import io.ddf.content.IHandleSchema;
-import io.ddf.content.IHandleViews;
-import io.ddf.content.Schema;
-import io.ddf.content.Schema.Column;
-import io.ddf.etl.IHandleJoins;
-import io.ddf.etl.IHandleMissingData;
-import io.ddf.etl.IHandleMissingData.Axis;
-import io.ddf.etl.IHandleMissingData.NAChecking;
-import io.ddf.etl.IHandleReshaping;
-import io.ddf.etl.IHandleSql;
-import io.ddf.etl.IHandleTransformations;
-import io.ddf.etl.Types.JoinType;
-import io.ddf.exception.DDFException;
-import io.ddf.facades.MLFacade;
-import io.ddf.facades.RFacade;
-import io.ddf.facades.TransformFacade;
-import io.ddf.facades.ViewsFacade;
-import io.ddf.misc.ADDFFunctionalGroupHandler;
-import io.ddf.misc.ALoggable;
-import io.ddf.misc.Config;
-import io.ddf.misc.IHandleMiscellany;
-import io.ddf.misc.IHandleStreamingData;
-import io.ddf.misc.IHandleTimeSeries;
-import io.ddf.ml.ISupportML;
-import io.ddf.ml.ISupportMLMetrics;
-import io.ddf.types.AGloballyAddressable;
-import io.ddf.types.IGloballyAddressable;
-import io.ddf.util.ISupportPhantomReference;
-import io.ddf.util.PhantomReference;
-import com.google.common.base.Strings;
-import com.google.gson.annotations.Expose;
 
 /**
  * <p>
@@ -81,7 +63,6 @@ import com.google.gson.annotations.Expose;
  * This class was designed using the Bridge Pattern to provide clean separation between the abstract concepts and the
  * implementation so that the API can support multiple big data platforms under the same set of abstract concepts.
  * </p>
- * 
  */
 public abstract class DDF extends ALoggable //
     implements IGloballyAddressable, IPersistible, ISupportPhantomReference, ISerializable {
@@ -92,7 +73,7 @@ public abstract class DDF extends ALoggable //
 
 
   /**
-   * 
+   *
    * @param data
    *          The DDF data
    * @param namespace
@@ -116,7 +97,7 @@ public abstract class DDF extends ALoggable //
 
   /**
    * This is intended primarily to provide a dummy DDF only. This signature must be provided by each implementor.
-   * 
+   *
    * @param manager
    * @throws DDFException
    */
@@ -133,7 +114,7 @@ public abstract class DDF extends ALoggable //
 
   /**
    * Save a given object in memory for later (quick server-side) retrieval
-   * 
+   *
    * @param obj
    * @return
    */
@@ -150,7 +131,7 @@ public abstract class DDF extends ALoggable //
 
   /**
    * Retrieve an earlier saved object given its ID
-   * 
+   *
    * @param objectId
    * @return
    */
@@ -160,7 +141,7 @@ public abstract class DDF extends ALoggable //
 
   /**
    * Available for run-time instantiation only.
-   * 
+   *
    * @throws DDFException
    */
   protected DDF() throws DDFException {
@@ -233,7 +214,7 @@ public abstract class DDF extends ALoggable //
 
   /**
    * Also synchronizes the Schema's table name with that of the DDF name
-   * 
+   *
    * @return the name of this DDF
    */
   @Override
@@ -280,7 +261,7 @@ public abstract class DDF extends ALoggable //
   /**
    * Returns the previously set manager, or sets it to a dummy manager if null. We provide a "dummy" DDF Manager in case
    * our manager is not set for some reason. (This may lead to nothing good).
-   * 
+   *
    * @return
    */
   public DDFManager getManager() {
@@ -294,7 +275,7 @@ public abstract class DDF extends ALoggable //
 
 
   /**
-   * 
+   *
    * @return The engine name we are built on, e.g., "spark" or "java_collections"
    */
   public String getEngine() {
@@ -343,15 +324,6 @@ public abstract class DDF extends ALoggable //
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }
   }
-  
-  public List<String> sql2txt(String sqlCommand, String errorMessage, int numRows) throws DDFException {
-    try {
-      sqlCommand = sqlCommand.replace("@this", this.getTableName());
-      return this.getManager().sql2txt(String.format(sqlCommand, this.getTableName()), numRows);
-    } catch (Exception e) {
-      throw new DDFException(String.format(errorMessage, this.getTableName()), e);
-    }
-  }
 
   public DDF sql2ddf(String sqlCommand) throws DDFException {
     try {
@@ -373,7 +345,7 @@ public abstract class DDF extends ALoggable //
   }
 
   /**
-   * 
+   *
    * @param columnA
    * @param columnB
    * @return correlation value of columnA and columnB
@@ -386,7 +358,7 @@ public abstract class DDF extends ALoggable //
   /**
    * Compute aggregation which is equivalent to SQL aggregation statement like
    * "SELECT a, b, sum(c), max(d) FROM e GROUP BY a, b"
-   * 
+   *
    * @param fields
    *          a string includes aggregated fields and functions, e.g "a, b, sum(c), max(d)"
    * @return
@@ -767,7 +739,7 @@ public abstract class DDF extends ALoggable //
 
   /**
    * Instantiate a new {@link ADDFFunctionalGroupHandler} given its class name
-   * 
+   *
    * @param className
    * @return
    * @throws ClassNotFoundException
@@ -878,7 +850,6 @@ public abstract class DDF extends ALoggable //
   // //// IHandleSchema //////
 
   /**
-   * 
    * @param columnName
    * @return
    */
@@ -950,7 +921,11 @@ public abstract class DDF extends ALoggable //
 
 
   public DDF dropNA() throws DDFException {
-    return this.getMissingDataHandler().dropNA(Axis.ROW, NAChecking.ANY, 0, null);
+    return dropNA(Axis.ROW);
+  }
+
+  public DDF dropNA(Axis pattern) throws DDFException {
+    return this.getMissingDataHandler().dropNA(pattern, NAChecking.ANY, 0, null);
   }
 
   public DDF fillNA(String value) throws DDFException {
@@ -1030,15 +1005,16 @@ public abstract class DDF extends ALoggable //
   }
 
   @Override
-  public void afterPersisting() {}
+  public void afterPersisting() {
+  }
 
   @Override
-  public void beforeUnpersisting() {}
+  public void beforeUnpersisting() {
+  }
 
   @Override
-  public void afterUnpersisting() {}
-
-
+  public void afterUnpersisting() {
+  }
 
   public static class DDFInformation {
     private Integer numColumns;
@@ -1046,8 +1022,6 @@ public abstract class DDF extends ALoggable //
     private String uri;
 
     private String createdTime;
-
-
 
     public String getUri() {
       return this.uri;
@@ -1068,10 +1042,12 @@ public abstract class DDF extends ALoggable //
   // //// ISerializable //////
 
   @Override
-  public void beforeSerialization() throws DDFException {}
+  public void beforeSerialization() throws DDFException {
+  }
 
   @Override
-  public void afterSerialization() throws DDFException {}
+  public void afterSerialization() throws DDFException {
+  }
 
   @Override
   public ISerializable afterDeserialization(ISerializable deserializedObject, Object serializationData)

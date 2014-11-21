@@ -2,14 +2,12 @@ package io.ddf.analytics;
 
 
 import io.ddf.DDF;
-import io.ddf.Factor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 
 public abstract class ABinningHandler extends ADDFFunctionalGroupHandler implements IHandleBinning {
 
   protected double[] breaks;
-
 
   public ABinningHandler(DDF theDDF) {
     super(theDDF);
@@ -30,8 +28,8 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
   }
 
   public abstract DDF binningImpl(String column, String binningType, int numBins, double[] breaks,
-      boolean includeLowest, boolean right) throws DDFException;
-
+      boolean includeLowest,
+      boolean right) throws DDFException;
 
   public enum BinningType {
     CUSTOM, EQUAlFREQ, EQUALINTERVAL;
