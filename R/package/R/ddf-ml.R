@@ -51,7 +51,7 @@ setGeneric("predict",
 setMethod("predict",
           signature("MLModel"),
           function(m, data) {
-            res = m@jmlmodel$getRawModel()$predict(.jarray(data))
+            res = m@jmlmodel$predict(.jarray(data))
             res
           }
 )
