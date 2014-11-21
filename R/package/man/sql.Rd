@@ -14,6 +14,6 @@ sql(x, sql, ...)
 a character vector
 }
 \description{
-Execute a HiveQL and return results as character
+Execute a HiveQL
 }
 

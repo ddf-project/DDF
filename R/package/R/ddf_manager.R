@@ -1,5 +1,5 @@
 #' An S4 class that represents a DistributedDataFrame Manager
-#' 
+#'
 #' @param engine the underlying engine, for example: spark or local
 #' @exportClass DDFManager
 #' @rdname DDFManager
@@ -26,10 +26,10 @@ DDFManager <- function(engine="spark") {
 }
 
 #' Execute a HiveQL
-#' 
-#' @param x a DistributedDataFrame object
+#'
+#' @param x a DDFManager object
 #' @param sql a HiveQL
-#' @return a list of strings
+#' @return a character vector
 #' @export
 setGeneric("sql",
            function(x, sql, ...) {
@@ -49,8 +49,8 @@ setMethod("sql",
 )
 
 #' Execute a HiveQL and return a DistributedDataFrame
-#' 
-#' @param x a DistributedDataFrame
+#'
+#' @param x a DDFManager object
 #' @param sql the query, only support SELECT ones
 #' @return a DistributedDataFrame
 #' @export
@@ -73,7 +73,7 @@ setMethod("sql2ddf",
 )
 
 #' Shutdown a DDFManager
-#' 
+#'
 #' @param x a DDFManager
 #' @export
 setGeneric("shutdown",
