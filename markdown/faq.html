@@ -13,6 +13,7 @@ This summarize all frequent asked questions in using DDF.
 
 ---
 * <a href="#ddf">DDF</a>
+* <a href="#ddf-yarn">DDF on Yarn</a>
 * <a href="#java">Java isses</a>
 * <a href="#R">R issues</a>
 
@@ -31,6 +32,14 @@ This summarize all frequent asked questions in using DDF.
 	* DDF is more than just applying analytic functions to big data. It also enables data sharing (collaboration) via URIs. 
 	* DDF is also about providing a uniform API across different engines, of which Spark is only one. 
 
+<a name="ddf-yarn"></a>
+### DDF on Yarn
+1. First you need to compile Spark with your Yarn version
+You can read instruction (here)[http://spark.apache.org/docs/latest/building-with-maven.html]
+
+2. Then build DDF on Spark that you just build
+
+3. To test the build you can follow ddf-shell in <a href="http://ddf.io/quickstart.html">tutorial</a>
 
 <a name="java"></a>
 ### Java issues
