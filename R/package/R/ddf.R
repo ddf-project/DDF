@@ -306,8 +306,9 @@ setMethod("daggr",
     group_res <- as.data.frame(t(group_vals), stringsAsFactors=F)
   }
 
-  res <- cbind(group_res, agg_res)
-  colnames(res) <- sapply(unlist(strsplit(cols_str, ",")), function(x) {str_trim(x)})
+  cols = unlist(strsplit(cols_str, ","))
+  res <- cbind(get.data.frame(x, group_res, cols[1:ncol(group_res)]), agg_res)
+  colnames(res) <- sapply(cols, function(x) str_trim(x))
   res
 
 }
@@ -370,14 +371,14 @@ setMethod("na.omit",
 )
 
 #----------------------- Helper methods ----------------------------------------------
-get.data.frame <- function(ddf, res) {
+get.data.frame <- function(ddf, res, mask = TRUE) {
   df <- as.data.frame(res, stringsAsFactors=F)
 
   # set types
-  coltypes <- .coltypes(ddf)
+  coltypes <- .coltypes(ddf)[mask]
   sapply(1:ncol(df), function(idx) {coltype <- coltypes[idx];
                                     df[,idx] <<- .set.type(df[,idx], coltype)})
-  colnames(df) <- colnames(ddf)
+  colnames(df) <- colnames(ddf)[match(mask,colnames(ddf))]
   df
 }
 
