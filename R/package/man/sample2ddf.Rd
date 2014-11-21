@@ -11,8 +11,6 @@ sample2ddf(x, ...)
 \item{percent}{a double value specify the fraction}
 
 \item{replace}{sampling with or without replacement}
-
-\item{seed}{a random seed}
 }
 \value{
 a DistributedDataFrame

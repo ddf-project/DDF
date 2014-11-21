@@ -177,12 +177,11 @@ setMethod("as.data.frame",
 #' @param x a DistributedDataFrame
 #' @param size number of samples
 #' @param replace sampling with or without replacement
-#' @param seed a random seed
 #' @export
 setMethod("sample",
           signature("DDF"),
-          function(x, size, replace=FALSE, seed=123L) {
-            res <- x@jddf$VIEWS$getRandomSample(as.integer(size), replace, seed)
+          function(x, size, replace=FALSE) {
+            res <- x@jddf$VIEWS$getRandomSample(as.integer(size), replace, sample.int(.Machine$integer.max, 1))
             ncols <- ncol(x)
             parsed.res <- t(sapply(res,
                           function(x) {sapply(1:ncols, function(y){.jarray(x)[[y]]$toString()})}))
@@ -195,7 +194,6 @@ setMethod("sample",
 #' @param x a DistributedDataFrame
 #' @param percent a double value specify the fraction
 #' @param replace sampling with or without replacement
-#' @param seed a random seed
 #' @return a DistributedDataFrame
 #' @export
 setGeneric("sample2ddf",
@@ -206,8 +204,8 @@ setGeneric("sample2ddf",
 
 setMethod("sample2ddf",
           signature("DDF"),
-          function(x, percent, replace=FALSE, seed=123L) {
-            new ("DDF",x@jddf$VIEWS$getRandomSample(percent, replace, seed))
+          function(x, percent, replace=FALSE) {
+            new ("DDF",x@jddf$VIEWS$getRandomSample(percent, replace, sample.int(.Machine$integer.max, 1)))
           }
 )
 

@@ -4,7 +4,7 @@
 \alias{sample,DDF-method}
 \title{Return a sample of specific size from a DistributedDataFrame}
 \usage{
-\S4method{sample}{DDF}(x, size, replace = FALSE, seed = 123L)
+\S4method{sample}{DDF}(x, size, replace = FALSE)
 }
 \arguments{
 \item{x}{a DistributedDataFrame}
@@ -12,8 +12,6 @@
 \item{size}{number of samples}
 
 \item{replace}{sampling with or without replacement}
-
-\item{seed}{a random seed}
 }
 \description{
 Return a sample of specific size from a DistributedDataFrame
