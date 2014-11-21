@@ -1,5 +1,5 @@
 #' A S4 class that represents a DistributedDataFrame
-#' 
+#'
 #' @param jddf Java object reference to the backing DistributedDataFrame
 #' @exportClass DDF
 #' @rdname DDF
@@ -37,7 +37,7 @@ DDF <- function(jddf) {
 }
 
 #' Retrieve a DistributedDataFrame's column names
-#' 
+#'
 #' @param x a DDF object
 #' @return a character vector
 #' @export
@@ -49,7 +49,7 @@ setMethod("colnames",
 )
 
 #' Get a DistributedDataFrame's number of rows
-#' 
+#'
 #' @param x a DDF object
 #' @return an integer of length 1 or NULL
 #' @export
@@ -61,7 +61,7 @@ setMethod("nrow",
 )
 
 #' Get a DistributedDataFrame's number of columns
-#' 
+#'
 #' @param x a DDF object
 #' @return an integer of length 1 or NULL
 #' @export
@@ -73,14 +73,14 @@ setMethod("ncol",
 )
 
 #' Return a statistical summary of a DistributedDataFrame's columns
-#' 
+#'
 #' @param object a DistributedDataFrame
 #' @return a data.frame containing summary numbers
 #' @export
 setMethod("summary",
           signature("DDF"),
           function(object) {
-            ret <- as.data.frame(sapply(object@jddf$getSummary(), 
+            ret <- as.data.frame(sapply(object@jddf$getSummary(),
                                         function(col) {
                                           if (!is.jnull(col)) {
                                             return(c(col$mean(), col$stdev(), col$count(), col$NACount(), col$min(), col$max()))
@@ -95,7 +95,7 @@ setMethod("summary",
 )
 
 #' DistributedDataFrame subsetting/filtering for extracting values
-#' 
+#'
 #' @section Usage:
 #' \describe{
 #'  \code{x[i,j,...,drop=TRUE]}
@@ -111,7 +111,7 @@ setMethod("summary",
 setMethod("[", signature(x="DDF"),
           function(x, i,j,...,drop=TRUE) {
             .subset(x, i,j,...,drop)
-          }  
+          }
 )
 
 .subset <- function(x, i,j,...,drop) {
@@ -131,15 +131,15 @@ setMethod("[", signature(x="DDF"),
         return(col)
       }
     })
-  
+
   names(col.names) <- NULL
-  
+
   new("DDF", x@jddf$VIEWS$project(.jarray(col.names)))
 }
 
 
 #' Return the First Part of a DistributedDataFrame
-#' 
+#'
 #' @details
 #' \code{head} for a DistributedDataFrame returns the first rows of that DistributedDataFrame as an R native data.frame.
 #' @param x a DistributedDataFrame
@@ -173,7 +173,7 @@ setMethod("as.data.frame",
 )
 
 #' Return a sample of specific size from a DistributedDataFrame
-#' 
+#'
 #' @param x a DistributedDataFrame
 #' @param size number of samples
 #' @param replace sampling with or without replacement
@@ -184,14 +184,14 @@ setMethod("sample",
           function(x, size, replace=FALSE, seed=123L) {
             res <- x@jddf$VIEWS$getRandomSample(as.integer(size), replace, seed)
             ncols <- ncol(x)
-            parsed.res <- t(sapply(res, 
+            parsed.res <- t(sapply(res,
                           function(x) {sapply(1:ncols, function(y){.jarray(x)[[y]]$toString()})}))
             get.data.frame(x, parsed.res)
           }
 )
 
 #' Sample a fraction of rows from a DistributedDataFrame
-#' 
+#'
 #' @param x a DistributedDataFrame
 #' @param percent a double value specify the fraction
 #' @param replace sampling with or without replacement
@@ -212,8 +212,8 @@ setMethod("sample2ddf",
 )
 
 #' Compute Summary Statistics of a Distributed Data Frame's Subsets
-#' 
-#' Splits a Distributed Data Frame into subsets, computes summary statistics for each, 
+#'
+#' Splits a Distributed Data Frame into subsets, computes summary statistics for each,
 #' and returns the result in a convenient form.
 #' @rdname daggr
 daggr <- function(x, ...)
@@ -236,37 +236,37 @@ daggr.formula <- function(formula, data, FUN) {
   else if (identical(deparse(left.vars[[1]]), "cbind")) {
     left.vars <- sapply(left.vars, deparse)[-1]
   } else stop("Unsupported operation on left hand side of the formula!!!")
-  
+
   left.vars <- unique(left.vars)
-  
+
   # parse formula's right hand side expression
   right.vars <- str_trim(unlist(strsplit(as.character(deparse(formula[[3]]))," \\+ ")))
   vars <- append(left.vars, right.vars)
   vars_idx <- .lookup(vars, colnames(data))
   if (is.character(vars_idx))
     stop(vars_idx)
-  
+
   right.vars <- unique(right.vars)
-  
+
   # variable in left-hand side must not be in righ-hand size
   errors <- NULL
   for(x in left.vars) {
     if (x %in% right.vars) {
-      if (is.null(errors)) 
-        errors <- paste0(x, " is in both side of formula") 
+      if (is.null(errors))
+        errors <- paste0(x, " is in both side of formula")
       else errors <- c(errors, paste0(x, " is in both side of formula"))}
   }
-  
+
   if (!is.null(errors))
     stop(paste(errors, collapse="\n"))
-  
+
   # check if FUN is a valid one
   fname <- deparse(substitute(FUN))
   if (is.na(pmatch(fname,c("sum", "count", "mean","median","variance"))))
     stop("Only support these FUNs: sum, count, mean, median, variance")
   if (identical(fname,"var"))
     fname <- "variance"
-  
+
   # build the query string
   cols_str <- paste(paste0(right.vars, collapse=","), paste0(sapply(left.vars, function(var) {paste0(fname, "(", var, ")")}), collapse=","), sep=",")
   res <- .daggr(data, cols_str)
@@ -300,24 +300,24 @@ setMethod("daggr",
   } else {
     agg_res <- as.data.frame(t(agg_vals))
   }
-  
+
   group_vals <- sapply(jres$keySet(), function(x) {x$split(",")})
   if (is.vector(group_vals)) {
     group_res <- as.data.frame(group_vals, stringsAsFactors=F)
   } else {
     group_res <- as.data.frame(t(group_vals), stringsAsFactors=F)
   }
-  
+
   res <- cbind(group_res, agg_res)
   colnames(res) <- sapply(unlist(strsplit(cols_str, ",")), function(x) {str_trim(x)})
   res
-  
+
 }
 
 
 #' Tukey Five-Number Summaries
-#' 
-#' Return Returns Tukey's five number summary (minimum, lower-hinge, median, upper-hinge, maximum) 
+#'
+#' Return Returns Tukey's five number summary (minimum, lower-hinge, median, upper-hinge, maximum)
 #' for each numeric column of a Distributed Data Frame.
 #' @param x a Distributed Data Frame.
 #' @return a data.frame in which each column is a vector containing the summary information.
@@ -329,15 +329,15 @@ setMethod("fivenum",
             # only numeric columns have those fivenum numbers
             col.names <- colnames(x)
             numeric.col.indices <- which(sapply(col.names, function(cn) {x@jddf$getColumn(cn)$isNumeric()})==TRUE)
-            
+
             # call java API
             fns <- x@jddf$getFiveNumSummary()
-            
+
             # extract values
             ret <- sapply(numeric.col.indices, function(idx) {fn <- fns[[idx]];
-                                                c(fn$getMin(), fn$getFirstQuantile(), fn$getMedian(), 
+                                                c(fn$getMin(), fn$getFirstQuantile(), fn$getMedian(),
                                                   fn$getThirdQuantile(), fn$getMax())})
-            
+
             # set row names
             rownames(ret) <- c("Min.", "1st Qu.", "Median", "3rd Qu.",  "Max.")
             ret
@@ -357,7 +357,7 @@ setMethod("na.omit",
           signature("DDF"),
           function(object, axis=c("ROW","COLUMN"), inplace=FALSE) {
             axis <- match.arg(axis)
-	     by <- J("io.ddf.etl.IHandleMissingData")$Axis$ROW			
+	     by <- J("io.ddf.etl.IHandleMissingData")$Axis$ROW
 	     if(axis=="COLUMN")
             	by <- J("io.ddf.etl.IHandleMissingData")$Axis$COLUMN
 
@@ -374,7 +374,7 @@ setMethod("na.omit",
 #----------------------- Helper methods ----------------------------------------------
 get.data.frame <- function(ddf, res) {
   df <- as.data.frame(res, stringsAsFactors=F)
-  
+
   # set types
   coltypes <- .coltypes(ddf)
   sapply(1:ncol(df), function(idx) {coltype <- coltypes[idx];
@@ -399,5 +399,5 @@ get.data.frame <- function(ddf, res) {
          character)
   fn <- paste("as", type, sep=".")
   do.call(fn, list(v))
-  
+
 }
