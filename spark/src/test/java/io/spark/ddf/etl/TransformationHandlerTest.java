@@ -6,6 +6,7 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.analytics.Summary;
 import io.ddf.content.Schema.ColumnType;
+import io.ddf.etl.TransformationHandler;
 import io.ddf.exception.DDFException;
 import io.spark.ddf.BaseTest;
 import org.junit.*;
@@ -68,7 +69,7 @@ public class TransformationHandlerTest extends BaseTest {
   }
 
 
-  @Ignore
+  @Test
   public void testTransformSql() throws DDFException {
 
     ddf.setMutable(true);
@@ -95,6 +96,17 @@ public class TransformationHandlerTest extends BaseTest {
 
     ddf.setMutable(false);
 
+    // transform using if condition
+    String s1 = "new_col = if(arrdelay=15,1,0),v ~ (arrtime-deptime),distance/(arrtime-deptime)";
+    String s2 = "arr_delayed=if(arrdelay=\"yes\",1,0)";
+    Assert.assertEquals("(if(arrdelay=15,1,0)) as new_col,((arrtime-deptime)) as v,(distance/(arrtime-deptime))",
+        TransformationHandler.RToSqlUdf(s1));
+    Assert.assertEquals("(if(arrdelay=\"yes\",1,0)) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
+
+    DDF ddf2 = ddf.Transform.transformUDF(s1, cols);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(6, ddf2.getNumColumns());
+
     // multiple expressions, column name with special characters
     DDF ddf3 = ddf.Transform.transformUDF("arrtime-deptime, (speed^*- = distance/(arrtime-deptime)", cols);
     Assert.assertEquals(31, ddf3.getNumRows());
@@ -103,5 +115,6 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(5, ddf3.getSummary().length);
 
   }
+
 
 }
