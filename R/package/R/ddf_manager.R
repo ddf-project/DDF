@@ -90,3 +90,7 @@ setMethod("shutdown",
             cat('Bye bye\n')
           }
 )
+
+is.DDFManager =
+  function(dm)
+    class(dm) == "DDFManager"

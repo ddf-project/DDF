@@ -172,6 +172,45 @@ setMethod("as.data.frame",
           }
 )
 
+#'Convert anything to a DDF
+#'
+#' @param x a DDF
+#' @param ... method-specific arguments
+#' @export
+#'
+setGeneric(
+  name = "as.DDF",
+  def = function(x, ...) standardGeneric("as.DDF"),
+  valueClass = "DDF")
+
+#' Convert a data.frame to a DDF
+#' @param dm a DDF manager
+#'
+setMethod(
+  f = as.DDF,
+  signature = c("data.frame"),
+  definition = function(x, dm) {
+    stopifnot(is.DDFManager(dm))
+    tf = tempfile()
+    #on.exit(unlink(tf))
+    write.table(x, tf, row.names=F, col.names=F)
+    tt = basename(tf)
+    #on.exit(sql(dm, paste("DROP TABLE IF EXISTS", tt)), add = TRUE)
+    sql(
+      dm,
+      paste(
+        "CREATE TABLE", tt,
+        "(",
+        paste(
+          names(mtcars),
+          sapply(mtcars, function(x) Rtype2sparkSQL(class(x))),
+          collapse = ", "),
+        ")",
+        "ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '"))
+    sql(dm, paste0("LOAD DATA LOCAL INPATH '", tf, "' INTO TABLE ", tt))
+    sql2ddf(dm, paste("SELECT * FROM", tt))})
+
+
 #' Return a sample of specific size from a DistributedDataFrame
 #'
 #' @param x a DistributedDataFrame
@@ -398,5 +437,14 @@ get.data.frame <- function(ddf, res, mask = TRUE) {
          character)
   fn <- paste("as", type, sep=".")
   do.call(fn, list(v))
-
 }
+
+Rtype2sparkSQL =
+  function(type)
+    switch(
+      type,
+      integer  = "INT",
+      numeric = "DOUBLE",
+      logical = "BOOLEAN",
+      character = "STRING",
+      stop(paste("Unsupported type", type)))
