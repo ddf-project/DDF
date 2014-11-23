@@ -18,6 +18,7 @@ package io.ddf;
 
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gson.annotations.Expose;
 import io.basic.ddf.BasicDDFManager;
 import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
@@ -313,6 +314,29 @@ public abstract class DDF extends ALoggable //
 
   public Date getCreatedTime() {
     return this.mCreatedTime;
+  }
+
+
+  public DDF removeColumn(String columnName)  throws DDFException {
+    DDF newddf = null;
+    List<String> columns = Lists.newArrayList();
+
+    columns = this.getColumnNames();
+
+    for (String column : columns) {
+      if (columnName == column) {
+        columns.remove(column);
+      }
+    }
+
+    newddf = this.VIEWS.project(columns);
+
+    if (this.isMutable()) {
+      return this.updateInplace(newddf);
+    } else {
+      this.getManager().addDDF(newddf);
+      return newddf;
+    }
   }
 
   // ///// Execute a sqlcmd
