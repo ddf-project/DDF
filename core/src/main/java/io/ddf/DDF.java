@@ -318,13 +318,16 @@ public abstract class DDF extends ALoggable //
 
 
   public DDF removeColumn(String columnName)  throws DDFException {
+    if (this.getSchema().getColumnIndex(columnName) < 0)
+      throw new DDFException("Error column name");
+      
     DDF newddf = null;
     List<String> columns = Lists.newArrayList();
 
     columns = this.getColumnNames();
 
     for (String column : columns) {
-      if (columnName == column) {
+      if (column.equals(columnName) {
         columns.remove(column);
       }
     }
