@@ -122,7 +122,7 @@ print(newddf.VIEWS.head(2));
 Run Mllib’s KMeans on newddf:
 ``` java
 import org.apache.spark.mllib.clustering.KMeansModel;
-kmeansModel = (KMeansModel) newddf.ML.train("kmeans", 5, 5).getRawModel();
+kmeansModel = (KMeansModel) newddf.ML.train("kmeans", 5, 5);
 ```
 Predict on the kmeansModel:
 ``` java
