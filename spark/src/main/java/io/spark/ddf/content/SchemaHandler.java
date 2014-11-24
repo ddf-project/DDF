@@ -43,29 +43,21 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
 
   public static String spark2DDFType(String colType) {
     String typeString = null;
-    switch (colType) {
-      case "integer":
-        typeString = "INT";
-        break;
-      case "string":
-        typeString = "STRING";
-        break;
-      case "float":
-        typeString = "FLOAT";
-        break;
-      case "double":
-        typeString = "DOUBLE";
-        break;
-      case "timestamp":
-        typeString = "TIMESTAMP";
-        break;
-      case "long":
-        typeString = "LONG";
-        break;
-      case "boolean":
-        typeString = "BOOLEAN";
-        break;
-    }
+    if (colType.equals("integer")) {
+      typeString = "INT";
+    } else if (colType.equals("string")) {
+      typeString = "STRING";
+    } else if (colType.equals("float")) {
+      typeString = "FLOAT";
+    } else if (colType.equals("double")) {
+      typeString = "DOUBLE";
+    } else if (colType.equals("timestamp")) {
+      typeString = "TIMESTAMP";
+    } else if (colType.equals("long")) {
+      typeString = "LONG";
+    } else if (colType.equals("boolean")) {
+      typeString = "BOOLEAN";
+    }  
     return typeString;
   }
 
