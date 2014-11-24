@@ -35,9 +35,9 @@ object RootBuild extends Build {
   val projectName = "ddf"
   val rootProjectName = projectName
   val rootVersion = if(YARN_ENABLED) {
-    "1.0"
+    "1.1"
   } else {
-    "1.0-mesos"
+    "1.1-mesos"
   }
 
   val projectOrganization = rootOrganization + "." + projectName
@@ -141,7 +141,7 @@ object RootBuild extends Build {
     //  exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"edu.berkeley.cs.amplab" % "shark_2.9.3" % SHARK_VERSION excludeAll(excludeSpark)
     //"edu.berkeley.cs.shark" %% "shark" % SHARK_VERSION exclude("org.apache.avro", "avro-ipc") exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all"),
-    "com.google.protobuf" % "protobuf-java" % "2.5.0"
+    "com.google.protobuf" % "protobuf-java" % "2.4.0a"
   )
 
 
@@ -204,7 +204,8 @@ object RootBuild extends Build {
       "org.easymock" % "easymock" % "3.1" % "test",
 
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
-      "mysql" % "mysql-connector-java" % "5.1.25"
+      "mysql" % "mysql-connector-java" % "5.1.25",
+      "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
     ),
 
 
@@ -492,7 +493,7 @@ object RootBuild extends Build {
 //    libraryDependencies += "org.apache.hadoop" % "hadoop-core" % "1.0.4" exclude("commons-httpclient", "commons-httpclient")
 //      exclude("tomcat", "jasper-compiler") exclude("tomcat", "jasper-runtime") exclude("org.mortbay.jetty", "servlet-api-2.5")
 //      exclude("org.mortbay.jetty", "jetty"),
-    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.2.0" exclude("org.mortbay.jetty", "servlet-api")
+    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.0.5-alpha" exclude("org.mortbay.jetty", "servlet-api")
       exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
     libraryDependencies ++= scalaDependencies,
