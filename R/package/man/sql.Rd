@@ -6,14 +6,14 @@
 sql(x, sql, ...)
 }
 \arguments{
-\item{x}{a DDFManager object}
+\item{x}{a DistributedDataFrame object}
 
 \item{sql}{a HiveQL}
 }
 \value{
-a character vector
+a list of strings
 }
 \description{
-Execute a HiveQL and return results as character
+Execute a HiveQL
 }
 

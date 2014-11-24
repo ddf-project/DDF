@@ -68,6 +68,8 @@ test_that("basic statistics works", {
   df.test <- as.data.frame(newddf)
   expect_equivalent(df.test[,1],c(21.0, 21.0, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8, 16.4, 17.3, 15.2, 10.4, 10.4, 14.7, 32.4, 30.4, 33.9, 21.5, 15.5, 15.2, 13.3, 19.2, 27.3, 26.0, 30.4, 15.8, 19.7, 15.0, 21.4))
 
+  ddf.mean <- mean(newddf)
+  expect_equivalent(round(ddf.mean,2),c(20.09,3.22))
 })
 
 test_that("drop na works", {

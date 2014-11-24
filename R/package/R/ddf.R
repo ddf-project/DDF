@@ -371,6 +371,24 @@ setMethod("na.omit",
           }
 )
 
+#' Calculate Mean value of each DDF Column
+#'
+#' Return the mean value of each DDF column.
+#' @param x a Distributed Data Frame.
+#' @return a vector contains mean values of all columns
+#' @export
+ 
+setMethod("mean",
+          signature("DDF"),
+          function(x) {
+          col.names <- colnames(x)
+          ret <- sapply(col.names,function(colname) {
+                    x@jddf$getVectorMean(colname)
+          })
+          return (ret)
+        }
+)
+
 #----------------------- Helper methods ----------------------------------------------
 get.data.frame <- function(ddf, res) {
   df <- as.data.frame(res, stringsAsFactors=F)
