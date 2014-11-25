@@ -4,19 +4,19 @@
 \alias{na.omit,DDF-method}
 \title{Drop NA values}
 \usage{
-\S4method{na.omit}{DDF}(object, by = "ROW", inplace = FALSE)
+\S4method{na.omit}{DDF}(object, axis = c("ROW", "COLUMN"), inplace = FALSE)
 }
 \arguments{
-\item{by}{the axis by which to drop if NA value exits, Row represents by Row as default, COLUMN is column.}
+\item{object}{a Distributed Data Frame.}
+
+\item{axis}{the axis by which to drop if NA value exits, ROW represents by Row as default, COLUMN is column.}
 
 \item{inplace}{whether to treat the ddf inplace, default is FALSE.}
-
-\item{x}{a Distributed Data Frame.}
 }
 \value{
-a data.frame with no NA values.
+a DDF with no NA values.
 }
 \description{
-Return a ddf instance with no NAs.
+Return a DDF instance with no NAs.
 }
 

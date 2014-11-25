@@ -344,6 +344,35 @@ setMethod("fivenum",
           }
 )
 
+#' Calculate the variance and std of a column in DDF
+#'
+#' Return a vector with dimension 2, 1st dimension denotes the variance and 2ed dimension denotes the standard variance.
+#' @param x a Distributed Data Frame.
+#' @param col the column name or index of x
+#' @return a vector with dimension 2.
+#' @export
+ 
+setMethod("var",
+          signature("DDF"),
+          function(x, y) {
+            cols <- colnames(x)
+			colname <- y
+			if(is.numeric(y)){
+			# validate column index
+			if (y < 0 || y > ncol(x) || !isInteger(y))
+				stop(paste0("Invalid column indices - ",y), call.=F)
+			colname <- as.character(cols[y])
+			}
+		   
+			# validate column name
+			if (!(colname %in% cols))
+				stop(paste0("Invalid column name - ",y), call.=F)
+				
+			ret <- sapply(x@jddf$getVectorVariance(colname), function(obj) {obj$toString()})
+			return(as.double(ret))
+      }
+)
+
 #' Drop NA values
 #'
 #' Return a DDF instance with no NAs.
