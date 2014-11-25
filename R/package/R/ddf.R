@@ -348,7 +348,7 @@ setMethod("fivenum",
 #'
 #' Return a vector with dimension 2, 1st dimension denotes the variance and 2ed dimension denotes the standard variance.
 #' @param x a Distributed Data Frame.
-#' @param col the column name or index of x
+#' @param y the column name or index of x
 #' @return a vector with dimension 2.
 #' @export
  
