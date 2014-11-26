@@ -359,18 +359,18 @@ setMethod("fivenum",
             colname <- y
             if(is.numeric(y)){
             # validate column index
-            	if (y < 0 || y > ncol(x) || !isInteger(y))
-								stop(paste0("Invalid column indices - ",y), call.=F)
-							colname <- as.character(cols[y])
-						}
+              if (y < 0 || y > ncol(x) || !isInteger(y))
+		stop(paste0("Invalid column indices - ",y), call.=F)
+		colname <- as.character(cols[y])
+	    }
 						
-						# validate column name
-						if (!(colname %in% cols))
-							stop(paste0("Invalid column name - ",y), call.=F)
+	    # validate column name
+	    if (!(colname %in% cols))
+	      stop(paste0("Invalid column name - ",y), call.=F)
 							
-						ret <- sapply(x@jddf$getVectorVariance(colname), function(obj) {obj$toString()})
-						return (as.double(ret))
-					}
+	    ret <- sapply(x@jddf$getVectorVariance(colname), function(obj) {obj$toString()})
+	    return (as.double(ret))
+	  }
 )
 
 #' Drop NA values
