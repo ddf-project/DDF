@@ -192,6 +192,9 @@ public class Utils {
   public static void writeToFile(String fileName, String contents) throws IOException {
     Writer writer = null;
     Configuration configuration = new Configuration();
+    String hadoopConfDir = System.getenv("HADOOP_CONF_DIR");
+    configuration.addResource(new Path(hadoopConfDir));
+
     try {
       FileSystem hdfs = FileSystem.get(configuration);
       FSDataOutputStream outputStream = hdfs.create(new Path(fileName));
