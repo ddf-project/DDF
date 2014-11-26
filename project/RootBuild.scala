@@ -195,7 +195,7 @@ object RootBuild extends Build {
       "com.google.guava" % "guava" % "14.0.1",
       "com.google.code.gson"% "gson" % "2.2.2",
       //"org.scalatest" % "scalatest_2.10" % "2.1.0" % "test",
-      "org.scalatest" % "scalatest_2.10" % "2.1.5" % "test",
+      "org.scalatest" % "scalatest_2.10" % "2.2.1" % "test",
       "org.scalacheck"   %% "scalacheck" % "1.11.3" % "test",
       "com.novocode" % "junit-interface" % "0.10" % "test",	
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
@@ -268,12 +268,16 @@ object RootBuild extends Build {
     dependencyOverrides += "commons-net" % "commons-net" % "3.1",
     dependencyOverrides += "org.mockito" % "mockito-all" % "1.8.5",
     dependencyOverrides += "org.apache.commons" % "commons-math3" % "3.1.1",
+    dependencyOverrides += "commons-httpclient" % "commons-httpclient" % "3.1",
     dependencyOverrides += "com.sun.jersey" % "jersey-json" % "1.9",
     dependencyOverrides += "com.sun.jersey" % "jersey-server" % "1.9",
     dependencyOverrides += "org.scalamacros" % "quasiquotes_2.10" % "2.0.0",
     dependencyOverrides += "commons-httpclient" % "commons-httpclient" % "3.1",
     dependencyOverrides += "org.apache.avro" % "avro-mapred" % "1.7.6",
     dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
+    dependencyOverrides += "cglib" % "cglib-nodep" % "2.2.2",
+    dependencyOverrides += "org.json" % "json" % "20090211",
+    dependencyOverrides += "xml-apis" % "xml-apis" % "1.4.01",
     pomExtra := (
       <!--
       **************************************************************************************************

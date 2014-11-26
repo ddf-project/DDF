@@ -10,7 +10,7 @@
 	<groupId>io</groupId>
 	<artifactId>ddf</artifactId>
 	<packaging>pom</packaging>
-	<description>Adatao Distributed DataFrame</description>
+	<description>Distributed DataFrame</description>
 	<version>1.1</version>
 	<name>ddf</name>
 	<organization>
@@ -20,8 +20,8 @@
 
 	<licenses>
 		<license>
-			<name>Copyright Adatao, Inc.</name>
-			<url>https://github.com/ddf-project/DDF/blob/master/LICENSE</url>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>

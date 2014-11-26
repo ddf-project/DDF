@@ -9,7 +9,6 @@ import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
-
 import java.util.List;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
@@ -122,7 +121,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   public static String RToSqlUdf(String RExp) {
     List<String> udfs = Lists.newArrayList();
     for (String str : RExp.split(",(?![^()]*+\\))")) {
-      String[] udf = str.replaceAll("\\s", "").split("[=~]");
+      String[] udf = str.replaceAll("\\s", "").split("[=~](?![^()]*+\\))");
       if (udf.length == 1) {
         udfs.add(String.format("(%s)", udf[0]));
       } else {
