@@ -360,8 +360,8 @@ setMethod("fivenum",
             if(is.numeric(y)){
             # validate column index
               if (y < 0 || y > ncol(x) || !isInteger(y))
-		stop(paste0("Invalid column indices - ",y), call.=F)
-		colname <- as.character(cols[y])
+		 stop(paste0("Invalid column indices - ",y), call.=F)
+	       colname <- as.character(cols[y])
 	    }
 						
 	    # validate column name
