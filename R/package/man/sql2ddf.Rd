@@ -6,7 +6,7 @@
 sql2ddf(x, sql, ...)
 }
 \arguments{
-\item{x}{a DistributedDataFrame}
+\item{x}{a DDFManager object}
 
 \item{sql}{the query, only support SELECT ones}
 }

@@ -13,6 +13,15 @@ load.mtcars <- function(dm) {
   sql2ddf(dm, "select * from mtcars")
 }
 
+load.airline <- function(dm) {
+  sql(dm, 'set hive.metastore.warehouse.dir=/tmp/hive/warehouse')
+  sql(dm, "drop table if exists airline")
+  sql(dm, "create table airline (Year int,Month int,DayofMonth int,DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int,TailNum string, ActualElapsedTime int, CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string,Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, ArcraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \',\'")
+  sql(dm, "load data local inpath './../resources/test/airlineWithNA.csv' into table airline")
+ 
+  sql2ddf(dm, "select * from airline")
+}
+
 dm <- DDFManager()
 
 test_that("basic statistics works", {
@@ -61,6 +70,12 @@ test_that("basic statistics works", {
 
 })
 
+test_that("drop na works", {
+    ddf <- load.airline(dm)
+ 
+    expect_equal(nrow(na.omit(ddf)),9)
+    expect_equal(ncol(na.omit(ddf,"COLUMN")),22)
+})
 
 test_that("subsetting works", {
   ddf <- load.mtcars(dm)
