@@ -5,12 +5,14 @@ package io.ddf.content;
 
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -74,6 +76,80 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     String selectedColumns = Joiner.on(",").join(columnNames);
     return sql2ddf(String.format("SELECT %s FROM %%s", selectedColumns),
         String.format("Unable to project column(s) %s from table %%s", selectedColumns));
+  }
+
+  @Override
+  public DDF removeColumn(String columnName) throws DDFException {
+    List<String> columns = Lists.newArrayList();
+
+    columns = this.getDDF().getColumnNames();
+
+    for (Iterator<String> it = list.iterator(); it.hasNext();) {
+      if (it.next().equals(columnName)) {
+        it.remove();
+      }
+    }
+
+    DDF newddf = this.project(columns);
+
+    if (this.getDDF().isMutable()) {
+      return this.getDDF().updateInplace(newddf);
+    } else {
+      this.getManager().addDDF(newddf);
+      return newddf;
+    }
+  }
+
+  @Override
+  public DDF removeColumns(String... columnNames) throws DDFException {
+    if (columnNames == null || columnNames.length == 0) throw new DDFException("columnNames must be specified");
+
+    List<String> columns = Lists.newArrayList();
+
+    columns = this.getDDF().getColumnNames();
+
+    for (String columnName : columnNames) {
+      for (Iterator<String> it = columns.iterator(); it.hasNext();) {
+        if (it.next().equals(columnName)) {
+          it.remove();
+        }
+      }
+    }
+
+    DDF newddf = this.project(columns);
+
+    if (this.getDDF().isMutable()) {
+      return this.getDDF().updateInplace(newddf);
+    } else {
+      this.getManager().addDDF(newddf);
+      return newddf;
+    }
+  }
+
+  @Override
+  public DDF removeColumns(List<String> columnNames) throws DDFException {
+    if (columnNames == null || columnNames.isEmpty()) throw new DDFException("columnNames must be specified");
+
+    List<String> columns = Lists.newArrayList();
+
+    columns = this.getDDF().getColumnNames();
+
+    for (String columnName : columnNames) {
+      for (Iterator<String> it = columns.iterator(); it.hasNext();) {
+        if (it.next().equals(columnName)) {
+          it.remove();
+        }
+      }
+    }
+
+    DDF newddf = this.project(columns);
+
+    if (this.getDDF().isMutable()) {
+      return this.getDDF().updateInplace(newddf);
+    } else {
+      this.getManager().addDDF(newddf);
+      return newddf;
+    }
   }
 
   // ///// Execute SQL command on the DDF ///////
