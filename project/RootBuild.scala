@@ -16,9 +16,11 @@ object RootBuild extends Build {
   //////// Project definitions/configs ///////
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
+  
+  lazy val hadoopVersion = env("HADOOP_VERSION") getOrElse
+    DEFAULT_HADOOP_VERSION
 
-
-  val SPARK_VERSION = "1.2.0-adatao"
+  val SPARK_VERSION = "1.3.0-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -497,7 +499,7 @@ object RootBuild extends Build {
 //    libraryDependencies += "org.apache.hadoop" % "hadoop-core" % "1.0.4" exclude("commons-httpclient", "commons-httpclient")
 //      exclude("tomcat", "jasper-compiler") exclude("tomcat", "jasper-runtime") exclude("org.mortbay.jetty", "servlet-api-2.5")
 //      exclude("org.mortbay.jetty", "jetty"),
-    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.0.5-alpha" exclude("org.mortbay.jetty", "servlet-api")
+    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion exclude("org.mortbay.jetty", "servlet-api")
       exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
     libraryDependencies ++= scalaDependencies,
