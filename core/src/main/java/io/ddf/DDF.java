@@ -315,7 +315,6 @@ public abstract class DDF extends ALoggable //
     return this.mCreatedTime;
   }
 
-
   // ///// Execute a sqlcmd
   public List<String> sql2txt(String sqlCommand, String errorMessage) throws DDFException {
     try {
