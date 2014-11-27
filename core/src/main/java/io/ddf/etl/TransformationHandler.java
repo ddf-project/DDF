@@ -121,11 +121,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   public static String RToSqlUdf(String RExp) {
     List<String> udfs = Lists.newArrayList();
     for (String str : RExp.split(",(?![^()]*+\\))")) {
-      String[] udf = str.replaceAll("\\s", "").split("[=~](?![^()]*+\\))");
+      String[] udf = str.split("[=~](?![^()]*+\\))");
       if (udf.length == 1) {
-        udfs.add(String.format("(%s)", udf[0]));
+        udfs.add(String.format("(%s)", udf[0]).trim());
       } else {
-        udfs.add(String.format("(%s) as %s", udf[1], udf[0].replaceAll("\\W", "")));
+        udfs.add(String.format("(%s) as %s", udf[1].trim(), udf[0].trim().replaceAll("\\W", "")));
       }
     }
     return Joiner.on(",").join(udfs);

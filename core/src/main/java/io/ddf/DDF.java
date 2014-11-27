@@ -269,7 +269,7 @@ public abstract class DDF extends ALoggable //
     return mManager;
   }
 
-  protected void setManager(DDFManager DDFManager) {
+  public void setManager(DDFManager DDFManager) {
     this.mManager = DDFManager;
   }
 
@@ -758,7 +758,7 @@ public abstract class DDF extends ALoggable //
 
     try {
       className = Config.getValueWithGlobalDefault(this.getEngine(), theInterface.getSimpleName());
-
+      mLog.info(">>> className = " + className);
       if (Strings.isNullOrEmpty(className)) {
         mLog.error(String.format("Cannot determine classname for %s from configuration source [%s] %s",
             theInterface.getSimpleName(), Config.getConfigHandler().getSource(), this.getEngine()));

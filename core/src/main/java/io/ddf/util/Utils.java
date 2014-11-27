@@ -38,6 +38,16 @@ public class Utils {
 
   public static Logger sLog = LoggerFactory.getLogger(Utils.class);
 
+  public static Configuration getConfiguration() {
+    Configuration configuration = new Configuration();
+    String hadoopConfDir = System.getenv("HADOOP_CONF_DIR");
+    if(hadoopConfDir != null) {
+        configuration.addResource(new Path(hadoopConfDir + "/" + "core-site.xml"));
+        configuration.addResource(new Path(hadoopConfDir + "/" + "hdfs-site.xml"));
+    }
+    return configuration;
+  }
+
   public static List<String> listFiles(String directory) {
     return listDirectory(directory, true, false);
   }
@@ -126,7 +136,7 @@ public class Utils {
    * @return true if "path" exists and is a file (and not a directory)
    */
   public static boolean fileExists(String path) throws IOException {
-    Configuration configuration = new Configuration();
+    Configuration configuration =  getConfiguration();
     FileSystem fileSystem = FileSystem.get(configuration);
     Path filePath = new Path(path);
     return (fileSystem.exists(filePath));
@@ -174,7 +184,7 @@ public class Utils {
 
   public static String readFromFile(String fileName) throws IOException {
     Reader reader = null;
-    Configuration configuration = new Configuration();
+    Configuration configuration = getConfiguration();
     try {
       FileSystem hdfs = FileSystem.get(configuration);
       FSDataInputStream inputStream = hdfs.open(new Path(fileName));
@@ -191,7 +201,7 @@ public class Utils {
 
   public static void writeToFile(String fileName, String contents) throws IOException {
     Writer writer = null;
-    Configuration configuration = new Configuration();
+    Configuration configuration =  getConfiguration();
     try {
       FileSystem hdfs = FileSystem.get(configuration);
       FSDataOutputStream outputStream = hdfs.create(new Path(fileName));
