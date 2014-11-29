@@ -12,6 +12,7 @@ import io.ddf.misc.ADDFFunctionalGroupHandler;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -82,22 +83,9 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   public DDF removeColumn(String columnName) throws DDFException {
     List<String> columns = Lists.newArrayList();
 
-    columns = this.getDDF().getColumnNames();
+    Collections.addAll(columns, columnName);
 
-    for (Iterator<String> it = list.iterator(); it.hasNext();) {
-      if (it.next().equals(columnName)) {
-        it.remove();
-      }
-    }
-
-    DDF newddf = this.project(columns);
-
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      this.getManager().addDDF(newddf);
-      return newddf;
-    }
+    return this.removeColumns(columns);
   }
 
   @Override
@@ -106,36 +94,19 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
     List<String> columns = Lists.newArrayList();
 
-    columns = this.getDDF().getColumnNames();
+    Collections.addAll(columns, columnNames);
 
-    for (String columnName : columnNames) {
-      for (Iterator<String> it = columns.iterator(); it.hasNext();) {
-        if (it.next().equals(columnName)) {
-          it.remove();
-        }
-      }
-    }
-
-    DDF newddf = this.project(columns);
-
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      this.getManager().addDDF(newddf);
-      return newddf;
-    }
+    return this.removeColumns(columns);
   }
 
   @Override
   public DDF removeColumns(List<String> columnNames) throws DDFException {
     if (columnNames == null || columnNames.isEmpty()) throw new DDFException("columnNames must be specified");
 
-    List<String> columns = Lists.newArrayList();
-
-    columns = this.getDDF().getColumnNames();
+    List<String> columns = this.getDDF().getColumnNames();
 
     for (String columnName : columnNames) {
-      for (Iterator<String> it = columns.iterator(); it.hasNext();) {
+      for (Iterator<String> it = columns.iterator();it.hasNext();) {
         if (it.next().equals(columnName)) {
           it.remove();
         }
