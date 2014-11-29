@@ -68,7 +68,6 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertTrue(newddf.getSchemaHandler().getColumns().get(1).getType() == ColumnType.INT);
   }
 
-
   @Test
   public void testTransformSql() throws DDFException {
 
@@ -96,23 +95,29 @@ public class TransformationHandlerTest extends BaseTest {
 
     ddf.setMutable(false);
 
-    // transform using if condition
-    String s1 = "new_col = if(arrdelay=15,1,0),v ~ (arrtime-deptime),distance/(arrtime-deptime)";
-    String s2 = "arr_delayed=if(arrdelay=\"yes\",1,0)";
-    Assert.assertEquals("(if(arrdelay=15,1,0)) as new_col,((arrtime-deptime)) as v,(distance/(arrtime-deptime))",
-        TransformationHandler.RToSqlUdf(s1));
-    Assert.assertEquals("(if(arrdelay=\"yes\",1,0)) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
-
-    DDF ddf2 = ddf.Transform.transformUDF(s1, cols);
-    Assert.assertEquals(31, ddf2.getNumRows());
-    Assert.assertEquals(6, ddf2.getNumColumns());
-
     // multiple expressions, column name with special characters
     DDF ddf3 = ddf.Transform.transformUDF("arrtime-deptime, (speed^*- = distance/(arrtime-deptime)", cols);
     Assert.assertEquals(31, ddf3.getNumRows());
     Assert.assertEquals(5, ddf3.getNumColumns());
     Assert.assertEquals("speed", ddf3.getColumnName(4));
     Assert.assertEquals(5, ddf3.getSummary().length);
+    
+    // transform using if else/case when
+    
+    List<String> lcols = Lists.newArrayList("distance", "arrtime", "deptime", "arrdelay");
+    String s0 = "new_col = if(arrdelay=15,1,0)";
+    String s1 = "new_col = if(arrdelay=15,1,0),v ~ (arrtime-deptime),distance/(arrtime-deptime)";
+    String s2 = "arr_delayed=if(arrdelay=\"yes\",1,0)";
+    String s3 = "origin_sfo = case origin when \'SFO\' then 1 else 0 end ";
+    Assert.assertEquals("(if(arrdelay=15,1,0)) as new_col,((arrtime-deptime)) as v,(distance/(arrtime-deptime))",
+        TransformationHandler.RToSqlUdf(s1));
+    Assert.assertEquals("(if(arrdelay=\"yes\",1,0)) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
+    Assert.assertEquals("(case origin when \'SFO\' then 1 else 0 end) as origin_sfo", TransformationHandler.RToSqlUdf(s3));
+    
+    DDF ddf2 = ddf.Transform.transformUDF(s1, lcols);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(7, ddf2.getNumColumns());
+
 
   }
 
