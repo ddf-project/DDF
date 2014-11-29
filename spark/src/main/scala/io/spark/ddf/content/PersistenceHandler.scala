@@ -66,6 +66,6 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
         val folderPath = this.getFolderPath(ddf.getNamespace, ddfName, "")
         new PersistenceUri(ddf.getEngine, folderPath).toString
       }
-    }
+    }.toList
   }
 }
