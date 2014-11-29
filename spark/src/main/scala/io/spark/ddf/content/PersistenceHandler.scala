@@ -53,4 +53,9 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
     val ddf = manager.newDDF(manager, schemaRDD, Array(classOf[SchemaRDD]), manager.getNamespace, null, schema)
     ddf
   }
+
+  def listPersistedDDF(): java.util.List[String] = {
+    val persistenceDirectory = this.locateOrCreatePersistenceSubdirectory(this.ddf.getNamespace)
+    Utils.listHDFSSubDirectory(persistenceDirectory)
+  }
 }
