@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+  import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -77,7 +77,7 @@ public class Utils {
     return listHDFSDirectory(directory, false, true);
   }
 
-  public static List<String> listHDFSDirectorty(String directory) throws IOException {
+  public static List<String> listHDFSDirectory(String directory) throws IOException {
     return listHDFSDirectory(directory, true, true);
   }
 
@@ -86,7 +86,7 @@ public class Utils {
     Configuration config = getConfiguration();
     FileSystem fileSystem = FileSystem.get(config);
     List<String> files = new ArrayList<String>();
-    RemoteIterator<LocatedFileStatus> fileStatusListIterator= fileSystem.listFiles(new Path(directory), false);
+    RemoteIterator<LocatedFileStatus> fileStatusListIterator= fileSystem.listLocatedStatus(new Path(directory));
 
     while(fileStatusListIterator.hasNext()) {
       FileStatus fileStatus = fileStatusListIterator.next();
