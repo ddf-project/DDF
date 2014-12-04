@@ -78,7 +78,7 @@ public class PersistenceHandler extends APersistenceHandler {
     return this.getFilePath(namespace, name, ".sch");
   }
 
-  private String getFilePath(String namespace, String name, String postfix) throws DDFException {
+  protected String getFilePath(String namespace, String name, String postfix) throws DDFException {
     String directory = locateOrCreatePersistenceSubdirectory(namespace);
     return String.format("%s/%s%s", directory, name, postfix);
   }

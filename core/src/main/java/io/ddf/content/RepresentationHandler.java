@@ -135,6 +135,11 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
+  public void removeConvertFunction(Representation fromRepresentation, Representation toRepresentation) {
+    this.mGraph.removeEdge(fromRepresentation, toRepresentation);
+  }
+
+  @Override
   public boolean has(String typeSpecs) {
     return mReps.containsKey(typeSpecs);
   }

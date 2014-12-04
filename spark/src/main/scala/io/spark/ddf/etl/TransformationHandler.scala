@@ -105,7 +105,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
           val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpression)
 
-          //        mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
+          // mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
 
           // compute!
           TransformationHandler.tryEval(rconn, expr, errMsgHeader = "failed to eval transform expression")

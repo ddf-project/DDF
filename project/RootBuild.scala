@@ -271,6 +271,7 @@ object RootBuild extends Build {
     dependencyOverrides += "commons-net" % "commons-net" % "3.1",
     dependencyOverrides += "org.mockito" % "mockito-all" % "1.8.5",
     dependencyOverrides += "org.apache.commons" % "commons-math3" % "3.1.1",
+    dependencyOverrides += "commons-httpclient" % "commons-httpclient" % "3.1",
     dependencyOverrides += "com.sun.jersey" % "jersey-json" % "1.9",
     dependencyOverrides += "com.sun.jersey" % "jersey-server" % "1.9",
     dependencyOverrides += "org.scalamacros" % "quasiquotes_2.10" % "2.0.0",
