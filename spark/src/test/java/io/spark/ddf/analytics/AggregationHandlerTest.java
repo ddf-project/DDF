@@ -51,8 +51,8 @@ public class AggregationHandlerTest extends BaseTest {
 
     Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics = count(*)")).getNumRows() > 0);
     Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics = count(1)")).getNumRows() > 0);
-    Assert
-        .assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=count(dayofweek )")).getNumRows() > 0);
+    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=count(dayofweek )")).getNumRows() > 0);
+    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=avg(arrdelay )")).getNumRows() > 0);
   }
 
 

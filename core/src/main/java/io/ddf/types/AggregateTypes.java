@@ -181,12 +181,9 @@ public class AggregateTypes {
 
       String spec = fieldSpec.trim();
       String[] parts = spec.split("\\(");
-      System.out.println(">>>>>parts.length =" + parts.length);
       if (parts.length == 1) {
         return new AggregateField(parts[0]); // just column name
-
       } else {
-        System.out.println(">>>>>>>>>>>>>>> part0 = " + parts[0] + "\tpart1=" + parts[1]);
         return new AggregateField(parts[0], parts[1].replaceAll("\\)", "")); // function(columnName)
       }
     }
