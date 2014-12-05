@@ -35,4 +35,10 @@ public interface IHandleViews extends IHandleDDFFunctionalGroup {
   public DDF project(List<String> columnNames) throws DDFException;
 
   public DDF subset(List<Column> columnExpr, Expression filter) throws DDFException;
+
+  public DDF removeColumn(String columnName) throws DDFException;
+
+  public DDF removeColumns(String... columnNames) throws DDFException;
+
+  public DDF removeColumns(List<String> columnNames) throws DDFException;
 }
