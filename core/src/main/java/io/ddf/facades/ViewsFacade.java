@@ -75,4 +75,19 @@ public class ViewsFacade implements IHandleViews {
   public DDF project(List<String> columnNames) throws DDFException {
     return this.getViewHandler().project(columnNames);
   }
+
+  @Override
+  public DDF removeColumn(String columnName) throws DDFException {
+    return this.getViewHandler().removeColumn(columnName);
+  }
+
+  @Override
+  public DDF removeColumns(String... columnNames) throws DDFException {
+    return this.getViewHandler().removeColumns(columnNames);
+  }
+
+  @Override
+  public DDF removeColumns(List<String> columnNames) throws DDFException {
+    return this.getViewHandler().removeColumns(columnNames);
+  }
 }

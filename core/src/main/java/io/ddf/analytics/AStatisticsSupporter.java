@@ -158,7 +158,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
         String[] arrayString = result.get(0).replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|", "").split(",");
 
         int i = 0;
-        while(i < numBins) {
+        while(i < numBins && i*2 + 1 < arrayString.length) {
           HistogramBin bin = new HistogramBin();
           bin.setX(Double.parseDouble(arrayString[i*2 + 0]));
           bin.setX(Double.parseDouble(arrayString[i*2 + 1]));
