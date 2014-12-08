@@ -161,7 +161,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
         while(i < numBins && i*2 + 1 < arrayString.length) {
           HistogramBin bin = new HistogramBin();
           bin.setX(Double.parseDouble(arrayString[i*2 + 0]));
-          bin.setX(Double.parseDouble(arrayString[i*2 + 1]));
+          bin.setY(Double.parseDouble(arrayString[i*2 + 1]));
           i += 1;
           bins.add(bin);
         }
