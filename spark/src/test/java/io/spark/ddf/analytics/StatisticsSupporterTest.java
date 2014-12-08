@@ -93,6 +93,8 @@ public class StatisticsSupporterTest extends BaseTest {
   public void testVectorHistogram() throws DDFException {
     List<HistogramBin> bins = ddf1.getVectorHistogram("arrdelay", 5);
     Assert.assertEquals(5, bins.size());
+    Assert.assertEquals(-12.45, bins.get(0).getX(), 0.01);
+    Assert.assertEquals(11, bins.get(0).getY(), 0.01);
   }
 
 
