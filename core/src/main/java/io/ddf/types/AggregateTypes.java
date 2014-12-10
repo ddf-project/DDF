@@ -12,7 +12,7 @@ import java.util.List;
 
 public class AggregateTypes {
   public enum AggregateFunction {
-    MEAN, COUNT, SUM, MIN, MAX, MEDIAN, VARIANCE, STDDEV;
+    MEAN, AVG, COUNT, SUM, MIN, MAX, MEDIAN, VARIANCE, STDDEV;
 
     public static AggregateFunction fromString(String s) {
       if (Strings.isNullOrEmpty(s)) return null;
@@ -30,6 +30,9 @@ public class AggregateTypes {
           return String.format("PERCENTILE_APPROX(%s, 0.5)", column);
 
         case MEAN:
+          return String.format("AVG(%s)", column);
+
+        case AVG:
           return String.format("AVG(%s)", column);
 
         default:
@@ -180,7 +183,6 @@ public class AggregateTypes {
       String[] parts = spec.split("\\(");
       if (parts.length == 1) {
         return new AggregateField(parts[0]); // just column name
-
       } else {
         return new AggregateField(parts[0], parts[1].replaceAll("\\)", "")); // function(columnName)
       }

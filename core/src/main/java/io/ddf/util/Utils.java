@@ -8,25 +8,19 @@ import io.ddf.content.ISerializable;
 import io.ddf.exception.DDFException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+  import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 //import java.io.*;
 
@@ -79,7 +73,34 @@ public class Utils {
     return Arrays.asList(directories);
   }
 
+  public static List<String> listHDFSSubDirectory(String directory) throws IOException {
+    return listHDFSDirectory(directory, false, true);
+  }
 
+  public static List<String> listHDFSDirectory(String directory) throws IOException {
+    return listHDFSDirectory(directory, true, true);
+  }
+
+  public static List<String> listHDFSDirectory(String directory, boolean doIncludeFiles,
+      boolean doIncludeSubdirectories) throws IOException {
+    Configuration config = getConfiguration();
+    FileSystem fileSystem = FileSystem.get(config);
+    List<String> files = new ArrayList<String>();
+    RemoteIterator<LocatedFileStatus> fileStatusListIterator= fileSystem.listLocatedStatus(new Path(directory));
+
+    while(fileStatusListIterator.hasNext()) {
+      FileStatus fileStatus = fileStatusListIterator.next();
+      if(doIncludeFiles) {
+        files.add(fileStatus.getPath().toString());
+      } else {
+        if(fileStatus.isDirectory()) {
+          files.add(fileStatus.getPath().toString());
+        }
+      }
+    }
+
+    return files;
+  }
 
   /**
    * Locates the given dirName as a full path, in the current directory or in successively higher parent directory

@@ -9,6 +9,8 @@ import io.ddf.util.Utils.JsonSerDes
 import org.apache.spark.sql.SchemaRDD
 import io.spark.ddf.SparkDDFManager
 import io.ddf.content.IHandlePersistence.IPersistible
+import scala.collection.JavaConversions._
+import org.apache.hadoop.fs.Path
 
 /**
  * author: daoduchuan
@@ -52,5 +54,18 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
 
     val ddf = manager.newDDF(manager, schemaRDD, Array(classOf[SchemaRDD]), manager.getNamespace, null, schema)
     ddf
+  }
+
+  def listPersistedDDFUris(): List[String] = {
+    val persistenceDirectory = this.locateOrCreatePersistenceSubdirectory(this.ddf.getNamespace)
+    val listDDFs = Utils.listHDFSSubDirectory(persistenceDirectory).map{
+      directory => new Path(directory).getName
+    }
+    listDDFs.map {
+      ddfName => {
+        val folderPath = this.getFolderPath(ddf.getNamespace, ddfName, "")
+        new PersistenceUri(ddf.getEngine, folderPath).toString
+      }
+    }.toList
   }
 }

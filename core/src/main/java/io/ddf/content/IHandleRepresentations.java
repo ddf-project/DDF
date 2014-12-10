@@ -84,6 +84,8 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
   public void addConvertFunction(Representation fromRepresentation, Representation toRepresentation,
       ConvertFunction convertFunction);
 
+  public void removeConvertFunction(Representation fromRepresentation, Representation toRepresentation);
+
   interface IGetResult {
     String getTypeSpecsString();
 
