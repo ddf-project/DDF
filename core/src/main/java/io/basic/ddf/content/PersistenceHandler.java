@@ -21,7 +21,7 @@ import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.IGloballyAddressable;
 import io.ddf.util.Utils;
 import io.ddf.util.Utils.JsonSerDes;
-
+import io.ddf.content.APersistenceHandler.PersistenceUri;
 import java.io.IOException;
 import java.util.List;
 
