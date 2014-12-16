@@ -93,7 +93,6 @@ object RootBuild extends Build {
   val excludeNetty = ExclusionRule(organization = "org.jboss.netty", name = "netty")
   val excludeScala = ExclusionRule(organization = "org.scala-lang", name = "scala-library")
   val excludeGuava = ExclusionRule(organization = "com.google.guava", name = "guava-parent")
-  val excludeJets3t = ExclusionRule(organization = "net.java.dev.jets3t", name = "jets3t")
   val excludeAsm = ExclusionRule(organization = "asm", name = "asm")
   val excludeSpark = ExclusionRule(organization = "org.apache.spark", name = "spark-core_2.10")
   val excludeEverthing = ExclusionRule(organization = "*", name = "*")
@@ -129,7 +128,7 @@ object RootBuild extends Build {
     //"commons-dbcp" % "commons-dbcp" % "1.4",
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
-    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION excludeAll(excludeJets3t) exclude("com.google.protobuf", "protobuf-java") 
+    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
@@ -243,7 +242,6 @@ object RootBuild extends Build {
     dependencyOverrides += "org.apache.avro" % "avro-ipc" % "1.7.4",
     dependencyOverrides += "org.apache.avro" % "avro" % "1.7.4",
     dependencyOverrides += "org.apache.zookeeper" % "zookeeper" % "3.4.5",
-    dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.9.0",
 //    dependencyOverrides += "org.eclipse.jetty" % "jetty-server" % "8.1.14.v20131031",
 //    dependencyOverrides += "org.eclipse.jetty" % "jetty-jndi" % "8.1.14.v20131031",
 //     dependencyOverrides += "org.eclipse.jetty" % "jetty-security" % "8.1.14.v20131031",
@@ -274,6 +272,7 @@ object RootBuild extends Build {
     dependencyOverrides += "commons-httpclient" % "commons-httpclient" % "3.1",
     dependencyOverrides += "org.apache.avro" % "avro-mapred" % "1.7.6",
     dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
+    dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.7.1",
     pomExtra := (
       <!--
       **************************************************************************************************
