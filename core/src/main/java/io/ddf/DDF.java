@@ -303,7 +303,7 @@ public abstract class DDF extends ALoggable //
   }
 
 
-  public long getNumRows() {
+  public long getNumRows() throws DDFException {
     return this.getMetaDataHandler().getNumRows();
   }
 
