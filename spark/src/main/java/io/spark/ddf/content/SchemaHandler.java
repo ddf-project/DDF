@@ -90,12 +90,12 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
       for (Integer colIndex : columnIndexes) {
         Column column = this.getColumn(this.getColumnName(colIndex));
         Map<String, Integer> levelCounts = listLevelCounts.get(colIndex);
-        Factor<?> factor = column.getOptionalFactor();
-
-        List<String> levels = new ArrayList<String>(levelCounts.keySet());
-
-        factor.setLevelCounts(levelCounts);
-        factor.setLevels(levels, false);
+        if(levelCounts != null) {
+          Factor<?> factor = column.getOptionalFactor();
+          List<String> levels = new ArrayList<String>(levelCounts.keySet());
+          factor.setLevelCounts(levelCounts);
+          factor.setLevels(levels, false);
+        }
       }
     }
   }

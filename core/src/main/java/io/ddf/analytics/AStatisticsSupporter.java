@@ -192,7 +192,6 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       default:
         return "";
     }
-
   }
 
   public static class HistogramBin {
