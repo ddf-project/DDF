@@ -157,11 +157,11 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
 
     if (Strings.isNullOrEmpty(s)) return null;
 
-    String[] splits = s.trim().split("=");
+    String[] splits = s.trim().split("=(?![^()]*+\\))");
     if (splits.length == 2) {
-      return AggregateField.fromFieldSpec(splits[1]).setName(splits[0]).toString();
+      return String.format("%s AS %s", splits[1], splits[0]);
     } else if (splits.length == 1) { // no name for aggregated value
-      return AggregateField.fromFieldSpec(splits[0]).toString();
+      return splits[0];
     }
     return s;
   }
