@@ -13,6 +13,8 @@ import io.ddf.util.Utils;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  *
@@ -156,8 +158,11 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
   private String convertAggregateFunctionsToSql(String s) {
 
     if (Strings.isNullOrEmpty(s)) return null;
-
-    String[] splits = s.trim().split("=(?![^()]*+\\))");
+    String r = "mean\\(";
+    Pattern pattern = Pattern.compile(r);
+    Matcher m = pattern.matcher(s);
+    String sql = m.replaceAll("avg\\(");
+    String[] splits = sql.trim().split("=(?![^()]*+\\))");
     if (splits.length == 2) {
       return String.format("%s AS %s", splits[1], splits[0]);
     } else if (splits.length == 1) { // no name for aggregated value
@@ -165,6 +170,5 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     }
     return s;
   }
-
 
 }
