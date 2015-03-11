@@ -302,6 +302,8 @@ public abstract class DDF extends ALoggable //
     return this.getSchema().getColumnNames();
   }
 
+  public void setColumnNames(List<String> columnNames) {this.getSchema().setColumnNames(columnNames);}
+
 
   public long getNumRows() throws DDFException {
     return this.getMetaDataHandler().getNumRows();
