@@ -182,7 +182,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
 
   public enum OperationName {
-    lt, le, eq, ge, gt, ne, and, or, neg, isnull, isnotnull
+    lt, le, eq, ge, gt, ne, and, or, neg, isnull, isnotnull, grep
   }
 
 
@@ -245,6 +245,8 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
           return String.format("(%s IS NULL)", operands[0].toSql());
         case isnotnull:
           return String.format("(%s IS NOT NULL)", operands[0].toSql());
+        case grep:
+          return String.format("(%s LIKE '%%%s%%')", operands[1].toSql(), operands[0].toSql().substring(1,operands[0].toSql().length()-1));
         default:
           throw new IllegalArgumentException("Unsupported Operator: " + name);
       }
