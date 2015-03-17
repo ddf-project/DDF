@@ -974,6 +974,16 @@ public abstract class DDF extends ALoggable //
     return this.getStatisticsSupporter().getVectorCovariance(xColumnName, yColumnName);
   }
 
+  public Double getVectorMin(String columnName) throws DDFException {
+    // TODO need to check columnName
+    return this.getStatisticsSupporter().getVectorMin(columnName);
+  }
+
+  public Double getVectorMax(String columnName) throws DDFException {
+    // TODO need to check columnName
+    return this.getStatisticsSupporter().getVectorMax(columnName);
+  }
+
 
   // //// ISupportML //////
   public MLFacade ML;
