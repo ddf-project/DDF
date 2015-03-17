@@ -59,6 +59,10 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
     return mNumRows;
   }
 
+  public void copyFactor(DDF oldDDF)  throws DDFException {
+
+  };
+
   private HashMap<Integer, ICustomMetaData> mCustomMetaDatas;
 
   public ICustomMetaData getCustomMetaData(int idx) {
