@@ -3,9 +3,10 @@ package io.spark.ddf.content;
 
 import io.ddf.DDF;
 import io.ddf.content.AMetaDataHandler;
+import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 import org.apache.log4j.Logger;
-
+import io.ddf.exception.DDFException;
 import java.util.List;
 
 /**
@@ -29,6 +30,17 @@ public class MetaDataHandler extends AMetaDataHandler {
     } catch (Exception e) {
       throw new DDFException("Error getting NRow", e);
     }
+  }
+  /*
+  transfer Factor information to the current DDF
+   */
+  public void copyFactor(DDF oldDDF)  throws DDFException {
+    for (Schema.Column col : oldDDF.getSchema().getColumns()) {
+      if (col.getColumnClass() == Schema.ColumnClass.FACTOR) {
+        this.getDDF().getSchemaHandler().setAsFactor(col.getName());
+      }
+    }
+    this.getDDF().getSchemaHandler().computeFactorLevelsAndLevelCounts();
   }
 
 }
