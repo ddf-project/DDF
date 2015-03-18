@@ -155,20 +155,16 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     }
   }
 
-  private String convertAggregateFunctionsToSql(String s) {
+  private String convertAggregateFunctionsToSql(String sql) {
 
-    if (Strings.isNullOrEmpty(s)) return null;
-    String r = "mean\\(";
-    Pattern pattern = Pattern.compile(r);
-    Matcher m = pattern.matcher(s);
-    String sql = m.replaceAll("avg\\(");
+    if (Strings.isNullOrEmpty(sql)) return null;
+
     String[] splits = sql.trim().split("=(?![^()]*+\\))");
     if (splits.length == 2) {
       return String.format("%s AS %s", splits[1], splits[0]);
     } else if (splits.length == 1) { // no name for aggregated value
       return splits[0];
     }
-    return s;
+    return sql;
   }
-
 }
