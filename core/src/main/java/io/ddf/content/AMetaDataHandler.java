@@ -66,7 +66,7 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
    */
   public void copyFactor(DDF ddf)  throws DDFException {
     for (Schema.Column col : ddf.getSchema().getColumns()) {
-      if (col.getColumnClass() == Schema.ColumnClass.FACTOR) {
+      if (this.getDDF().getColumn(col.getName()) != null && col.getColumnClass() == Schema.ColumnClass.FACTOR) {
         this.getDDF().getSchemaHandler().setAsFactor(col.getName());
       }
     }
