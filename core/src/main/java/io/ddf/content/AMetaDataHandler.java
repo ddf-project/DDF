@@ -59,9 +59,23 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
     return mNumRows;
   }
 
-  public void copyFactor(DDF oldDDF)  throws DDFException {
+  /**
+   * Transfer factor information from ddf to this DDF
+   * @param ddf
+   * @throws DDFException
+   */
+  public void copyFactor(DDF ddf)  throws DDFException {
+    for (Schema.Column col : ddf.getSchema().getColumns()) {
+      if (this.getDDF().getColumn(col.getName()) != null && col.getColumnClass() == Schema.ColumnClass.FACTOR) {
+        this.getDDF().getSchemaHandler().setAsFactor(col.getName());
+      }
+    }
+    this.getDDF().getSchemaHandler().computeFactorLevelsAndLevelCounts();
+  }
 
-  };
+  public void copyMetaData(DDF ddf) throws DDFException {
+    this.copyFactor(ddf);
+  }
 
   private HashMap<Integer, ICustomMetaData> mCustomMetaDatas;
 

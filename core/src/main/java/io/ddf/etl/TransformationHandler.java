@@ -41,8 +41,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString());
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
     this.getManager().addDDF(newddf);
-
     return newddf;
   }
 
@@ -69,7 +69,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString());
-
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
     this.getManager().addDDF(newddf);
     return newddf;
 
@@ -101,10 +101,9 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       return this.getDDF().updateInplace(newddf);
     } else {
       this.getManager().addDDF(newddf);
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
       return newddf;
     }
-
-
   }
 
   public DDF transformUDF(String RExp) throws DDFException {
@@ -130,5 +129,4 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     }
     return Joiner.on(",").join(udfs);
   }
-
 }
