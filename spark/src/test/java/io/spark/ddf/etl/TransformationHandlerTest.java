@@ -71,8 +71,8 @@ public class TransformationHandlerTest extends BaseTest {
   @Test
   public void testTransformSql() throws DDFException {
 
-    ddf.setAsFactor(0);
-    ddf.setAsFactor(1);
+    ddf.setAsFactor("year");
+    ddf.setAsFactor("month");
     System.out.println(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
     Assert.assertTrue(ddf.getColumn("year").getOptionalFactor().getLevels().size() > 0);
     Assert.assertTrue(ddf.getColumn("month").getOptionalFactor().getLevels().size() > 0);
