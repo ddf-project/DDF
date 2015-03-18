@@ -153,9 +153,5 @@ public class TransformationHandlerTest extends BaseTest {
     DDF ddf2 = ddf.Transform.transformUDF(s1, lcols);
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(7, ddf2.getNumColumns());
-
-
   }
-
-
 }
