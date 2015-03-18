@@ -78,8 +78,6 @@ public class TransformationHandlerTest extends BaseTest {
     System.out.println(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
     System.out.println(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
 
-    Assert.assertTrue(ddf.getColumn("year").getOptionalFactor().getLevels().size() > 0);
-    Assert.assertTrue(ddf.getColumn("month").getOptionalFactor().getLevels().size() > 0);
 
     ddf.setMutable(true);
     ddf = ddf.Transform.transformUDF("dist= round(distance/2, 2)");
@@ -89,6 +87,10 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals("dist", ddf.getColumnName(8));
     Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
 
+
+    System.out.println(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
+    System.out.println(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
+    
     Assert.assertTrue(ddf.getColumn("year").getOptionalFactor().getLevels().size() > 0);
     Assert.assertTrue(ddf.getColumn("month").getOptionalFactor().getLevels().size() > 0);
     System.out.println(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
