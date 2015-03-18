@@ -70,13 +70,11 @@ public class TransformationHandlerTest extends BaseTest {
   }
 
   @Test
-  public void testTransformSql() throws DDFException {
-
+  public void testReservedFactor() throws DDFException {
     ddf.setAsFactor("year");
     ddf.setAsFactor("month");
 
     Assert.assertTrue(ddf.getSchema() != null);
-    System.out.println(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
 
 
     System.out.println(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
@@ -86,7 +84,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertTrue(ddf.getColumn("month").getColumnClass() == Schema.ColumnClass.FACTOR);
 
     ddf.setMutable(true);
-    ddf = ddf.Transform.transformUDF("dist= round(distance/2, 2)");
+    ddf = ddf.Transform.transformUDF("test123= round(distance/2, 2)");
 
     Assert.assertEquals(31, ddf.getNumRows());
     Assert.assertEquals(9, ddf.getNumColumns());
@@ -103,10 +101,19 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertTrue(ddf.getColumn("year").getOptionalFactor().getLevels().size() > 0);
     Assert.assertTrue(ddf.getColumn("month").getOptionalFactor().getLevels().size() > 0);
     System.out.println(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
+  }
+
+  @Test
+  public void testTransformSql() throws DDFException {
 
 
-    //check if factor information is reserved
-    System.out.println(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
+    ddf.setMutable(true);
+    ddf = ddf.Transform.transformUDF("dist= round(distance/2, 2)");
+
+    Assert.assertEquals(31, ddf.getNumRows());
+    Assert.assertEquals(9, ddf.getNumColumns());
+    Assert.assertEquals("dist", ddf.getColumnName(8));
+    Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
 
     // udf without assigning column name
     ddf.Transform.transformUDF("arrtime-deptime");
