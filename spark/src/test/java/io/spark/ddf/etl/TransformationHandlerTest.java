@@ -88,7 +88,7 @@ public class TransformationHandlerTest extends BaseTest {
 
     Assert.assertEquals(31, ddf.getNumRows());
     Assert.assertEquals(9, ddf.getNumColumns());
-    Assert.assertEquals("dist", ddf.getColumnName(8));
+    Assert.assertEquals("test123", ddf.getColumnName(8));
     Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
 
 
