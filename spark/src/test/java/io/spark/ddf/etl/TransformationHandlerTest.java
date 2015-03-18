@@ -74,7 +74,10 @@ public class TransformationHandlerTest extends BaseTest {
 
     ddf.setAsFactor("year");
     ddf.setAsFactor("month");
+
+    Assert.assertTrue(ddf.getSchema() != null);
     System.out.println(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
+
 
     System.out.println(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
     System.out.println(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
