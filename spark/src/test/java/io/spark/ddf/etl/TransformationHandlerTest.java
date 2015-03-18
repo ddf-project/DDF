@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.analytics.Summary;
+import io.ddf.content.Schema;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.etl.TransformationHandler;
 import io.ddf.exception.DDFException;
@@ -78,6 +79,8 @@ public class TransformationHandlerTest extends BaseTest {
     System.out.println(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
     System.out.println(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
 
+    Assert.assertTrue(ddf.getColumn("year").getColumnClass() == Schema.ColumnClass.FACTOR);
+    Assert.assertTrue(ddf.getColumn("month").getColumnClass() == Schema.ColumnClass.FACTOR);
 
     ddf.setMutable(true);
     ddf = ddf.Transform.transformUDF("dist= round(distance/2, 2)");
@@ -90,7 +93,10 @@ public class TransformationHandlerTest extends BaseTest {
 
     System.out.println(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
     System.out.println(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
-    
+
+    Assert.assertTrue(ddf.getColumn("year").getColumnClass() == Schema.ColumnClass.FACTOR);
+    Assert.assertTrue(ddf.getColumn("month").getColumnClass() == Schema.ColumnClass.FACTOR);
+
     Assert.assertTrue(ddf.getColumn("year").getOptionalFactor().getLevels().size() > 0);
     Assert.assertTrue(ddf.getColumn("month").getOptionalFactor().getLevels().size() > 0);
     System.out.println(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
