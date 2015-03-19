@@ -8,6 +8,7 @@ import io.ddf.content.ISerializable;
 import io.ddf.exception.DDFException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,11 +200,8 @@ public class Utils {
     }
   }
 
-  public static void deleteFile(String fileName) {
-    Configuration configuration =  getConfiguration();
-    FileSystem fileSystem = FileSystem.get(configuration);
-    Path filePath = new Path(fileName);
-    fileSystem.delete(filePath);
+  public static void deleteFile(String fileName) throws IOException {
+    FileUtil.fullyDelete(new File(fileName));
   }
 
   public static String readFromFile(String fileName) throws IOException {
