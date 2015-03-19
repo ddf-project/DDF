@@ -106,6 +106,12 @@ public class PersistenceHandler extends APersistenceHandler {
     try {
       this.getDDF().beforePersisting();
 
+      //if overwrite and existed
+      if (doOverwrite && (Utils.fileExists(dataFile) || Utils.fileExists(schemaFile))) {
+        if(Utils.fileExists(dataFile)) Utils.deleteFile(dataFile);
+        if(Utils.fileExists(schemaFile)) Utils.deleteFile(schemaFile);
+      }
+
       Utils.writeToFile(dataFile, JsonSerDes.serialize(this.getDDF()) + '\n');
       Utils.writeToFile(schemaFile, JsonSerDes.serialize(this.getDDF().getSchema()) + '\n');
 
