@@ -22,8 +22,14 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
     val dataFile = this.getDataFileName()
     val schemaFile = this.getSchemaFileName()
     if(doOverwrite) {
-      if(Utils.fileExists(dataFile)) Utils.deleteFile(dataFile)
-      if(Utils.fileExists(schemaFile)) Utils.deleteFile(schemaFile)
+      if(Utils.fileExists(dataFile)) {
+        mLog.info(s">>> file $dataFile exists deleting")
+        Utils.deleteFile(dataFile)
+      }
+      if(Utils.fileExists(schemaFile)) {
+        mLog.info(s">>> file $schemaFile exists deleting")
+        Utils.deleteFile(schemaFile)
+      }
     }
 
     val folderPath = this.getFolderPath(ddf.getNamespace, ddf.getName, "")
