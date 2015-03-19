@@ -200,7 +200,10 @@ public class Utils {
   }
 
   public static void deleteFile(String fileName) {
-    new File(fileName).delete();
+    Configuration configuration =  getConfiguration();
+    FileSystem fileSystem = FileSystem.get(configuration);
+    Path filePath = new Path(fileName);
+    fileSystem.delete(filePath);
   }
 
   public static String readFromFile(String fileName) throws IOException {
