@@ -22,6 +22,7 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
     val dataFile = this.getDataFileName()
     val schemaFile = this.getSchemaFileName()
     if(doOverwrite) {
+      mLog.info(">>>> overwriting")
       if(Utils.fileExists(dataFile)) {
         mLog.info(s">>> file $dataFile exists deleting")
         Utils.deleteFile(dataFile)
