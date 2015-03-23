@@ -91,6 +91,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
       return this.getDDF().updateInplace(newddf);
     } else {
       this.getManager().addDDF(newddf);
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
       return newddf;
     }
 
@@ -170,6 +171,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
       return this.getDDF().updateInplace(newddf);
     } else {
       this.getManager().addDDF(newddf);
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
       return newddf;
     }
 
