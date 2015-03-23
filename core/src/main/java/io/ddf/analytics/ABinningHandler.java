@@ -23,6 +23,7 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
       return this.getDDF().updateInplace(newddf);
     } else {
       this.getManager().addDDF(newddf);
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
       return newddf;
     }
   }

@@ -119,6 +119,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
       return this.getDDF().updateInplace(newddf);
     } else {
       this.getManager().addDDF(newddf);
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
       return newddf;
     }
   }
@@ -155,6 +156,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     DDF subset = this.getManager().sql2ddf(sqlCmd);
 
     this.getManager().addDDF(subset);
+    subset.getMetaDataHandler().copyFactor(this.getDDF());
     return subset;
 
   }
