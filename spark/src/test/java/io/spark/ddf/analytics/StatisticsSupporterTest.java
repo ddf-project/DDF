@@ -35,7 +35,7 @@ public class StatisticsSupporterTest extends BaseTest {
     Assert.assertEquals(31, ddf.getNumRows());
     createTableSmiths2();
     DDF ddf3 = manager.sql2ddf("select * from smiths2");
-    Summary[] summary = ddf.getSummary();
+    Summary[] summary = ddf3.getSummary();
     Assert.assertEquals(summary[2].NACount(), 4);
   }
   
