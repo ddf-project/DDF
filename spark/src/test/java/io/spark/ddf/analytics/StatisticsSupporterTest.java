@@ -5,6 +5,7 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
 import io.ddf.analytics.AStatisticsSupporter.HistogramBin;
+import io.ddf.analytics.Summary;
 import io.ddf.exception.DDFException;
 import io.spark.ddf.BaseTest;
 import io.spark.ddf.SparkDDF;
@@ -32,6 +33,10 @@ public class StatisticsSupporterTest extends BaseTest {
   public void testSummary() throws DDFException {
     Assert.assertEquals(14, ddf.getSummary().length);
     Assert.assertEquals(31, ddf.getNumRows());
+    createTableSmiths2();
+    DDF ddf3 = manager.sql2ddf("select * from smiths2");
+    Summary[] summary = ddf.getSummary();
+    Assert.assertEquals(summary[2].NACount(), 4);
   }
   
 //  @Test
