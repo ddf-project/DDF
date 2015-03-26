@@ -21,6 +21,18 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
   override def persist(doOverwrite: Boolean): PersistenceUri = {
     val dataFile = this.getDataFileName()
     val schemaFile = this.getSchemaFileName()
+    if(doOverwrite) {
+      mLog.info(">>>> overwriting")
+      if(Utils.fileExists(dataFile)) {
+        mLog.info(s">>> file $dataFile exists deleting")
+        Utils.deleteFile(dataFile)
+      }
+      if(Utils.fileExists(schemaFile)) {
+        mLog.info(s">>> file $schemaFile exists deleting")
+        Utils.deleteFile(schemaFile)
+      }
+    }
+
     val folderPath = this.getFolderPath(ddf.getNamespace, ddf.getName, "")
     Utils.writeToFile(schemaFile, JsonSerDes.serialize(this.getDDF.getSchema) + "\n")
     val schemaRDD = ddf.getRepresentationHandler.get(classOf[SchemaRDD]).asInstanceOf[SchemaRDD]

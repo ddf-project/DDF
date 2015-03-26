@@ -28,7 +28,7 @@ public class AggregationHandlerTest extends BaseTest {
 
     // aggregation: select year, month, min(depdelay), max(arrdelay) from airline group by year, month;
     // Assert.assertEquals(13, ddf.aggregate("year, month, mean(depdelay), median(arrdelay)").size());
-    Assert.assertEquals(13, ddf.aggregate("year, month, mean(depdelay), stddev(arrdelay)").size());
+    Assert.assertEquals(13, ddf.aggregate("year, month, avg(depdelay), stddev(arrdelay)").size());
     Assert.assertEquals(2, ddf.aggregate("year, month, min(depdelay), max(arrdelay)").get("2010,3").length);
 
     Assert.assertEquals(0.87, ddf.correlation("arrdelay", "depdelay"), 0.5);
@@ -40,7 +40,7 @@ public class AggregationHandlerTest extends BaseTest {
   @Test
   public void testGroupBy() throws DDFException {
     List<String> l1 = Arrays.asList("year", "month");
-    List<String> l2 = Arrays.asList("m=mean(depdelay)");
+    List<String> l2 = Arrays.asList("m=avg(depdelay)");
     List<String> l3 = Arrays.asList("m= stddev(arrdelay)");
 
     Assert.assertEquals(13, ddf.groupBy(l1, l2).getNumRows());

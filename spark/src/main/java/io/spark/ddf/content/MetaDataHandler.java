@@ -3,9 +3,10 @@ package io.spark.ddf.content;
 
 import io.ddf.DDF;
 import io.ddf.content.AMetaDataHandler;
+import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 import org.apache.log4j.Logger;
-
+import io.ddf.exception.DDFException;
 import java.util.List;
 
 /**
@@ -30,5 +31,4 @@ public class MetaDataHandler extends AMetaDataHandler {
       throw new DDFException("Error getting NRow", e);
     }
   }
-
 }
