@@ -9,7 +9,6 @@ import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
-
 import java.util.List;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
@@ -42,8 +41,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString());
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
     this.getManager().addDDF(newddf);
-
     return newddf;
   }
 
@@ -70,7 +69,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString());
-
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
     this.getManager().addDDF(newddf);
     return newddf;
 
@@ -102,10 +101,9 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       return this.getDDF().updateInplace(newddf);
     } else {
       this.getManager().addDDF(newddf);
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
       return newddf;
     }
-
-
   }
 
   public DDF transformUDF(String RExp) throws DDFException {
@@ -122,14 +120,13 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   public static String RToSqlUdf(String RExp) {
     List<String> udfs = Lists.newArrayList();
     for (String str : RExp.split(",(?![^()]*+\\))")) {
-      String[] udf = str.replaceAll("\\s", "").split("[=~]");
+      String[] udf = str.split("[=~](?![^()]*+\\))");
       if (udf.length == 1) {
-        udfs.add(String.format("(%s)", udf[0]));
+        udfs.add(String.format("(%s)", udf[0]).trim());
       } else {
-        udfs.add(String.format("(%s) as %s", udf[1], udf[0].replaceAll("\\W", "")));
+        udfs.add(String.format("(%s) as %s", udf[1].trim(), udf[0].trim().replaceAll("\\W", "")));
       }
     }
     return Joiner.on(",").join(udfs);
   }
-
 }

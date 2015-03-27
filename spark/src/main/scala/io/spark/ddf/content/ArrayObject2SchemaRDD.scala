@@ -35,14 +35,14 @@ class ArrayObject2SchemaRDD(@transient ddf: DDF) extends ConvertFunction(ddf) {
 object ArrayObject2SchemaRDD {
   def column2StructField(column: Column): StructField = {
     column.getType match {
-      case ColumnType.DOUBLE => new StructField(column.getName, DoubleType, true)
-      case ColumnType.INT => new StructField(column.getName, IntegerType, true)
-      case ColumnType.STRING => new StructField(column.getName, StringType, true)
-      case ColumnType.FLOAT => new StructField(column.getName, FloatType, true)
-      case ColumnType.BIGINT => new StructField(column.getName, LongType, true)
-      case ColumnType.LONG => new StructField(column.getName, LongType, true)
-      case ColumnType.LOGICAL => new StructField(column.getName, BooleanType, true)
-      case ColumnType.TIMESTAMP => new StructField(column.getName, TimestampType, true)
+      case ColumnType.DOUBLE => StructField(column.getName, DoubleType, true)
+      case ColumnType.INT => StructField(column.getName, IntegerType, true)
+      case ColumnType.STRING => StructField(column.getName, StringType, true)
+      case ColumnType.FLOAT => StructField(column.getName, FloatType, true)
+      case ColumnType.BIGINT => StructField(column.getName, LongType, true)
+      case ColumnType.LONG => StructField(column.getName, LongType, true)
+      case ColumnType.LOGICAL => StructField(column.getName, BooleanType, true)
+      case ColumnType.TIMESTAMP => StructField(column.getName, TimestampType, true)
     }
   }
 }

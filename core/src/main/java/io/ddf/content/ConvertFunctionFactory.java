@@ -21,6 +21,10 @@ public class ConvertFunctionFactory implements EdgeFactory<Representation, Conve
     this.mMap.put(startVertex, endVertex, convertFunction);
   }
 
+  public void remove(Representation startVertext, Representation endVertex) {
+    this.mMap.remove(startVertext, endVertex);
+  }
+
   @Override
   public ConvertFunction createEdge(Representation startVertex, Representation endVertex) {
     return this.mMap.get(startVertex, endVertex);

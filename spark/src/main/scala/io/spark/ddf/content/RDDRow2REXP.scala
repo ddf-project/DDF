@@ -82,6 +82,7 @@ class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
             Iterator(REXP.createDataFrame(dfList))
           }
         }
+
         new Representation(rddREXP, RepresentationHandler.RDD_REXP.getTypeSpecsString)
       }
     }

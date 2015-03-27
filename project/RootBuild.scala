@@ -1,3 +1,5 @@
+import _root_.sbt.Keys._
+import _root_.sbt.Keys._
 import sbt._
 import sbt.Classpaths.publishTask
 import Keys._
@@ -16,7 +18,7 @@ object RootBuild extends Build {
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
 
-  val SPARK_VERSION = "1.2.0-SNAPSHOT"
+  val SPARK_VERSION = "1.2.0-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -33,7 +35,7 @@ object RootBuild extends Build {
   val projectName = "ddf"
   val rootProjectName = projectName
   val rootVersion = if(YARN_ENABLED) {
-    "1.1"
+    "1.1-adatao"
   } else {
     "1.1-mesos"
   }
@@ -53,14 +55,14 @@ object RootBuild extends Build {
 //  } else {
 //    rootVersion + "-mesos"
 //  }
-  val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + sparkVersion + ".jar"
-  val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + sparkVersion + "-tests.jar"
+  val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + ".jar"
+  val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + "-tests.jar"
   
 
   val examplesProjectName = projectName + "_examples"
   val examplesVersion = rootVersion
-  val examplesJarName = examplesProjectName + "-" + sparkVersion + ".jar"
-  val examplesTestJarName = examplesProjectName + "-" + sparkVersion + "-tests.jar"
+  val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
+  val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
   
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
@@ -91,7 +93,6 @@ object RootBuild extends Build {
   val excludeNetty = ExclusionRule(organization = "org.jboss.netty", name = "netty")
   val excludeScala = ExclusionRule(organization = "org.scala-lang", name = "scala-library")
   val excludeGuava = ExclusionRule(organization = "com.google.guava", name = "guava-parent")
-  val excludeJets3t = ExclusionRule(organization = "net.java.dev.jets3t", name = "jets3t")
   val excludeAsm = ExclusionRule(organization = "asm", name = "asm")
   val excludeSpark = ExclusionRule(organization = "org.apache.spark", name = "spark-core_2.10")
   val excludeEverthing = ExclusionRule(organization = "*", name = "*")
@@ -127,7 +128,7 @@ object RootBuild extends Build {
     //"commons-dbcp" % "commons-dbcp" % "1.4",
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
-    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION excludeAll(excludeJets3t) exclude("com.google.protobuf", "protobuf-java") 
+    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
@@ -241,7 +242,6 @@ object RootBuild extends Build {
     dependencyOverrides += "org.apache.avro" % "avro-ipc" % "1.7.4",
     dependencyOverrides += "org.apache.avro" % "avro" % "1.7.4",
     dependencyOverrides += "org.apache.zookeeper" % "zookeeper" % "3.4.5",
-    dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.9.0",
 //    dependencyOverrides += "org.eclipse.jetty" % "jetty-server" % "8.1.14.v20131031",
 //    dependencyOverrides += "org.eclipse.jetty" % "jetty-jndi" % "8.1.14.v20131031",
 //     dependencyOverrides += "org.eclipse.jetty" % "jetty-security" % "8.1.14.v20131031",
@@ -269,6 +269,10 @@ object RootBuild extends Build {
     dependencyOverrides += "com.sun.jersey" % "jersey-json" % "1.9",
     dependencyOverrides += "com.sun.jersey" % "jersey-server" % "1.9",
     dependencyOverrides += "org.scalamacros" % "quasiquotes_2.10" % "2.0.0",
+    dependencyOverrides += "commons-httpclient" % "commons-httpclient" % "3.1",
+    dependencyOverrides += "org.apache.avro" % "avro-mapred" % "1.7.6",
+    dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
+    dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.7.1",
     pomExtra := (
       <!--
       **************************************************************************************************
