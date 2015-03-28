@@ -15,6 +15,7 @@ public interface IHandleMetaData extends IHandleDDFFunctionalGroup {
 
   public long getNumRows() throws DDFException;
 
-  public void copyFactor(DDF oldDDF)  throws DDFException;
+  public void copyFactor(DDF ddf)  throws DDFException;
 
+  public void copyMetaData(DDF ddf) throws DDFException;
 }
