@@ -273,6 +273,7 @@ object RootBuild extends Build {
     dependencyOverrides += "org.apache.avro" % "avro-mapred" % "1.7.6",
     dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
     dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.7.1",
+    dependencyOverrides += "com.google.code.gson"% "gson" % "2.3.1",
     pomExtra := (
       <!--
       **************************************************************************************************
