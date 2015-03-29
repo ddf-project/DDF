@@ -33,7 +33,7 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
 
   private long mNumRows = 0L;
   private boolean bNumRowsIsValid = false;
-
+  private int useCount = 0;
   /**
    * Each implementation needs to come up with its own way to compute the row
    * count.
@@ -57,6 +57,20 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
       //      bNumRowsIsValid = true;
     }
     return mNumRows;
+  }
+
+  @Override
+  public boolean inUse() {
+    if(useCount > 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public synchronized void increaseUseCount() {
+    this.useCount += 1;
   }
 
   /**
