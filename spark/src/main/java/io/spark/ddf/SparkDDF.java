@@ -7,6 +7,7 @@ import io.ddf.content.IHandleRepresentations.IGetResult;
 import io.ddf.content.RepresentationHandler.GetResult;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
+import io.spark.ddf.util.SparkUtils;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.SchemaRDD;
@@ -37,12 +38,12 @@ public class SparkDDF extends DDF {
     this.initialize(manager, rdd, new Class<?>[] { RDD.class, unitType }, namespace, name, schema);
   }
 
-  public SparkDDF(DDFManager manager, SchemaRDD rdd, String namespace, String name, Schema schema) throws DDFException {
+  public SparkDDF(DDFManager manager, SchemaRDD rdd, String namespace, String name) throws DDFException {
     super(manager);
     if (rdd == null) throw new DDFException("Non-null RDD is required to instantiate a new SparkDDF");
+    Schema schema = SparkUtils.schemaFromSchemaRDD(rdd);
     this.initialize(manager, rdd, new Class<?>[] { SchemaRDD.class }, namespace, name, schema);
   }
-
   /**
    * Signature without RDD, useful for creating a dummy DDF used by DDFManager
    *
