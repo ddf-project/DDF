@@ -15,6 +15,14 @@ public interface IHandleMetaData extends IHandleDDFFunctionalGroup {
 
   public long getNumRows() throws DDFException;
 
-  public void copyFactor(DDF oldDDF)  throws DDFException;
+  public void copyFactor(DDF ddf)  throws DDFException;
 
+  public void copyMetaData(DDF ddf) throws DDFException;
+
+  // return true if ddf is in use
+  // false otherwise
+  public boolean inUse();
+
+  //increase number of user using ddf
+  public void increaseUseCount();
 }
