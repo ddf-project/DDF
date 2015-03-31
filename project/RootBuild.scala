@@ -158,6 +158,7 @@ object RootBuild extends Build {
 
     // Fork new JVMs for tests and set Java options for those
     fork in Test := true,
+    parallelExecution in ThisBuild := false,
     javaOptions in Test ++= Seq("-Xmx2g"),
 
     // Only allow one test at a time, even across projects, since they run in the same JVM

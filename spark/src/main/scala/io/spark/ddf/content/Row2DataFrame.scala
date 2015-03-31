@@ -15,9 +15,9 @@ class Row2DataFrame(@transient ddf: DDF) extends ConvertFunction(ddf) {
   override def apply(representation: Representation): Representation = {
     representation.getValue match {
       case rdd: RDD[Row] => {
-        val schema = StructType(ddf.getSchemaHandler.getColumns.map(col => ArrayObject2SchemaRDD.column2StructField(col)))
+        val schema = StructType(ddf.getSchemaHandler.getColumns.map(col => ArrayObject2DataFrame.column2StructField(col)))
         val schemaRDD = ddf.getManager.asInstanceOf[SparkDDFManager].getHiveContext.applySchema(rdd, schema)
-        new Representation(schemaRDD, RepresentationHandler.SCHEMARDD.getTypeSpecsString)
+        new Representation(schemaRDD, RepresentationHandler.DATAFRAME.getTypeSpecsString)
       }
     }
   }

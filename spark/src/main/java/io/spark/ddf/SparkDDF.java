@@ -109,11 +109,7 @@ public class SparkDDF extends DDF {
 
   public Boolean isCached() {
     HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
-    try {
-      return hiveContext.isCached(this.getTableName());
-    } catch (Exception e) {
-      return false;
-    }
+    return hiveContext.isCached(this.getTableName());
   }
 
   public void cacheTable() throws DDFException {

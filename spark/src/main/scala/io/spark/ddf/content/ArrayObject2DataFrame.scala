@@ -14,7 +14,7 @@ import scala.collection.mutable.ArrayBuffer
 
 /**
   */
-class ArrayObject2SchemaRDD(@transient ddf: DDF) extends ConvertFunction(ddf) {
+class ArrayObject2DataFrame(@transient ddf: DDF) extends ConvertFunction(ddf) {
 
   override def apply(representation: Representation): Representation = {
     representation.getValue match {
@@ -22,7 +22,7 @@ class ArrayObject2SchemaRDD(@transient ddf: DDF) extends ConvertFunction(ddf) {
         val rddRow = rdd.map {
           row => Row(row: _*)
         }
-        val schema = StructType(ddf.getSchemaHandler.getColumns.map(col => ArrayObject2SchemaRDD.column2StructField(col)))
+        val schema = StructType(ddf.getSchemaHandler.getColumns.map(col => ArrayObject2DataFrame.column2StructField(col)))
         val schemaRDD = ddf.getManager.asInstanceOf[SparkDDFManager].getHiveContext.applySchema(rddRow, schema)
         new Representation(schemaRDD, RepresentationHandler.DATAFRAME.getTypeSpecsString)
       }
@@ -30,7 +30,7 @@ class ArrayObject2SchemaRDD(@transient ddf: DDF) extends ConvertFunction(ddf) {
   }
 }
 
-object ArrayObject2SchemaRDD {
+object ArrayObject2DataFrame {
   def column2StructField(column: Column): StructField = {
     column.getType match {
       case ColumnType.DOUBLE => StructField(column.getName, DoubleType, true)
