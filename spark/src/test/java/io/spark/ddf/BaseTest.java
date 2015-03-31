@@ -16,6 +16,7 @@ public class BaseTest {
 
   @BeforeClass
   public static void startServer() throws Exception {
+    Thread.sleep(1000);
     LOG = LoggerFactory.getLogger(BaseTest.class);
     manager = DDFManager.get("spark");
 

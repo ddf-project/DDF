@@ -14,7 +14,7 @@ class RDDRow2ArrayObject(@transient ddf: DDF) extends ConvertFunction(ddf) {
     representation.getValue match {
       case rdd: RDD[Row] => {
         val rddArrObj = rdd.map {
-          row => row.asInstanceOf[Seq[Any]].toArray
+          row => row.toSeq.toArray
         }
         new Representation(rddArrObj, RepresentationHandler.RDD_ARR_OBJECT.getTypeSpecsString)
       }

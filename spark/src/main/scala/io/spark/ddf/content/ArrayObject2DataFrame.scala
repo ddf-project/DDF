@@ -24,7 +24,7 @@ class ArrayObject2SchemaRDD(@transient ddf: DDF) extends ConvertFunction(ddf) {
         }
         val schema = StructType(ddf.getSchemaHandler.getColumns.map(col => ArrayObject2SchemaRDD.column2StructField(col)))
         val schemaRDD = ddf.getManager.asInstanceOf[SparkDDFManager].getHiveContext.applySchema(rddRow, schema)
-        new Representation(schemaRDD, RepresentationHandler.SCHEMARDD.getTypeSpecsString)
+        new Representation(schemaRDD, RepresentationHandler.DATAFRAME.getTypeSpecsString)
       }
     }
   }

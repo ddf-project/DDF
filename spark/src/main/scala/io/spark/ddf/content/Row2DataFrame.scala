@@ -10,7 +10,7 @@ import io.spark.ddf.SparkDDFManager
 
 /**
   */
-class Row2SchemaRDD(@transient ddf: DDF) extends ConvertFunction(ddf) {
+class Row2DataFrame(@transient ddf: DDF) extends ConvertFunction(ddf) {
 
   override def apply(representation: Representation): Representation = {
     representation.getValue match {

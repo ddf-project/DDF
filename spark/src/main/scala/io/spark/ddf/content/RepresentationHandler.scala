@@ -15,7 +15,7 @@ import io.ddf.content.{ RepresentationHandler ⇒ RH, Representation }
 import org.rosuda.REngine._
 import io.ddf._
 import io.ddf.types.TupleMatrixVector
-import org.apache.spark.sql.SchemaRDD
+import org.apache.spark.sql.{DataFrame, SchemaRDD}
 import org.apache.spark.sql.catalyst.expressions.Row
 
 /**
@@ -35,11 +35,11 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   this.addConvertFunction(RDD_ROW, RDD_ARR_OBJECT, new RDDRow2ArrayObject(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_ARR_DOUBLE, new RDDRow2ArrayDouble(this.mDDF))
   this.addConvertFunction(RDD_ARR_DOUBLE, RDD_VECTOR, new ArrayDouble2Vector(this.mDDF))
-  this.addConvertFunction(RDD_ARR_OBJECT, SCHEMARDD, new ArrayObject2SchemaRDD(this.mDDF))
+  this.addConvertFunction(RDD_ARR_OBJECT, DATAFRAME, new ArrayObject2DataFrame(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_REXP, new RDDROW2REXP(this.mDDF))
-  this.addConvertFunction(SCHEMARDD, RDD_MATRIX_VECTOR, new SchemaRDD2MatrixVector(this.mDDF))
-  this.addConvertFunction(RDD_ROW, SCHEMARDD, new Row2SchemaRDD(this.mDDF))
-  this.addConvertFunction(SCHEMARDD, RDD_ROW, new SchemaRDD2RDDRow(this.mDDF))
+  this.addConvertFunction(DATAFRAME, RDD_MATRIX_VECTOR, new DataFrame2MatrixVector(this.mDDF))
+  this.addConvertFunction(RDD_ROW, DATAFRAME, new Row2DataFrame(this.mDDF))
+  this.addConvertFunction(DATAFRAME, RDD_ROW, new DataFrame2RDDRow(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_RATING, new Row2Rating(this.mDDF))
 
   override def getDefaultDataType: Array[Class[_]] = Array(classOf[RDD[_]], classOf[Array[Object]])
@@ -94,7 +94,7 @@ object RepresentationHandler {
   val RDD_LABELED_POINT = new Representation(classOf[RDD[_]], classOf[LabeledPoint])
   val RDD_MATRIX_VECTOR = new Representation(classOf[RDD[_]], classOf[TupleMatrixVector])
   val RDD_REXP = new Representation(classOf[RDD[_]], classOf[REXP])
-  val SCHEMARDD = new Representation(classOf[SchemaRDD])
+  val DATAFRAME = new Representation(classOf[DataFrame])
   val RDD_ROW = new Representation(classOf[RDD[_]], classOf[Row])
   val RDD_VECTOR = new Representation(classOf[RDD[_]], classOf[Vector])
   val RDD_RATING = new Representation(classOf[RDD[_]], classOf[Rating])

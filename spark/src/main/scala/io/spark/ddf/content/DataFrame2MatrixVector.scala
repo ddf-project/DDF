@@ -14,7 +14,7 @@ import org.apache.spark.sql.SchemaRDD
 
 /**
   */
-class SchemaRDD2MatrixVector(@transient ddf: DDF) extends ConvertFunction(ddf) {
+class DataFrame2MatrixVector(@transient ddf: DDF) extends ConvertFunction(ddf) {
 
   override def apply(representation: Representation): Representation = {
     val columns = ddf.getSchemaHandler.getColumns

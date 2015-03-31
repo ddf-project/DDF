@@ -8,7 +8,7 @@ import org.apache.spark.rdd.RDD
 
 /**
  */
-class SchemaRDD2RDDRow(@transient ddf: DDF) extends ConvertFunction(ddf){
+class DataFrame2RDDRow(@transient ddf: DDF) extends ConvertFunction(ddf){
 
   override def apply(representation: Representation): Representation = {
     representation.getValue match {

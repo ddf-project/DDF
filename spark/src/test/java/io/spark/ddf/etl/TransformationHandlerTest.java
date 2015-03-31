@@ -149,7 +149,10 @@ public class TransformationHandlerTest extends BaseTest {
         TransformationHandler.RToSqlUdf(s1));
     Assert.assertEquals("(if(arrdelay=\"yes\",1,0)) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
     Assert.assertEquals("(case origin when \'SFO\' then 1 else 0 end) as origin_sfo", TransformationHandler.RToSqlUdf(s3));
-
+    ddf.getColumnNames().size();
+    for(String col: ddf.getColumnNames()) {
+      System.out.println(">>> col=" + col);
+    }
     DDF ddf2 = ddf.Transform.transformUDF(s1, lcols);
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(7, ddf2.getNumColumns());
