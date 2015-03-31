@@ -122,25 +122,24 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(10, ddf.getSummary().length);
 
     // specifying selected column list
-    List<String> cols = Lists.newArrayList("distance", "arrtime", "deptime");
+    List<String> cols = Lists.newArrayList("distance", "arrtime", "deptime", "arrdelay");
 
     ddf = ddf.Transform.transformUDF("speed = distance/(arrtime-deptime)", cols);
     Assert.assertEquals(31, ddf.getNumRows());
-    Assert.assertEquals(4, ddf.getNumColumns());
-    Assert.assertEquals("speed", ddf.getColumnName(3));
-
+    Assert.assertEquals(5, ddf.getNumColumns());
+    Assert.assertEquals("speed", ddf.getColumnName(4));
     ddf.setMutable(false);
 
     // multiple expressions, column name with special characters
     DDF ddf3 = ddf.Transform.transformUDF("arrtime-deptime, (speed^*- = distance/(arrtime-deptime)", cols);
     Assert.assertEquals(31, ddf3.getNumRows());
-    Assert.assertEquals(5, ddf3.getNumColumns());
-    Assert.assertEquals("speed", ddf3.getColumnName(4));
-    Assert.assertEquals(5, ddf3.getSummary().length);
+    Assert.assertEquals(6, ddf3.getNumColumns());
+    Assert.assertEquals("speed", ddf3.getColumnName(5));
+    Assert.assertEquals(6, ddf3.getSummary().length);
 
     // transform using if else/case when
 
-    List<String> lcols = Lists.newArrayList("distance", "arrtime", "deptime", "arrdelay");
+    List<String> lcols = Lists.newArrayList("distance", "arrtime", "deptime");
     String s0 = "new_col = if(arrdelay=15,1,0)";
     String s1 = "new_col = if(arrdelay=15,1,0),v ~ (arrtime-deptime),distance/(arrtime-deptime)";
     String s2 = "arr_delayed=if(arrdelay=\"yes\",1,0)";
@@ -149,12 +148,8 @@ public class TransformationHandlerTest extends BaseTest {
         TransformationHandler.RToSqlUdf(s1));
     Assert.assertEquals("(if(arrdelay=\"yes\",1,0)) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
     Assert.assertEquals("(case origin when \'SFO\' then 1 else 0 end) as origin_sfo", TransformationHandler.RToSqlUdf(s3));
-    ddf.getColumnNames().size();
-    for(String col: ddf.getColumnNames()) {
-      System.out.println(">>> col=" + col);
-    }
     DDF ddf2 = ddf.Transform.transformUDF(s1, lcols);
     Assert.assertEquals(31, ddf2.getNumRows());
-    Assert.assertEquals(7, ddf2.getNumColumns());
+    Assert.assertEquals(6, ddf2.getNumColumns());
   }
 }
