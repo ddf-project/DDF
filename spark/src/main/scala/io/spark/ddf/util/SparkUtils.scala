@@ -3,7 +3,7 @@ package io.spark.ddf.util
 import java.util.{Map => JMap}
 import scala.collection.JavaConverters._
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.SchemaRDD
+import org.apache.spark.sql.DataFrame
 import io.ddf.content.Schema
 import scala.collection.mutable.ArrayBuffer
 import java.util.{List => JList}
@@ -43,7 +43,7 @@ object SparkUtils {
     new SparkContext(conf)
   }
 
-  def schemaFromSchemaRDD(schemaRDD: SchemaRDD): Schema = {
+  def schemaFromDataFrame(schemaRDD: DataFrame): Schema = {
     val schema = schemaRDD.schema
     val cols: ArrayList[Column] = Lists.newArrayList();
     for(field <- schema.fields) {

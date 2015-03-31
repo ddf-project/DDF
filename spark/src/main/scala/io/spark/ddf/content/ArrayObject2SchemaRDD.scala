@@ -9,10 +9,8 @@ import org.apache.spark.sql.SchemaRDD
 import io.ddf.content.Schema.{ColumnType, Column}
 import org.apache.spark.sql.types.StructType
 import scala.collection.JavaConversions._
-import org.apache.spark.sql.execution.{SparkPlan, SparkLogicalPlan, ExistingRdd}
 import org.apache.spark.sql.types._
 import scala.collection.mutable.ArrayBuffer
-import org.apache.spark.sql.catalyst.expressions.AttributeReference
 
 /**
   */

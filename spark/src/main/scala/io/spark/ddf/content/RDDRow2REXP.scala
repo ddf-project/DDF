@@ -4,9 +4,9 @@ import io.ddf.DDF
 import io.ddf.content.{Representation, ConvertFunction}
 import org.apache.spark.rdd.RDD
 import io.spark.ddf.{SparkDDFManager, SparkDDF}
-import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.sql.Row
 import io.ddf.content.Schema.{ColumnType, Column}
-import org.apache.spark.sql.catalyst.types.StructField
+import org.apache.spark.sql.types.StructField
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 import org.rosuda.REngine._

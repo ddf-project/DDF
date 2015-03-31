@@ -13,8 +13,8 @@ import io.spark.ddf.SparkDDF;
 import io.spark.ddf.SparkDDFManager;
 import io.spark.ddf.content.SchemaHandler;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.SchemaRDD;
-import org.apache.spark.sql.catalyst.expressions.Row;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 import scala.collection.Seq;
 
@@ -48,9 +48,9 @@ public class SqlHandler extends ASqlHandler {
       mLog.info(">>>>>> get table for ddf");
       DDF ddf = this.getManager().getDDF(tableName);
       if (ddf != null) {
-        SchemaRDD rdd = (SchemaRDD) ddf.getRepresentationHandler().get(SchemaRDD.class);
+        DataFrame rdd = (DataFrame) ddf.getRepresentationHandler().get(DataFrame.class);
         if (rdd == null) {
-          throw new DDFException("Error getting SchemaRDD");
+          throw new DDFException("Error getting DataFrame");
         }
         ((SparkDDF) ddf).cacheTable();
       }
@@ -90,7 +90,7 @@ public class SqlHandler extends ASqlHandler {
   public DDF sql2ddf(String command, Schema schema, String dataSource, DataFormat dataFormat) throws DDFException {
     //    TableRDD tableRdd = null;
     //    RDD<Row> rddRow = null;
-    SchemaRDD rdd = null;
+    DataFrame rdd = null;
     // TODO: handle other dataSources and dataFormats
 
     String tableName = this.getDDF().getSchemaHandler().newTableName();
@@ -116,19 +116,19 @@ public class SqlHandler extends ASqlHandler {
     } else {
       // TODO
     }
-    if (schema == null) schema = SchemaHandler.getSchemaFromSchemaRDD(rdd);
+    if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
 
     if (tableName != null) {
       schema.setTableName(tableName);
     }
 
-    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {SchemaRDD.class}, null,
+    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
         tableName, schema);
     ((SparkDDF) ddf).cacheTable();
 
-    //get RDD<Row> from the cacheTable SchemaRDD is faster than recompute from reading from disk.
-    //and more memory efficient than cache the original SchemaRDD
-    RDD<Row> rddRow = this.getHiveContext().sql(String.format("select * from %s", ddf.getTableName()));
+    //get RDD<Row> from the cacheTable DataFrame is faster than recompute from reading from disk.
+    //and more memory efficient than cache the original DataFrame
+    RDD<Row> rddRow = (this.getHiveContext().sql(String.format("select * from %s", ddf.getTableName()))).rdd();
     ddf.getRepresentationHandler().add(rddRow, RDD.class, Row.class);
     this.getManager().addDDF(ddf);
     return ddf;
@@ -172,7 +172,7 @@ public class SqlHandler extends ASqlHandler {
         this.createTableForDDF(ddfTableNameFromQuery);
       }
     }
-    SchemaRDD rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
+    DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
     Row[] arrRow = rdd.collect();
     List<String> lsString = new ArrayList<String>();
 
