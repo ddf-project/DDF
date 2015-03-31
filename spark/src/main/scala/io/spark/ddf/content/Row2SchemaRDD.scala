@@ -3,8 +3,8 @@ package io.spark.ddf.content
 import io.ddf.DDF
 import io.ddf.content.{Representation, ConvertFunction}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.catalyst.expressions.Row
-import org.apache.spark.sql.catalyst.types.StructType
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.StructType
 import scala.collection.JavaConversions._
 import io.spark.ddf.SparkDDFManager
 

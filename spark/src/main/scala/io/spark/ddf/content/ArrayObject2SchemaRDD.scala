@@ -4,13 +4,13 @@ import io.ddf.DDF
 import io.ddf.content.{Representation, ConvertFunction}
 import org.apache.spark.rdd.RDD
 import io.spark.ddf.{SparkDDFManager, SparkDDF}
-import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.sql.Row
 import org.apache.spark.sql.SchemaRDD
 import io.ddf.content.Schema.{ColumnType, Column}
-import org.apache.spark.sql.catalyst.types.StructType
+import org.apache.spark.sql.types.StructType
 import scala.collection.JavaConversions._
 import org.apache.spark.sql.execution.{SparkPlan, SparkLogicalPlan, ExistingRdd}
-import org.apache.spark.sql.catalyst.types._
+import org.apache.spark.sql.types._
 import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.sql.catalyst.expressions.AttributeReference
 

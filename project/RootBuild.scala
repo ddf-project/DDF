@@ -237,6 +237,7 @@ object RootBuild extends Build {
     dependencyOverrides += "org.codehaus.jackson" % "jackson-jaxrs" % "1.8.8",
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4",
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.4.4",
+    dependencyOverrides += "com.google.code.findbugs" % "jsr305" % "2.0.1",
     dependencyOverrides += "com.thoughtworks.paranamer" % "paranamer" % "2.4.1", //net.liftweb conflict with avro
     dependencyOverrides += "org.xerial.snappy" % "snappy-java" % "1.0.5", //spark-core conflicts with avro
     dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.1.4",
