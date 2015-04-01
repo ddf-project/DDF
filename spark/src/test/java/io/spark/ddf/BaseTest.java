@@ -44,6 +44,16 @@ public class BaseTest {
 
   }
 
+  public void createTableSmiths2() throws DDFException {
+    manager.sql2txt("drop table if exists smiths2");
+
+    manager.sql2txt("create table smiths2 (subject string, variable string, value double) "
+        + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','");
+
+    manager.sql2txt("load data local inpath '../resources/test/smiths2' into table smiths2");
+
+  }
+
   public void createTableAirlineWithNA() throws DDFException {
     manager.sql2txt("drop table if exists airline");
 
