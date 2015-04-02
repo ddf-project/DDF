@@ -46,32 +46,26 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
         Summary[] result = new Summary[dim];
         for (int i = 0; i < dim; i++) {
           Summary s = new Summary();
-          if (null == p[i]) {
-            result[i] = null;
-          } else {
-            if (p[i] instanceof Double) {
-              Double a = (Double) p[i];
-              result[i] = s.merge(a);
-            } else if (p[i] instanceof Integer) {
-              Double a = Double.parseDouble(p[i].toString());
-              result[i] = s.merge(a);
-            } else if (p[i] instanceof Float) {
-              Double a = Double.parseDouble(p[i].toString());
-              result[i] = s.merge(a);
-            } else if (p[i] != null) {
-              String str = p[i].toString();
-              if (str.trim().equalsIgnoreCase("NA")) {
-                result[i] = new Summary();
-                result[i].setNACount(1);
+          if(p[i] == null) {
+            result[i] = new Summary();
+            result[i].setNACount(1);
+          } else if (p[i] instanceof Double) {
+            Double a = (Double) p[i];
+            result[i] = s.merge(a);
+          } else if (p[i] instanceof Integer) {
+            Double a = Double.parseDouble(p[i].toString());
+            result[i] = s.merge(a);
+          } else if (p[i] != null) {
+            String str = p[i].toString();
+            if (str.trim().equalsIgnoreCase("NA")) {
+              result[i] = new Summary();
+              result[i].setNACount(1);
+            } else {
+              if (NumberUtils.isNumber(str)) {
+                double number = Double.parseDouble(str);
+                s.merge(number);
               } else {
-                double number = 0.0;
-
-                if (NumberUtils.isNumber(str)) {
-                  number = Double.parseDouble(str);
-                  s.merge(number);
-                } else {
-                  result[i] = null;
-                }
+                result[i] = null;
               }
             }
           }
