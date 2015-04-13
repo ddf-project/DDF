@@ -129,6 +129,11 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
   void remove(Class<?>... typeSpecs);
 
   /**
+   * Cache a representation in memory
+   */
+  void cache();
+
+  /**
    * Cache all representations, e.g., in an in-memory context
    */
   void cacheAll();
