@@ -48,11 +48,7 @@ public class SqlHandler extends ASqlHandler {
       mLog.info(">>>>>> get table for ddf");
       DDF ddf = this.getManager().getDDF(tableName);
       if (ddf != null) {
-        SchemaRDD rdd = (SchemaRDD) ddf.getRepresentationHandler().get(SchemaRDD.class);
-        if (rdd == null) {
-          throw new DDFException("Error getting SchemaRDD");
-        }
-        ((SparkDDF) ddf).cacheTable();
+        ((SparkDDF) ddf).saveAsTable();
       }
     } catch (Exception e) {
       mLog.info(">>>> Exception e.message = " + e.getMessage());
@@ -111,7 +107,6 @@ public class SqlHandler extends ASqlHandler {
     }
 
     if (dataSource == null) {
-
       rdd = this.getHiveContext().sql(command);
     } else {
       // TODO
@@ -124,12 +119,8 @@ public class SqlHandler extends ASqlHandler {
 
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {SchemaRDD.class}, null,
         tableName, schema);
-    ((SparkDDF) ddf).cacheTable();
+    ((SparkDDF) ddf).saveAsTable();
 
-    //get RDD<Row> from the cacheTable SchemaRDD is faster than recompute from reading from disk.
-    //and more memory efficient than cache the original SchemaRDD
-    RDD<Row> rddRow = this.getHiveContext().sql(String.format("select * from %s", ddf.getTableName()));
-    ddf.getRepresentationHandler().add(rddRow, RDD.class, Row.class);
     this.getManager().addDDF(ddf);
     return ddf;
   }
