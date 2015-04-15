@@ -12,7 +12,7 @@ public class MutabilityHandler extends ADDFFunctionalGroupHandler implements IHa
     // TODO Auto-generated constructor stub
   }
 
-  private boolean isMutable = false;
+  private boolean isMutable = true;
 
   @Override
   public boolean isMutable() {
