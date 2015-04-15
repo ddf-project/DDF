@@ -29,8 +29,8 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     // Prepare data as REXP objects
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
 
-	// RSession to use
-	val rsess = Rsession.newInstanceTry(mLog);
+    // RSession to use
+    val rsess = Rsession.newInstanceTry(mLog);
 
     // 1. map!
     val rMapped = dfrdd.map {
@@ -101,7 +101,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
         try {
           // send the df.partition to R process environment
           val dfvarname = "df.partition"
-		  rsess.set(dfvarname, partdf)
+          rsess.set(dfvarname, partdf)
 
           val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpression)
 
@@ -112,7 +112,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
           // transfer data to JVM
           val partdfres = rsess.eval(dfvarname)
-		  rsess.rm(dfvarname)
+          rsess.rm(dfvarname)
 
           partdfres
         } catch {
