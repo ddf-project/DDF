@@ -22,15 +22,17 @@ import io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
 import io.ddf.exception.DDFException
 import io.spark.ddf.SparkDDF
 
+import java.io.PrintStream
+import com.google.api.client.util.LoggingOutputStream
+
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
+  // Rsession to use
+  val rsess = Rsession.newInstanceTry(new PrintStream(new LoggingOutputStream(mLog, false), true), null)
 
   override def transformMapReduceNative(mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean = true): DDF = {
 
     // Prepare data as REXP objects
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
-
-    // RSession to use
-    val rsess = Rsession.newInstanceTry(mLog);
 
     // 1. map!
     val rMapped = dfrdd.map {
@@ -145,7 +147,7 @@ object TransformationHandler {
    * if fails raise AdataoException with captured R error message.
    * See: http://rforge.net/Rserve/faq.html#errors
    */
-  def tryEval(rsess: RSession, expr: String, errMsgHeader: String) {
+  def tryEval(rsess: Rsession, expr: String, errMsgHeader: String) {
     rsess.set(".tmp.", expr)
     val r = rsess.eval("r <- try(eval(parse(text=.tmp.)), silent=TRUE); if (inherits(r, 'try-error')) r else NULL")
     if (r.inherits("try-error")) throw new DDFException(errMsgHeader + ": " + r.asString())
@@ -154,7 +156,7 @@ object TransformationHandler {
   /**
    * eval the R expr and return all captured output
    */
-  def evalCaptureOutput(rsess: RSession, expr: String): String = {
+  def evalCaptureOutput(rsess: Rsession, expr: String): String = {
     rsess.eval("paste(capture.output(print(" + expr + ")), collapse='\\n')").asString()
   }
 
@@ -177,7 +179,7 @@ object TransformationHandler {
   /**
    * Perform map and mapsideCombine phase
    */
-  def preShuffleMapper(rsess: RSession, partdf: REXP, mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean): REXP = {
+  def preShuffleMapper(rsess: Rsession, partdf: REXP, mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean): REXP = {
 
     // send the df.partition to R process environment
     rsess.set("df.partition", partdf)
@@ -317,7 +319,7 @@ object TransformationHandler {
    * serialize data to R, perform reduce,
    * then assemble each resulting partition as a data.frame of REXP in Java
    */
-  def postShufflePartitionMapper(rsess: RSession, input: Iterator[(String, Iterable[REXP])], reduceFuncDef: String): Iterator[REXP] = {
+  def postShufflePartitionMapper(rsess: Rsession, input: Iterator[(String, Iterable[REXP])], reduceFuncDef: String): Iterator[REXP] = {
     // pre-amble
     // copied from: https://github.com/adatao/RClient/blob/master/io.pa/R/mapreduce.R
     // tests: https://github.com/adatao/RClient/blob/mapreduce/io.pa/inst/tests/test-mapreduce.r#L238
