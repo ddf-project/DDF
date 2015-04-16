@@ -59,7 +59,12 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
 
   private def forAllReps[T](f: RDD[_] ⇒ Any) {
     mReps.foreach {
-      kv ⇒ if (kv._2 != null) f(kv._2.asInstanceOf[RDD[_]])
+      kv ⇒ if (kv._2 != null) {
+        kv._2.getValue match {
+          case rdd: RDD[_] => f(rdd)
+          case _           =>
+        }
+      } //f(kv._2.asInstanceOf[RDD[_]])
     }
   }
 
@@ -77,8 +82,16 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
     forAllReps({
       rdd: RDD[_] ⇒
         if (rdd != null) {
-          mLog.info(this.getClass() + ": Unpersisting " + rdd)
-          rdd.unpersist(false)
+          rdd match {
+            case schemaRDD: SchemaRDD => if(schemaRDD.sqlContext.lookupCachedData(schemaRDD).nonEmpty) {
+              mLog.info(this.getClass() + ": Unpersisting " + schemaRDD.toString())
+              schemaRDD.unpersist(false)
+            }
+            case rd: RDD[_] =>   {
+              mLog.info(this.getClass() + ": Unpersisting " + rd.toString())
+              rd.unpersist(false)
+            }
+          }
         }
     })
   }
