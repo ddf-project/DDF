@@ -134,9 +134,14 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val manager = this.getManager
     val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]], classOf[REXP]), manager.getNamespace, null, newSchema)
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
-    ddf.getMetaDataHandler.copyFactor(this.getDDF)
-    manager.addDDF(ddf)
-    ddf
+
+    if(this.getDDF.isMutable) {
+      return this.getDDF.updateInplace(ddf)
+    } else {
+      ddf.getMetaDataHandler.copyFactor(this.getDDF)
+      manager.addDDF(ddf)
+      ddf
+    }
   }
 
 }
