@@ -52,18 +52,15 @@ public class BinningHandlerTest extends BaseTest {
       }
     }
 
-    // test mutable binning
-    ddf.setMutable(true);
-    ddf.binning("distance", "EQUALINTERVAL", 3, null, true, true);
-    Assert.assertEquals(ColumnClass.FACTOR, ddf.getSchemaHandler().getColumn("distance").getColumnClass());
-
-    Assert.assertEquals(3, ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().size());
-    Assert.assertEquals("[162,869]", ddf.VIEWS.head(3).get(0).split("\t")[6]);
-    System.out.println(">>>>>NEW 1st ROW"
-        + ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().keySet().toString());// [162,869],
-                                                                                                              // (869,1576],
-                                                                                                              // (1576,2283]
-
+//    // test mutable binning
+//    ddf.setMutable(true);
+//    ddf.binning("distance", "EQUALINTERVAL", 3, null, true, true);
+//    Assert.assertEquals(ColumnClass.FACTOR, ddf.getSchemaHandler().getColumn("distance").getColumnClass());
+//
+//    Assert.assertEquals(3, ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().size());
+//    Assert.assertEquals("[162,869]", ddf.VIEWS.head(3).get(0).split("\t")[6]);
+//    System.out.println(">>>>>NEW 1st ROW"
+//        + ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().keySet().toString());// [162,869],
   }
 
   public static MetaInfo[] generateMetaInfo(Schema schema) throws DDFException {
