@@ -22,12 +22,7 @@ import io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
 import io.ddf.exception.DDFException
 import io.spark.ddf.SparkDDF
 
-import java.io.PrintStream
-import com.google.api.client.util.LoggingOutputStream
-
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
-  // Rsession to use
-  val rsess = Rsession.newInstanceTry(new PrintStream(new LoggingOutputStream(mLog, false), true), null)
 
   override def transformMapReduceNative(mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean = true): DDF = {
 
@@ -36,6 +31,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     // 1. map!
     val rMapped = dfrdd.map {
+      val rsess = Rsession.newInstanceTry(System.out, null)
       partdf ⇒
         try {
           TransformationHandler.preShuffleMapper(rsess, partdf, mapFuncDef, reduceFuncDef, mapsideCombine)
@@ -58,6 +54,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     // 3. reduce!
     val rReduced = groupped.mapPartitions {
+      val rsess = Rsession.newInstanceTry(System.out, null)
       partdf ⇒
         try {
           TransformationHandler.postShufflePartitionMapper(rsess, partdf, reduceFuncDef)
@@ -99,6 +96,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     // process each DF partition in R
     val rMapped = dfrdd.map {
+      val rsess = Rsession.newInstanceTry(System.out, null)
       partdf ⇒
         try {
           // send the df.partition to R process environment
@@ -113,7 +111,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
           TransformationHandler.tryEval(rsess, expr, errMsgHeader = "failed to eval transform expression")
 
           // transfer data to JVM
-          val partdfres = rsess.eval(dfvarname)
+          val partdfres: REXP = rsess.eval(dfvarname)
           rsess.rm(dfvarname)
 
           partdfres

@@ -191,7 +191,6 @@ object RootBuild extends Build {
       "org.slf4j" % "slf4j-api" % slf4jVersion,
       "org.slf4j" % "slf4j-log4j12" % slf4jVersion,
       "commons-configuration" % "commons-configuration" % "1.6",
-      "com.google.api-client" % "api-client" % "1.18.0-rc",
       "com.google.guava" % "guava" % "14.0.1",
       "com.google.code.gson"% "gson" % "2.2.2",
       //"org.scalatest" % "scalatest_2.10" % "2.1.0" % "test",
