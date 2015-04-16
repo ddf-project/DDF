@@ -19,13 +19,9 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
 
     DDF newddf = binningImpl(column, binningType, numBins, breaks, includeLowest, right);
 
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      this.getManager().addDDF(newddf);
-      newddf.getMetaDataHandler().copyFactor(this.getDDF());
-      return newddf;
-    }
+    this.getManager().addDDF(newddf);
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+    return newddf;
   }
 
   public abstract DDF binningImpl(String column, String binningType, int numBins, double[] breaks,

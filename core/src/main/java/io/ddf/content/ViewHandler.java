@@ -115,13 +115,9 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
     DDF newddf = this.project(columns);
 
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      this.getManager().addDDF(newddf);
-      newddf.getMetaDataHandler().copyFactor(this.getDDF());
-      return newddf;
-    }
+    this.getManager().addDDF(newddf);
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+    return newddf;
   }
 
   // ///// Execute SQL command on the DDF ///////
