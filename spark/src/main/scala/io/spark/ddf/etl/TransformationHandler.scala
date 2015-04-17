@@ -13,7 +13,7 @@ import org.rosuda.REngine.REXPList
 import org.rosuda.REngine.REXPLogical
 import org.rosuda.REngine.REXPString
 import org.rosuda.REngine.RList
-import org.rosuda.REngine.Rserve.RConnection
+import org.math.R.Rsession;
 
 import io.ddf.DDF
 import io.ddf.content.Schema
@@ -31,9 +31,10 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     // 1. map!
     val rMapped = dfrdd.map {
+      val rsess = Rsession.newInstanceTry(System.out, null)
       partdf ⇒
         try {
-          TransformationHandler.preShuffleMapper(partdf, mapFuncDef, reduceFuncDef, mapsideCombine)
+          TransformationHandler.preShuffleMapper(rsess, partdf, mapFuncDef, reduceFuncDef, mapsideCombine)
         } catch {
           case e: Exception ⇒ {
 
@@ -53,9 +54,10 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     // 3. reduce!
     val rReduced = groupped.mapPartitions {
+      val rsess = Rsession.newInstanceTry(System.out, null)
       partdf ⇒
         try {
-          TransformationHandler.postShufflePartitionMapper(partdf, reduceFuncDef)
+          TransformationHandler.postShufflePartitionMapper(rsess, partdf, reduceFuncDef)
         } catch {
           case e: Exception ⇒ {
             e match {
@@ -94,28 +96,23 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     // process each DF partition in R
     val rMapped = dfrdd.map {
+      val rsess = Rsession.newInstanceTry(System.out, null)
       partdf ⇒
         try {
-          // one connection for each compute job
-          val rconn = new RConnection()
-
           // send the df.partition to R process environment
           val dfvarname = "df.partition"
-          rconn.assign(dfvarname, partdf)
+          rsess.set(dfvarname, partdf)
 
           val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpression)
 
           // mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
 
           // compute!
-          TransformationHandler.tryEval(rconn, expr, errMsgHeader = "failed to eval transform expression")
+          TransformationHandler.tryEval(rsess, expr, errMsgHeader = "failed to eval transform expression")
 
           // transfer data to JVM
-          val partdfres = rconn.eval(dfvarname)
-
-          // uncomment this to print whole content of the df.partition for debug
-          // rconn.voidEval(String.format("print(%s)", dfvarname))
-          rconn.close()
+          val partdfres: REXP = rsess.eval(dfvarname)
+          rsess.rm(dfvarname)
 
           partdfres
         } catch {
@@ -144,21 +141,21 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 object TransformationHandler {
 
   /**
-   * Eval the expr in rconn, if succeeds return null (like rconn.voidEval),
+   * Eval the expr in rsess, if succeeds return null (like rsess.voidEval),
    * if fails raise AdataoException with captured R error message.
    * See: http://rforge.net/Rserve/faq.html#errors
    */
-  def tryEval(rconn: RConnection, expr: String, errMsgHeader: String) {
-    rconn.assign(".tmp.", expr)
-    val r = rconn.eval("r <- try(eval(parse(text=.tmp.)), silent=TRUE); if (inherits(r, 'try-error')) r else NULL")
+  def tryEval(rsess: Rsession, expr: String, errMsgHeader: String) {
+    rsess.set(".tmp.", expr)
+    val r = rsess.eval("r <- try(eval(parse(text=.tmp.)), silent=TRUE); if (inherits(r, 'try-error')) r else NULL")
     if (r.inherits("try-error")) throw new DDFException(errMsgHeader + ": " + r.asString())
   }
 
   /**
    * eval the R expr and return all captured output
    */
-  def evalCaptureOutput(rconn: RConnection, expr: String): String = {
-    rconn.eval("paste(capture.output(print(" + expr + ")), collapse='\\n')").asString()
+  def evalCaptureOutput(rsess: Rsession, expr: String): String = {
+    rsess.eval("paste(capture.output(print(" + expr + ")), collapse='\\n')").asString()
   }
 
   def RDataFrameToColumnList(rdd: RDD[REXP]): Array[Column] = {
@@ -180,24 +177,22 @@ object TransformationHandler {
   /**
    * Perform map and mapsideCombine phase
    */
-  def preShuffleMapper(partdf: REXP, mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean): REXP = {
-    // one connection for each compute job
-    val rconn = new RConnection()
+  def preShuffleMapper(rsess: Rsession, partdf: REXP, mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean): REXP = {
 
     // send the df.partition to R process environment
-    rconn.assign("df.partition", partdf)
-    rconn.assign("mapside.combine", new REXPLogical(mapsideCombine))
+    rsess.set("df.partition", partdf)
+    rsess.set("mapside.combine", new REXPLogical(mapsideCombine))
 
-    TransformationHandler.tryEval(rconn, "map.func <- " + mapFuncDef,
+    TransformationHandler.tryEval(rsess, "map.func <- " + mapFuncDef,
       errMsgHeader = "fail to eval map.func definition")
-    TransformationHandler.tryEval(rconn, "combine.func <- " + reduceFuncDef,
+    TransformationHandler.tryEval(rsess, "combine.func <- " + reduceFuncDef,
       errMsgHeader = "fail to eval combine.func definition")
 
     // pre-amble to define internal functions
     // copied from: https://github.com/adatao/RClient/blob/master/io.pa/R/mapreduce.R
     // tests: https://github.com/adatao/RClient/blob/mapreduce/io.pa/inst/tests/test-mapreduce.r#L106
     // should consider some packaging to synchroncize code
-    rconn.voidEval(
+    rsess.voidEval(
       """
         |#' Emit keys and values for map/reduce.
         |keyval <- function(key, val) {
@@ -289,14 +284,11 @@ object TransformationHandler {
       """.stripMargin)
 
     // map!
-    TransformationHandler.tryEval(rconn, "pre.shuffle.result <- do.pre.shuffle(df.partition, map.func, combine.func, mapside.combine, debug=T)",
+    TransformationHandler.tryEval(rsess, "pre.shuffle.result <- do.pre.shuffle(df.partition, map.func, combine.func, mapside.combine, debug=T)",
       errMsgHeader = "fail to apply map.func to data partition")
 
     // transfer pre-shuffle result into JVM
-    val result = rconn.eval("pre.shuffle.result")
-
-    // we will another RConnection because we will now shuffle data
-    rconn.close()
+    val result = rsess.eval("pre.shuffle.result")
 
     result
   }
@@ -325,14 +317,12 @@ object TransformationHandler {
    * serialize data to R, perform reduce,
    * then assemble each resulting partition as a data.frame of REXP in Java
    */
-  def postShufflePartitionMapper(input: Iterator[(String, Iterable[REXP])], reduceFuncDef: String): Iterator[REXP] = {
-    val rconn = new RConnection()
-
+  def postShufflePartitionMapper(rsess: Rsession, input: Iterator[(String, Iterable[REXP])], reduceFuncDef: String): Iterator[REXP] = {
     // pre-amble
     // copied from: https://github.com/adatao/RClient/blob/master/io.pa/R/mapreduce.R
     // tests: https://github.com/adatao/RClient/blob/mapreduce/io.pa/inst/tests/test-mapreduce.r#L238
     // should consider some packaging to synchronize code
-    rconn.voidEval(
+    rsess.voidEval(
       """
         |#' Emit keys and values for map/reduce.
         |keyval <- function(key, val) {
@@ -415,57 +405,54 @@ object TransformationHandler {
         |}
       """.stripMargin)
 
-    TransformationHandler.tryEval(rconn, "reduce.func <- " + reduceFuncDef,
+    TransformationHandler.tryEval(rsess, "reduce.func <- " + reduceFuncDef,
       errMsgHeader = "fail to eval reduce.func definition")
 
-    rconn.voidEval("reductions <- list()")
-    rconn.voidEval("options(stringsAsFactors = F)")
+    rsess.voidEval("reductions <- list()")
+    rsess.voidEval("options(stringsAsFactors = F)")
 
     // we do this in a loop because each of the seqv could potentially be very large
     input.zipWithIndex.foreach {
       case ((k: String, seqv: Seq[_]), i: Int) ⇒
 
         // send data to R to compute reductions
-        rconn.assign("idx", new REXPInteger(i))
-        rconn.assign("reduce.key", k)
-        rconn.assign("reduce.serialized.vvlist", new REXPList(new RList(seqv)))
+        rsess.set("idx", new REXPInteger(i))
+        rsess.set("reduce.key", k)
+        rsess.set("reduce.serialized.vvlist", new REXPList(new RList(seqv)))
 
         // print to Rserve log
-        rconn.voidEval("print(paste('====== processing key = ', reduce.key))")
+        rsess.voidEval("print(paste('====== processing key = ', reduce.key))")
 
-        TransformationHandler.tryEval(rconn, "reduce.vvlist <- lapply(reduce.serialized.vvlist, unserialize)",
+        TransformationHandler.tryEval(rsess, "reduce.vvlist <- lapply(reduce.serialized.vvlist, unserialize)",
           errMsgHeader = "fail to unserialize shuffled values for key = " + k)
 
-        TransformationHandler.tryEval(rconn, "reduce.vv <- rbind.vv(reduce.vvlist)",
+        TransformationHandler.tryEval(rsess, "reduce.vv <- rbind.vv(reduce.vvlist)",
           errMsgHeader = "fail to merge (using rbind.vv) shuffled values for key = " + k)
 
         // reduce!
-        TransformationHandler.tryEval(rconn, "reduced.kv <- reduce.func(reduce.key, reduce.vv)",
+        TransformationHandler.tryEval(rsess, "reduced.kv <- reduce.func(reduce.key, reduce.vv)",
           errMsgHeader = "fail to apply reduce func to data partition")
 
         // flatten the nested val list if needed
-        TransformationHandler.tryEval(rconn, "reduced <- handle.reduced.kv(reduced.kv)",
+        TransformationHandler.tryEval(rsess, "reduced <- handle.reduced.kv(reduced.kv)",
           errMsgHeader = "malformed reduce.func output, please run mapreduce.local to test your reduce.func")
 
         // assign reduced item to reductions list
-        rconn.voidEval("if (!is.null(reduced)) { reductions[[idx+1]] <- reduced } ")
+        rsess.voidEval("if (!is.null(reduced)) { reductions[[idx+1]] <- reduced } ")
     }
 
     // bind the reduced rows together, it contains rows of the resulting BigDataFrame
-    TransformationHandler.tryEval(rconn, "reduced.partition <- do.call(rbind.data.frame, reductions)",
+    TransformationHandler.tryEval(rsess, "reduced.partition <- do.call(rbind.data.frame, reductions)",
       errMsgHeader = "fail to use rbind.data.frame on reductions list, reduce.func cannot be combined as a BigDataFrame")
 
     // remove weird row names
-    rconn.voidEval("rownames(reduced.partition) <- NULL")
+    rsess.voidEval("rownames(reduced.partition) <- NULL")
 
     // transfer reduced data back to JVM
-    val result = rconn.eval("reduced.partition")
+    val result = rsess.eval("reduced.partition")
 
     // print to Rserve log
-    rconn.voidEval("print('==== reduce phase completed')")
-
-    // done R computation for this partition
-    rconn.close()
+    rsess.voidEval("print('==== reduce phase completed')")
 
     // wrap it on a Iterator to satisfy mapPartitions
     Iterator.single(result)
