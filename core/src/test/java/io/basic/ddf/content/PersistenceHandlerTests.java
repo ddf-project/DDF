@@ -10,6 +10,7 @@ import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.Config.ConfigConstant;
 import junit.framework.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -36,7 +37,7 @@ public class PersistenceHandlerTests {
     }
   }
 
-  @Test
+  @Ignore
   public void testPersistDDF() throws Exception {
     DDFManager manager = DDFManager.get("basic");
     DDF ddf = manager.newDDF();
