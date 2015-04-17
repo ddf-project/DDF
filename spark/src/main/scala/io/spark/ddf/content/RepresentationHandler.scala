@@ -4,6 +4,8 @@
 package io.spark.ddf.content
 
 import java.lang.Class
+import io.spark.ddf.{SparkDDFManager, SparkDDF}
+
 import scala.reflect.Manifest
 import scala.collection.JavaConversions._
 import io.spark.ddf.content.RepresentationHandler._
@@ -66,6 +68,16 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
         }
       } //f(kv._2.asInstanceOf[RDD[_]])
     }
+  }
+
+  /**
+   * Cache SchemaRDD in memory
+   * */
+  override def cache = {
+    val ddf = this.getDDF.asInstanceOf[SparkDDF]
+    ddf.saveAsTable()
+    val schemaRDD = ddf.getRepresentationHandler.get(classOf[SchemaRDD]).asInstanceOf[SchemaRDD]
+    schemaRDD.persist()
   }
 
   override def cacheAll = {
