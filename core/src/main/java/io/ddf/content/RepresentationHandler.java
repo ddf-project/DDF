@@ -303,6 +303,11 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
+  public void cache() {
+
+  }
+
+  @Override
   public void cacheAll() {
     // TODO Auto-generated method stub
 
