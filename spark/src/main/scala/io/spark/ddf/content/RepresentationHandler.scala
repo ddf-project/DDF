@@ -83,9 +83,10 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
       rdd: RDD[_] ⇒
         if (rdd != null) {
           rdd match {
-            case schemaRDD: SchemaRDD => if(schemaRDD.sqlContext.lookupCachedData(schemaRDD).nonEmpty) {
-              mLog.info(this.getClass() + ": Unpersisting " + schemaRDD.toString())
-              schemaRDD.unpersist(false)
+            case dataFrame: DataFrame => {
+              if(dataFrame.sqlContext.isCached(this.getDDF.getTableName)) {
+                dataFrame.sqlContext.uncacheTable(this.getDDF.getTableName)
+              }
             }
             case rd: RDD[_] =>   {
               mLog.info(this.getClass() + ": Unpersisting " + rd.toString())
