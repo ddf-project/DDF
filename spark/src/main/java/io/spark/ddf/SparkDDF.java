@@ -107,26 +107,6 @@ public class SparkDDF extends DDF {
     }
   }
 
-  public Boolean isCached() {
-    HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
-    return hiveContext.isCached(this.getTableName());
-  }
-
-  public void cacheTable() throws DDFException {
-    this.saveAsTable();
-    HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
-    hiveContext.cacheTable(this.getTableName());
-  }
-
-  public void unCacheTable() {
-    try {
-      HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
-      hiveContext.uncacheTable(this.getTableName());
-    } catch (IllegalArgumentException e) {
-
-    }
-  }
-
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public IGetResult getJavaRDD(Class<?>... acceptableUnitTypes) throws DDFException {
     IGetResult result = this.getRDD(acceptableUnitTypes);

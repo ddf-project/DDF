@@ -52,7 +52,7 @@ public class SqlHandler extends ASqlHandler {
         if (rdd == null) {
           throw new DDFException("Error getting DataFrame");
         }
-        ((SparkDDF) ddf).cacheTable();
+        ((SparkDDF) ddf).saveAsTable();
       }
     } catch (Exception e) {
       mLog.info(">>>> Exception e.message = " + e.getMessage());
@@ -111,7 +111,6 @@ public class SqlHandler extends ASqlHandler {
     }
 
     if (dataSource == null) {
-
       rdd = this.getHiveContext().sql(command);
     } else {
       // TODO
@@ -124,12 +123,8 @@ public class SqlHandler extends ASqlHandler {
 
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
         tableName, schema);
-    ((SparkDDF) ddf).cacheTable();
+    ((SparkDDF) ddf).saveAsTable();
 
-    //get RDD<Row> from the cacheTable DataFrame is faster than recompute from reading from disk.
-    //and more memory efficient than cache the original DataFrame
-    RDD<Row> rddRow = (this.getHiveContext().sql(String.format("select * from %s", ddf.getTableName()))).rdd();
-    ddf.getRepresentationHandler().add(rddRow, RDD.class, Row.class);
     this.getManager().addDDF(ddf);
     return ddf;
   }
