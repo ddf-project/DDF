@@ -81,11 +81,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
 
   public void addDDF(DDF ddf) throws DDFException {
-    if(mDDFs.containsKey(ddf.getUUID())) {
-      throw new DDFException(String.format("DDF with uuid %s already exists", ddf.getUUID()));
-    } else {
-      mDDFs.put(ddf.getUUID(), ddf);
-    }
+    mDDFs.put(ddf.getUUID(), ddf);
   }
 
   public DDF getDDF(String uuid) {
