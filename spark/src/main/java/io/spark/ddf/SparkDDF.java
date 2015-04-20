@@ -88,7 +88,7 @@ public class SparkDDF extends DDF {
     return rdd.toJavaRDD();
   }
 
-  public void saveAsTable() throws DDFException {
+  public void saveAsTable() {
     HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
     Boolean isTable = true;
     try {
@@ -99,7 +99,7 @@ public class SparkDDF extends DDF {
     if (!isTable) {
       SchemaRDD rdd = (SchemaRDD) this.getRepresentationHandler().get(SchemaRDD.class);
       if (rdd == null) {
-        throw new DDFException("Could not create SchemaRDD for ddf");
+        mLog.info("Could not create SchemaRDD for ddf");
       }
       mLog.info(String.format(">>>> register %s as table", this.getTableName()));
       rdd.registerTempTable(this.getTableName());
