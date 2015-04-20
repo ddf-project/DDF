@@ -144,19 +144,13 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
           .newDDF(this.getManager(), result.rdd(), new Class<?>[] { RDD.class, double[].class },
               this.getManager().getNamespace(), null, schema);
 
-      IHandleSchema schemaHandler = resultDDF.getSchemaHandler();
-      resultDDF.getSchema().setTableName(schemaHandler.newTableName());
-
       return resultDDF;
     } else if (Object[].class.equals(resultUnitType)) {
       DDF resultDDF = this.getManager()
           .newDDF(this.getManager(), result.rdd(), new Class<?>[] { RDD.class, Object[].class },
               this.getManager().getNamespace(), null, schema);
-
-      IHandleSchema schemaHandler = resultDDF.getSchemaHandler();
-      resultDDF.getSchema().setTableName(schemaHandler.newTableName());
-
       return resultDDF;
+
     } else return null;
   }
 
