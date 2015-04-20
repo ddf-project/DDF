@@ -43,18 +43,18 @@ public class SqlHandler extends ASqlHandler {
     return ((SparkDDFManager) this.getManager()).getHiveContext();
   }
 
-  protected void createTableForDDF(String tableName) throws DDFException {
-    try {
-      mLog.info(">>>>>> get table for ddf");
-      DDF ddf = this.getManager().getDDF(tableName);
-      if (ddf != null) {
-        ((SparkDDF) ddf).saveAsTable();
-      }
-    } catch (Exception e) {
-      mLog.info(">>>> Exception e.message = " + e.getMessage());
-      throw new DDFException(String.format("Can not create table for DDF %s, " + e.getMessage(), tableName), e);
-    }
-  }
+//  protected void createTableForDDF(String tableName) throws DDFException {
+//    try {
+//      mLog.info(">>>>>> get table for ddf");
+//      DDF ddf = this.getManager().getDDF(tableName);
+//      if (ddf != null) {
+//        ((SparkDDF) ddf).saveAsTable();
+//      }
+//    } catch (Exception e) {
+//      mLog.info(">>>> Exception e.message = " + e.getMessage());
+//      throw new DDFException(String.format("Can not create table for DDF %s, " + e.getMessage(), tableName), e);
+//    }
+//  }
 
   @Override
   public DDF sql2ddf(String command) throws DDFException {
@@ -96,15 +96,15 @@ public class SqlHandler extends ASqlHandler {
      * Find tableName that match the pattern
      * "... from tableName ..."
      */
-    String ddfTableNameFromQuery;
-    Pattern p = Pattern.compile("(?<=.from\\s)([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE);
-    Matcher m = p.matcher(command);
-    mLog.info(">>>>>>> DDF's TableName from query command = " + command);
-    if (m.find()) {
-      ddfTableNameFromQuery = m.group();
-      mLog.info(">>>>>>> DDF's TableName from query = " + ddfTableNameFromQuery);
-      this.createTableForDDF(ddfTableNameFromQuery);
-    }
+//    String ddfTableNameFromQuery;
+//    Pattern p = Pattern.compile("(?<=.from\\s)([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE);
+//    Matcher m = p.matcher(command);
+//    mLog.info(">>>>>>> DDF's TableName from query command = " + command);
+//    if (m.find()) {
+//      ddfTableNameFromQuery = m.group();
+//      mLog.info(">>>>>>> DDF's TableName from query = " + ddfTableNameFromQuery);
+//      this.createTableForDDF(ddfTableNameFromQuery);
+//    }
 
     if (dataSource == null) {
       rdd = this.getHiveContext().sql(command);
@@ -152,17 +152,17 @@ public class SqlHandler extends ASqlHandler {
      * Find tableName that match the pattern
      * "... from tableName ..."
      */
-    String ddfTableNameFromQuery;
-    Pattern p = Pattern.compile("(?<=.from\\s)([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE);
-    Matcher m = p.matcher(command);
-    mLog.info(">>>>>>> DDF's TableName from query command = " + command);
-    if (m.find()) {
-      ddfTableNameFromQuery = m.group();
-      mLog.info(">>>>>>> DDF's TableName from query = " + ddfTableNameFromQuery);
-      if (this.getManager().getDDF(ddfTableNameFromQuery) != null) {
-        this.createTableForDDF(ddfTableNameFromQuery);
-      }
-    }
+//    String ddfTableNameFromQuery;
+//    Pattern p = Pattern.compile("(?<=.from\\s)([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE);
+//    Matcher m = p.matcher(command);
+//    mLog.info(">>>>>>> DDF's TableName from query command = " + command);
+//    if (m.find()) {
+//      ddfTableNameFromQuery = m.group();
+//      mLog.info(">>>>>>> DDF's TableName from query = " + ddfTableNameFromQuery);
+//      if (this.getManager().getDDF(ddfTableNameFromQuery) != null) {
+//        this.createTableForDDF(ddfTableNameFromQuery);
+//      }
+//    }
     SchemaRDD rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
     Row[] arrRow = rdd.collect();
     List<String> lsString = new ArrayList<String>();
