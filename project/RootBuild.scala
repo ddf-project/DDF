@@ -525,7 +525,7 @@ object RootBuild extends Build {
       //"Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
     ),
     testOptions in Test += Tests.Argument("-oI"),
-    //libraryDependencies ++= com_adatao_unmanaged,
+    libraryDependencies ++= com_adatao_unmanaged,
     libraryDependencies ++= spark_dependencies,
     if(isLocal) {
       initialCommands in console :=
