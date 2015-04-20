@@ -159,6 +159,11 @@ public abstract class DDF extends ALoggable //
     this.getRepresentationHandler().set(data, typeSpecs);
 
     this.getSchemaHandler().setSchema(schema);
+    if(schema.getTableName() == null) {
+      String tableName = this.getSchemaHandler().newTableName();
+      schema.setTableName(tableName);
+    }
+    
     if (Strings.isNullOrEmpty(name) && schema != null) name = schema.getTableName();
 
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();

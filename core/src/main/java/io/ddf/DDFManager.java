@@ -89,6 +89,18 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return data;
   }
 
+  public DDF getDDFByName(String name) throws DDFException {
+    DDF result= null;
+    for(DDF ddf: mDDFs.values()) {
+      if(ddf.getName().equals(name)) {
+        result = ddf;
+      }
+    }
+    if(result == null) throw new DDFException(String.format("Cannot find ddf with name %s", name));
+    else {
+      return result;
+    }
+  }
   /*
    * return list of DDFs infomation
    * only return DDF with alias
