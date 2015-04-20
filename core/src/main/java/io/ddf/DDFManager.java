@@ -77,35 +77,19 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    */
   protected HashMap<String, DDF> mDDFs = new HashMap<String, DDF>();
 
-  // ephemeral mapping between ddf alias and DDF
-  protected HashMap<String, DDF> mDDFsByName = new HashMap<String, DDF>();
-
   protected Map<String, IModel> mModels = new HashMap<String, IModel>();
 
-  // lookup name (aliasName, name)
-  protected Map<String, String> mAliasesToNames = new HashMap<String, String>();
 
-
-  public String addDDF(DDF data) {
-    mDDFs.put(data.getName(), data);
-    mDDFs.put(data.getUri(), data);
-    return data.getUri();
+  public void addDDF(DDF ddf) throws DDFException {
+    if(mDDFs.containsKey(ddf.getUUID())) {
+      throw new DDFException(String.format("DDF with uuid %s already exists", ddf.getUUID()));
+    } else {
+      mDDFs.put(ddf.getUUID(), ddf);
+    }
   }
 
-  public DDF getDDF(String ddfName) {
-    DDF data = mDDFs.get(ddfName);
-    return data;
-  }
-
-
-  /*
-   * aliasName is user-specified name This name is ephemeral in the sense that it existed in cluster memory and will be
-   * disappear once we restart cluster For simplicity this aliasName is global name and doesn't provide namespace
-   * information etc ..
-   */
-  public DDF getDDFByAlias(String aliasName) {
-    String aliasNameSub = aliasName.substring(aliasName.lastIndexOf("/") + 1);
-    DDF data = mDDFsByName.get(aliasNameSub);
+  public DDF getDDF(String uuid) {
+    DDF data = mDDFs.get(uuid);
     return data;
   }
 
@@ -125,39 +109,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return ddfInformationList.toArray(new DDF.DDFInformation[ddfInformationList.size()]);
   }
 
-
-  /*
-   * aliasName is user-specified name This name is ephemeral in the sense that it existed in cluster memory and will be
-   * disappear once we restart cluster
-   */
-  public void setDDFByName(String dataContainerId, String aliasName) {
-    DDF data = getDDF(dataContainerId);
-    if (data != null) mDDFsByName.put(aliasName, data);
-    else {
-      Log.error("Cannot get ddf for dataContainerId = " + dataContainerId);
-    }
-  }
-
-  public HashMap<String, DDF> getDDFs() {
-    return mDDFs;
-  }
-
   public void addModel(IModel model) {
     mModels.put(model.getName(), model);
   }
 
   public IModel getModel(String modelName) {
     return mModels.get(modelName);
-  }
-
-  public IModel getModelByName(String aliasName) {
-    String aliasNameSub = aliasName.substring(aliasName.lastIndexOf("/") + 1);
-    IModel model = mModels.get(mAliasesToNames.get(aliasNameSub));
-    return model;
-  }
-
-  public void setModelName(String modelId, String aliasName) {
-    mAliasesToNames.put(aliasName, modelId);
   }
 
   public DDF serialize2DDF(IModel model) throws DDFException {

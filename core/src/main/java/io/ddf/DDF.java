@@ -166,7 +166,9 @@ public abstract class DDF extends ALoggable //
 
     this.setName(name);
 
+    this.uuid = UUID.randomUUID().toString();
     // Facades
+
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
     this.Transform = new TransformFacade(this, this.getTransformationHandler());
@@ -185,7 +187,7 @@ public abstract class DDF extends ALoggable //
 
   @Expose private String mName;
 
-
+  @Expose private String uuid;
   /**
    * @return the namespace this DDF belongs in
    * @throws DDFException
@@ -245,10 +247,10 @@ public abstract class DDF extends ALoggable //
 
   @Override
   public String getGlobalObjectType() {
-    return "ddf";
+    return "bdf";
   }
 
-
+  public String getUUID() {return uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
