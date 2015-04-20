@@ -100,10 +100,10 @@ public class SparkDDF extends DDF {
       SchemaRDD rdd = (SchemaRDD) this.getRepresentationHandler().get(SchemaRDD.class);
       if (rdd == null) {
         mLog.info("Could not create SchemaRDD for ddf");
+      } else {
+        mLog.info(String.format(">>>> register %s as table", this.getTableName()));
+        rdd.registerTempTable(this.getTableName());
       }
-      mLog.info(String.format(">>>> register %s as table", this.getTableName()));
-      rdd.registerTempTable(this.getTableName());
-      //rdd.saveAsTable(this.getTableName());
     }
   }
 
