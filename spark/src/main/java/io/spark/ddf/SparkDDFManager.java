@@ -4,6 +4,7 @@ package io.spark.ddf;
 import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
+import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 import io.spark.ddf.util.SparkUtils;
 import org.apache.commons.lang.StringUtils;
@@ -195,6 +196,26 @@ public class SparkDDFManager extends DDFManager {
     return this.getSparkContext();
   }
 
+  @Override
+  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
+          throws DDFException {
+    DDF ddf = super.newDDF(manager, data, typeSpecs, namespace, name, schema);
+    if(ddf instanceof SparkDDF) {
+      ((SparkDDF) ddf).saveAsTable();
+    }
+    return ddf;
+  }
+
+  @Override
+  public DDF newDDF(Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
+          throws DDFException {
+    DDF ddf = super.newDDF(data, typeSpecs, namespace, name, schema);
+    if(ddf instanceof SparkDDF) {
+      ((SparkDDF) ddf).saveAsTable();
+    }
+    return ddf;
+  }
+  
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
     JavaRDD<String> fileRDD = mJavaSparkContext.textFile(fileURL);
     String[] metaInfos = getMetaInfo(fileRDD, fieldSeparator);
