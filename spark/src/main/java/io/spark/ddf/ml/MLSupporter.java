@@ -146,7 +146,6 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
 
       IHandleSchema schemaHandler = resultDDF.getSchemaHandler();
       resultDDF.getSchema().setTableName(schemaHandler.newTableName());
-      this.getManager().addDDF(resultDDF);
 
       return resultDDF;
     } else if (Object[].class.equals(resultUnitType)) {
@@ -156,7 +155,6 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
 
       IHandleSchema schemaHandler = resultDDF.getSchemaHandler();
       resultDDF.getSchema().setTableName(schemaHandler.newTableName());
-      this.getManager().addDDF(resultDDF);
 
       return resultDDF;
     } else return null;

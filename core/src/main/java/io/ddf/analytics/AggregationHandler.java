@@ -142,7 +142,6 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
 
       try {
         DDF resultDDF = this.getManager().sql2ddf(sqlCmd);
-        this.getManager().addDDF(resultDDF);
         return resultDDF;
 
       } catch (Exception e) {
