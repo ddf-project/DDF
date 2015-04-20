@@ -88,7 +88,7 @@ public class SparkDDF extends DDF {
     return rdd.toJavaRDD();
   }
 
-  public void saveAsTable() {
+  public void saveAsTable() throws DDFException {
     HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
     Boolean isTable = true;
     try {
