@@ -100,8 +100,9 @@ object RootBuild extends Build {
 
   // We define this explicitly rather than via unmanagedJars, so that make-pom will generate it in pom.xml as well
   // org % package % version
+
   val com_adatao_unmanaged = Seq(
-    "com.adatao.unmanaged.net.rforge" % "REngine" % "1.8.2.compiled",
+    "com.adatao.unmanaged.net.rforge" % "REngine" % "2.1.1.compiled",
     "com.adatao.unmanaged.net.rforge" % "Rserve" % "1.8.2.compiled"
   )
 
@@ -524,7 +525,7 @@ object RootBuild extends Build {
       //"Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
     ),
     testOptions in Test += Tests.Argument("-oI"),
-    libraryDependencies ++= com_adatao_unmanaged,
+    //libraryDependencies ++= com_adatao_unmanaged,
     libraryDependencies ++= spark_dependencies,
     if(isLocal) {
       initialCommands in console :=
