@@ -215,7 +215,7 @@ public class SparkDDFManager extends DDFManager {
     }
     return ddf;
   }
-  
+
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
     JavaRDD<String> fileRDD = mJavaSparkContext.textFile(fileURL);
     String[] metaInfos = getMetaInfo(fileRDD, fieldSeparator);

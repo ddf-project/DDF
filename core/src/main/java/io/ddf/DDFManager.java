@@ -194,23 +194,24 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       throws DDFException {
 
     // @formatter:off
-		return this.newDDF(new Class<?>[] { DDFManager.class, Object.class,
+    DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class, Object.class,
 				Class[].class, String.class, String.class, Schema.class },
 				new Object[] { manager, data, typeSpecs, namespace, name,
 						schema });
-		// @formatter:on
+    this.addDDF(ddf);
+    return ddf;
   }
 
   public DDF newDDF(Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
       throws DDFException {
 
     // @formatter:off
-		return this
-				.newDDF(new Class<?>[] { DDFManager.class, Object.class,
+    DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class, Object.class,
 						Class[].class, String.class, String.class, Schema.class },
 						new Object[] { this, data, typeSpecs, namespace, name,
 								schema });
-		// @formatter:on
+    this.addDDF(ddf);
+    return ddf;
   }
 
   /**

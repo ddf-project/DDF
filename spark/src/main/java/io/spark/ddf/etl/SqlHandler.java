@@ -88,24 +88,6 @@ public class SqlHandler extends ASqlHandler {
     //    RDD<Row> rddRow = null;
     SchemaRDD rdd = null;
     // TODO: handle other dataSources and dataFormats
-
-    String tableName = this.getDDF().getSchemaHandler().newTableName();
-
-    /**
-     * Make sure that the ddf needed was backed by a table
-     * Find tableName that match the pattern
-     * "... from tableName ..."
-     */
-//    String ddfTableNameFromQuery;
-//    Pattern p = Pattern.compile("(?<=.from\\s)([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE);
-//    Matcher m = p.matcher(command);
-//    mLog.info(">>>>>>> DDF's TableName from query command = " + command);
-//    if (m.find()) {
-//      ddfTableNameFromQuery = m.group();
-//      mLog.info(">>>>>>> DDF's TableName from query = " + ddfTableNameFromQuery);
-//      this.createTableForDDF(ddfTableNameFromQuery);
-//    }
-
     if (dataSource == null) {
       rdd = this.getHiveContext().sql(command);
     } else {
@@ -113,15 +95,10 @@ public class SqlHandler extends ASqlHandler {
     }
     if (schema == null) schema = SchemaHandler.getSchemaFromSchemaRDD(rdd);
 
-    if (tableName != null) {
-      schema.setTableName(tableName);
-    }
-
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {SchemaRDD.class}, null,
-        tableName, schema);
+        null, schema);
     ((SparkDDF) ddf).saveAsTable();
 
-    this.getManager().addDDF(ddf);
     return ddf;
   }
 
@@ -146,23 +123,7 @@ public class SqlHandler extends ASqlHandler {
   //TODO SparkSql
   @Override
   public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
-    // TODO: handle other dataSources
-    /**
-     * Make sure that the ddf needed was backed by a table
-     * Find tableName that match the pattern
-     * "... from tableName ..."
-     */
-//    String ddfTableNameFromQuery;
-//    Pattern p = Pattern.compile("(?<=.from\\s)([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE);
-//    Matcher m = p.matcher(command);
-//    mLog.info(">>>>>>> DDF's TableName from query command = " + command);
-//    if (m.find()) {
-//      ddfTableNameFromQuery = m.group();
-//      mLog.info(">>>>>>> DDF's TableName from query = " + ddfTableNameFromQuery);
-//      if (this.getManager().getDDF(ddfTableNameFromQuery) != null) {
-//        this.createTableForDDF(ddfTableNameFromQuery);
-//      }
-//    }
+
     SchemaRDD rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
     Row[] arrRow = rdd.collect();
     List<String> lsString = new ArrayList<String>();
