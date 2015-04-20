@@ -14,6 +14,7 @@ import org.rosuda.REngine.REXPLogical
 import org.rosuda.REngine.REXPString
 import org.rosuda.REngine.RList
 import org.rosuda.REngine.Rserve.RConnection
+import org.rosuda.REngine.Rserve.StartRserve
 
 import io.ddf.DDF
 import io.ddf.content.Schema
@@ -96,6 +97,8 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val rMapped = dfrdd.map {
       partdf ⇒
         try {
+          // check if Rserve is running, if not: start it
+          if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
           // one connection for each compute job
           val rconn = new RConnection()
 
@@ -181,6 +184,8 @@ object TransformationHandler {
    * Perform map and mapsideCombine phase
    */
   def preShuffleMapper(partdf: REXP, mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean): REXP = {
+    // check if Rserve is running, if not: start it
+    if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
     // one connection for each compute job
     val rconn = new RConnection()
 
@@ -326,6 +331,8 @@ object TransformationHandler {
    * then assemble each resulting partition as a data.frame of REXP in Java
    */
   def postShufflePartitionMapper(input: Iterator[(String, Iterable[REXP])], reduceFuncDef: String): Iterator[REXP] = {
+    // check if Rserve is running, if not: start it
+    if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
     val rconn = new RConnection()
 
     // pre-amble

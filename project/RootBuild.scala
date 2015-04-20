@@ -100,9 +100,10 @@ object RootBuild extends Build {
 
   // We define this explicitly rather than via unmanagedJars, so that make-pom will generate it in pom.xml as well
   // org % package % version
+
   val com_adatao_unmanaged = Seq(
-    "com.adatao.unmanaged.net.rforge" % "REngine" % "1.7.2.compiled",
-    "com.adatao.unmanaged.net.rforge" % "Rserve" % "1.7.2.compiled"
+    "com.adatao.unmanaged.net.rforge" % "REngine" % "2.1.1.compiled",
+    "com.adatao.unmanaged.net.rforge" % "Rserve" % "1.8.2.compiled"
   )
 
   val scalaArtifacts = Seq("jline", "scala-compiler", "scala-library", "scala-reflect")
