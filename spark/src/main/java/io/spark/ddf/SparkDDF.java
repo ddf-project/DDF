@@ -24,6 +24,13 @@ public class SparkDDF extends DDF {
 
   private static final long serialVersionUID = 7466377156065874568L;
 
+  @Override
+  public void initialize(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace,
+                         String name, Schema schema) throws DDFException {
+    super.initialize(manager, data, typeSpecs, namespace, name, schema);
+    this.saveAsTable();
+  }
+
   public SparkDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
       throws DDFException {
     super(manager);
