@@ -101,6 +101,20 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       return result;
     }
   }
+
+  public DDF getDDFByURI(String uri) throws DDFException {
+    DDF result = null;
+    for(DDF ddf: mDDFs.values()) {
+      if(ddf.getUri().equals(uri)) {
+        result = ddf;
+      }
+    }
+    if(result == null) throw new DDFException(String.format("Cannot find ddf with uri %s", uri));
+    else {
+      return result;
+    }
+  }
+
   /*
    * return list of DDFs infomation
    * only return DDF with alias

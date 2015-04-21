@@ -257,6 +257,8 @@ public abstract class DDF extends ALoggable //
 
   public String getUUID() {return uuid;}
 
+  public String setUUID(String uuid) {this.uuid = uuid;}
+
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
    */
@@ -280,7 +282,6 @@ public abstract class DDF extends ALoggable //
     this.mManager = DDFManager;
   }
 
-
   /**
    *
    * @return The engine name we are built on, e.g., "spark" or "java_collections"
@@ -288,8 +289,6 @@ public abstract class DDF extends ALoggable //
   public String getEngine() {
     return this.getManager().getEngine();
   }
-
-
 
   // ////// MetaData that deserves to be right here at the top level ////////
 
