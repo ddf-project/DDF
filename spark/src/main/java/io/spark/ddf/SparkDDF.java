@@ -99,11 +99,12 @@ public class SparkDDF extends DDF {
     if (!isTable) {
       DataFrame rdd = (DataFrame) this.getRepresentationHandler().get(DataFrame.class);
       if (rdd == null) {
-        throw new DDFException("Could not create DataFrame for ddf");
+        mLog.info("Could not create SchemaRDD for ddf");
+        mLog.info(String.format("Could not save ddf %s as table", this.getUUID()));
+      } else {
+        mLog.info(String.format(">>>> register %s as table", this.getTableName()));
+        rdd.registerTempTable(this.getTableName());
       }
-      mLog.info(String.format(">>>> register %s as table", this.getTableName()));
-      rdd.registerTempTable(this.getTableName());
-      //rdd.saveAsTable(this.getTableName());
     }
   }
 

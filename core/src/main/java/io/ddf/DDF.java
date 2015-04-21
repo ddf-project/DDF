@@ -159,6 +159,11 @@ public abstract class DDF extends ALoggable //
     this.getRepresentationHandler().set(data, typeSpecs);
 
     this.getSchemaHandler().setSchema(schema);
+    if(schema!= null && schema.getTableName() == null) {
+      String tableName = this.getSchemaHandler().newTableName();
+      schema.setTableName(tableName);
+    }
+
     if (Strings.isNullOrEmpty(name) && schema != null) name = schema.getTableName();
 
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
@@ -166,7 +171,9 @@ public abstract class DDF extends ALoggable //
 
     this.setName(name);
 
+    this.uuid = UUID.randomUUID().toString();
     // Facades
+
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
     this.Transform = new TransformFacade(this, this.getTransformationHandler());
@@ -185,7 +192,7 @@ public abstract class DDF extends ALoggable //
 
   @Expose private String mName;
 
-
+  @Expose private String uuid;
   /**
    * @return the namespace this DDF belongs in
    * @throws DDFException
@@ -245,10 +252,12 @@ public abstract class DDF extends ALoggable //
 
   @Override
   public String getGlobalObjectType() {
-    return "ddf";
+    return "bdt";
   }
 
+  public String getUUID() {return uuid;}
 
+  public void setUUID(String uuid) {this.uuid = uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
@@ -273,7 +282,6 @@ public abstract class DDF extends ALoggable //
     this.mManager = DDFManager;
   }
 
-
   /**
    *
    * @return The engine name we are built on, e.g., "spark" or "java_collections"
@@ -281,8 +289,6 @@ public abstract class DDF extends ALoggable //
   public String getEngine() {
     return this.getManager().getEngine();
   }
-
-
 
   // ////// MetaData that deserves to be right here at the top level ////////
 

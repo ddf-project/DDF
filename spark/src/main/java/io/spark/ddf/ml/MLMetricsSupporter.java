@@ -118,7 +118,6 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
 
     if (residualDDF == null) mLog.error(">>>>>>>>>>>.residualDDF is null");
 
-    if (residualDDF != null) predictionDDF.getManager().addDDF(residualDDF);
     return residualDDF;
   }
 
