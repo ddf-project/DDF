@@ -86,7 +86,6 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
           "Either choose Axis.ROW for row-based NA filtering or Axis.COLUMN for column-based NA filtering");
     }
 
-    this.getManager().addDDF(newddf);
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
     return newddf;
   }
@@ -160,7 +159,6 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
       // TODO:
     }
 
-    this.getManager().addDDF(newddf);
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
     return newddf;
   }

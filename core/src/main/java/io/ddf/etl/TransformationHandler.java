@@ -42,7 +42,6 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
-    this.getManager().addDDF(newddf);
     return newddf;
   }
 
@@ -70,7 +69,6 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
-    this.getManager().addDDF(newddf);
     return newddf;
 
   }
@@ -100,7 +98,6 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     if (this.getDDF().isMutable()) {
       return this.getDDF().updateInplace(newddf);
     } else {
-      this.getManager().addDDF(newddf);
       newddf.getMetaDataHandler().copyFactor(this.getDDF());
       return newddf;
     }

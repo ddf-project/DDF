@@ -58,10 +58,8 @@ public class MissingDataHandlerTest extends BaseTest {
       }
     };
 
-    ddf1.setMutable(true);
-    ddf1.getMissingDataHandler().fillNA(null, null, 0, null, dict, null);
-    Assert.assertEquals(301, ddf1.aggregate("year, sum(LateAircraftDelay)").get("2008")[0], 0.1);
+    //ddf1.setMutable(true);
+    DDF ddf2 = ddf1.getMissingDataHandler().fillNA(null, null, 0, null, dict, null);
+    Assert.assertEquals(301, ddf2.aggregate("year, sum(LateAircraftDelay)").get("2008")[0], 0.1);
   }
-
-
 }
