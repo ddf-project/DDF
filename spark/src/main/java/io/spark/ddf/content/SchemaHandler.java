@@ -15,9 +15,9 @@ import io.ddf.exception.DDFException;
 import io.spark.ddf.SparkDDF;
 import io.spark.ddf.util.SparkUtils;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.SchemaRDD;
-import org.apache.spark.sql.catalyst.types.StructType;
-import org.apache.spark.sql.catalyst.types.StructField;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.StructField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +29,8 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
     super(theDDF);
   }
 
-  public static Schema getSchemaFromSchemaRDD(SchemaRDD rdd) {
-    return SparkUtils.schemaFromSchemaRDD(rdd);
+  public static Schema getSchemaFromDataFrame(DataFrame rdd) {
+    return SparkUtils.schemaFromDataFrame(rdd);
   }
 
   @Override

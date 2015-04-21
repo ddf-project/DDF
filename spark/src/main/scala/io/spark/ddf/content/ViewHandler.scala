@@ -8,9 +8,8 @@ import io.ddf.content.IHandleViews
 import scala.collection.JavaConverters._
 import io.ddf.content.Schema
 import io.spark.ddf.SparkDDF
-import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.sql.Row
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.catalyst.expressions.Row
 
 /**
  * RDD-based ViewHandler
@@ -67,7 +66,7 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
         val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
         rdd.takeSample(withReplacement, numSamples, seed).map {
           row => {
-            row.toArray.asInstanceOf[Array[Object]]
+            row.toSeq.toArray.asInstanceOf[Array[Object]]
           }
         }.toList.asJava
       }

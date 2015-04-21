@@ -13,8 +13,8 @@ import io.spark.ddf.SparkDDF;
 import io.spark.ddf.SparkDDFManager;
 import io.spark.ddf.content.SchemaHandler;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.SchemaRDD;
-import org.apache.spark.sql.catalyst.expressions.Row;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 import scala.collection.Seq;
 
@@ -42,19 +42,6 @@ public class SqlHandler extends ASqlHandler {
   private HiveContext getHiveContext() {
     return ((SparkDDFManager) this.getManager()).getHiveContext();
   }
-
-//  protected void createTableForDDF(String tableName) throws DDFException {
-//    try {
-//      mLog.info(">>>>>> get table for ddf");
-//      DDF ddf = this.getManager().getDDF(tableName);
-//      if (ddf != null) {
-//        ((SparkDDF) ddf).saveAsTable();
-//      }
-//    } catch (Exception e) {
-//      mLog.info(">>>> Exception e.message = " + e.getMessage());
-//      throw new DDFException(String.format("Can not create table for DDF %s, " + e.getMessage(), tableName), e);
-//    }
-//  }
 
   @Override
   public DDF sql2ddf(String command) throws DDFException {
@@ -86,18 +73,16 @@ public class SqlHandler extends ASqlHandler {
   public DDF sql2ddf(String command, Schema schema, String dataSource, DataFormat dataFormat) throws DDFException {
     //    TableRDD tableRdd = null;
     //    RDD<Row> rddRow = null;
-    SchemaRDD rdd = null;
+    DataFrame rdd = null;
     // TODO: handle other dataSources and dataFormats
     if (dataSource == null) {
       rdd = this.getHiveContext().sql(command);
     } else {
       // TODO
     }
-    if (schema == null) schema = SchemaHandler.getSchemaFromSchemaRDD(rdd);
-
-    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {SchemaRDD.class}, null,
+    if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
+    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
         null, schema);
-    ((SparkDDF) ddf).saveAsTable();
 
     return ddf;
   }
@@ -123,8 +108,7 @@ public class SqlHandler extends ASqlHandler {
   //TODO SparkSql
   @Override
   public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
-
-    SchemaRDD rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
+    DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
     Row[] arrRow = rdd.collect();
     List<String> lsString = new ArrayList<String>();
 

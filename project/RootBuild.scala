@@ -18,7 +18,7 @@ object RootBuild extends Build {
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
 
-  val SPARK_VERSION = "1.2.0-adatao"
+  val SPARK_VERSION = "1.3.5-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -35,9 +35,9 @@ object RootBuild extends Build {
   val projectName = "ddf"
   val rootProjectName = projectName
   val rootVersion = if(YARN_ENABLED) {
-    "1.1-adatao"
+    "1.2-adatao"
   } else {
-    "1.1-mesos"
+    "1.2-mesos"
   }
 
   val projectOrganization = rootOrganization + "." + projectName
@@ -159,6 +159,7 @@ object RootBuild extends Build {
 
     // Fork new JVMs for tests and set Java options for those
     fork in Test := true,
+    parallelExecution in ThisBuild := false,
     javaOptions in Test ++= Seq("-Xmx2g"),
 
     // Only allow one test at a time, even across projects, since they run in the same JVM
@@ -236,7 +237,9 @@ object RootBuild extends Build {
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-xc" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-jaxrs" % "1.8.8",
-    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.3.1",
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4",
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.4.4",
+    dependencyOverrides += "com.google.code.findbugs" % "jsr305" % "2.0.1",
     dependencyOverrides += "com.thoughtworks.paranamer" % "paranamer" % "2.4.1", //net.liftweb conflict with avro
     dependencyOverrides += "org.xerial.snappy" % "snappy-java" % "1.0.5", //spark-core conflicts with avro
     dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.1.4",
