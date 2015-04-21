@@ -82,8 +82,7 @@ public class SqlHandler extends ASqlHandler {
     }
     if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
-        tableName, schema);
-    ((SparkDDF) ddf).saveAsTable();
+        null, schema);
 
     return ddf;
   }
