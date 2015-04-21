@@ -257,7 +257,7 @@ public abstract class DDF extends ALoggable //
 
   public String getUUID() {return uuid;}
 
-  public String setUUID(String uuid) {this.uuid = uuid;}
+  public void setUUID(String uuid) {this.uuid = uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
