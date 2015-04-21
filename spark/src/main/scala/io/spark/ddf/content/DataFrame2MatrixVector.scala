@@ -10,7 +10,7 @@ import io.ddf.exception.DDFException
 import io.ddf.types.{Matrix, Vector}
 import io.spark.ddf.ml.TransformRow
 import io.ddf.content.Schema.{ColumnType, Column}
-import org.apache.spark.sql.SchemaRDD
+import org.apache.spark.sql.DataFrame
 
 /**
   */
@@ -20,8 +20,8 @@ class DataFrame2MatrixVector(@transient ddf: DDF) extends ConvertFunction(ddf) {
     val columns = ddf.getSchemaHandler.getColumns
     val dummyCoding = ddf.getSchema.getDummyCoding
     val rddMatrixVector = representation.getValue match {
-      case rdd: SchemaRDD => {
-        rdd.mapPartitions {
+      case rdd: DataFrame => {
+        rdd.rdd.mapPartitions {
           rows => rowsToMatrixVector(rows, columns, dummyCoding)
         }
       }

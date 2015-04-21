@@ -5,7 +5,6 @@ import io.ddf.content.{Representation, ConvertFunction}
 import org.apache.spark.rdd.RDD
 import io.spark.ddf.{SparkDDFManager, SparkDDF}
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.SchemaRDD
 import io.ddf.content.Schema.{ColumnType, Column}
 import org.apache.spark.sql.types.StructType
 import scala.collection.JavaConversions._
@@ -23,8 +22,8 @@ class ArrayObject2DataFrame(@transient ddf: DDF) extends ConvertFunction(ddf) {
           row => Row(row: _*)
         }
         val schema = StructType(ddf.getSchemaHandler.getColumns.map(col => ArrayObject2DataFrame.column2StructField(col)))
-        val schemaRDD = ddf.getManager.asInstanceOf[SparkDDFManager].getHiveContext.applySchema(rddRow, schema)
-        new Representation(schemaRDD, RepresentationHandler.DATAFRAME.getTypeSpecsString)
+        val dataFrame = ddf.getManager.asInstanceOf[SparkDDFManager].getHiveContext.applySchema(rddRow, schema)
+        new Representation(dataFrame, RepresentationHandler.DATAFRAME.getTypeSpecsString)
       }
     }
   }
