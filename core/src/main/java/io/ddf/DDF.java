@@ -43,6 +43,7 @@ import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.AggregateTypes.AggregateField;
 import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
+import io.ddf.util.DDFUtils;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
 
@@ -171,7 +172,7 @@ public abstract class DDF extends ALoggable //
 
     this.setName(name);
 
-    this.uuid = UUID.randomUUID().toString().replace("-", "_");
+    this.uuid = DDFUtils.generateObjectName(this);
     // Facades
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
