@@ -171,9 +171,8 @@ public abstract class DDF extends ALoggable //
 
     this.setName(name);
 
-    this.uuid = UUID.randomUUID().toString();
+    this.uuid = UUID.randomUUID().toString().replace("-", "_");
     // Facades
-
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
     this.Transform = new TransformFacade(this, this.getTransformationHandler());
