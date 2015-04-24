@@ -20,7 +20,8 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
   override def getVectorHistogramImpl(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
     val projectedDDF: DDF = mDDF.VIEWS.project(columnName)
     val rdd: RDD[Row] = projectedDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
-    val doubleRDD: DoubleRDDFunctions = rdd.map(x => x.get(0).asInstanceOf[Double])
+    val doubleRDD: DoubleRDDFunctions = new DoubleRDDFunctions(rdd.map(x => x.get(0).toString.toDouble))
+
     val hist: (Array[Double], Array[Long]) = doubleRDD.histogram(numBins)
     val x: Array[Double] = hist._1
     val y: Array[Long] = hist._2
