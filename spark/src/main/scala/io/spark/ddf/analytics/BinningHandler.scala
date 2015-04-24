@@ -35,7 +35,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     }
 
     bins.toList.asJava
-d  }
+  }
 
   override def binningImpl(column: String, binningTypeString: String, numBins: Int, inputBreaks: Array[Double], includeLowest: Boolean,
                            right: Boolean): DDF = {
