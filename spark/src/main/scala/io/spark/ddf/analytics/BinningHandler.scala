@@ -25,10 +25,10 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     val x: Array[Double] = hist._1
     val y: Array[Long] = hist._2
     val bins: List[AStatisticsSupporter.HistogramBin] = List[AStatisticsSupporter.HistogramBin]()
-    for (i <- 0 until x.length) {
+    for (i <- 0 until y.length) {
       val bin: AStatisticsSupporter.HistogramBin = new AStatisticsSupporter.HistogramBin
-      bin.setX(x(i))
-      bin.setY(y(i))
+      bin.setX(x(i).asInstanceOf[Double])
+      bin.setY(y(i).asInstanceOf[Double])
       bins.add(bin)
     }
     scala.collection.JavaConversions.seqAsJavaList[AStatisticsSupporter.HistogramBin](bins)
