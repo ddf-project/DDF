@@ -38,13 +38,13 @@ public class StatisticsSupporterTest extends BaseTest {
     Summary[] summary = ddf3.getSummary();
     Assert.assertEquals(summary[2].NACount(), 4);
   }
-  
+
 //  @Test
 //  public void testFiveNum() throws DDFException {
 //    Assert.assertEquals(5, ddf1.getFiveNumSummary().length);
 //    Assert.assertEquals(FiveNumSummary.class, ddf1.getFiveNumSummary()[0].getClass());
 //  }
-  
+
   @Test
   public void testSampling() throws DDFException {
     DDF ddf2 = manager.sql2ddf("select * from airline");
@@ -96,11 +96,15 @@ public class StatisticsSupporterTest extends BaseTest {
 
   @Test
   public void testVectorHistogram() throws DDFException {
-    List<HistogramBin> bins = ddf1.getVectorHistogram("arrdelay", 5);
+    List<HistogramBin> bins = ddf1.getVectorHistogram_Hive("arrdelay", 5);
+    System.out.println(bins);
     Assert.assertEquals(5, bins.size());
     Assert.assertEquals(-12.45, bins.get(0).getX(), 0.01);
     Assert.assertEquals(11, bins.get(0).getY(), 0.01);
+
+    bins = ddf1.getVectorHistogram("arrdelay", 5);
+    for (int i = 0; i < bins.size(); i++) {
+      System.out.println(bins.get(i).getX() + " - " + bins.get(i).getY());
+    }
   }
-
-
 }

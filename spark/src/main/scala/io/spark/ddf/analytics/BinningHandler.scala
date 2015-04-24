@@ -1,17 +1,38 @@
 package io.spark.ddf.analytics
 
 import io.ddf.DDF
+import org.apache.spark.rdd.{DoubleRDDFunctions, RDD}
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.catalyst.expressions._
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import io.ddf.analytics.ABinningHandler
+import io.ddf.analytics.{AStatisticsSupporter, ABinningHandler, IHandleBinning}
 import io.ddf.analytics.ABinningHandler._
-import io.ddf.analytics.IHandleBinning
 import io.ddf.exception.DDFException
 import java.text.DecimalFormat
 import scala.annotation.tailrec
 import scala.Array.canBuildFrom
 
+
 class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinning {
+
+
+  override def getVectorHistogramImpl(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
+    val projectedDDF: DDF = mDDF.VIEWS.project(columnName)
+    val rdd: RDD[Row] = projectedDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
+    val doubleRDD: DoubleRDDFunctions = rdd.map(x => x.get(0).asInstanceOf[Double])
+    val hist: (Array[Double], Array[Long]) = doubleRDD.histogram(numBins)
+    val x: Array[Double] = hist._1
+    val y: Array[Long] = hist._2
+    val bins: List[AStatisticsSupporter.HistogramBin] = List[AStatisticsSupporter.HistogramBin]()
+    for (i <- 0 until x.length) {
+      val bin: AStatisticsSupporter.HistogramBin = new AStatisticsSupporter.HistogramBin
+      bin.setX(x(i))
+      bin.setY(y(i))
+      bins.add(bin)
+    }
+    scala.collection.JavaConversions.seqAsJavaList[AStatisticsSupporter.HistogramBin](bins)
+  }
 
   override def binningImpl(column: String, binningTypeString: String, numBins: Int, inputBreaks: Array[Double], includeLowest: Boolean,
                            right: Boolean): DDF = {
@@ -203,6 +224,8 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
         case None ⇒ Option(null)
       }
     }
+
+
   }
 
 }
