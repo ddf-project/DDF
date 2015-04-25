@@ -165,8 +165,6 @@ public abstract class DDF extends ALoggable //
       schema.setTableName(tableName);
     }
 
-    if (Strings.isNullOrEmpty(name) && schema != null) name = schema.getTableName();
-
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
 
@@ -220,24 +218,11 @@ public abstract class DDF extends ALoggable //
   }
 
   /**
-   * Also synchronizes the Schema's table name with that of the DDF name
    *
    * @return the name of this DDF
    */
   @Override
   public String getName() {
-    if (Strings.isNullOrEmpty(mName)) {
-      if (!Strings.isNullOrEmpty(this.getSchemaHandler().getTableName())) {
-        mName = this.getSchemaHandler().getTableName();
-
-      } else {
-        mName = this.getSchemaHandler().newTableName();
-        if (this.getSchemaHandler().getSchema() != null) {
-          this.getSchemaHandler().getSchema().setTableName(mName);
-        }
-      }
-    }
-
     return mName;
   }
 

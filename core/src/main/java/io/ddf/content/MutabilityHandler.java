@@ -35,7 +35,8 @@ public class MutabilityHandler extends ADDFFunctionalGroupHandler implements IHa
     //    this.getManager().sql2txt(String.format("DROP TABLE IF EXISTS %s", oldname));
 
     //must copy the factor information from curDDF to new ddf
-    newddf.getMetaDataHandler().copyFactor(curDDF);
+    newddf.getManager().removeDDF(curDDF);
+    newddf.getMetaDataHandler().copyMetaData(curDDF);
 
     curDDF.getSchemaHandler().setSchema(newddf.getSchema());
     return curDDF;

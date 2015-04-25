@@ -84,6 +84,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     mDDFs.put(ddf.getUUID(), ddf);
   }
 
+  public void removeDDF(DDF ddf) throws DDFException {
+    mDDFs.remove(ddf.getUUID());
+  }
+
   public DDF getDDF(String uuid) {
     DDF data = mDDFs.get(uuid);
     return data;
@@ -123,10 +127,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     Collection<DDF> ddfs = this.mDDFs.values();
     List<DDF.DDFInformation> ddfInformationList = new ArrayList<DDF.DDFInformation>();
     for (DDF ddf : ddfs) {
-      SimpleDateFormat dateformat = new SimpleDateFormat("MM.d.yyyy 'at' HH:mm a");
-      DDF.DDFInformation information = new DDF.DDFInformation(
-          ddf.getUri(), dateformat.format(ddf.getCreatedTime()));
-      ddfInformationList.add(information);
+      if(!Strings.isNullOrEmpty(ddf.getName())) {
+        SimpleDateFormat dateformat = new SimpleDateFormat("MM.d.yyyy 'at' HH:mm a");
+        DDF.DDFInformation information = new DDF.DDFInformation(
+                ddf.getUri(), dateformat.format(ddf.getCreatedTime()));
+        ddfInformationList.add(information);
+      }
     }
     return ddfInformationList.toArray(new DDF.DDFInformation[ddfInformationList.size()]);
   }
