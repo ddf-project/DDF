@@ -950,9 +950,15 @@ public abstract class DDF extends ALoggable //
     return this.getStatisticsSupporter().getVectorMean(columnName);
   }
 
-  public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
+  public List<HistogramBin> getVectorHistogram_Hive(String columnName, int numBins) throws DDFException {
     // TODO need to check columnName
     return this.getStatisticsSupporter().getVectorHistogram(columnName, numBins);
+
+  }
+
+  public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
+    // TODO need to check columnName
+    return this.getBinningHandler().getVectorHistogram(columnName, numBins);
   }
 
   public Double getVectorCor(String xColumnName, String yColumnName) throws DDFException {
