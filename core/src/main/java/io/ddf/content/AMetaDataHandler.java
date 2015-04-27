@@ -88,6 +88,8 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
   }
 
   public void copyMetaData(DDF ddf) throws DDFException {
+    this.getDDF().setUUID(ddf.getUUID());
+    this.getDDF().setName(ddf.getName());
     this.copyFactor(ddf);
   }
 

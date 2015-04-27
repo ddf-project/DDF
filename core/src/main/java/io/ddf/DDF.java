@@ -43,6 +43,7 @@ import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.AggregateTypes.AggregateField;
 import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
+import io.ddf.util.DDFUtils;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
 
@@ -164,16 +165,13 @@ public abstract class DDF extends ALoggable //
       schema.setTableName(tableName);
     }
 
-    if (Strings.isNullOrEmpty(name) && schema != null) name = schema.getTableName();
-
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
 
     this.setName(name);
 
-    this.uuid = UUID.randomUUID().toString();
+    this.uuid = DDFUtils.generateObjectName(this);
     // Facades
-
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
     this.Transform = new TransformFacade(this, this.getTransformationHandler());
@@ -220,24 +218,11 @@ public abstract class DDF extends ALoggable //
   }
 
   /**
-   * Also synchronizes the Schema's table name with that of the DDF name
    *
    * @return the name of this DDF
    */
   @Override
   public String getName() {
-    if (Strings.isNullOrEmpty(mName)) {
-      if (!Strings.isNullOrEmpty(this.getSchemaHandler().getTableName())) {
-        mName = this.getSchemaHandler().getTableName();
-
-      } else {
-        mName = this.getSchemaHandler().newTableName();
-        if (this.getSchemaHandler().getSchema() != null) {
-          this.getSchemaHandler().getSchema().setTableName(mName);
-        }
-      }
-    }
-
     return mName;
   }
 
@@ -965,9 +950,15 @@ public abstract class DDF extends ALoggable //
     return this.getStatisticsSupporter().getVectorMean(columnName);
   }
 
-  public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
+  public List<HistogramBin> getVectorHistogram_Hive(String columnName, int numBins) throws DDFException {
     // TODO need to check columnName
     return this.getStatisticsSupporter().getVectorHistogram(columnName, numBins);
+
+  }
+
+  public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
+    // TODO need to check columnName
+    return this.getBinningHandler().getVectorHistogram(columnName, numBins);
   }
 
   public Double getVectorCor(String xColumnName, String yColumnName) throws DDFException {
