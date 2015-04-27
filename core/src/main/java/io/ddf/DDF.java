@@ -234,12 +234,13 @@ public abstract class DDF extends ALoggable //
    */
   @Override
   public void setName(String name) throws DDFException {
-    if(validateName(name)) {
-      this.mName = name;
-    }
-     else {
-      throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
-              "and dash (\"-\") and underscore (\"_\")", name));
+    if(name != null) {
+      if (validateName(name)) {
+        this.mName = name;
+      } else {
+        throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
+                "and dash (\"-\") and underscore (\"_\")", name));
+      }
     }
   }
 
