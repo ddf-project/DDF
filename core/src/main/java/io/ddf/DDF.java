@@ -237,7 +237,7 @@ public abstract class DDF extends ALoggable //
 
   @Override
   public String getGlobalObjectType() {
-    return "bdt";
+    return "ddf";
   }
 
   public String getUUID() {return uuid;}
