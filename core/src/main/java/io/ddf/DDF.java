@@ -54,6 +54,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -231,8 +233,20 @@ public abstract class DDF extends ALoggable //
    *          the DDF name to set
    */
   @Override
-  public void setName(String name) {
-    this.mName = name;
+  public void setName(String name) throws DDFException {
+    if(validateName(name)) {
+      this.mName = name;
+    }
+     else {
+      throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
+              "and dash (\"-\") and underscore (\"_\")", name));
+    }
+  }
+
+  private boolean validateName(String name) {
+    Pattern p = Pattern.compile("^[a-zA-Z0-9_-]*$");
+    Matcher m = p.matcher(name);
+    return m.find();
   }
 
   @Override
