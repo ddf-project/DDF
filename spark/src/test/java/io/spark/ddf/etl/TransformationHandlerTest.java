@@ -52,7 +52,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(8, newddf1.getSummary().length);
   }
 
-  @Test
+  @Ignore
   public void testTransformMapReduceNative() throws DDFException {
     // aggregate sum of month group by year
 
