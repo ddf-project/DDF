@@ -123,7 +123,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
         udfs.add(String.format("(%s)", udf[0]).trim());
       } else {
         String newCol = udf[0].trim().replaceAll("\\W", "");
-        if (existingColumns.contains(newCol)) {
+        if (existingColumns != null && existingColumns.contains(newCol)) {
             throw new RuntimeException(newCol + " duplicates another column name");
         }
         else {
@@ -135,6 +135,6 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   public static String RToSqlUdf(String RExp) {
-    return RToSqlUdf(RExp, new ArrayList<String>());
+    return RToSqlUdf(RExp, null);
   }
 }
