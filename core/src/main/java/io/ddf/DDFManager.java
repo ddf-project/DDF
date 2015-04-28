@@ -96,7 +96,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public DDF getDDFByName(String name) throws DDFException {
     DDF result= null;
     for(DDF ddf: mDDFs.values()) {
-      if(ddf.getName().equals(name)) {
+      if(!Strings.isNullOrEmpty(ddf.getName()) && ddf.getName().equals(name)) {
         result = ddf;
       }
     }
