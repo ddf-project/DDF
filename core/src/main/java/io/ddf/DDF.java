@@ -172,7 +172,7 @@ public abstract class DDF extends ALoggable //
 
     manager.setDDFName(this, name);
 
-    this.uuid = DDFUtils.generateObjectName(this);
+    manager.setDDFUUID(this, DDFUtils.generateObjectName(this));
     // Facades
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
@@ -266,7 +266,7 @@ public abstract class DDF extends ALoggable //
 
   public String getUUID() {return uuid;}
 
-  public void setUUID(String uuid) {this.uuid = uuid;}
+  protected void setUUID(String uuid) {this.uuid = uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
