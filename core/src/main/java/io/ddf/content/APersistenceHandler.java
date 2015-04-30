@@ -116,7 +116,7 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
       // Make sure the DDF's names match ours
       ddf.setNamespace(this.getNamespace());
-      ddf.setName(this.getName());
+      ddf.getManager().setDDFName(ddf, this.getName());
 
       return ddf;
     }
@@ -188,7 +188,6 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
       return mName;
     }
 
-    @Override
     public void setName(String name) {
       mName = name;
     }

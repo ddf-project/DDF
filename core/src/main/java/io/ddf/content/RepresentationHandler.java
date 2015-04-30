@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -22,7 +23,7 @@ import java.util.Map;
 public class RepresentationHandler extends ADDFFunctionalGroupHandler implements IHandleRepresentations {
 
   // The various representations for our DDF
-  protected HashMap<String, Representation> mReps = new HashMap<String, Representation>();
+  protected Map<String, Representation> mReps = new ConcurrentHashMap<String, Representation>();
 
   private RepresentationsGraph mGraph;
 
@@ -347,7 +348,6 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
       return mName;
     }
 
-    @Override
     public void setName(String name) {
       mName = name;
     }

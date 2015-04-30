@@ -13,8 +13,6 @@ public interface IGloballyAddressable {
 
   String getName();
 
-  void setName(String name) throws DDFException;
-
   String getUri();
 
   String getGlobalObjectType();

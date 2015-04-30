@@ -11,8 +11,8 @@ class ListDDFSuite extends ATestSuite {
   test("test list ddf") {
     val ddf1 = manager.sql2ddf("select * from mtcars")
     val ddf2 = manager.sql2ddf("select * from airline")
-    ddf1.setName("mtcars")
-    ddf2.setName("airline")
+    ddf1.getManager.setDDFName(ddf1, "mtcars")
+    ddf2.getManager.setDDFName(ddf2, "airline")
     manager.addDDF(ddf2)
 
     val listDDF = manager.listDDFs()

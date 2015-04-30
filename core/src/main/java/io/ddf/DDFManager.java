@@ -38,6 +38,7 @@ import scala.tools.jline.internal.Log;
 import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>
@@ -75,9 +76,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   /**
    * List of existing DDFs
    */
-  protected HashMap<String, DDF> mDDFs = new HashMap<String, DDF>();
+  protected Map<String, DDF> mDDFs = new ConcurrentHashMap<String, DDF>();
 
-  protected Map<String, IModel> mModels = new HashMap<String, IModel>();
+  protected Map<String, IModel> mModels = new ConcurrentHashMap<String, IModel>();
 
 
   public void addDDF(DDF ddf) throws DDFException {
@@ -104,6 +105,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     else {
       return result;
     }
+  }
+
+  public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
+    ddf.setName(name);
   }
 
   public DDF getDDFByURI(String uri) throws DDFException {

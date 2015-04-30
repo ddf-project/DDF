@@ -158,7 +158,7 @@ public class PersistenceHandler extends APersistenceHandler {
     if (from instanceof DDF) {
       DDF to = (DDF) from;
       to.setNamespace(toNamespace);
-      to.setName(toName);
+      to.getManager().setDDFName(to, toName);
       to.persist();
 
     } else {
@@ -294,7 +294,6 @@ public class PersistenceHandler extends APersistenceHandler {
     /**
      * @param name the name to set
      */
-    @Override
     public void setName(String name) {
       this.mName = name;
     }
