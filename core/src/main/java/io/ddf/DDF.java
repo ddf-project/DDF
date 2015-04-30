@@ -170,7 +170,7 @@ public abstract class DDF extends ALoggable //
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
 
-    this.setName(name);
+    manager.setDDFName(this, name);
 
     this.uuid = DDFUtils.generateObjectName(this);
     // Facades
@@ -232,8 +232,7 @@ public abstract class DDF extends ALoggable //
    * @param name
    *          the DDF name to set
    */
-  @Override
-  public void setName(String name) throws DDFException {
+  protected void setName(String name) throws DDFException {
     if(name != null) validateName(name);
     this.mName = name;
   }

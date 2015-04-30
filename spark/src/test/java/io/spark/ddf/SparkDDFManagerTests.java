@@ -40,7 +40,7 @@ public class SparkDDFManagerTests extends BaseTest {
         + "depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
 
     Assert.assertEquals(14, ddf.getSummary().length);
-    ddf.setName("myddf");
+    manager.setDDFName(ddf, "myddf");
     Assert.assertEquals("ddf://adatao/" + ddf.getName(), ddf.getUri());
 
     manager.addDDF(ddf);
