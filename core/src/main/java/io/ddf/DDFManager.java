@@ -111,6 +111,14 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     ddf.setName(name);
   }
 
+  public synchronized void setDDFUUID(DDF ddf, String uuid) throws DDFException{
+    DDF existedDDF = this.getDDF(uuid);
+    if(existedDDF != null) {
+      throw new DDFException(String.format("DDF with uuid % already exists", uuid));
+    }
+    ddf.setUUID(uuid);
+  }
+
   public DDF getDDFByURI(String uri) throws DDFException {
     DDF result = null;
     for(DDF ddf: mDDFs.values()) {
