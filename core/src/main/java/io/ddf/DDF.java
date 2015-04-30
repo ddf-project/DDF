@@ -234,20 +234,30 @@ public abstract class DDF extends ALoggable //
    */
   @Override
   public void setName(String name) throws DDFException {
-    if(name != null) {
-      if (validateName(name)) {
-        this.mName = name;
-      } else {
-        throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
-                "and dash (\"-\") and underscore (\"_\")", name));
-      }
-    }
+    if(name != null) validateName(name);
+    this.mName = name;
   }
 
-  private boolean validateName(String name) {
+  //Ensure name is unique
+  //Also only allow alphanumberic and dash "-" and underscore "_"
+  private void validateName(String name) throws DDFException {
+    Boolean isNameExisted;
+    try {
+      this.getManager().getDDFByName(name);
+      isNameExisted = true;
+    } catch (DDFException e) {
+      isNameExisted = false;
+    }
+    if(isNameExisted) {
+      throw new DDFException(String.format("DDF with name %s already exists", name));
+    }
+
     Pattern p = Pattern.compile("^[a-zA-Z0-9_-]*$");
     Matcher m = p.matcher(name);
-    return m.find();
+    if(!m.find()) {
+      throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
+              "and dash (\"-\") and underscore (\"_\")", name));
+    }
   }
 
   @Override
