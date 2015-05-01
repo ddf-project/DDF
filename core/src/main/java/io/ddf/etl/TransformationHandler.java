@@ -10,6 +10,7 @@ import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import java.util.List;
+import java.util.ArrayList;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
 
@@ -90,6 +91,10 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     if (columns != null) {
       columnList = Joiner.on(",").skipNulls().join(columns);
     } else {
+      columns = new ArrayList<String>();
+      for (Column c : this.getDDF().getSchema().getColumns()) {
+        columns.add(c.getName());
+      }
       columnList = "*";
     }
     String sqlCmd = String.format("SELECT %s, %s FROM %s", columnList, RToSqlUdf(RExp, columns), this.getDDF().getTableName());
@@ -115,6 +120,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
    */
 
   public static String RToSqlUdf(String RExp, List<String> existingColumns) {
+    System.out.println("Existing columns: " + Joiner.on(",").skipNulls().join(existingColumns));
     List<String> udfs = Lists.newArrayList();
     for (String str : RExp.split(",(?![^()]*+\\))")) {
       String[] udf = str.split("[=~](?![^()]*+\\))");
