@@ -115,6 +115,38 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
   }
 
   @Override
+  public Double getVectorMin(String columnName) throws DDFException {
+    Double min = 0.0;
+    String command = String.format("select min(%s) from @this", columnName);
+
+    if (!Strings.isNullOrEmpty(command)) {
+      List<String> result = this.getDDF()
+          .sql2txt(command, String.format("Unable to compute the minimum value of the given column from table %%s"));
+      if (result != null && !result.isEmpty() && result.get(0) != null) {
+        min = Double.parseDouble(result.get(0));
+        return min;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public Double getVectorMax(String columnName) throws DDFException {
+    Double max = 0.0;
+    String command = String.format("select max(%s) from @this", columnName);
+
+    if (!Strings.isNullOrEmpty(command)) {
+      List<String> result = this.getDDF()
+          .sql2txt(command, String.format("Unable to compute the maximum value of the given column from table %%s"));
+      if (result != null && !result.isEmpty() && result.get(0) != null) {
+        max = Double.parseDouble(result.get(0));
+        return max;
+      }
+    }
+    return null;
+  }
+
+  @Override
   public double getVectorCor(String xColumnName, String yColumnName) throws DDFException {
     double corr = 0.0;
     String command = String.format("select corr(%s, %s) from @this", xColumnName, yColumnName);
@@ -192,7 +224,6 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       default:
         return "";
     }
-
   }
 
   public static class HistogramBin {

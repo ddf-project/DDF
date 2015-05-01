@@ -13,6 +13,8 @@ import io.ddf.util.Utils;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  *
@@ -140,7 +142,6 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
 
       try {
         DDF resultDDF = this.getManager().sql2ddf(sqlCmd);
-        this.getManager().addDDF(resultDDF);
         return resultDDF;
 
       } catch (Exception e) {
@@ -153,18 +154,16 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     }
   }
 
-  private String convertAggregateFunctionsToSql(String s) {
+  private String convertAggregateFunctionsToSql(String sql) {
 
-    if (Strings.isNullOrEmpty(s)) return null;
+    if (Strings.isNullOrEmpty(sql)) return null;
 
-    String[] splits = s.trim().split("=");
+    String[] splits = sql.trim().split("=(?![^()]*+\\))");
     if (splits.length == 2) {
-      return AggregateField.fromFieldSpec(splits[1]).setName(splits[0]).toString();
+      return String.format("%s AS %s", splits[1], splits[0]);
     } else if (splits.length == 1) { // no name for aggregated value
-      return AggregateField.fromFieldSpec(splits[0]).toString();
+      return splits[0];
     }
-    return s;
+    return sql;
   }
-
-
 }

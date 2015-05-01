@@ -8,25 +8,20 @@ import io.ddf.content.ISerializable;
 import io.ddf.exception.DDFException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.commons.io.FileUtils;
+import org.apache.hadoop.fs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+  import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 //import java.io.*;
 
@@ -37,6 +32,16 @@ import java.util.List;
 public class Utils {
 
   public static Logger sLog = LoggerFactory.getLogger(Utils.class);
+
+  public static Configuration getConfiguration() {
+    Configuration configuration = new Configuration();
+    String hadoopConfDir = System.getenv("HADOOP_CONF_DIR");
+    if(hadoopConfDir != null) {
+        configuration.addResource(new Path(hadoopConfDir + "/" + "core-site.xml"));
+        configuration.addResource(new Path(hadoopConfDir + "/" + "hdfs-site.xml"));
+    }
+    return configuration;
+  }
 
   public static List<String> listFiles(String directory) {
     return listDirectory(directory, true, false);
@@ -69,7 +74,34 @@ public class Utils {
     return Arrays.asList(directories);
   }
 
+  public static List<String> listHDFSSubDirectory(String directory) throws IOException {
+    return listHDFSDirectory(directory, false, true);
+  }
 
+  public static List<String> listHDFSDirectory(String directory) throws IOException {
+    return listHDFSDirectory(directory, true, true);
+  }
+
+  public static List<String> listHDFSDirectory(String directory, boolean doIncludeFiles,
+      boolean doIncludeSubdirectories) throws IOException {
+    Configuration config = getConfiguration();
+    FileSystem fileSystem = FileSystem.get(config);
+    List<String> files = new ArrayList<String>();
+    RemoteIterator<LocatedFileStatus> fileStatusListIterator= fileSystem.listLocatedStatus(new Path(directory));
+
+    while(fileStatusListIterator.hasNext()) {
+      FileStatus fileStatus = fileStatusListIterator.next();
+      if(doIncludeFiles) {
+        files.add(fileStatus.getPath().toString());
+      } else {
+        if(fileStatus.isDirectory()) {
+          files.add(fileStatus.getPath().toString());
+        }
+      }
+    }
+
+    return files;
+  }
 
   /**
    * Locates the given dirName as a full path, in the current directory or in successively higher parent directory
@@ -126,7 +158,7 @@ public class Utils {
    * @return true if "path" exists and is a file (and not a directory)
    */
   public static boolean fileExists(String path) throws IOException {
-    Configuration configuration = new Configuration();
+    Configuration configuration =  getConfiguration();
     FileSystem fileSystem = FileSystem.get(configuration);
     Path filePath = new Path(path);
     return (fileSystem.exists(filePath));
@@ -168,13 +200,16 @@ public class Utils {
     }
   }
 
-  public static void deleteFile(String fileName) {
-    new File(fileName).delete();
+  public static void deleteFile(String fileName) throws IOException {
+    Configuration configuration =  getConfiguration();
+    FileSystem fileSystem = FileSystem.get(configuration);
+    Path path = new Path(fileName);
+    fileSystem.delete(path, true);
   }
 
   public static String readFromFile(String fileName) throws IOException {
     Reader reader = null;
-    Configuration configuration = new Configuration();
+    Configuration configuration = getConfiguration();
     try {
       FileSystem hdfs = FileSystem.get(configuration);
       FSDataInputStream inputStream = hdfs.open(new Path(fileName));
@@ -191,7 +226,7 @@ public class Utils {
 
   public static void writeToFile(String fileName, String contents) throws IOException {
     Writer writer = null;
-    Configuration configuration = new Configuration();
+    Configuration configuration =  getConfiguration();
     try {
       FileSystem hdfs = FileSystem.get(configuration);
       FSDataOutputStream outputStream = hdfs.create(new Path(fileName));

@@ -86,14 +86,8 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
           "Either choose Axis.ROW for row-based NA filtering or Axis.COLUMN for column-based NA filtering");
     }
 
-
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      this.getManager().addDDF(newddf);
-      return newddf;
-    }
-
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+    return newddf;
   }
 
   private String dropNARowSQL(long thresh, List<String> columns) {
@@ -165,14 +159,8 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
       // TODO:
     }
 
-
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      this.getManager().addDDF(newddf);
-      return newddf;
-    }
-
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+    return newddf;
   }
 
   private String fillNAWithValueSQL(String value, AggregateFunction function, Map<String, String> columnsToValues,

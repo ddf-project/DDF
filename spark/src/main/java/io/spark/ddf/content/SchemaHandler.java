@@ -13,9 +13,11 @@ import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
 import io.spark.ddf.SparkDDF;
+import io.spark.ddf.util.SparkUtils;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.SchemaRDD;
-
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.StructField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,46 +29,8 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
     super(theDDF);
   }
 
-  public static Schema getSchemaFromSchemaRDD(SchemaRDD rdd) {
-    List<Column> cols = Lists.newArrayList();
-
-    String schema = rdd.schemaString().replace("root", "").replace("|--", "").trim();
-    String[] columns = schema.split("\n");
-    for (String colString : columns) {
-      String[] colNameNType = colString.trim().split(":");
-      String colName = colNameNType[0];
-      String colType = colNameNType[1].trim().split("\\(")[0].trim();
-      cols.add(new Column(colName, spark2DDFType(colType)));
-    }
-    return new Schema(null, cols);
-  }
-
-  public static String spark2DDFType(String colType) {
-    String typeString = null;
-    switch (colType) {
-      case "integer":
-        typeString = "INT";
-        break;
-      case "string":
-        typeString = "STRING";
-        break;
-      case "float":
-        typeString = "FLOAT";
-        break;
-      case "double":
-        typeString = "DOUBLE";
-        break;
-      case "timestamp":
-        typeString = "TIMESTAMP";
-        break;
-      case "long":
-        typeString = "LONG";
-        break;
-      case "boolean":
-        typeString = "BOOLEAN";
-        break;
-    }
-    return typeString;
+  public static Schema getSchemaFromDataFrame(DataFrame rdd) {
+    return SparkUtils.schemaFromDataFrame(rdd);
   }
 
   @Override
@@ -126,12 +90,12 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
       for (Integer colIndex : columnIndexes) {
         Column column = this.getColumn(this.getColumnName(colIndex));
         Map<String, Integer> levelCounts = listLevelCounts.get(colIndex);
-        Factor<?> factor = column.getOptionalFactor();
-
-        List<String> levels = new ArrayList<String>(levelCounts.keySet());
-
-        factor.setLevelCounts(levelCounts);
-        factor.setLevels(levels, false);
+        if(levelCounts != null) {
+          Factor<?> factor = column.getOptionalFactor();
+          List<String> levels = new ArrayList<String>(levelCounts.keySet());
+          factor.setLevelCounts(levelCounts);
+          factor.setLevels(levels, false);
+        }
       }
     }
   }

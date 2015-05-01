@@ -5,6 +5,8 @@ import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 
+import java.util.List;
+
 public abstract class ABinningHandler extends ADDFFunctionalGroupHandler implements IHandleBinning {
 
   protected double[] breaks;
@@ -14,17 +16,21 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
     // TODO Auto-generated constructor stub
   }
 
+  public List<AStatisticsSupporter.HistogramBin> getVectorHistogram(String column, int numBins) throws DDFException{
+    List<AStatisticsSupporter.HistogramBin> bins = getVectorHistogramImpl(column, numBins);
+    return bins;
+  }
+
+  public abstract List<AStatisticsSupporter.HistogramBin> getVectorHistogramImpl(String column, int numBins)
+          throws DDFException;
+
   public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
       boolean right) throws DDFException {
 
     DDF newddf = binningImpl(column, binningType, numBins, breaks, includeLowest, right);
 
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      this.getManager().addDDF(newddf);
-      return newddf;
-    }
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+    return newddf;
   }
 
   public abstract DDF binningImpl(String column, String binningType, int numBins, double[] breaks,

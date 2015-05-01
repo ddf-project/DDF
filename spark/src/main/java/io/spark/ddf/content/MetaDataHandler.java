@@ -3,8 +3,10 @@ package io.spark.ddf.content;
 
 import io.ddf.DDF;
 import io.ddf.content.AMetaDataHandler;
+import io.ddf.content.Schema;
+import io.ddf.exception.DDFException;
 import org.apache.log4j.Logger;
-
+import io.ddf.exception.DDFException;
 import java.util.List;
 
 /**
@@ -19,16 +21,14 @@ public class MetaDataHandler extends AMetaDataHandler {
   }
 
   @Override
-  protected long getNumRowsImpl() {
+  protected long getNumRowsImpl() throws DDFException {
     String tableName = this.getDDF().getSchemaHandler().getTableName();
     logger.debug("get NumRows Impl called");
     try {
       List<String> rs = this.getManager().sql2txt("SELECT COUNT(*) FROM " + tableName);
       return Long.parseLong(rs.get(0));
     } catch (Exception e) {
-      logger.error("Unable to query from " + tableName, e);
+      throw new DDFException("Error getting NRow", e);
     }
-    return 0;
   }
-
 }

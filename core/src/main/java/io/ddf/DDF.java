@@ -43,6 +43,7 @@ import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.AggregateTypes.AggregateField;
 import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
+import io.ddf.util.DDFUtils;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
 
@@ -53,6 +54,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -159,13 +162,17 @@ public abstract class DDF extends ALoggable //
     this.getRepresentationHandler().set(data, typeSpecs);
 
     this.getSchemaHandler().setSchema(schema);
-    if (Strings.isNullOrEmpty(name) && schema != null) name = schema.getTableName();
+    if(schema!= null && schema.getTableName() == null) {
+      String tableName = this.getSchemaHandler().newTableName();
+      schema.setTableName(tableName);
+    }
 
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
 
-    this.setName(name);
+    manager.setDDFName(this, name);
 
+    manager.setDDFUUID(this, DDFUtils.generateObjectName(this));
     // Facades
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
@@ -185,7 +192,7 @@ public abstract class DDF extends ALoggable //
 
   @Expose private String mName;
 
-
+  @Expose private String uuid;
   /**
    * @return the namespace this DDF belongs in
    * @throws DDFException
@@ -213,24 +220,11 @@ public abstract class DDF extends ALoggable //
   }
 
   /**
-   * Also synchronizes the Schema's table name with that of the DDF name
    *
    * @return the name of this DDF
    */
   @Override
   public String getName() {
-    if (Strings.isNullOrEmpty(mName)) {
-      if (!Strings.isNullOrEmpty(this.getSchemaHandler().getTableName())) {
-        mName = this.getSchemaHandler().getTableName();
-
-      } else {
-        mName = this.getSchemaHandler().newTableName();
-        if (this.getSchemaHandler().getSchema() != null) {
-          this.getSchemaHandler().getSchema().setTableName(mName);
-        }
-      }
-    }
-
     return mName;
   }
 
@@ -238,9 +232,31 @@ public abstract class DDF extends ALoggable //
    * @param name
    *          the DDF name to set
    */
-  @Override
-  public void setName(String name) {
+  protected void setName(String name) throws DDFException {
+    if(name != null) validateName(name);
     this.mName = name;
+  }
+
+  //Ensure name is unique
+  //Also only allow alphanumberic and dash "-" and underscore "_"
+  private void validateName(String name) throws DDFException {
+    Boolean isNameExisted;
+    try {
+      this.getManager().getDDFByName(name);
+      isNameExisted = true;
+    } catch (DDFException e) {
+      isNameExisted = false;
+    }
+    if(isNameExisted) {
+      throw new DDFException(String.format("DDF with name %s already exists", name));
+    }
+
+    Pattern p = Pattern.compile("^[a-zA-Z0-9_-]*$");
+    Matcher m = p.matcher(name);
+    if(!m.find()) {
+      throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
+              "and dash (\"-\") and underscore (\"_\")", name));
+    }
   }
 
   @Override
@@ -248,7 +264,9 @@ public abstract class DDF extends ALoggable //
     return "ddf";
   }
 
+  public String getUUID() {return uuid;}
 
+  protected void setUUID(String uuid) {this.uuid = uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
@@ -269,10 +287,9 @@ public abstract class DDF extends ALoggable //
     return mManager;
   }
 
-  protected void setManager(DDFManager DDFManager) {
+  public void setManager(DDFManager DDFManager) {
     this.mManager = DDFManager;
   }
-
 
   /**
    *
@@ -281,8 +298,6 @@ public abstract class DDF extends ALoggable //
   public String getEngine() {
     return this.getManager().getEngine();
   }
-
-
 
   // ////// MetaData that deserves to be right here at the top level ////////
 
@@ -302,8 +317,10 @@ public abstract class DDF extends ALoggable //
     return this.getSchema().getColumnNames();
   }
 
+  public void setColumnNames(List<String> columnNames) {this.getSchema().setColumnNames(columnNames);}
 
-  public long getNumRows() {
+
+  public long getNumRows() throws DDFException {
     return this.getMetaDataHandler().getNumRows();
   }
 
@@ -758,7 +775,7 @@ public abstract class DDF extends ALoggable //
 
     try {
       className = Config.getValueWithGlobalDefault(this.getEngine(), theInterface.getSimpleName());
-
+      mLog.info(">>> className = " + className);
       if (Strings.isNullOrEmpty(className)) {
         mLog.error(String.format("Cannot determine classname for %s from configuration source [%s] %s",
             theInterface.getSimpleName(), Config.getConfigHandler().getSource(), this.getEngine()));
@@ -957,9 +974,15 @@ public abstract class DDF extends ALoggable //
     return this.getStatisticsSupporter().getVectorMean(columnName);
   }
 
-  public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
+  public List<HistogramBin> getVectorHistogram_Hive(String columnName, int numBins) throws DDFException {
     // TODO need to check columnName
     return this.getStatisticsSupporter().getVectorHistogram(columnName, numBins);
+
+  }
+
+  public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
+    // TODO need to check columnName
+    return this.getBinningHandler().getVectorHistogram(columnName, numBins);
   }
 
   public Double getVectorCor(String xColumnName, String yColumnName) throws DDFException {
@@ -970,6 +993,16 @@ public abstract class DDF extends ALoggable //
   public Double getVectorCovariance(String xColumnName, String yColumnName) throws DDFException {
     // TODO need to check columnName
     return this.getStatisticsSupporter().getVectorCovariance(xColumnName, yColumnName);
+  }
+
+  public Double getVectorMin(String columnName) throws DDFException {
+    // TODO need to check columnName
+    return this.getStatisticsSupporter().getVectorMin(columnName);
+  }
+
+  public Double getVectorMax(String columnName) throws DDFException {
+    // TODO need to check columnName
+    return this.getStatisticsSupporter().getVectorMax(columnName);
   }
 
 

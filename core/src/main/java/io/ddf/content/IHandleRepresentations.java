@@ -84,6 +84,8 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
   public void addConvertFunction(Representation fromRepresentation, Representation toRepresentation,
       ConvertFunction convertFunction);
 
+  public void removeConvertFunction(Representation fromRepresentation, Representation toRepresentation);
+
   interface IGetResult {
     String getTypeSpecsString();
 
@@ -125,6 +127,11 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
    *                  RDD<List<Double>> would be (RDD.class, List.class, Double.class)
    */
   void remove(Class<?>... typeSpecs);
+
+  /**
+   * Cache a representation in memory
+   */
+  void cache();
 
   /**
    * Cache all representations, e.g., in an in-memory context
