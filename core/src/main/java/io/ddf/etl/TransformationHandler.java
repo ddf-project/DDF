@@ -90,7 +90,6 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     String sqlCmd = String.format("SELECT %s FROM %s",
         RToSqlUdf(RExp, columns, this.getDDF().getSchema().getColumns()),
         this.getDDF().getTableName());
-    System.out.println("Performing: " + sqlCmd);
 
     DDF newddf = this.getManager().sql2ddf(sqlCmd);
 
