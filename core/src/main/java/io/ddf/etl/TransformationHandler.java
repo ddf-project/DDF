@@ -10,7 +10,8 @@ import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
 
@@ -86,18 +87,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   public DDF transformUDF(String RExp, List<String> columns) throws DDFException {
+    String sqlCmd = String.format("SELECT %s FROM %s",
+        RToSqlUdf(RExp, columns, this.getDDF().getSchema().getColumns()),
+        this.getDDF().getTableName());
+    System.out.println("Performing: " + sqlCmd);
 
-    String columnList;
-    if (columns != null) {
-      columnList = Joiner.on(",").skipNulls().join(columns);
-    } else {
-      columns = new ArrayList<String>();
-      for (Column c : this.getDDF().getSchema().getColumns()) {
-        columns.add(c.getName());
-      }
-      columnList = "*";
-    }
-    String sqlCmd = String.format("SELECT %s, %s FROM %s", columnList, RToSqlUdf(RExp, columns), this.getDDF().getTableName());
     DDF newddf = this.getManager().sql2ddf(sqlCmd);
 
     if (this.getDDF().isMutable()) {
@@ -119,27 +113,45 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
    * @return "(arrtime - crsarrtime) as foobar, (distance / airtime) as speed
    */
 
-  public static String RToSqlUdf(String RExp, List<String> existingColumns) {
-    System.out.println("Existing columns: " + Joiner.on(",").skipNulls().join(existingColumns));
+  public static String RToSqlUdf(String RExp, List<String> selectedColumns, List<Column> existingColumns) {
     List<String> udfs = Lists.newArrayList();
+    Set<String> newColsSet = new HashSet<String>();
     for (String str : RExp.split(",(?![^()]*+\\))")) {
       String[] udf = str.split("[=~](?![^()]*+\\))");
       if (udf.length == 1) {
         udfs.add(String.format("(%s)", udf[0]).trim());
       } else {
         String newCol = udf[0].trim().replaceAll("\\W", "");
-        if (existingColumns != null && existingColumns.contains(newCol)) {
+        if (newColsSet.contains(newCol)) {
             throw new RuntimeException(newCol + " duplicates another column name");
         }
         else {
             udfs.add(String.format("(%s) as %s", udf[1].trim(), newCol));
+            newColsSet.add(newCol);
         }
       }
+    }
+    if (selectedColumns != null) {
+        for (String sc : selectedColumns) {
+            if (newColsSet.contains(sc)) {
+                throw new RuntimeException(sc + " duplicates another column name");
+            } else {
+                udfs.add(sc);
+                newColsSet.add(sc);
+            }
+        }
+    } else if (existingColumns != null) {
+        for (Column ec : existingColumns) {
+            String ecName = ec.getName();
+            if (!newColsSet.contains(ecName)) {
+                udfs.add(ecName);
+            }
+        }
     }
     return Joiner.on(",").join(udfs);
   }
 
   public static String RToSqlUdf(String RExp) {
-    return RToSqlUdf(RExp, null);
+    return RToSqlUdf(RExp, null, null);
   }
 }
