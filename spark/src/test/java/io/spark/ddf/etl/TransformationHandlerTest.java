@@ -88,7 +88,7 @@ public class TransformationHandlerTest extends BaseTest {
 
     Assert.assertEquals(31, ddf.getNumRows());
     Assert.assertEquals(9, ddf.getNumColumns());
-    Assert.assertEquals("test123", ddf.getColumnName(0));
+    Assert.assertEquals("test123", ddf.getColumnName(8));
     Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
 
 
@@ -112,7 +112,7 @@ public class TransformationHandlerTest extends BaseTest {
 
     Assert.assertEquals(31, ddf.getNumRows());
     Assert.assertEquals(9, ddf.getNumColumns());
-    Assert.assertEquals("dist", ddf.getColumnName(0));
+    Assert.assertEquals("dist", ddf.getColumnName(8));
     Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
 
     // udf without assigning column name
@@ -127,14 +127,14 @@ public class TransformationHandlerTest extends BaseTest {
     ddf = ddf.Transform.transformUDF("speed = distance/(arrtime-deptime)", cols);
     Assert.assertEquals(31, ddf.getNumRows());
     Assert.assertEquals(5, ddf.getNumColumns());
-    Assert.assertEquals("speed", ddf.getColumnName(0));
+    Assert.assertEquals("speed", ddf.getColumnName(4));
     ddf.setMutable(false);
 
     // multiple expressions, column name with special characters
     DDF ddf3 = ddf.Transform.transformUDF("arrtime-deptime, (speed^*- = distance/(arrtime-deptime)", cols);
     Assert.assertEquals(31, ddf3.getNumRows());
     Assert.assertEquals(6, ddf3.getNumColumns());
-    Assert.assertEquals("speed", ddf3.getColumnName(1));
+    Assert.assertEquals("speed", ddf3.getColumnName(5));
     Assert.assertEquals(6, ddf3.getSummary().length);
 
     // transform using if else/case when
@@ -158,5 +158,11 @@ public class TransformationHandlerTest extends BaseTest {
     ddf.setMutable(true);
     List<String> cols = Lists.newArrayList("distance");
     ddf.Transform.transformUDF("distance=100", cols);
+  }
+
+  @Test(expected=RuntimeException.class)
+  public void testConflictingColumnDefinitions2() throws DDFException {
+    ddf.setMutable(true);
+    ddf.Transform.transformUDF("distance=100, distance");
   }
 }

@@ -12,6 +12,8 @@ import io.ddf.misc.ADDFFunctionalGroupHandler;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
 
@@ -91,8 +93,6 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
         RToSqlUdf(RExp, columns, this.getDDF().getSchema().getColumns()),
         this.getDDF().getTableName());
 
-    System.out.println("Performing: " + sqlCmd);
-
     DDF newddf = this.getManager().sql2ddf(sqlCmd);
 
     if (this.getDDF().isMutable()) {
@@ -118,6 +118,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     List<String> udfs = Lists.newArrayList();
     Map<String, String> newColToDef = new HashMap<String, String>();
     boolean updateOnConflict = (selectedColumns == null || selectedColumns.isEmpty());
+    String dupColExp = "%s duplicates another column name";
 
     if (updateOnConflict) {
       if (existingColumns != null && !existingColumns.isEmpty()) {
@@ -132,20 +133,27 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       }
     }
 
+    Set<String> newColsInRExp = new HashSet<String>();
     for (String str : RExp.split(",(?![^()]*+\\))")) {
       String[] udf = str.split("[=~](?![^()]*+\\))");
-      String newCol = udf[0].trim().replaceAll("\\W", "");
+      String newCol = (udf.length > 1) ?
+        udf[0].trim().replaceAll("\\W", "") :
+        udf[0].trim();
+      if (newColsInRExp.contains(newCol)) {
+        throw new RuntimeException(String.format(dupColExp, newCol));
+      }
       String newDef = (udf.length > 1) ? udf[1].trim() : null;
       if (!udfs.contains(newCol)) {
         udfs.add(newCol);
       }
       else if (!updateOnConflict) {
-          throw new RuntimeException(newCol + " duplicates another column name");
+        throw new RuntimeException(String.format(dupColExp,newCol));
       }
 
       if (newDef != null && !newDef.isEmpty()) {
-        newColToDef.put(newCol, newDef);
+        newColToDef.put(newCol.replaceAll("\\W", ""), newDef);
       }
+      newColsInRExp.add(newCol);
     }
 
     String selectStr = "";
