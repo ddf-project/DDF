@@ -73,11 +73,14 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   /**
    * Cache SchemaRDD in memory
    * */
-  override def cache = {
+  override def cache(isLazy: Boolean) = {
     val ddf = this.getDDF.asInstanceOf[SparkDDF]
     ddf.saveAsTable()
     val schemaRDD = ddf.getRepresentationHandler.get(classOf[SchemaRDD]).asInstanceOf[SchemaRDD]
     schemaRDD.persist()
+    if(!isLazy) {
+      schemaRDD.count()
+    }
   }
 
   override def cacheAll = {

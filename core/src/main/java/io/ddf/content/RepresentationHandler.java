@@ -304,7 +304,7 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public void cache() {
+  public void cache(boolean lazy) {
 
   }
 
