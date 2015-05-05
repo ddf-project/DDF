@@ -28,6 +28,11 @@ public class RepresentationsGraph {
     return this.mGraph.addEdge(startVertex, endVertex);
   }
 
+  public void removeEdge(Representation startVertex, Representation endVertex) {
+    this.mConvertFunctionFactory.remove(startVertex, endVertex);
+    this.mGraph.removeEdge(startVertex, endVertex);
+  }
+
   public GraphPath<Representation, ConvertFunction> getShortestPath(Representation startVertex,
       Representation endVertex) {
     try {
