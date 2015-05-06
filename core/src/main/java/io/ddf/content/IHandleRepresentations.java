@@ -131,7 +131,7 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
   /**
    * Cache a representation in memory
    */
-  void cache();
+  void cache(boolean lazy);
 
   /**
    * Cache all representations, e.g., in an in-memory context
