@@ -401,12 +401,16 @@ public class Schema implements Serializable {
    * The R concept of a column "type", such as STRING, INT, LONG, etc.
    */
   public enum ColumnType {
-
-    STRING(String.class), INT(Integer.class), LONG(Long.class), FLOAT(
-        Float.class), DOUBLE(Double.class), BIGINT(Long.class), //
-    TIMESTAMP(Date.class, java.sql.Date.class, Time.class, Timestamp.class), BLOB(
-        Object.class), //
-    LOGICAL(Boolean.class), //
+    STRING(String.class),
+    INT(Integer.class),
+    LONG(Long.class),
+    FLOAT(Float.class),
+    DOUBLE(Double.class),
+    BIGINT(Long.class), //
+    TIMESTAMP(Date.class, java.sql.Date.class, Time.class, Timestamp.class),
+    STRUCT(Object.class),
+    BLOB(Object.class), //
+    LOGICAL(Boolean.class),
     ANY(/* for ColumnClass.Factor */) //
     ;
 
@@ -484,7 +488,6 @@ public class Schema implements Serializable {
     NUMERIC(ColumnType.LONG, ColumnType.FLOAT, ColumnType.DOUBLE), //
     CHARACTER(ColumnType.STRING), //
     LOGICAL(ColumnType.LOGICAL), //
-
     FACTOR(ColumnType.ANY) //
 
     ;
