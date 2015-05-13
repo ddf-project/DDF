@@ -45,6 +45,7 @@ object SparkUtils {
 
   def schemaFromDataFrame(schemaRDD: DataFrame): Schema = {
     val schema = schemaRDD.schema
+    println("<<<< schema: " + schema)
     val cols: ArrayList[Column] = Lists.newArrayList();
     for(field <- schema.fields) {
       val colType = spark2DDFType(field.dataType.typeName)
@@ -55,6 +56,7 @@ object SparkUtils {
   }
 
   def spark2DDFType(colType: String): String = {
+    println(colType)
     colType match {
       case "integer" => "INT"
       case "string" => "STRING"
