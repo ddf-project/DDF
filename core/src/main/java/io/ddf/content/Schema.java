@@ -409,6 +409,7 @@ public class Schema implements Serializable {
     BIGINT(Long.class), //
     TIMESTAMP(Date.class, java.sql.Date.class, Time.class, Timestamp.class),
     STRUCT(Object.class),
+    ARRAY(scala.collection.Seq.class),
     BLOB(Object.class), //
     LOGICAL(Boolean.class),
     ANY(/* for ColumnClass.Factor */) //

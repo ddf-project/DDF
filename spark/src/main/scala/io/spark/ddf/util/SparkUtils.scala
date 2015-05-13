@@ -66,6 +66,7 @@ object SparkUtils {
       case "long"     => "LONG"
       case "boolean"  => "BOOLEAN"
       case "struct" => "STRUCT"
+      case "array" => "ARRAY"
       case x => throw new DDFException(s"Type not support $x")
     }
   }
