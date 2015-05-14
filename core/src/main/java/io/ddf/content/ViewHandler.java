@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+import scala.Int;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -189,6 +190,9 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     OperationName name;
     Expression[] operands;
 
+    public Operator() {
+      super.setType("Operator");
+    }
 
     public OperationName getName() {
       return name;
@@ -254,11 +258,18 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   public abstract static class Value extends Expression {
     public abstract Object getValue();
+    public void setType(String type) {
+      super.setType(type);
+    }
   }
 
 
   static public class IntVal extends Value {
     int value;
+
+    public IntVal() {
+      super.setType("IntVal");
+    }
 
 
     @Override
@@ -281,6 +292,10 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   static public class DoubleVal extends Value {
     double value;
 
+    public DoubleVal() {
+      super.setType("DoubleVal");
+    }
+
 
     @Override
     public String toString() {
@@ -301,6 +316,10 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   static public class StringVal extends Value {
     String value;
+
+    public StringVal() {
+      super.setType("StringVal");
+    }
 
     public void setValue(String val) {
       this.value = val;
@@ -326,6 +345,10 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   static public class BooleanVal extends Value {
     Boolean value;
 
+    public BooleanVal() {
+      super.setType("BooleanVal");
+    }
+
 
     @Override
     public String toString() {
@@ -348,6 +371,10 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     String id;
     String name;
     Integer index = null;
+
+    public Column() {
+      super.setType("Column");
+    }
 
 
     public String getID() {

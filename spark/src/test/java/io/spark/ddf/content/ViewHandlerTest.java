@@ -44,16 +44,13 @@ public class ViewHandlerTest extends BaseTest{
     List<Column> columns = Lists.newArrayList();
     Column col = new Column();
     col.setName("origin");
-    col.setType("Column");
     columns.add(col);
 
     Operator grep = new Operator();
     grep.setName(OperationName.grep);
-    grep.setType("Operator");
     Expression[] operands = new Expression[2];
     StringVal val = new StringVal();
     val.setValue("IAD");
-    val.setType("StringVal");
     operands[0] = val;
     operands[1] = col;
     grep.setOperarands(operands);
@@ -72,16 +69,13 @@ public class ViewHandlerTest extends BaseTest{
     List<Column> columns = Lists.newArrayList();
     Column col = new Column();
     col.setName("origin");
-    col.setType("Column");
     columns.add(col);
 
     Operator grep = new Operator();
     grep.setName(OperationName.grep_ic);
-    grep.setType("Operator");
     Expression[] operands = new Expression[2];
     StringVal val = new StringVal();
     val.setValue("iad");
-    val.setType("StringVal");
     operands[0] = val;
     operands[1] = col;
     grep.setOperarands(operands);
