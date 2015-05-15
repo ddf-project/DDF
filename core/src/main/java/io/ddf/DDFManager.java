@@ -231,7 +231,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 				Class[].class, String.class, String.class, Schema.class },
 				new Object[] { manager, data, typeSpecs, namespace, name,
 						schema });
-    this.addDDF(ddf);
     return ddf;
   }
 
@@ -243,7 +242,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 						Class[].class, String.class, String.class, Schema.class },
 						new Object[] { this, data, typeSpecs, namespace, name,
 								schema });
-    this.addDDF(ddf);
     return ddf;
   }
 
@@ -285,7 +283,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
       DDF ddf = cons.newInstance(argValues);
       if (ddf == null) throw new DDFException("Cannot instantiate a new instance of " + className);
-
+      this.addDDF(ddf);
       return ddf;
 
     } catch (Exception e) {
