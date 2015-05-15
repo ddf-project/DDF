@@ -34,9 +34,9 @@ public class BinningHandlerTest extends BaseTest {
     DDF ddf1 = ddf.binning("month", "custom", 0, new double[] { 2, 4, 6, 8 }, true, true);
     Assert.assertTrue(ddf1.getSchemaHandler().getColumn("month").getColumnClass() == ColumnClass.FACTOR);
     // {'[2,4]'=1, '(4,6]'=2, '(6,8]'=3}
-    System.out.println(">>>>> get2,4) == " + ddf1.getSchemaHandler().getColumn("month").getOptionalFactor().getLevelMap().get("[2,4]"));
-	Assert.assertTrue(ddf1.getSchemaHandler().getColumn("month").getOptionalFactor().getLevelMap().get("[2,4]") == 2);
-
+    ddf1.getSchemaHandler().computeFactorLevelsAndLevelCounts();
+    Assert.assertEquals(ddf1.getSchemaHandler().getColumn("month").getOptionalFactor().getLevelMap().get("[2,4]"), 1, 0);
+    Assert.assertEquals(ddf1.getSchemaHandler().getColumn("month").getOptionalFactor().getLevelCounts().get("[2,4]"), 6, 0);
     Assert.assertFalse(Strings.isNullOrEmpty(newddf.sql2txt("select dayofweek from @this", "").get(0)));
     Assert.assertFalse(Strings.isNullOrEmpty(ddf1.sql2txt("select month from @this", "").get(0)));
 
