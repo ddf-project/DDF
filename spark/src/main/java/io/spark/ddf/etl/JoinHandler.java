@@ -2,11 +2,14 @@ package io.spark.ddf.etl;
 
 
 import io.ddf.DDF;
+import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.etl.IHandleJoins;
 import io.ddf.etl.Types.JoinType;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+import io.spark.ddf.util.SparkUtils;
+import org.apache.spark.sql.DataFrame;
 
 import java.util.HashSet;
 import java.util.List;
@@ -75,7 +78,6 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
 
     try {
       DDF resultDDF = this.getManager().sql2ddf(joinSqlCommand);
-      this.getDDF().getManager().addDDF(resultDDF);
       return resultDDF;
     } catch (Exception e) {
       e.printStackTrace();
@@ -83,5 +85,12 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
     }
 
   }
-
+  @Override
+  public DDF merge(DDF anotherDDF) throws DDFException {
+    DataFrame rdd1 = ((DataFrame) this.getDDF().getRepresentationHandler().get(DataFrame.class));
+    DataFrame rdd2 = ((DataFrame) anotherDDF.getRepresentationHandler().get(DataFrame.class));
+    DataFrame newRDD = rdd1.unionAll(rdd2);
+    Schema schema = SparkUtils.schemaFromDataFrame(newRDD);
+    return this.getManager().newDDF(newRDD, new Class<?>[]{DataFrame.class}, null, null, schema);
+  }
 }

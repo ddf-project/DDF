@@ -1,3 +1,5 @@
+import _root_.sbt.Keys._
+import _root_.sbt.Keys._
 import sbt._
 import sbt.Classpaths.publishTask
 import Keys._
@@ -16,7 +18,7 @@ object RootBuild extends Build {
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
 
-  val SPARK_VERSION = "1.2.0-SNAPSHOT"
+  val SPARK_VERSION = "1.3.1"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -33,9 +35,9 @@ object RootBuild extends Build {
   val projectName = "ddf"
   val rootProjectName = projectName
   val rootVersion = if(YARN_ENABLED) {
-    "1.1"
+    "1.2-adatao"
   } else {
-    "1.1-mesos"
+    "1.2-mesos"
   }
 
   val projectOrganization = rootOrganization + "." + projectName
@@ -53,14 +55,14 @@ object RootBuild extends Build {
 //  } else {
 //    rootVersion + "-mesos"
 //  }
-  val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + sparkVersion + ".jar"
-  val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + sparkVersion + "-tests.jar"
+  val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + ".jar"
+  val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + "-tests.jar"
   
 
   val examplesProjectName = projectName + "_examples"
   val examplesVersion = rootVersion
-  val examplesJarName = examplesProjectName + "-" + sparkVersion + ".jar"
-  val examplesTestJarName = examplesProjectName + "-" + sparkVersion + "-tests.jar"
+  val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
+  val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
   
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
@@ -91,7 +93,6 @@ object RootBuild extends Build {
   val excludeNetty = ExclusionRule(organization = "org.jboss.netty", name = "netty")
   val excludeScala = ExclusionRule(organization = "org.scala-lang", name = "scala-library")
   val excludeGuava = ExclusionRule(organization = "com.google.guava", name = "guava-parent")
-  val excludeJets3t = ExclusionRule(organization = "net.java.dev.jets3t", name = "jets3t")
   val excludeAsm = ExclusionRule(organization = "asm", name = "asm")
   val excludeSpark = ExclusionRule(organization = "org.apache.spark", name = "spark-core_2.10")
   val excludeEverthing = ExclusionRule(organization = "*", name = "*")
@@ -99,9 +100,10 @@ object RootBuild extends Build {
 
   // We define this explicitly rather than via unmanagedJars, so that make-pom will generate it in pom.xml as well
   // org % package % version
+
   val com_adatao_unmanaged = Seq(
-    "com.adatao.unmanaged.net.rforge" % "REngine" % "1.7.2.compiled",
-    "com.adatao.unmanaged.net.rforge" % "Rserve" % "1.7.2.compiled"
+    "com.adatao.unmanaged.net.rforge" % "REngine" % "2.1.1.compiled",
+    "com.adatao.unmanaged.net.rforge" % "Rserve" % "1.8.2.compiled"
   )
 
   val scalaArtifacts = Seq("jline", "scala-compiler", "scala-library", "scala-reflect")
@@ -127,7 +129,7 @@ object RootBuild extends Build {
     //"commons-dbcp" % "commons-dbcp" % "1.4",
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
-    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION excludeAll(excludeJets3t) exclude("com.google.protobuf", "protobuf-java") 
+    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
@@ -157,6 +159,7 @@ object RootBuild extends Build {
 
     // Fork new JVMs for tests and set Java options for those
     fork in Test := true,
+    parallelExecution in ThisBuild := false,
     javaOptions in Test ++= Seq("-Xmx2g"),
 
     // Only allow one test at a time, even across projects, since they run in the same JVM
@@ -234,14 +237,15 @@ object RootBuild extends Build {
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-xc" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-jaxrs" % "1.8.8",
-    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.3.1",
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4",
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.4.4",
+    dependencyOverrides += "com.google.code.findbugs" % "jsr305" % "2.0.1",
     dependencyOverrides += "com.thoughtworks.paranamer" % "paranamer" % "2.4.1", //net.liftweb conflict with avro
     dependencyOverrides += "org.xerial.snappy" % "snappy-java" % "1.0.5", //spark-core conflicts with avro
     dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.1.4",
     dependencyOverrides += "org.apache.avro" % "avro-ipc" % "1.7.4",
     dependencyOverrides += "org.apache.avro" % "avro" % "1.7.4",
     dependencyOverrides += "org.apache.zookeeper" % "zookeeper" % "3.4.5",
-    dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.9.0",
 //    dependencyOverrides += "org.eclipse.jetty" % "jetty-server" % "8.1.14.v20131031",
 //    dependencyOverrides += "org.eclipse.jetty" % "jetty-jndi" % "8.1.14.v20131031",
 //     dependencyOverrides += "org.eclipse.jetty" % "jetty-security" % "8.1.14.v20131031",
@@ -269,6 +273,11 @@ object RootBuild extends Build {
     dependencyOverrides += "com.sun.jersey" % "jersey-json" % "1.9",
     dependencyOverrides += "com.sun.jersey" % "jersey-server" % "1.9",
     dependencyOverrides += "org.scalamacros" % "quasiquotes_2.10" % "2.0.0",
+    dependencyOverrides += "commons-httpclient" % "commons-httpclient" % "3.1",
+    dependencyOverrides += "org.apache.avro" % "avro-mapred" % "1.7.6",
+    dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
+    dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.7.1",
+    dependencyOverrides += "com.google.code.gson"% "gson" % "2.3.1",
     pomExtra := (
       <!--
       **************************************************************************************************

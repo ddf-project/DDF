@@ -5,6 +5,7 @@ package io.ddf.content;
 
 
 import io.ddf.DDF;
+import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 
 import java.util.HashMap;
@@ -32,14 +33,14 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
 
   private long mNumRows = 0L;
   private boolean bNumRowsIsValid = false;
-
+  private int useCount = 0;
   /**
    * Each implementation needs to come up with its own way to compute the row
    * count.
    *
    * @return row count of a DDF
    */
-  protected abstract long getNumRowsImpl();
+  protected abstract long getNumRowsImpl() throws DDFException;
 
   /**
    * Called to assert that the row count needs to be recomputed at next access
@@ -50,12 +51,46 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
   }
 
   @Override
-  public long getNumRows() {
+  public long getNumRows() throws DDFException {
     if (!bNumRowsIsValid) {
       mNumRows = this.getNumRowsImpl();
       //      bNumRowsIsValid = true;
     }
     return mNumRows;
+  }
+
+  @Override
+  public boolean inUse() {
+    if(useCount > 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public synchronized void increaseUseCount() {
+    this.useCount += 1;
+  }
+
+  /**
+   * Transfer factor information from ddf to this DDF
+   * @param ddf
+   * @throws DDFException
+   */
+  public void copyFactor(DDF ddf)  throws DDFException {
+    for (Schema.Column col : ddf.getSchema().getColumns()) {
+      if (this.getDDF().getColumn(col.getName()) != null && col.getColumnClass() == Schema.ColumnClass.FACTOR) {
+        this.getDDF().getSchemaHandler().setAsFactor(col.getName());
+      }
+    }
+    this.getDDF().getSchemaHandler().computeFactorLevelsAndLevelCounts();
+  }
+
+  public void copyMetaData(DDF ddf) throws DDFException {
+    this.getDDF().getManager().setDDFUUID(ddf, ddf.getUUID());
+    this.getDDF().getManager().setDDFName(ddf, ddf.getName());
+    this.copyFactor(ddf);
   }
 
   private HashMap<Integer, ICustomMetaData> mCustomMetaDatas;

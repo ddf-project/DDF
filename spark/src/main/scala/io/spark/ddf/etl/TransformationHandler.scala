@@ -14,6 +14,7 @@ import org.rosuda.REngine.REXPLogical
 import org.rosuda.REngine.REXPString
 import org.rosuda.REngine.RList
 import org.rosuda.REngine.Rserve.RConnection
+import org.rosuda.REngine.Rserve.StartRserve
 
 import io.ddf.DDF
 import io.ddf.content.Schema
@@ -84,7 +85,6 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val manager = this.getManager
     val ddf = manager.newDDF(manager, rReduced, Array(classOf[RDD[_]], classOf[REXP]), manager.getNamespace, null, newSchema)
-    manager.addDDF(ddf)
     ddf
   }
 
@@ -96,6 +96,8 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val rMapped = dfrdd.map {
       partdf ⇒
         try {
+          // check if Rserve is running, if not: start it
+          if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
           // one connection for each compute job
           val rconn = new RConnection()
 
@@ -105,7 +107,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
           val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpression)
 
-          //        mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
+          // mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
 
           // compute!
           TransformationHandler.tryEval(rconn, expr, errMsgHeader = "failed to eval transform expression")
@@ -134,7 +136,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val manager = this.getManager
     val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]], classOf[REXP]), manager.getNamespace, null, newSchema)
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
-    manager.addDDF(ddf)
+    ddf.getMetaDataHandler.copyFactor(this.getDDF)
     ddf
   }
 
@@ -180,6 +182,8 @@ object TransformationHandler {
    * Perform map and mapsideCombine phase
    */
   def preShuffleMapper(partdf: REXP, mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean): REXP = {
+    // check if Rserve is running, if not: start it
+    if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
     // one connection for each compute job
     val rconn = new RConnection()
 
@@ -325,6 +329,8 @@ object TransformationHandler {
    * then assemble each resulting partition as a data.frame of REXP in Java
    */
   def postShufflePartitionMapper(input: Iterator[(String, Iterable[REXP])], reduceFuncDef: String): Iterator[REXP] = {
+    // check if Rserve is running, if not: start it
+    if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
     val rconn = new RConnection()
 
     // pre-amble
