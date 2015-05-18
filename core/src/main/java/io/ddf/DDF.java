@@ -1049,28 +1049,6 @@ public abstract class DDF extends ALoggable //
   public void afterUnpersisting() {
   }
 
-  public static class DDFInformation {
-    private Integer numColumns;
-
-    private String uri;
-
-    private String createdTime;
-
-    public String getUri() {
-      return this.uri;
-    }
-
-    public String getCreatedTime() {
-      return this.createdTime;
-    }
-
-    public DDFInformation(String uri, String createdTime) {
-      this.uri = uri;
-      this.createdTime = createdTime;
-    }
-  }
-
-
   //
   // //// ISerializable //////
 
