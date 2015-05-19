@@ -74,4 +74,12 @@ public class TransformFacade implements IHandleTransformations {
   public DDF transformUDF(String transformExpression) throws DDFException {
     return transformUDF(transformExpression, null);
   }
+
+  public DDF flattenDDF(List<String> columns) throws DDFException {
+    return flattenDDF(columns);
+  }
+
+  public DDF flattenDDF() throws DDFException {
+    return flattenDDF();
+  }
 }
