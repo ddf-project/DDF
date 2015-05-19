@@ -40,7 +40,9 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     mDDF.sql2ddf(q)
   }
 
-
+  override def flattenDDF(): DDF = {
+    flattenDDF(null)
+  }
 
   override def transformMapReduceNative(mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean = true): DDF = {
 
