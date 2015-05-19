@@ -18,6 +18,7 @@ import io.ddf.exception.DDFException
 
 import scala.util
 
+
 /**
   */
 
@@ -71,16 +72,16 @@ object SparkUtils {
     val schema = df.schema
     val fields =
       if(colNames == null || colNames.isEmpty) {
-        schema.fields
+        schema.fields.toList
       } else {
-        val flds:ArrayList[StructField] = Lists.newArrayList()
-        for(name:String <- colNames) {
+        val flds:ArrayList[StructField] = new ArrayList[StructField]()
+        for(name <- colNames.asScala.toList) {
           if(schema.fieldNames.contains(name))
             flds.add(schema.apply(name))
           else
             throw new DDFException("Error: column-name " + name + " does not exist in the dataset")
         }
-        flds
+        flds.asScala.toList
       }
 
     for(field <- fields) {
@@ -103,8 +104,8 @@ object SparkUtils {
     result
   }
 
-  private def flattenColumnNamesFromStruct(structField: StructField, resultList: ArrayList[String], curColName: String) = {
-    val colName = if(curColName == "") structField.name else (curColName + "." + name)
+  private def flattenColumnNamesFromStruct(structField: StructField, resultList: ArrayList[String], curColName: String): Unit = {
+    val colName = if(curColName == "") structField.name else (curColName + "." + structField.name)
     val dType = structField.dataType
 
     if(dType.typeName != "struct") {
@@ -115,6 +116,7 @@ object SparkUtils {
         flattenColumnNamesFromStruct(field, resultList, colName)
       }
     }
+
   }
 
   def spark2DDFType(colType: String): String = {
