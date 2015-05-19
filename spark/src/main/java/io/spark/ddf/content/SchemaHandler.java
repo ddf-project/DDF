@@ -16,8 +16,6 @@ import io.spark.ddf.SparkDDF;
 import io.spark.ddf.util.SparkUtils;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.types.StructType;
-import org.apache.spark.sql.types.StructField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +29,22 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
 
   public static Schema getSchemaFromDataFrame(DataFrame rdd) {
     return SparkUtils.schemaFromDataFrame(rdd);
+  }
+
+  /**
+   *
+   * @param df spark dataframe that may contain struct columns
+   * @param colNames list of columns that need to be flattened.
+   *
+   * @return a list of non-struct columns flattened from columns in colNames. If colNames is empty or null,
+   *  then return a list of flattened column names from the entire input dataframe, i.e. from all the columns.
+   */
+  public static List<String> getFlattenedColumnsFromDataFrame(DataFrame df, List<String> colNames) {
+    return SparkUtils.flattenColumnNamesFromDataFrame(df, colNames);
+  }
+
+  public static List<String> getFlattenedColumnsFromDataFrame(DataFrame rdd) {
+    return getFlattenedColumnsFromDataFrame(rdd, null);
   }
 
   @Override

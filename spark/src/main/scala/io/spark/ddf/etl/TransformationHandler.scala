@@ -1,5 +1,8 @@
 package io.spark.ddf.etl
 
+import org.apache.spark.sql.DataFrame
+
+import scala.collection.JavaConverters._
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.JavaConversions.seqAsJavaList
 
@@ -21,9 +24,23 @@ import io.ddf.content.Schema
 import io.ddf.content.Schema.Column
 import io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
 import io.ddf.exception.DDFException
-import io.spark.ddf.SparkDDF
+import io.spark.ddf.util.SparkUtils
+import java.util.{ArrayList, List}
 
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
+
+
+  override def flattenDDF(selectedColumns: List[String]): DDF = {
+    val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    val flattenedColumns: ArrayList[String] = SparkUtils.flattenColumnNamesFromDataFrame(df, selectedColumns)
+
+    val selectClause = flattenedColumns.asScala.toList.mkString(",")
+    val q = String.format("select %s from %s", selectClause, mDDF.getTableName)
+
+    mDDF.sql2ddf(q)
+  }
+
+
 
   override def transformMapReduceNative(mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean = true): DDF = {
 
