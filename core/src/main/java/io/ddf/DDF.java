@@ -359,10 +359,10 @@ public abstract class DDF extends ALoggable //
 
 
   public DDF getFlattenedDDF(List<String> columns) throws DDFException {
-    return Transform.flattenDDF(columns);
+    return this.getTransformationHandler().flattenDDF(columns);
   }
   public DDF getFlattenedDDF() throws DDFException {
-    return Transform.flattenDDF();
+    return this.getTransformationHandler().flattenDDF();
   }
 
   public DDF transform(String transformExpression) throws DDFException {
