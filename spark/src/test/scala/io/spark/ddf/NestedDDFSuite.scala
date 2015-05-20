@@ -19,7 +19,7 @@ class NestedDDFSuite extends ATestSuite {
   */
   test("Loading a JSON dataset from a text file") {
     val path = "resources/test/sleep_data_sample.json"
-    val sqlCtx = new SQLContext(manager.getSparkContext)
+    val sqlCtx = manager.getHiveContext
     val df:DataFrame = sqlCtx.jsonFile(path)
 
     println("dataframe created from json file at " + path)
