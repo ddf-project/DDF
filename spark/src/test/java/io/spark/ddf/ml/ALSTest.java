@@ -5,10 +5,11 @@ import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.spark.ddf.BaseTest;
 import org.apache.spark.mllib.recommendation.MatrixFactorizationModel;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ALSTest extends BaseTest {
-  @Test
+  @Ignore
   public void TestALS() throws DDFException {
     createTableRatings();
 

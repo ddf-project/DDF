@@ -80,13 +80,16 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   protected Map<String, IModel> mModels = new ConcurrentHashMap<String, IModel>();
 
-
   public void addDDF(DDF ddf) throws DDFException {
     mDDFs.put(ddf.getUUID(), ddf);
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
     mDDFs.remove(ddf.getUUID());
+  }
+
+  public DDF[] listDDFs() {
+    return this.mDDFs.values().toArray(new DDF[] {});
   }
 
   public DDF getDDF(String uuid) {
@@ -130,24 +133,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     else {
       return result;
     }
-  }
-
-  /*
-   * return list of DDFs infomation
-   * only return DDF with alias
-   */
-  public DDF.DDFInformation[] listDDFs() {
-    Collection<DDF> ddfs = this.mDDFs.values();
-    List<DDF.DDFInformation> ddfInformationList = new ArrayList<DDF.DDFInformation>();
-    for (DDF ddf : ddfs) {
-      if(!Strings.isNullOrEmpty(ddf.getName())) {
-        SimpleDateFormat dateformat = new SimpleDateFormat("MM.d.yyyy 'at' HH:mm a");
-        DDF.DDFInformation information = new DDF.DDFInformation(
-                ddf.getUri(), dateformat.format(ddf.getCreatedTime()));
-        ddfInformationList.add(information);
-      }
-    }
-    return ddfInformationList.toArray(new DDF.DDFInformation[ddfInformationList.size()]);
   }
 
   public void addModel(IModel model) {
