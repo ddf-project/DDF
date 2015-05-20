@@ -1,7 +1,7 @@
 // scalastyle:off
 package io.spark.ddf
 
-import org.apache.spark.sql.test.TestSQLContext
+
 import org.scalatest.FunSuite
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -97,17 +97,6 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
     manager.sql2txt("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineWithNA.csv' " +
       "INTO TABLE airlineWithNA")
   }
-
-  val primitiveFieldAndType =
-    TestSQLContext.sparkContext.parallelize(
-      """{"string":"this is a simple string.",
-          "integer":10,
-          "long":21474836470,
-          "bigInteger":92233720368547758070,
-          "double":1.7976931348623157E308,
-          "boolean":true,
-          "null":null
-      }"""  :: Nil)
 
 }
 
