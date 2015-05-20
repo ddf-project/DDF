@@ -8,6 +8,7 @@ import org.apache.spark.sql.test.TestSQLContext._
   */
 class NestedDDFSuite extends ATestSuite {
 
+  /*
   test("test JSON with primitiveFieldAndType") {
 
     val df:DataFrame = jsonRDD(primitiveFieldAndType)
@@ -16,7 +17,7 @@ class NestedDDFSuite extends ATestSuite {
     println("Number of records: " + df.count())
 
   }
-
+  */
   test("Loading a JSON dataset from a text file") {
     val path = "resources/test/sleep_data_sample.json"
     val df:DataFrame = jsonFile(path)
