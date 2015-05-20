@@ -39,11 +39,11 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
    * @return a list of non-struct columns flattened from columns in colNames. If colNames is empty or null,
    *  then return a list of flattened column names from the entire input dataframe, i.e. from all the columns.
    */
-  public static List<String> getFlattenedColumnsFromDataFrame(DataFrame df, List<String> colNames) {
+  public static String[] getFlattenedColumnsFromDataFrame(DataFrame df, String[] colNames) {
     return SparkUtils.flattenColumnNamesFromDataFrame(df, colNames);
   }
 
-  public static List<String> getFlattenedColumnsFromDataFrame(DataFrame rdd) {
+  public static String[] getFlattenedColumnsFromDataFrame(DataFrame rdd) {
     return getFlattenedColumnsFromDataFrame(rdd, null);
   }
 

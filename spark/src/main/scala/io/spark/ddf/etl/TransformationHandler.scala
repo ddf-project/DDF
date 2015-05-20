@@ -30,11 +30,11 @@ import java.util.{ArrayList, List}
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
 
-  override def flattenDDF(selectedColumns: List[String]): DDF = {
+  override def flattenDDF(selectedColumns: Array[String]): DDF = {
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-    val flattenedColumns: ArrayList[String] = SparkUtils.flattenColumnNamesFromDataFrame(df, selectedColumns)
+    val flattenedColumns: Array[String] = SparkUtils.flattenColumnNamesFromDataFrame(df, selectedColumns)
 
-    val selectClause = flattenedColumns.asScala.toList.mkString(",")
+    val selectClause = flattenedColumns.mkString(",")
     val q = String.format("select %s from %s", selectClause, mDDF.getTableName)
 
     mDDF.sql2ddf(q)

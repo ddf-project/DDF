@@ -89,7 +89,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public DDF flattenDDF(List<String> columns) {
+  public DDF flattenDDF(String[] columns) {
     return null;
   }
 

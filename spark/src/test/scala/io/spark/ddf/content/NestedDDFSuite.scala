@@ -6,6 +6,7 @@ import io.spark.ddf.ATestSuite
 import io.spark.ddf.util.SparkUtils
 import java.util.ArrayList
 import org.apache.spark.sql.{SQLContext, DataFrame}
+import scala.collection.JavaConverters._
 
 
 /**
@@ -32,13 +33,13 @@ class NestedDDFSuite extends ATestSuite {
     println("Number of records: " + df.count())
 
     println("<<<< all flattened cols from the dataframe:")
-    val cols = SparkUtils.flattenColumnNamesFromDataFrame();
+    val cols = SparkUtils.flattenColumnNamesFromDataFrame(df);
     for(col <- cols)
       println(col)
 
 
     println("<<<< cols flattened from cols '_id' and 'data' of the dataframe:")
-    val selected_cols = SparkUtils.flattenColumnNamesFromDataFrame(new ArrayList("_id", "data"))
+    val selected_cols = SparkUtils.flattenColumnNamesFromDataFrame(df, Array("_id", "data"))
     for(col <- selected_cols)
       println(col)
 

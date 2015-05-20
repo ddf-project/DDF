@@ -358,7 +358,7 @@ public abstract class DDF extends ALoggable //
   public RFacade R;
 
 
-  public DDF getFlattenedDDF(List<String> columns) throws DDFException {
+  public DDF getFlattenedDDF(String[] columns) throws DDFException {
     return this.getTransformationHandler().flattenDDF(columns);
   }
   public DDF getFlattenedDDF() throws DDFException {

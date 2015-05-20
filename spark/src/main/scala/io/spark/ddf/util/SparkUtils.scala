@@ -67,30 +67,30 @@ object SparkUtils {
    * @param colNames subset of column that user wants to flatten
    * @return a list of names of non-struct fields flattened from the dataframe
    */
-  def flattenColumnNamesFromDataFrame(df: DataFrame, colNames: JList[String]): ArrayList[String] = {
-    val result: ArrayList[String] = Lists.newArrayList()
+  def flattenColumnNamesFromDataFrame(df: DataFrame, colNames: Array[String]): Array[String] = {
+    val result: ArrayBuffer[String] = new ArrayBuffer[String]()
     val schema = df.schema
     val fields =
       if(colNames == null || colNames.isEmpty) {
-        schema.fields.toList
+        schema.fields
       } else {
-        val flds:ArrayList[StructField] = new ArrayList[StructField]()
-        for(name <- colNames.asScala.toList) {
-          if(schema.fieldNames.contains(name))
-            flds.add(schema.apply(name))
+        val flds:ArrayBuffer[StructField] = new ArrayBuffer[StructField]()
+        for(name <- colNames) {
+          if (schema.fieldNames.contains(name))
+            flds.append(schema.apply(name))
           else
             throw new DDFException("Error: column-name " + name + " does not exist in the dataset")
         }
-        flds.asScala.toList
+        flds.toArray
       }
 
     for(field <- fields) {
-      result.addAll(flattenColumnNamesFromStruct(field))
+      result.appendAll(flattenColumnNamesFromStruct(field))
     }
-    result
+    result.toArray[String]
   }
 
-  def flattenColumnNamesFromDataFrame(df: DataFrame): ArrayList[String] = {
+  def flattenColumnNamesFromDataFrame(df: DataFrame): Array[String] = {
     flattenColumnNamesFromDataFrame(df, null)
   }
 
@@ -98,18 +98,18 @@ object SparkUtils {
    * @param structField
    * @return all primitive column paths inside the struct
    */
-  private def flattenColumnNamesFromStruct(structField: StructField): ArrayList[String] = {
-    var result:ArrayList[String] = new ArrayList[String]()
+  private def flattenColumnNamesFromStruct(structField: StructField): Array[String] = {
+    var result:ArrayBuffer[String] = new ArrayBuffer[String]()
     flattenColumnNamesFromStruct(structField, result, "")
-    result
+    result.toArray[String]
   }
 
-  private def flattenColumnNamesFromStruct(structField: StructField, resultList: ArrayList[String], curColName: String): Unit = {
+  private def flattenColumnNamesFromStruct(structField: StructField, resultList: ArrayBuffer[String], curColName: String): Unit = {
     val colName = if(curColName == "") structField.name else (curColName + "." + structField.name)
     val dType = structField.dataType
 
     if(dType.typeName != "struct") {
-      resultList.add(colName)
+      resultList.append(colName)
     } else {
       val fields = dType.asInstanceOf[StructType].fields
       for(field <- fields) {
