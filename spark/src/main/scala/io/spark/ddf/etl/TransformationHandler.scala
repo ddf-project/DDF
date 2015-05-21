@@ -33,9 +33,20 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
   override def flattenDDF(selectedColumns: Array[String]): DDF = {
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     val flattenedColumns: Array[String] = SparkUtils.flattenColumnNamesFromDataFrame(df, selectedColumns)
+    val selectColumns:Array[String] = new Array[String](flattenedColumns.length)
+    // update hive-invalid column names
+    for(i <- 0 until flattenedColumns.length) {
+      selectColumns(i) = flattenedColumns(i)
+      if(flattenedColumns(i).charAt(0) == '_') {
+        selectColumns(i) += s" as ${flattenedColumns(i).substring(1)}"
+      }
+    }
 
-    val selectClause = flattenedColumns.mkString(",")
-    val q = String.format("select %s from %s", selectClause, mDDF.getTableName)
+    val selectClause = selectColumns.mkString(",")
+    //val q = String.format("select %s from %s", selectClause, mDDF.getTableName)
+    val q = s"select $selectClause from ${mDDF.getTableName}"
+
+    //println("Query: \n" + q)
 
     mDDF.sql2ddf(q)
   }

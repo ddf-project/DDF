@@ -4,7 +4,6 @@ import java.util
 import java.util.{Map => JMap}
 import org.apache.spark.sql.types.{StructType, StructField}
 
-import scala.collection.JavaConverters._
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.DataFrame
 import io.ddf.content.Schema
@@ -15,7 +14,7 @@ import com.google.common.collect.Lists
 import java.util.ArrayList
 import scala.util
 import io.ddf.exception.DDFException
-
+import scala.collection.JavaConverters._
 import scala.util
 
 

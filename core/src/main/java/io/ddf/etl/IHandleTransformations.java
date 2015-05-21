@@ -20,5 +20,6 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
   public DDF transformUDF(String transformExpression, List<String> columns) throws DDFException;
 
   public DDF flattenDDF(String[] columns) throws DDFException;
+
   public DDF flattenDDF() throws DDFException;
 }
