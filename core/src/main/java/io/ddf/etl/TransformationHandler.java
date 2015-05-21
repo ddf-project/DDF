@@ -88,6 +88,16 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return null;
   }
 
+  @Override
+  public DDF flattenDDF(String[] columns) {
+    return null;
+  }
+
+  @Override
+  public DDF flattenDDF() {
+    return flattenDDF(null);
+  }
+
   public DDF transformUDF(String RExp, List<String> columns) throws DDFException {
     String sqlCmd = String.format("SELECT %s FROM %s",
         RToSqlUdf(RExp, columns, this.getDDF().getSchema().getColumns()),

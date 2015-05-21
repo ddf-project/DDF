@@ -1,6 +1,7 @@
 // scalastyle:off
 package io.spark.ddf
 
+
 import org.scalatest.FunSuite
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -96,6 +97,7 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
     manager.sql2txt("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineWithNA.csv' " +
       "INTO TABLE airlineWithNA")
   }
+
 }
 
 /**

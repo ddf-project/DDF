@@ -336,7 +336,7 @@ public abstract class DDF extends ALoggable //
   public List<String> sql2txt(String sqlCommand, String errorMessage) throws DDFException {
     try {
       sqlCommand = sqlCommand.replace("@this", this.getTableName());
-      return this.getManager().sql2txt(String.format(sqlCommand, this.getTableName()));
+      return this.getSqlHandler().sql2txt(String.format(sqlCommand, this.getTableName()));
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }
@@ -345,17 +345,25 @@ public abstract class DDF extends ALoggable //
   public DDF sql2ddf(String sqlCommand) throws DDFException {
     try {
       sqlCommand = sqlCommand.replace("@this", this.getTableName());
-      return this.getManager().sql2ddf(sqlCommand);
+      return this.getSqlHandler().sql2ddf(sqlCommand);
     } catch (Exception e) {
       throw new DDFException(String.format("Error executing queries for ddf %s", this.getTableName()), e);
     }
   }
 
 
+
   // ///// Aggregate operations
 
   public RFacade R;
 
+
+  public DDF getFlattenedDDF(String[] columns) throws DDFException {
+    return this.getTransformationHandler().flattenDDF(columns);
+  }
+  public DDF getFlattenedDDF() throws DDFException {
+    return this.getTransformationHandler().flattenDDF();
+  }
 
   public DDF transform(String transformExpression) throws DDFException {
     return Transform.transformUDF(transformExpression);

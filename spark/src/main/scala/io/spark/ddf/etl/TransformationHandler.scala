@@ -1,5 +1,8 @@
 package io.spark.ddf.etl
 
+import org.apache.spark.sql.DataFrame
+
+import scala.collection.JavaConverters._
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.JavaConversions.seqAsJavaList
 
@@ -21,9 +24,36 @@ import io.ddf.content.Schema
 import io.ddf.content.Schema.Column
 import io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
 import io.ddf.exception.DDFException
-import io.spark.ddf.SparkDDF
+import io.spark.ddf.util.SparkUtils
+import java.util.{ArrayList, List}
 
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
+
+
+  override def flattenDDF(selectedColumns: Array[String]): DDF = {
+    val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    val flattenedColumns: Array[String] = SparkUtils.flattenColumnNamesFromDataFrame(df, selectedColumns)
+    val selectColumns:Array[String] = new Array[String](flattenedColumns.length)
+    // update hive-invalid column names
+    for(i <- 0 until flattenedColumns.length) {
+      selectColumns(i) = flattenedColumns(i)
+      if(flattenedColumns(i).charAt(0) == '_') {
+        selectColumns(i) += s" as ${flattenedColumns(i).substring(1)}"
+      }
+    }
+
+    val selectClause = selectColumns.mkString(",")
+    //val q = String.format("select %s from %s", selectClause, mDDF.getTableName)
+    val q = s"select $selectClause from ${mDDF.getTableName}"
+
+    //println("Query: \n" + q)
+
+    mDDF.sql2ddf(q)
+  }
+
+  override def flattenDDF(): DDF = {
+    flattenDDF(null)
+  }
 
   override def transformMapReduceNative(mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean = true): DDF = {
 

@@ -1,7 +1,9 @@
 package io.spark.ddf.util
 
+import java.util
 import java.util.{Map => JMap}
-import scala.collection.JavaConverters._
+import org.apache.spark.sql.types.{StructType, StructField}
+
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.DataFrame
 import io.ddf.content.Schema
@@ -12,6 +14,9 @@ import com.google.common.collect.Lists
 import java.util.ArrayList
 import scala.util
 import io.ddf.exception.DDFException
+import scala.collection.JavaConverters._
+import scala.util
+
 
 /**
   */
@@ -53,6 +58,64 @@ object SparkUtils {
       cols.add(new Column(colName, colType))
     }
     new Schema(null, cols)
+  }
+
+  /**
+   *
+   * @param df the input dataframe
+   * @param colNames subset of column that user wants to flatten
+   * @return a list of names of non-struct fields flattened from the dataframe
+   */
+  def flattenColumnNamesFromDataFrame(df: DataFrame, colNames: Array[String]): Array[String] = {
+    val result: ArrayBuffer[String] = new ArrayBuffer[String]()
+    val schema = df.schema
+    val fields =
+      if(colNames == null || colNames.isEmpty) {
+        schema.fields
+      } else {
+        val flds:ArrayBuffer[StructField] = new ArrayBuffer[StructField]()
+        for(name <- colNames) {
+          if (schema.fieldNames.contains(name))
+            flds.append(schema.apply(name))
+          else
+            throw new DDFException("Error: column-name " + name + " does not exist in the dataset")
+        }
+        flds.toArray
+      }
+
+    for(field <- fields) {
+      result.appendAll(flattenColumnNamesFromStruct(field))
+    }
+    result.toArray[String]
+  }
+
+  def flattenColumnNamesFromDataFrame(df: DataFrame): Array[String] = {
+    flattenColumnNamesFromDataFrame(df, null)
+  }
+
+  /**
+   * @param structField
+   * @return all primitive column paths inside the struct
+   */
+  private def flattenColumnNamesFromStruct(structField: StructField): Array[String] = {
+    var result:ArrayBuffer[String] = new ArrayBuffer[String]()
+    flattenColumnNamesFromStruct(structField, result, "")
+    result.toArray[String]
+  }
+
+  private def flattenColumnNamesFromStruct(structField: StructField, resultList: ArrayBuffer[String], curColName: String): Unit = {
+    val colName = if(curColName == "") structField.name else (curColName + "." + structField.name)
+    val dType = structField.dataType
+
+    if(dType.typeName != "struct") {
+      resultList.append(colName)
+    } else {
+      val fields = dType.asInstanceOf[StructType].fields
+      for(field <- fields) {
+        flattenColumnNamesFromStruct(field, resultList, colName)
+      }
+    }
+
   }
 
   def spark2DDFType(colType: String): String = {
