@@ -302,6 +302,7 @@ object RootBuild extends Build {
                 <enableAssertions>false</enableAssertions>
                 <environmentVariables>
                     <RSERVER_JAR>${{basedir}}/{targetDir}/*.jar,${{basedir}}/{targetDir}/lib/*</RSERVER_JAR>              
+                    <JAVA_TOOL_OPTIONS>"-Xmx1024m -XX:MaxPermSize=512m -Xms512m"</JAVA_TOOL_OPTIONS>
                 </environmentVariables>
                 <systemPropertyVariables>
                   <spark.serializer>org.apache.spark.serializer.KryoSerializer</spark.serializer>
