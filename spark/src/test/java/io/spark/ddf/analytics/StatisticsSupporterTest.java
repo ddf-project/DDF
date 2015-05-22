@@ -39,6 +39,16 @@ public class StatisticsSupporterTest extends BaseTest {
     Assert.assertEquals(summary[2].NACount(), 4);
   }
 
+  @Test
+  public void testSummaryBigInt() throws DDFException {
+    DDF ddf4 = manager.sql2ddf("select floor(deptime/100) as dephour, cast(arrdelay as bigint) as arrdelay1 from airline");
+    Summary[] summary = ddf4.getSummary();
+    Assert.assertTrue(summary[0].min() != Double.NaN);
+    Assert.assertTrue(summary[0].count() > 0);
+    Assert.assertTrue(summary[1].min() != Double.NaN);
+    Assert.assertTrue(summary[1].count() > 0);
+  }
+
 //  @Test
 //  public void testFiveNum() throws DDFException {
 //    Assert.assertEquals(5, ddf1.getFiveNumSummary().length);
