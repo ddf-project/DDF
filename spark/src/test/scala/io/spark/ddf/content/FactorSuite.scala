@@ -1,6 +1,6 @@
 package io.spark.ddf.content
 
-import io.ddf.content.Schema.ColumnType
+import io.ddf.content.Schema.{ColumnClass, ColumnType}
 import io.spark.ddf.ATestSuite
 
 /**
@@ -35,6 +35,7 @@ class FactorSuite extends ATestSuite {
     ddf.getSchemaHandler.setAsFactor("cyl")
     ddf.getSchemaHandler.computeFactorLevelsAndLevelCounts()
     assert(ddf.getSchemaHandler.getColumn("cyl").getType == ColumnType.LONG)
+    assert(ddf.getSchemaHandler.getColumn("cyl").getColumnClass == ColumnClass.FACTOR)
     assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("4") == 11)
     assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("6") == 7)
     assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("8") == 14)
