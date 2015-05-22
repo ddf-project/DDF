@@ -6,6 +6,7 @@ import org.apache.spark.sql.types.{StructType, StructField}
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{Column => DFColumn}
 import io.ddf.content.Schema
 import scala.collection.mutable.ArrayBuffer
 import java.util.{List => JList}
@@ -116,6 +117,14 @@ object SparkUtils {
       }
     }
 
+  }
+
+  def getDataFrameWithValidColnames(df: DataFrame): DataFrame = {
+    // remove '_' if '_' is at the start of a col name
+    val colNames = df.columns.map { colName =>
+      if (colName.charAt(0) == '_') new DFColumn(colName).as(colName.substring(1)) else new DFColumn(colName)
+    }
+    df.select(colNames :_*)
   }
 
   def spark2DDFType(colType: String): String = {
