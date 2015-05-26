@@ -111,29 +111,7 @@ class NestedDDFSuite extends ATestSuite {
     println("data:")
     qdata.VIEWS.head(10).asScala.toList.foreach(println)
   }
-
-
-
-  test("get flatten DDF loaded from Smurf pubsub JSON file") {
-    println("\n\n ================================= get flatten DDF loaded from Smurf pubsub JSON file")
-    val path = "../resources/test/smurf_pubsub_sample.json"
-    val ddf: DDF = json2ddf(path)
-    println("--- ddf schema: \n" + ddf.getSchema.getColumnNames)
-
-    val fddf: DDF = ddf.getFlattenedDDF()
-    println("---flattened_ddf schema: \n" + fddf.getSchema.getColumnNames)
-
-    println("\n---- Query 4 elements from the flattenedDDF")
-    val qdata = fddf.sql2ddf(s"select event_commandId, event_data, event_date, event_description, event_deviceId, event_deviceTypeId, event_displayed, event_eventSource, event_eventType, event_hubId, event_id from ${fddf.getTableName} limit 4")
-    //val qdata = fddf.sql2ddf(s"select * from ${fddf.getTableName} limit 4")
-    println("---query result from a flattened ddf: ")
-    println("schema: " + qdata.getSchema.getColumnNames)
-    println("data:")
-    qdata.VIEWS.head(10).asScala.toList.foreach(println)
-
-    println(" ======= DONE =====")
-  }
-
+  
 
   def json2ddf(path:String): DDF = {
     val sqlCtx = manager.getHiveContext
