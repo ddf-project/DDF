@@ -101,7 +101,6 @@ public class SparkDDF extends DDF {
   }
 
   public void saveAsTable() throws DDFException {
-    HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
     if (!this.isTable()) {
       DataFrame rdd = (DataFrame) this.getRepresentationHandler().get(DataFrame.class);
       if (rdd == null) {
