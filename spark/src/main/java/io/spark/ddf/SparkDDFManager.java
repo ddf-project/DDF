@@ -7,13 +7,16 @@ import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 import io.spark.ddf.util.SparkUtils;
+import io.spark.ddf.util.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.hive.HiveContext;
 
+import java.io.File;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +174,6 @@ public class SparkDDFManager extends DDFManager {
     return params;
   }
 
-
   /**
    * Side effect: also sets SharkContext and SparkContextParams in case the client wants to examine or use those.
    *
@@ -182,8 +184,33 @@ public class SparkDDFManager extends DDFManager {
   private SparkContext createSparkContext(Map<String, String> params) throws DDFException {
     this.setSparkContextParams(this.mergeSparkParamsFromSettings(params));
     String ddfSparkJar = params.get("DDFSPARK_JAR");
+
     String[] jobJars = ddfSparkJar != null ? ddfSparkJar.split(",") : new String[] { };
+
+    ArrayList<String> finalJobJars = new ArrayList<String>();
+
+    // DDFSPARK_JAR could contain directories too, used in case of Databricks Cloud where we don't have the jars at start-up
+    // time but the directory and we will search and includes all of jars at run-time
+    for (String jobJar: jobJars) {
+      if ((!jobJar.endsWith(".jar")) && (new File(jobJar).list() != null)) {
+        // This is a directory
+        ArrayList<String> jars = Utils.listJars(jobJar);
+        if (jars != null) {
+          finalJobJars.addAll(jars);
+        }
+
+      } else  {
+        finalJobJars.add(jobJar);
+      }
+    }
+
     mLog.info(">>>>> ddfSparkJar = " + ddfSparkJar);
+    for(String jar: finalJobJars) {
+      mLog.info(">>>>> " + jar);
+    }
+
+    jobJars = new String[finalJobJars.size()];
+    jobJars = finalJobJars.toArray(jobJars);
 
     for (String key : params.keySet()) {
       mLog.info(">>>> key = " + key + ", value = " + params.get(key));
