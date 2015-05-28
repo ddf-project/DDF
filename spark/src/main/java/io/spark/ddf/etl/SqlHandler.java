@@ -12,17 +12,23 @@ import io.ddf.exception.DDFException;
 import io.spark.ddf.SparkDDF;
 import io.spark.ddf.SparkDDFManager;
 import io.spark.ddf.content.SchemaHandler;
+import io.spark.ddf.util.SparkUtils;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
+import org.codehaus.jackson.JsonGenerator;
 import scala.collection.Seq;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.io.CharArrayWriter;
+import com.fasterxml.jackson.core.JsonFactory;
+import org.apache.spark.sql.json.JsonRDD;
 //import org.apache.hadoop.hive.ql.metadata.HiveException;
 
 /**
@@ -109,6 +115,8 @@ public class SqlHandler extends ASqlHandler {
   @Override
   public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
     DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
+
+    /*
     Row[] arrRow = rdd.collect();
     List<String> lsString = new ArrayList<String>();
 
@@ -116,5 +124,10 @@ public class SqlHandler extends ASqlHandler {
       lsString.add(row.mkString("\t"));
     }
     return lsString;
+    */
+
+    String[] strResult = SparkUtils.jsonForComplexType(rdd, "\t");
+    return Arrays.asList(strResult);
+
   }
 }

@@ -10,7 +10,7 @@ import io.ddf.DDF
 import scala.collection.JavaConverters._
 /**
   */
-class NestedDDFSuite extends ATestSuite {
+class ComplexTypeDDFSuite extends ATestSuite {
 
 
   /*
@@ -111,7 +111,6 @@ class NestedDDFSuite extends ATestSuite {
     println("data:")
     qdata.VIEWS.head(10).asScala.toList.foreach(println)
   }
-  
 
   def json2ddf(path:String): DDF = {
     val sqlCtx = manager.getHiveContext
