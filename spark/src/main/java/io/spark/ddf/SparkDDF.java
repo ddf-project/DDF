@@ -88,15 +88,20 @@ public class SparkDDF extends DDF {
     return rdd.toJavaRDD();
   }
 
-  public void saveAsTable() throws DDFException {
+  public boolean isTable() {
     HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
-    Boolean isTable = true;
-    try {
-      hiveContext.table(this.getTableName());
-    } catch (Exception e) {
-      isTable = false;
+    String[] tableNames = hiveContext.tableNames();
+    Boolean tableExists = false;
+    for(String table: tableNames) {
+      if(table.equals(this.getTableName())) {
+        tableExists = true;
+      }
     }
-    if (!isTable) {
+    return tableExists;
+  }
+
+  public void saveAsTable() throws DDFException {
+    if (!this.isTable()) {
       DataFrame rdd = (DataFrame) this.getRepresentationHandler().get(DataFrame.class);
       if (rdd == null) {
         mLog.info("Could not create SchemaRDD for ddf");
