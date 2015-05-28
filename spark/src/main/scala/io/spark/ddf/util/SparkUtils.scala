@@ -212,6 +212,7 @@ object SparkUtils {
       case "boolean"  => "BOOLEAN"
       case "struct" => "STRUCT"
       case "array" => "ARRAY"
+      case "map" => "MAP"
       case x => throw new DDFException(s"Type not support $x")
     }
   }

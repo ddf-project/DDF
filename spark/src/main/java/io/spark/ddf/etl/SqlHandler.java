@@ -123,7 +123,7 @@ public class SqlHandler extends ASqlHandler {
     for (Row row : arrRow) {
       lsString.add(row.mkString("\t"));
     }
-    return lsString
+    return lsString;
     */
 
     String[] strResult = SparkUtils.jsonForComplexType(rdd, "\t");
