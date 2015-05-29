@@ -41,7 +41,7 @@ class ComplexTypeDDFSuite extends ATestSuite {
 
   // TODO add assertion to really have unit tests
   // currently, just printout for debugging
-
+/*
   test("get flattened columns from struct dataframe loaded form a JSON file") {
     println("\n\n ================================= get flatten columns from struct dataframe")
     val path = "../resources/test/sleep_data_sample.json"
@@ -94,23 +94,71 @@ class ComplexTypeDDFSuite extends ATestSuite {
     println("data:")
     qdata.VIEWS.head(10).asScala.toList.foreach(println)
   }
-
+*/
+  /*
   test("test query result from flattened DDF with all columns") {
     println("\n\n ================================= query result from flattened DDF with all columns")
     val path = "../resources/test/sleep_data_sample.json"
     val ddf = json2ddf(path)
     println("---ddf schema: \n" + ddf.getSchema.getColumnNames)
+    ddf.VIEWS.head(3).asScala.toList.foreach(println)
 
     val fddf: DDF = ddf.getFlattenedDDF()
     println("---flattened_ddf schema: \n" + fddf.getSchema.getColumnNames)
+    fddf.VIEWS.head(3).asScala.toList.foreach(println)
 
     println("\n---- Query 4 elements from the flattenedDDF")
     val qdata = fddf.sql2ddf(s"select data_bookmarkTime from ${fddf.getTableName} limit 4")
     println("---query result from a flattened ddf: ")
     println("schema: " + qdata.getSchema.getColumnNames)
     println("data:")
-    qdata.VIEWS.head(10).asScala.toList.foreach(println)
+    qdata.VIEWS.head(3).asScala.toList.foreach(println)
   }
+
+  test("test query result from flattened DDF with all columns from Smurf data") {
+    println("\n\n ================================= query result from flattened DDF with all columns on Smurf ")
+    val path = "../resources/test/smurf_pubsub_sample.json"
+    val ddf = json2ddf(path)
+    println("---ddf schema: \n" + ddf.getSchema.getColumnNames)
+    ddf.VIEWS.head(3).asScala.toList.foreach(println)
+
+    val fddf: DDF = ddf.getFlattenedDDF()
+    println("---flattened_ddf schema: \n" + fddf.getSchema.getColumnNames)
+    fddf.VIEWS.head(3).asScala.toList.foreach(println)
+
+    println("\n---- Query 4 elements from the flattenedDDF")
+    val qdata = fddf.sql2ddf(s"select * from ${fddf.getTableName} limit 4")
+    println("---query result from a flattened ddf: ")
+    println("schema: " + qdata.getSchema.getColumnNames)
+    println("data:")
+    qdata.VIEWS.head(3).asScala.toList.foreach(println)
+  }
+  */
+
+  test("test query result from flattened DDF with all columns") {
+    println("\n\n ================================= query result from flattened DDF with all columns")
+    val path = "../resources/test/sleep_data_sample.json"
+    val ddf = json2ddf(path)
+    println("---ddf schema: \n" + ddf.getSchema.getColumnNames)
+   // ddf.VIEWS.head(3).asScala.toList.foreach(println)
+
+    val fddf: DDF = ddf.getFlattenedDDF()
+    println("---flattened_ddf schema: \n" + fddf.getSchema.getColumnNames)
+    //fddf.VIEWS.head(3).asScala.toList.foreach(println)
+
+    println("\n---- Query 4 elements from the flattenedDDF")
+    val qdata = fddf.sql2ddf(s"select data_realDeepSleepTimeInMinutes from ${fddf.getTableName} limit 4")
+    println("---query result from a flattened ddf: ")
+    println("schema: " + qdata.getSchema.getColumnNames)
+    println("data:")
+    qdata.VIEWS.head(3).asScala.toList.foreach( x => {
+      println(x)
+      println(x.split("\t| ").deep)
+    })
+    println(qdata.getFiveNumSummary)
+
+  }
+
 
   def json2ddf(path:String): DDF = {
     val sqlCtx = manager.getHiveContext
