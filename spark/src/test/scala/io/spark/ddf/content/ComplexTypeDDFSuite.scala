@@ -140,23 +140,22 @@ class ComplexTypeDDFSuite extends ATestSuite {
     val path = "../resources/test/sleep_data_sample.json"
     val ddf = json2ddf(path)
     println("---ddf schema: \n" + ddf.getSchema.getColumnNames)
-   // ddf.VIEWS.head(3).asScala.toList.foreach(println)
+    ddf.VIEWS.head(3).asScala.toList.foreach(println)
 
     val fddf: DDF = ddf.getFlattenedDDF()
     println("---flattened_ddf schema: \n" + fddf.getSchema.getColumnNames)
-    //fddf.VIEWS.head(3).asScala.toList.foreach(println)
+    fddf.VIEWS.head(3).asScala.toList.foreach(println)
 
-    println("\n---- Query 4 elements from the flattenedDDF")
-    val qdata = fddf.sql2ddf(s"select data_realDeepSleepTimeInMinutes from ${fddf.getTableName} limit 4")
+    println("\n---- Query min, max, histogram from the flattenedDDF")
+    val qdata = fddf.sql2txt(s"select min(data_realDeepSleepTimeInMinutes), max(data_realDeepSleepTimeInMinutes), avg(data_realDeepSleepTimeInMinutes), PERCENTILE(data_realDeepSleepTimeInMinutes, array(0, 1, 0.25, 0.5, 0.75)), histogram_numeric(data_realDeepSleepTimeInMinutes, 10) from ${fddf.getTableName}", "")
     println("---query result from a flattened ddf: ")
-    println("schema: " + qdata.getSchema.getColumnNames)
-    println("data:")
-    qdata.VIEWS.head(3).asScala.toList.foreach( x => {
-      println(x)
-      println(x.split("\t| ").deep)
-    })
-    println(qdata.getFiveNumSummary)
+    qdata.get(0).split("\t").foreach(println)
 
+    val qdf = fddf.sql2ddf(s"select data_realDeepSleepTimeInMinutes from ${fddf.getTableName}")
+    println("get FiveNum")
+    qdf.getFiveNumSummary.foreach(x => {
+      println(Array(x.getFirstQuantile, x.getMedian, x.getThirdQuantile).mkString(","))
+    })
   }
 
 
