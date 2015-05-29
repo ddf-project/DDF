@@ -182,11 +182,18 @@ object SparkUtils {
     var i = 0
     rowSchema.zip(row.toSeq).foreach {
       case (_, null) =>
+        if(i > 0)
+          gen.writeRaw(separator)
+        i = i+1
+        gen.writeNull()
       case (field, v) =>
         if(i > 0)
           gen.writeRaw(separator)
         i = i+1
-        valWriter(field.dataType, v)
+        if(field.dataType.isPrimitive)
+          gen.writeRaw(v.toString)
+        else
+          valWriter(field.dataType, v)
     }
     gen.close()
     writer.toString
