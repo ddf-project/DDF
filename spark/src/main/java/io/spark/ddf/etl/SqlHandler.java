@@ -115,8 +115,6 @@ public class SqlHandler extends ASqlHandler {
   @Override
   public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
     DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
-
-    /*
     Row[] arrRow = rdd.collect();
     List<String> lsString = new ArrayList<String>();
 
@@ -124,10 +122,12 @@ public class SqlHandler extends ASqlHandler {
       lsString.add(row.mkString("\t"));
     }
     return lsString;
-    */
+  }
 
+
+  public List<String> sql2txt_new(String command, Integer maxRows, String dataSource) throws DDFException {
+    DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
     String[] strResult = SparkUtils.jsonForComplexType(rdd, "\t");
     return Arrays.asList(strResult);
-
   }
 }
