@@ -212,13 +212,14 @@ object SparkUtils {
     colType match {
       case "string" => "STRING"
       case "boolean"  => "BOOLEAN"
-      case "byte" => "INT" // TODO review
+      case "binary" => "BINARY"
+      case "byte" => "INT"
       case "short" => "INT"
       case "integer" | "int" => "INT"
       case "long"     => "LONG"
       case "float"  => "FLOAT"
       case "double" => "DOUBLE"
-      case "decimal" => "BIGDECIMAL" // TODO review
+      case "decimal" => "BIGDECIMAL"
       case "date" => "DATE"
       case "timestamp" => "TIMESTAMP"
       case "struct" => "STRUCT"
