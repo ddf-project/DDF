@@ -210,13 +210,17 @@ object SparkUtils {
   def spark2DDFType(colType: String): String = {
     //println(colType)
     colType match {
-      case "integer" => "INT"
       case "string" => "STRING"
+      case "boolean"  => "BOOLEAN"
+      case "byte" => "INT" // TODO review
+      case "short" => "INT"
+      case "integer" | "int" => "INT"
+      case "long"     => "LONG"
       case "float"  => "FLOAT"
       case "double" => "DOUBLE"
+      case "decimal" => "BIGDECIMAL" // TODO review
+      case "date" => "DATE"
       case "timestamp" => "TIMESTAMP"
-      case "long"     => "LONG"
-      case "boolean"  => "BOOLEAN"
       case "struct" => "STRUCT"
       case "array" => "ARRAY"
       case "map" => "MAP"

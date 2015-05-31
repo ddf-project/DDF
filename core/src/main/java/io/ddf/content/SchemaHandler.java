@@ -126,7 +126,7 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
       case LONG:
         factor = new Factor<Long>(this.getDDF(), columnName);
         break;
-      case LOGICAL:
+      case BOOLEAN:
         factor = new Factor<Boolean>(this.getDDF(), columnName);
         break;
       case STRING:

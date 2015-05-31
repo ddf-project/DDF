@@ -38,7 +38,7 @@ object ArrayObject2DataFrame {
       case ColumnType.FLOAT => StructField(column.getName, FloatType, true)
       case ColumnType.BIGINT => StructField(column.getName, LongType, true)
       case ColumnType.LONG => StructField(column.getName, LongType, true)
-      case ColumnType.LOGICAL => StructField(column.getName, BooleanType, true)
+      case ColumnType.BOOLEAN => StructField(column.getName, BooleanType, true)
       case ColumnType.TIMESTAMP => StructField(column.getName, TimestampType, true)
     }
   }

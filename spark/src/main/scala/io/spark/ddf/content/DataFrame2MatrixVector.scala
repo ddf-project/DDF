@@ -100,7 +100,7 @@ class DataFrame2MatrixVector(@transient ddf: DDF) extends ConvertFunction(ddf) {
         case ColumnType.FLOAT => {
           (row: Row, idx: Int) => row.getFloat(idx).toDouble
         }
-        case ColumnType.LOGICAL => {
+        case ColumnType.BOOLEAN => {
           (row: Row, idx: Int) => if (row.getBoolean(idx)) 1.0 else 0.0
         }
         case ColumnType.STRING => {

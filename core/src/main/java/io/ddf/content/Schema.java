@@ -402,19 +402,23 @@ public class Schema implements Serializable {
    */
   public enum ColumnType {
     STRING(String.class),
-    INT(Integer.class),
+    INT(Integer.class, Byte.class, Short.class), // new
     LONG(Long.class),
     FLOAT(Float.class),
     DOUBLE(Double.class),
     BIGINT(Long.class), //
+    BIGDECIMAL(java.math.BigDecimal.class),
+    BINARY(Byte[].class),
     TIMESTAMP(Date.class, java.sql.Date.class, Time.class, Timestamp.class),
+    DATE(java.sql.Date.class),
     STRUCT(Object.class),
     ARRAY(scala.collection.Seq.class),
     MAP(scala.collection.Map.class),
+    BOOLEAN(Boolean.class),
     BLOB(Object.class), //
-    LOGICAL(Boolean.class),
     ANY(/* for ColumnClass.Factor */) //
     ;
+
 
     private List<Class<?>> mClasses = Lists.newArrayList();
 
@@ -489,7 +493,7 @@ public class Schema implements Serializable {
   public enum ColumnClass {
     NUMERIC(ColumnType.LONG, ColumnType.FLOAT, ColumnType.DOUBLE), //
     CHARACTER(ColumnType.STRING), //
-    LOGICAL(ColumnType.LOGICAL), //
+    LOGICAL(ColumnType.BOOLEAN), //
     FACTOR(ColumnType.ANY) //
 
     ;

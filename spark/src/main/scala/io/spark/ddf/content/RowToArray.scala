@@ -36,7 +36,7 @@ trait RowToArray {
           case ColumnType.INT => row.getInt(i).toDouble
           case ColumnType.FLOAT => row.getFloat(i).toDouble
           case ColumnType.DOUBLE => row.getDouble(i)
-          case ColumnType.LOGICAL => row.getBoolean(i) match {
+          case ColumnType.BOOLEAN => row.getBoolean(i) match {
             case true => 1.0
             case false => 0.0
           }
