@@ -89,7 +89,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   public DDF[] listDDFs() {
-    return this.mDDFs.values().toArray(new DDF[] {});
+    return this.mDDFs.values().toArray(new DDF[] { });
+  }
+
+  public IModel[] listModels() {
+    return this.mModels.values().toArray(new IModel[] {});
   }
 
   public DDF getDDF(String uuid) {
