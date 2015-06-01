@@ -22,7 +22,7 @@ import scala.util
 import io.ddf.exception.DDFException
 import scala.collection.JavaConverters._
 import scala.util
-
+import org.apache.spark.sql.types._
 
 /**
   */
@@ -59,7 +59,7 @@ object SparkUtils {
     //println("<<<< schema: " + schema)
     val cols: ArrayList[Column] = Lists.newArrayList();
     for(field <- schema.fields) {
-      val colType = spark2DDFType(field.dataType.typeName)
+      val colType = spark2DDFType(field.dataType)
       val colName = field.name
       cols.add(new Column(colName, colType))
     }
@@ -207,19 +207,19 @@ object SparkUtils {
     df.select(colNames :_*)
   }
 
-  def spark2DDFType(colType: String): String = {
+  def spark2DDFType(colType: DataType): Schema.ColumnType = {
     //println(colType)
     colType match {
-      case "integer" => "INT"
-      case "string" => "STRING"
-      case "float"  => "FLOAT"
-      case "double" => "DOUBLE"
-      case "timestamp" => "TIMESTAMP"
-      case "long"     => "LONG"
-      case "boolean"  => "BOOLEAN"
-      case "struct" => "STRUCT"
-      case "array" => "ARRAY"
-      case "map" => "MAP"
+      case IntegerType => Schema.ColumnType.INT
+      case StringType => Schema.ColumnType.STRING
+      case FloatType  => Schema.ColumnType.FLOAT
+      case DoubleType => Schema.ColumnType.DOUBLE
+      case TimestampType => Schema.ColumnType.TIMESTAMP
+      case LongType     => Schema.ColumnType.LONG
+      case BooleanType  => Schema.ColumnType.LOGICAL
+      case StructType(_) => Schema.ColumnType.STRUCT
+      case ArrayType(_, _) => Schema.ColumnType.ARRAY
+      case MapType(_, _) => Schema.ColumnType.MAP
       case x => throw new DDFException(s"Type not support $x")
     }
   }
