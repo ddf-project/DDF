@@ -219,7 +219,7 @@ object SparkUtils {
       case BooleanType  => Schema.ColumnType.LOGICAL
       case StructType(_) => Schema.ColumnType.STRUCT
       case ArrayType(_, _) => Schema.ColumnType.ARRAY
-      case MapType(_, _) => Schema.ColumnType.MAP
+      case MapType(_, _, _) => Schema.ColumnType.MAP
       case x => throw new DDFException(s"Type not support $x")
     }
   }
