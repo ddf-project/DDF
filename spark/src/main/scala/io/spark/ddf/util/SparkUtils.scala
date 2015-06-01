@@ -1,13 +1,18 @@
 package io.spark.ddf.util
 
+import java.io.CharArrayWriter
 import java.util
 import java.util.{Map => JMap}
-import org.apache.spark.sql.types.{StructType, StructField}
+import com.fasterxml.jackson.core.{JsonGenerator, JsonFactory}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.types._
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.{Column => DFColumn}
 import io.ddf.content.Schema
+import scala.collection.Map
 import scala.collection.mutable.ArrayBuffer
 import java.util.{List => JList}
 import io.ddf.content.Schema.Column
@@ -119,6 +124,81 @@ object SparkUtils {
 
   }
 
+  /**
+   *
+   * @param df
+   * @return an Array of string showing the dataframe with complex column-object replaced by json string
+   */
+  def jsonForComplexType(df: DataFrame, sep: String): Array[String] = {
+    val schema = df.schema
+    val df1: RDD[String] = df.map(r => rowToJSON(schema, r, sep))
+    df1.collect()
+  }
+
+  private def rowToJSON(rowSchema: StructType, row: Row, separator: String): String = {
+    val writer = new CharArrayWriter()
+    val gen = new JsonFactory().createGenerator(writer).setRootValueSeparator(null)
+
+    def valWriter: (DataType, Any) => Unit = {
+      case (_, null) | (NullType, _)  => gen.writeNull()
+      case (StringType, v: String) => gen.writeString(v)
+      case (TimestampType, v: java.sql.Timestamp) => gen.writeString(v.toString)
+      case (IntegerType, v: Int) => gen.writeNumber(v)
+      case (ShortType, v: Short) => gen.writeNumber(v)
+      case (FloatType, v: Float) => gen.writeNumber(v)
+      case (DoubleType, v: Double) => gen.writeNumber(v)
+      case (LongType, v: Long) => gen.writeNumber(v)
+      case (DecimalType(), v: java.math.BigDecimal) => gen.writeNumber(v)
+      case (ByteType, v: Byte) => gen.writeNumber(v.toInt)
+      case (BinaryType, v: Array[Byte]) => gen.writeBinary(v)
+      case (BooleanType, v: Boolean) => gen.writeBoolean(v)
+      case (DateType, v) => gen.writeString(v.toString)
+      case (udt: UserDefinedType[_], v) => valWriter(udt.sqlType, v)
+
+      case (ArrayType(ty, _), v: Seq[_] ) =>
+        gen.writeStartArray()
+        v.foreach(valWriter(ty,_))
+        gen.writeEndArray()
+
+      case (MapType(kv,vv, _), v: Map[_,_]) =>
+        gen.writeStartObject()
+        v.foreach { p =>
+          gen.writeFieldName(p._1.toString)
+          valWriter(vv,p._2)
+        }
+        gen.writeEndObject()
+
+      case (StructType(ty), v: Row) =>
+        gen.writeStartObject()
+        ty.zip(v.toSeq).foreach {
+          case (_, null) =>
+          case (field, v) =>
+            gen.writeFieldName(field.name)
+            valWriter(field.dataType, v)
+        }
+        gen.writeEndObject()
+    }
+
+    var i = 0
+    rowSchema.zip(row.toSeq).foreach {
+      case (_, null) =>
+        if(i > 0)
+          gen.writeRaw(separator)
+        i = i+1
+        gen.writeNull()
+      case (field, v) =>
+        if(i > 0)
+          gen.writeRaw(separator)
+        i = i+1
+        if(field.dataType.isPrimitive)
+          gen.writeRaw(v.toString)
+        else
+          valWriter(field.dataType, v)
+    }
+    gen.close()
+    writer.toString
+  }
+
   def getDataFrameWithValidColnames(df: DataFrame): DataFrame = {
     // remove '_' if '_' is at the start of a col name
     val colNames = df.columns.map { colName =>
@@ -139,6 +219,7 @@ object SparkUtils {
       case "boolean"  => "BOOLEAN"
       case "struct" => "STRUCT"
       case "array" => "ARRAY"
+      case "map" => "MAP"
       case x => throw new DDFException(s"Type not support $x")
     }
   }

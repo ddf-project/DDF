@@ -410,6 +410,7 @@ public class Schema implements Serializable {
     TIMESTAMP(Date.class, java.sql.Date.class, Time.class, Timestamp.class),
     STRUCT(Object.class),
     ARRAY(scala.collection.Seq.class),
+    MAP(scala.collection.Map.class),
     BLOB(Object.class), //
     LOGICAL(Boolean.class),
     ANY(/* for ColumnClass.Factor */) //
@@ -535,7 +536,7 @@ public class Schema implements Serializable {
    *
    */
   public enum DataFormat {
-    SQL, CSV, TSV
+    SQL, CSV, TSV, JSON
   }
 
 
