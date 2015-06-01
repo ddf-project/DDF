@@ -357,7 +357,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
         pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), " + B.toString()
             + ")";
       } else {
-        throw new DDFException("Only support numeric verctors!!!");
+        throw new DDFException("Only support numeric vectors!!!");
       }
     }
 
@@ -384,8 +384,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       throw new DDFException("Cannot get vector quantiles from SQL queries");
     }
     String[] convertedResults = rs.get(0)
-        .replaceAll("ArrayBuffer|\\(|\\)|\\[|\\]|,", "")
-        .replace("null", "NULL, NULL, NULL").split("\t| ");
+        .replaceAll("\\[|\\]| ", "").replaceAll(",", "\t")
+        .replace("null", "NULL, NULL, NULL").split("\t");
     mLog.info("Raw info " + StringUtils.join(rs, "\n"));
 
     Double[] result = new Double[percentiles.length];
