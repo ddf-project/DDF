@@ -7,6 +7,7 @@ import io.spark.ddf.util.SparkUtils
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.DataFrame
 import io.ddf.DDF
+import org.junit.Assert
 import scala.collection.JavaConverters._
 /**
   */
@@ -95,7 +96,7 @@ class ComplexTypeDDFSuite extends ATestSuite {
     qdata.VIEWS.head(10).asScala.toList.foreach(println)
   }
 */
-  /*
+
   test("test query result from flattened DDF with all columns") {
     println("\n\n ================================= query result from flattened DDF with all columns")
     val path = "../resources/test/sleep_data_sample.json"
@@ -113,33 +114,6 @@ class ComplexTypeDDFSuite extends ATestSuite {
     println("schema: " + qdata.getSchema.getColumnNames)
     println("data:")
     qdata.VIEWS.head(3).asScala.toList.foreach(println)
-  }
-
-  */
-
-  test("test some stats functions on flattened DDF") {
-    println("\n\n ================================= test some stats functions on flattened DDF")
-    val path = "../resources/test/sleep_data_sample.json"
-    val ddf = json2ddf(path)
-    val fddf: DDF = ddf.getFlattenedDDF()
-
-    println("\nquery min, max, histogram from the flattenedDDF")
-    val qdata = fddf.sql2txt(s"select min(data_realDeepSleepTimeInMinutes), max(data_realDeepSleepTimeInMinutes), avg(data_realDeepSleepTimeInMinutes), PERCENTILE(data_realDeepSleepTimeInMinutes, array(0, 1, 0.25, 0.5, 0.75)), histogram_numeric(data_realDeepSleepTimeInMinutes, 10) from ${fddf.getTableName}", "")
-    qdata.get(0).split("\t").foreach(println)
-
-    val qdf = fddf.sql2ddf(s"select data_realDeepSleepTimeInMinutes from ${fddf.getTableName}")
-    println("get FiveNum")
-    qdf.getFiveNumSummary.foreach(x => {
-      println(Array(x.getFirstQuantile, x.getMedian, x.getThirdQuantile).mkString(","))
-    })
-
-    println("get vectorQuantiles")
-    println(qdf.getVectorQuantiles(Array(0.25, 0.5, 0.75)).mkString(","))
-
-    println("get Summary")
-    qdf.getSummary.foreach(x => {
-      println(x.toString)
-    })
   }
 
 

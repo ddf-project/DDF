@@ -94,23 +94,24 @@ public class StatisticsSupporterTest extends BaseTest {
     System.out.println(">>>>> testVectorCovariance = " + a);
   }
 
-//  @Test
-//  public void testVectorQuantiles() throws DDFException {
-//    // Double[] quantiles = ddf1.getVectorQuantiles("deptime", {0.3, 0.5, 0.7});
-//    Double[] pArray = { 0.3, 0.5, 0.7 };
-//    Double[] expectedQuantiles = { 801.0, 1416.0, 1644.0 };
-//    Double[] quantiles = ddf1.getVectorQuantiles("deptime", pArray);
-//    System.out.println("Quantiles: " + StringUtils.join(quantiles, ", "));
-//    Assert.assertArrayEquals(expectedQuantiles, quantiles);
-//  }
+  @Test
+  public void testVectorQuantiles() throws DDFException {
+    System.out.println(">>>>> testVectorQuantiles");
+    // Double[] quantiles = ddf1.getVectorQuantiles("deptime", {0.3, 0.5, 0.7});
+    Double[] pArray = { 0.3, 0.5, 0.7 };
+    Double[] expectedQuantiles = { 801.0, 1416.0, 1644.0 };
+    Double[] quantiles = ddf1.getVectorQuantiles("deptime", pArray);
+    System.out.println("Quantiles: " + StringUtils.join(quantiles, ", "));
+    Assert.assertArrayEquals(expectedQuantiles, quantiles);
+  }
 
   @Test
   public void testVectorHistogram_Hive() throws DDFException {
     System.out.println(">>>>> testVectorHistogram_Hive");
     List<HistogramBin> bins = ddf1.getVectorHistogram_Hive("arrdelay", 5);
-    for (int i = 0; i < bins.size(); i++) {
-      System.out.println(bins.get(i).getX() + " - " + bins.get(i).getY());
-    }
+    //for (int i = 0; i < bins.size(); i++)
+    //  System.out.println(bins.get(i).getX() + " - " + bins.get(i).getY());
+
     Assert.assertEquals(5, bins.size());
     Assert.assertEquals(-12.45, bins.get(0).getX(), 0.01);
     Assert.assertEquals(11, bins.get(0).getY(), 0.01);
@@ -121,8 +122,11 @@ public class StatisticsSupporterTest extends BaseTest {
   public void testVectorHistogram() throws DDFException {
     System.out.println(">>>>> testVectorHistogram");
     List<HistogramBin> bins = ddf1.getVectorHistogram("arrdelay", 5);
-    for (int i = 0; i < bins.size(); i++) {
-      System.out.println(bins.get(i).getX() + " - " + bins.get(i).getY());
-    }
+    //for (int i = 0; i < bins.size(); i++)
+    //  System.out.println(bins.get(i).getX() + " - " + bins.get(i).getY());
+
+    Assert.assertEquals(5, bins.size());
+    Assert.assertEquals(-24, bins.get(0).getX(), 0.01);
+    Assert.assertEquals(10, bins.get(0).getY(), 0.01);
   }
 }
