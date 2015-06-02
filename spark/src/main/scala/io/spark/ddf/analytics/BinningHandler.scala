@@ -46,13 +46,13 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     mLog.info(">>>> getVectorHistogram command = " + command)
     val ddf: DDF = this.getDDF.sql2ddf(command)
     mLog.info(ddf.VIEWS.head(1).toString)
-    val rdd: RDD[Row] = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
+    val rddbins = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]].collect
+    val histbins = rddbins(0).get(0).asInstanceOf[ArrayBuffer[Row]]
 
-    val rddbins = rdd.collect()(0)(0).asInstanceOf[ArrayBuffer[Array[Double]]]
-    val bins = rddbins.map(r => {
+    val bins = histbins.map(r => {
       val b = new AStatisticsSupporter.HistogramBin
-      b.setX(r(0))
-      b.setY(r(1))
+      b.setX(r.get(0).asInstanceOf[Double])
+      b.setY(r.get(1).asInstanceOf[Double])
       b
     })
     return bins.toList.asJava
