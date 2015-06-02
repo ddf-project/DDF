@@ -115,46 +115,30 @@ class ComplexTypeDDFSuite extends ATestSuite {
     qdata.VIEWS.head(3).asScala.toList.foreach(println)
   }
 
-  test("test query result from flattened DDF with all columns from Smurf data") {
-    println("\n\n ================================= query result from flattened DDF with all columns on Smurf ")
-    val path = "../resources/test/smurf_pubsub_sample.json"
-    val ddf = json2ddf(path)
-    println("---ddf schema: \n" + ddf.getSchema.getColumnNames)
-    ddf.VIEWS.head(3).asScala.toList.foreach(println)
-
-    val fddf: DDF = ddf.getFlattenedDDF()
-    println("---flattened_ddf schema: \n" + fddf.getSchema.getColumnNames)
-    fddf.VIEWS.head(3).asScala.toList.foreach(println)
-
-    println("\n---- Query 4 elements from the flattenedDDF")
-    val qdata = fddf.sql2ddf(s"select * from ${fddf.getTableName} limit 4")
-    println("---query result from a flattened ddf: ")
-    println("schema: " + qdata.getSchema.getColumnNames)
-    println("data:")
-    qdata.VIEWS.head(3).asScala.toList.foreach(println)
-  }
   */
 
-  test("test query result from flattened DDF with all columns") {
-    println("\n\n ================================= query result from flattened DDF with all columns")
+  test("test some stats functions on flattened DDF") {
+    println("\n\n ================================= test some stats functions on flattened DDF")
     val path = "../resources/test/sleep_data_sample.json"
     val ddf = json2ddf(path)
-    println("---ddf schema: \n" + ddf.getSchema.getColumnNames)
-    ddf.VIEWS.head(3).asScala.toList.foreach(println)
-
     val fddf: DDF = ddf.getFlattenedDDF()
-    println("---flattened_ddf schema: \n" + fddf.getSchema.getColumnNames)
-    fddf.VIEWS.head(3).asScala.toList.foreach(println)
 
-    println("\n---- Query min, max, histogram from the flattenedDDF")
+    println("\nquery min, max, histogram from the flattenedDDF")
     val qdata = fddf.sql2txt(s"select min(data_realDeepSleepTimeInMinutes), max(data_realDeepSleepTimeInMinutes), avg(data_realDeepSleepTimeInMinutes), PERCENTILE(data_realDeepSleepTimeInMinutes, array(0, 1, 0.25, 0.5, 0.75)), histogram_numeric(data_realDeepSleepTimeInMinutes, 10) from ${fddf.getTableName}", "")
-    println("---query result from a flattened ddf: ")
     qdata.get(0).split("\t").foreach(println)
 
     val qdf = fddf.sql2ddf(s"select data_realDeepSleepTimeInMinutes from ${fddf.getTableName}")
     println("get FiveNum")
     qdf.getFiveNumSummary.foreach(x => {
       println(Array(x.getFirstQuantile, x.getMedian, x.getThirdQuantile).mkString(","))
+    })
+
+    println("get vectorQuantiles")
+    println(qdf.getVectorQuantiles(Array(0.25, 0.5, 0.75)).mkString(","))
+
+    println("get Summary")
+    qdf.getSummary.foreach(x => {
+      println(x.toString)
     })
   }
 
