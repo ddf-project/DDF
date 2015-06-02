@@ -152,7 +152,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("select corr(%s, %s) from @this", xColumnName, yColumnName);
     if (!Strings.isNullOrEmpty(command)) {
       List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute correlation of %s and %s from table %%s", xColumnName, yColumnName));
+              String.format("Unable to compute correlation of %s and %s from table %%s", xColumnName, yColumnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         corr = Double.parseDouble(result.get(0));
         return corr;
@@ -167,7 +167,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("select  covar_samp(%s, %s) from @this", xColumnName, yColumnName);
     if (!Strings.isNullOrEmpty(command)) {
       List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute covariance of %s and %s from table %%s", xColumnName, yColumnName));
+              String.format("Unable to compute covariance of %s and %s from table %%s", xColumnName, yColumnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         System.out.println(">>>>> parseDouble: " + result.get(0));
         cov = Double.parseDouble(result.get(0));
@@ -177,6 +177,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     return Double.NaN;
   }
 
+/*
   @Override
   public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException {
     String command = String.format("select histogram_numeric(%s,%s) from @this", columnName, numBins);
@@ -202,6 +203,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     }
     return null;
   }
+*/
+
 
   private double parseDouble(String s) {
     mLog.info(">>>> parseDouble: " + s);

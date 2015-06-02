@@ -106,6 +106,7 @@ public class StatisticsSupporterTest extends BaseTest {
 
   @Test
   public void testVectorHistogram_Hive() throws DDFException {
+    System.out.println(">>>>> testVectorHistogram_Hive");
     List<HistogramBin> bins = ddf1.getVectorHistogram_Hive("arrdelay", 5);
     for (int i = 0; i < bins.size(); i++) {
       System.out.println(bins.get(i).getX() + " - " + bins.get(i).getY());
@@ -118,10 +119,7 @@ public class StatisticsSupporterTest extends BaseTest {
 
   @Test
   public void testVectorHistogram() throws DDFException {
-    //createTableMovie();
-    //mdf = manager.sql2ddf("select year, length, rating, votes from movie");
-    //List<HistogramBin> bins = mdf.getVectorHistogram("length", 5);
-
+    System.out.println(">>>>> testVectorHistogram");
     List<HistogramBin> bins = ddf1.getVectorHistogram("arrdelay", 5);
     for (int i = 0; i < bins.size(); i++) {
       System.out.println(bins.get(i).getX() + " - " + bins.get(i).getY());

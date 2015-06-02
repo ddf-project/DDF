@@ -20,7 +20,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
   def parseDouble(r: Row) = try {r.get(0).toString.toDouble } catch { case _ => None }
 
-  override def getVectorHistogramImpl(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
+  override def getVectorHistogram(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
     val projectedDDF: DDF = mDDF.VIEWS.project(columnName)
     val rdd: RDD[Row] = projectedDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
     val rdd1 = rdd.map(r => {try {r.get(0).toString.toDouble } catch { case _ => None }})
@@ -38,6 +38,24 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     }
     bins.toList.asJava
 
+  }
+
+  override def getVectorHistogram_Hive(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
+    val command: String = s"select histogram_numeric($columnName,$numBins) from @this"
+
+    mLog.info(">>>> getVectorHistogram command = " + command)
+    val ddf: DDF = this.getDDF.sql2ddf(command)
+    mLog.info(ddf.VIEWS.head(1).toString)
+    val rdd: RDD[Row] = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
+
+    val rddbins = rdd.collect()(0)(0).asInstanceOf[ArrayBuffer[Array[Double]]]
+    val bins = rddbins.map(r => {
+      val b = new AStatisticsSupporter.HistogramBin
+      b.setX(r(0))
+      b.setY(r(1))
+      b
+    })
+    return bins.toList.asJava
   }
 
   override def binningImpl(column: String, binningTypeString: String, numBins: Int, inputBreaks: Array[Double], includeLowest: Boolean,

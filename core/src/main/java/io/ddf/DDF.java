@@ -982,7 +982,7 @@ public abstract class DDF extends ALoggable //
 
   public List<HistogramBin> getVectorHistogram_Hive(String columnName, int numBins) throws DDFException {
     // TODO need to check columnName
-    return this.getStatisticsSupporter().getVectorHistogram(columnName, numBins);
+    return this.getBinningHandler().getVectorHistogram_Hive(columnName, numBins);
 
   }
 
