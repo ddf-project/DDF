@@ -22,6 +22,5 @@ class ListDDFSuite extends ATestSuite {
     }
 
     assert(listDDF.size > 0)
-    assert(listDDF(1).getUri != null)
   }
 }
