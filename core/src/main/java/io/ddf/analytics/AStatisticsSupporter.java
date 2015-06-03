@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.ddf.DDF;
+import io.ddf.content.Schema;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
@@ -167,7 +168,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("select  covar_samp(%s, %s) from @this", xColumnName, yColumnName);
     if (!Strings.isNullOrEmpty(command)) {
       List<String> result = this.getDDF().sql2txt(command,
-              String.format("Unable to compute covariance of %s and %s from table %%s", xColumnName, yColumnName));
+          String.format("Unable to compute covariance of %s and %s from table %%s", xColumnName, yColumnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         System.out.println(">>>>> parseDouble: " + result.get(0));
         cov = Double.parseDouble(result.get(0));
@@ -327,13 +328,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     if (Strings.isNullOrEmpty(columnName)) {
       throw new DDFException("Column name must not be empty");
     }
-
-    String colType = getDDF().getSchema().getColumn(columnName).getType().name().toLowerCase();
-
-    mLog.info("Column type: " + colType);
     List<Double> pValues = Arrays.asList(percentiles);
-    Pattern p1 = Pattern.compile("(big|small|tiny|int|long)");
-    Pattern p2 = Pattern.compile("(float|double)");
 
     String min = "";
     boolean hasZero = false;
@@ -352,11 +347,15 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     }
 
     String pParams = "";
+    List<Schema.ColumnType> wholeNumbers = Arrays.asList(ColumnType.BIGINT, ColumnType.INT, ColumnType.LONG);
+    List<Schema.ColumnType> decimals = Arrays.asList(ColumnType.FLOAT, ColumnType.DOUBLE);
+    ColumnType columnType = this.getDDF().getColumn(columnName).getType();
+    mLog.info("Column type: " + columnType.name());
 
     if (!pValues.isEmpty()) {
-      if (p1.matcher(colType).matches()) {
+      if (wholeNumbers.contains(columnType)) {
         pParams = "percentile(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "))";
-      } else if (p2.matcher(colType).matches()) {
+      } else if (decimals.contains(columnType)) {
         pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), " + B.toString()
             + ")";
       } else {
