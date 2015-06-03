@@ -299,7 +299,7 @@ public class Schema implements Serializable {
     public Column(String name, ColumnType type) {
       this.mName = name;
       this.mType = type;
-      this.mClass = ColumnClass.get(type);
+      this.mClass = ColumnClass.UNFACTOR; //ColumnClass.get(type);
     }
 
     public Column(String name, String type) {
@@ -350,7 +350,7 @@ public class Schema implements Serializable {
     }
 
     public Column unsetAsFactor() {
-      mClass = ColumnClass.get(mType);
+      mClass = ColumnClass.UNFACTOR; //ColumnClass.get(mType);
       mOptionalFactor = null;
       return this;
     }
@@ -483,31 +483,28 @@ public class Schema implements Serializable {
 
 
   /**
-   * The R concept of a column class. A Column class of NUMERIC would be
-   * associate with any of the following types: LONG, FLOAT, DOUBLE.
+   * There are two column classes: FACTOR (aka. Categorical or Dimension column)
+   * and UNFACTOR
    */
   public enum ColumnClass {
-    NUMERIC(ColumnType.LONG, ColumnType.FLOAT, ColumnType.DOUBLE), //
-    CHARACTER(ColumnType.STRING), //
-    LOGICAL(ColumnType.LOGICAL), //
-    FACTOR(ColumnType.ANY) //
-
+    FACTOR, //
+    UNFACTOR //
     ;
 
-    private List<ColumnType> mTypes = Lists.newArrayList();
+//    private List<ColumnType> mTypes = Lists.newArrayList();
 
-    private ColumnClass(ColumnType... acceptableColumnTypes) {
-      if (acceptableColumnTypes != null
-          && acceptableColumnTypes.length > 0) {
-        for (ColumnType type : acceptableColumnTypes) {
-          mTypes.add(type);
-        }
-      }
-    }
+//    private ColumnClass(ColumnType... acceptableColumnTypes) {
+//      if (acceptableColumnTypes != null
+//          && acceptableColumnTypes.length > 0) {
+//        for (ColumnType type : acceptableColumnTypes) {
+//          mTypes.add(type);
+//        }
+//      }
+//    }
 
-    public List<ColumnType> getColumnTypes() {
-      return mTypes;
-    }
+//    public List<ColumnType> getColumnTypes() {
+//      return mTypes;
+//    }
 
     /**
      * Returns the appropriate {@link ColumnClass} for a given
@@ -516,19 +513,19 @@ public class Schema implements Serializable {
      * @param type
      * @return
      */
-    public static ColumnClass get(ColumnType type) {
-      if (type == null)
-        return null;
-
-      for (ColumnClass clz : ColumnClass.values()) {
-        for (ColumnType t : clz.getColumnTypes()) {
-          if (type.equals(t))
-            return clz;
-        }
-      }
-
-      return null;
-    }
+//    public static ColumnClass get(ColumnType type) {
+//      if (type == null)
+//        return null;
+//
+//      for (ColumnClass clz : ColumnClass.values()) {
+//        for (ColumnType t : clz.getColumnTypes()) {
+//          if (type.equals(t))
+//            return clz;
+//        }
+//      }
+//
+//      return null;
+//    }
   }
 
 
