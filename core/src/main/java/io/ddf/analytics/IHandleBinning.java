@@ -13,5 +13,5 @@ public interface IHandleBinning extends IHandleDDFFunctionalGroup {
       boolean right) throws DDFException;
 
     public List<AStatisticsSupporter.HistogramBin> getVectorHistogram(String column, int numBins) throws DDFException;
-    public List<AStatisticsSupporter.HistogramBin> getVectorHistogram_Hive(String column, int numBins) throws DDFException;
+    public List<AStatisticsSupporter.HistogramBin> getVectorApproxHistogram(String column, int numBins) throws DDFException;
 }

@@ -40,7 +40,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
   }
 
-  override def getVectorHistogram_Hive(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
+  override def getVectorApproxHistogram(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
     val command: String = s"select histogram_numeric($columnName,$numBins) from @this"
 
     mLog.info(">>>> getVectorHistogram command = " + command)

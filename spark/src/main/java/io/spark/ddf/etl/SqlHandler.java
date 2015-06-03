@@ -112,19 +112,6 @@ public class SqlHandler extends ASqlHandler {
   }
 
   //TODO SparkSql
-  //@Override
-  public List<String> sql2txt_old(String command, Integer maxRows, String dataSource) throws DDFException {
-    DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
-    Row[] arrRow = rdd.collect();
-    List<String> lsString = new ArrayList<String>();
-
-    for (Row row : arrRow) {
-      lsString.add(row.mkString("\t"));
-    }
-    return lsString;
-  }
-
-  //TODO SparkSql
   @Override
   public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
     DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
