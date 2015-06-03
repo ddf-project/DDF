@@ -411,7 +411,7 @@ public class Schema implements Serializable {
     STRING(String.class),
     BINARY(Byte[].class),
     BOOLEAN(Boolean.class),
-    TIMESTAMP(Date.class, java.sql.Date.class, Time.class, Timestamp.class),
+    TIMESTAMP(java.sql.Timestamp.class),
     DATE(java.sql.Date.class),
     ARRAY(scala.collection.Seq.class),
     STRUCT(Object.class),
