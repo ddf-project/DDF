@@ -1,5 +1,5 @@
 // scalastyle:off
-package io.spark.ddf
+package io.ddf.spark
 
 
 import org.scalatest.FunSuite

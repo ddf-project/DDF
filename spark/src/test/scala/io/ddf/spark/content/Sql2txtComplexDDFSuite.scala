@@ -1,8 +1,8 @@
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 import io.ddf.DDF
-import io.spark.ddf.ATestSuite
-import io.spark.ddf.util.SparkUtils
+import io.ddf.spark.ATestSuite
+import io.ddf.spark.util.SparkUtils
 import org.apache.spark.sql.DataFrame
 
 import scala.collection.JavaConverters._

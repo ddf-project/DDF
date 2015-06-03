@@ -1,4 +1,4 @@
-package io.spark.ddf.analytics;
+package io.ddf.spark.analytics;
 
 
 import io.ddf.DDF;
@@ -7,8 +7,8 @@ import io.ddf.analytics.AStatisticsSupporter.FiveNumSummary;
 import io.ddf.analytics.AStatisticsSupporter.HistogramBin;
 import io.ddf.analytics.Summary;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.BaseTest;
-import io.spark.ddf.SparkDDF;
+import io.ddf.spark.BaseTest;
+import io.ddf.spark.SparkDDF;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;

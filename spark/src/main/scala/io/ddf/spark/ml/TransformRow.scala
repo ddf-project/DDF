@@ -1,4 +1,4 @@
-package io.spark.ddf.ml
+package io.ddf.spark.ml
 
 import java.util.{HashMap => JMap}
 import org.jblas.DoubleMatrix

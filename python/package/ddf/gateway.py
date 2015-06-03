@@ -41,7 +41,7 @@ def start_gateway_server():
     # connect to the gateway server
     gateway = JavaGateway(GatewayClient(port = port), auto_convert = False)
     java_import(gateway.jvm, "io.ddf.*")
-    java_import(gateway.jvm, "io.spark.ddf.*")
+    java_import(gateway.jvm, "io.ddf.spark.*")
     return gateway
 
 def compute_classpath(rootPath):

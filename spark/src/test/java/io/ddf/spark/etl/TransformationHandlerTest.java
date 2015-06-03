@@ -1,4 +1,4 @@
-package io.spark.ddf.etl;
+package io.ddf.spark.etl;
 
 
 import com.google.common.collect.Lists;
@@ -9,7 +9,7 @@ import io.ddf.content.Schema;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.etl.TransformationHandler;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.BaseTest;
+import io.ddf.spark.BaseTest;
 import org.junit.*;
 import java.util.List;
 

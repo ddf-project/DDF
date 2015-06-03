@@ -1,6 +1,6 @@
-package io.spark.ddf.content
+package io.ddf.spark.content
 
-import io.spark.ddf.ATestSuite
+import io.ddf.spark.ATestSuite
 
 /**
  */

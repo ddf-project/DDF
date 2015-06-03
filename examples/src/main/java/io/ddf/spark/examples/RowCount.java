@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.spark.ddf.examples;
+package io.ddf.spark.examples;
 
 
 import io.ddf.DDF;

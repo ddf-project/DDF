@@ -1,14 +1,14 @@
 /**
  *
  */
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 import java.lang.Class
-import io.spark.ddf.{SparkDDFManager, SparkDDF}
+import io.ddf.spark.{SparkDDFManager, SparkDDF}
 
 import scala.reflect.Manifest
 import scala.collection.JavaConversions._
-import io.spark.ddf.content.RepresentationHandler._
+import io.ddf.spark.content.RepresentationHandler._
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD

@@ -1,9 +1,9 @@
-package io.spark.ddf.analytics;
+package io.ddf.spark.analytics;
 
 
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.BaseTest;
+import io.ddf.spark.BaseTest;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;

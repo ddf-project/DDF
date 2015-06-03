@@ -1,13 +1,13 @@
 /**
  *
  */
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 import io.ddf.DDF
 import io.ddf.content.IHandleViews
 import scala.collection.JavaConverters._
 import io.ddf.content.Schema
-import io.spark.ddf.SparkDDF
+import io.ddf.spark.SparkDDF
 import org.apache.spark.sql.Row
 import org.apache.spark.rdd.RDD
 

@@ -1,4 +1,4 @@
-package io.spark.ddf.etl;
+package io.ddf.spark.etl;
 
 
 import io.ddf.DDF;
@@ -8,7 +8,7 @@ import io.ddf.etl.IHandleJoins;
 import io.ddf.etl.Types.JoinType;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
-import io.spark.ddf.util.SparkUtils;
+import io.ddf.spark.util.SparkUtils;
 import org.apache.spark.sql.DataFrame;
 
 import java.util.HashSet;

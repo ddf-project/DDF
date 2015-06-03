@@ -68,7 +68,7 @@ echo $CLASSPATH
 echo $RUNNER
 echo $JAVA_OPTS
 echo $@
-#java -Dhive.metastore.warehouse.dir=/tmp/hive/warehouse -cp examples/target/scala-2.10/ddf_examples_2.10-0.9.jar:examples/target/scala-2.10/lib/* io.spark.ddf.examples.RowCount
+#java -Dhive.metastore.warehouse.dir=/tmp/hive/warehouse -cp examples/target/scala-2.10/ddf_examples_2.10-0.9.jar:examples/target/scala-2.10/lib/* io.ddf.spark.examples.RowCount
 exec "$RUNNER" $JAVA_OPTS -cp "$CLASSPATH" "$@"
 
 

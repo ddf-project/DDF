@@ -1,4 +1,4 @@
-package io.spark.ddf;
+package io.ddf.spark;
 
 
 import com.google.gson.Gson;
@@ -6,8 +6,8 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.util.SparkUtils;
-import io.spark.ddf.util.Utils;
+import io.ddf.spark.util.SparkUtils;
+import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;

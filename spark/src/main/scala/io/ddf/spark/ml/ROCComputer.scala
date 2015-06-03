@@ -1,4 +1,4 @@
-package io.spark.ddf.ml
+package io.ddf.spark.ml
 
 import org.apache.spark.rdd.RDD
 import io.ddf.ml.RocMetric

@@ -5,7 +5,7 @@ import org.apache.spark.serializer.{KryoRegistrator => SparkKryoRegistrator}
 import com.esotericsoftware.kryo.serializers.{JavaSerializer => KryoJavaSerializer, FieldSerializer}
 import io.ddf.types.Matrix
 import io.ddf.types.Vector
-import io.spark.ddf.ml.ROCComputer
+import io.ddf.spark.ml.ROCComputer
 import org.jblas.DoubleMatrix
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.RList

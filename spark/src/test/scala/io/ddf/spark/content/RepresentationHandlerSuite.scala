@@ -1,4 +1,4 @@
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 //import shark.api.Row
 //import shark.memstore2.TablePartition
@@ -7,7 +7,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.junit.Assert.assertEquals
 import scala.collection.JavaConversions._
-import io.spark.ddf.{ATestSuite, SparkDDF}
+import io.ddf.spark.{ATestSuite, SparkDDF}
 import org.apache.spark.sql.Row
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.sql.{DataFrame}

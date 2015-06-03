@@ -1,9 +1,9 @@
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 import io.ddf.DDF
 import io.ddf.content.{Representation, ConvertFunction}
 import org.apache.spark.rdd.RDD
-import io.spark.ddf.{SparkDDFManager, SparkDDF}
+import io.ddf.spark.{SparkDDFManager, SparkDDF}
 import org.apache.spark.sql.Row
 import io.ddf.content.Schema.{ColumnType, Column}
 import org.apache.spark.sql.types.StructField

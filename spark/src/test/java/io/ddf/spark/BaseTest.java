@@ -1,4 +1,4 @@
-package io.spark.ddf;
+package io.ddf.spark;
 
 
 import io.ddf.DDFManager;

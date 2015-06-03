@@ -1,4 +1,4 @@
-package io.spark.ddf.analytics;
+package io.ddf.spark.analytics;
 
 
 import io.ddf.DDF;
@@ -6,7 +6,7 @@ import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.BaseTest;
+import io.ddf.spark.BaseTest;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package io.spark.ddf.ml;
+package io.ddf.spark.ml;
 
 
 import io.ddf.DDF;
@@ -7,7 +7,7 @@ import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 import io.ddf.ml.AMLMetricsSupporter;
 import io.ddf.ml.RocMetric;
-import io.spark.ddf.SparkDDF;
+import io.ddf.spark.SparkDDF;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;

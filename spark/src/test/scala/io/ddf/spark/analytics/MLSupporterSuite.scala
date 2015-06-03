@@ -1,8 +1,8 @@
-package io.spark.ddf.analytics
+package io.ddf.spark.analytics
 
 import io.ddf.DDF
 import io.ddf.ml.IModel
-import io.spark.ddf.{ATestSuite, SparkDDF}
+import io.ddf.spark.{ATestSuite, SparkDDF}
 
 /**
   */

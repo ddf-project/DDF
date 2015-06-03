@@ -1,4 +1,4 @@
-package io.spark.ddf.content;
+package io.ddf.spark.content;
 
 
 import com.google.common.collect.Lists;
@@ -7,7 +7,7 @@ import io.ddf.content.*;
 import io.ddf.content.ViewHandler;
 import io.ddf.content.ViewHandler.*;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.BaseTest;
+import io.ddf.spark.BaseTest;
 import junit.framework.Assert;
 import org.junit.Test;
 

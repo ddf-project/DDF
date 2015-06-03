@@ -1,4 +1,4 @@
-package io.spark.ddf.util
+package io.ddf.spark.util
 
 import scala.collection.mutable.ArrayBuffer
 

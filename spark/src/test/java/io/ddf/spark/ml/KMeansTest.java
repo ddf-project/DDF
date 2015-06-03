@@ -1,9 +1,9 @@
-package io.spark.ddf.ml;
+package io.ddf.spark.ml;
 
 
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.BaseTest;
+import io.ddf.spark.BaseTest;
 import org.apache.spark.mllib.clustering.KMeansModel;
 import org.junit.Assert;
 import org.junit.Test;

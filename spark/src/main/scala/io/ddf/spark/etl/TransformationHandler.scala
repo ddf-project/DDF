@@ -1,4 +1,4 @@
-package io.spark.ddf.etl
+package io.ddf.spark.etl
 
 import org.apache.spark.sql.DataFrame
 
@@ -24,7 +24,7 @@ import io.ddf.content.Schema
 import io.ddf.content.Schema.Column
 import io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
 import io.ddf.exception.DDFException
-import io.spark.ddf.util.SparkUtils
+import io.ddf.spark.util.SparkUtils
 import java.util.{ArrayList, List}
 
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {

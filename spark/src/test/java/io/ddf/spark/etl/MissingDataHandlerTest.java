@@ -1,4 +1,4 @@
-package io.spark.ddf.etl;
+package io.ddf.spark.etl;
 
 
 import io.ddf.DDF;
@@ -6,7 +6,7 @@ import io.ddf.etl.IHandleMissingData.Axis;
 import io.ddf.etl.IHandleMissingData.NAChecking;
 import io.ddf.exception.DDFException;
 import io.ddf.types.AggregateTypes.AggregateFunction;
-import io.spark.ddf.BaseTest;
+import io.ddf.spark.BaseTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

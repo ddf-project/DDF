@@ -1,4 +1,4 @@
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 import io.ddf.content.Schema.{ColumnType, Column}
 import org.apache.spark.sql.catalyst.expressions.Row

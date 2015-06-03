@@ -1,9 +1,9 @@
-package io.spark.ddf.ml;
+package io.ddf.spark.ml;
 
 
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.BaseTest;
+import io.ddf.spark.BaseTest;
 import org.apache.spark.mllib.recommendation.MatrixFactorizationModel;
 import org.junit.Ignore;
 import org.junit.Test;

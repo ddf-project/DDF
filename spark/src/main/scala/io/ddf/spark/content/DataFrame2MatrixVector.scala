@@ -1,4 +1,4 @@
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 import io.ddf.DDF
 import org.apache.spark.sql.catalyst.expressions.Row
@@ -8,7 +8,7 @@ import java.util.{List => JList}
 import io.ddf.content.{Representation, ConvertFunction}
 import io.ddf.exception.DDFException
 import io.ddf.types.{Matrix, Vector}
-import io.spark.ddf.ml.TransformRow
+import io.ddf.spark.ml.TransformRow
 import io.ddf.content.Schema.{ColumnType, Column}
 import org.apache.spark.sql.DataFrame
 

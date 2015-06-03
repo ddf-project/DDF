@@ -1,4 +1,4 @@
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 import io.ddf.content.Schema.{ColumnType, Column}
 import scala.collection.JavaConversions._

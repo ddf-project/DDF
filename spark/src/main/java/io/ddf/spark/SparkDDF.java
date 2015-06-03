@@ -1,4 +1,4 @@
-package io.spark.ddf;
+package io.ddf.spark;
 
 
 import io.ddf.DDF;
@@ -7,7 +7,7 @@ import io.ddf.content.IHandleRepresentations.IGetResult;
 import io.ddf.content.RepresentationHandler.GetResult;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.util.SparkUtils;
+import io.ddf.spark.util.SparkUtils;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;

@@ -1,4 +1,4 @@
-package io.spark.ddf.content
+package io.ddf.spark.content
 
 import io.basic.ddf.content.{PersistenceHandler => BPersistenceHandler}
 import io.ddf.DDF
@@ -7,7 +7,7 @@ import io.ddf.content.APersistenceHandler.PersistenceUri
 import io.ddf.util.Utils
 import io.ddf.util.Utils.JsonSerDes
 import org.apache.spark.sql.SchemaRDD
-import io.spark.ddf.SparkDDFManager
+import io.ddf.spark.SparkDDFManager
 import io.ddf.content.IHandlePersistence.IPersistible
 import scala.collection.JavaConversions._
 import org.apache.hadoop.fs.Path

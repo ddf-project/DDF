@@ -1,7 +1,7 @@
 /**
  *
  */
-package io.spark.ddf.content;
+package io.ddf.spark.content;
 
 
 import com.google.common.collect.Lists;
@@ -12,8 +12,8 @@ import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.SparkDDF;
-import io.spark.ddf.util.SparkUtils;
+import io.ddf.spark.SparkDDF;
+import io.ddf.spark.util.SparkUtils;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import java.util.ArrayList;

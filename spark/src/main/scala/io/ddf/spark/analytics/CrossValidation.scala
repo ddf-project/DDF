@@ -1,4 +1,4 @@
-package io.spark.ddf.analytics
+package io.ddf.spark.analytics
 
 import org.apache.spark.{TaskContext, Partition}
 import org.apache.spark.rdd.RDD
@@ -8,7 +8,7 @@ import java.util.{List => JList}
 import io.ddf.exception.DDFException
 import java.util
 import io.ddf.content.Schema
-import io.spark.ddf.SparkDDF
+import io.ddf.spark.SparkDDF
 import org.apache.spark.sql.catalyst.expressions.Row
 
 private[spark]

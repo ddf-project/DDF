@@ -1,7 +1,7 @@
 /**
  *
  */
-package io.spark.ddf.etl;
+package io.ddf.spark.etl;
 
 
 import io.ddf.DDF;
@@ -9,10 +9,10 @@ import io.ddf.content.Schema;
 import io.ddf.content.Schema.DataFormat;
 import io.ddf.etl.ASqlHandler;
 import io.ddf.exception.DDFException;
-import io.spark.ddf.SparkDDF;
-import io.spark.ddf.SparkDDFManager;
-import io.spark.ddf.content.SchemaHandler;
-import io.spark.ddf.util.SparkUtils;
+import io.ddf.spark.SparkDDF;
+import io.ddf.spark.SparkDDFManager;
+import io.ddf.spark.content.SchemaHandler;
+import io.ddf.spark.util.SparkUtils;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;

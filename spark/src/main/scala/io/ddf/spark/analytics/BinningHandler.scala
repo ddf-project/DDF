@@ -1,4 +1,4 @@
-package io.spark.ddf.analytics
+package io.ddf.spark.analytics
 
 import io.ddf.DDF
 import org.apache.spark.rdd.{DoubleRDDFunctions, RDD}

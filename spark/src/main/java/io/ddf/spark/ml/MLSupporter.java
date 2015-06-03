@@ -1,4 +1,4 @@
-package io.spark.ddf.ml;
+package io.ddf.spark.ml;
 
 
 import io.ddf.DDF;
@@ -9,8 +9,8 @@ import io.ddf.exception.DDFException;
 import io.ddf.ml.IModel;
 import io.ddf.types.TupleMatrixVector;
 import io.ddf.util.Utils.MethodInfo.ParamInfo;
-import io.spark.ddf.SparkDDF;
-import io.spark.ddf.analytics.CrossValidation;
+import io.ddf.spark.SparkDDF;
+import io.ddf.spark.analytics.CrossValidation;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -45,7 +45,7 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
   @SuppressWarnings("unchecked")
   @Override
   protected Object convertDDF(ParamInfo paramInfo) throws DDFException {
-    mLog.info(">>>> Running ConvertDDF of io.spark.ddf.ml.MLSupporter");
+    mLog.info(">>>> Running ConvertDDF of io.ddf.spark.ml.MLSupporter");
     if (paramInfo.argMatches(RDD.class)) {
       // Yay, our target data format is an RDD!
       RDD<?> rdd = null;
