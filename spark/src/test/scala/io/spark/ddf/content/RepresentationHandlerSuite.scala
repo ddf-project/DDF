@@ -8,7 +8,7 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.junit.Assert.assertEquals
 import scala.collection.JavaConversions._
 import io.spark.ddf.{ATestSuite, SparkDDF}
-import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.sql.Row
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.sql.{DataFrame}
 import org.rosuda.REngine.REXP
@@ -58,14 +58,11 @@ class RepresentationHandlerSuite extends ATestSuite {
 
   test("Can get RDD[Array[Object]] & RDD[LabeledPoint] from RDD[Array[Double]]") {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline").asInstanceOf[SparkDDF]
-    val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
     val repHandler = ddf.getRepresentationHandler
-    //    repHandler.remove(classOf[RDD[_]], classOf[Row])
-    //    repHandler.remove(classOf[RDD[_]], classOf[TablePartition])
+    val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
+    repHandler.remove(classOf[RDD[_]], classOf[Row])
     val keys = ddf.getRepresentationHandler.getAllRepresentations.keySet()
     LOG.info(">>>> keys = " + keys.mkString(", "))
-    ddf.VIEWS.head(10)
-    ddf.getNumRows
     val arrObj = ddf.getRDD(classOf[Array[Object]])
     assert(arrObj.count == 295)
     assert(arrObj != null)
