@@ -123,7 +123,7 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
       case INT:
         factor = new Factor<Integer>(this.getDDF(), columnName);
         break;
-      case LONG:
+      case BIGINT:
         factor = new Factor<Long>(this.getDDF(), columnName);
         break;
       case BOOLEAN:

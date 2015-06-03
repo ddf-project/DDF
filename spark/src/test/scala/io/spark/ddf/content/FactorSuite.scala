@@ -34,7 +34,7 @@ class FactorSuite extends ATestSuite {
     val ddf = manager.sql2ddf("select mpg, cast(cyl as bigint) as cyl from mtcars")
     ddf.getSchemaHandler.setAsFactor("cyl")
     ddf.getSchemaHandler.computeFactorLevelsAndLevelCounts()
-    assert(ddf.getSchemaHandler.getColumn("cyl").getType == ColumnType.LONG)
+    assert(ddf.getSchemaHandler.getColumn("cyl").getType == ColumnType.BIGINT)
     assert(ddf.getSchemaHandler.getColumn("cyl").getColumnClass == ColumnClass.FACTOR)
     assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("4") == 11)
     assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("6") == 7)

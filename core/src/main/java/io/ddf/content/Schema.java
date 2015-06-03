@@ -398,23 +398,24 @@ public class Schema implements Serializable {
 
 
   /**
-   * The R concept of a column "type", such as STRING, INT, LONG, etc.
+   * The R concept of a column "type", such as STRING, INT, BIGINT, etc.
    */
   public enum ColumnType {
-    STRING(String.class),
-    INT(Integer.class, Byte.class, Short.class), // new
-    LONG(Long.class),
+    TINYINT(Byte.class),
+    SMALLINT(Short.class),
+    INT(Integer.class),
+    BIGINT(Long.class),
     FLOAT(Float.class),
     DOUBLE(Double.class),
-    BIGINT(Long.class), //
-    BIGDECIMAL(java.math.BigDecimal.class),
+    DECIMAL(java.math.BigDecimal.class),
+    STRING(String.class),
     BINARY(Byte[].class),
+    BOOLEAN(Boolean.class),
     TIMESTAMP(Date.class, java.sql.Date.class, Time.class, Timestamp.class),
     DATE(java.sql.Date.class),
-    STRUCT(Object.class),
     ARRAY(scala.collection.Seq.class),
+    STRUCT(Object.class),
     MAP(scala.collection.Map.class),
-    BOOLEAN(Boolean.class),
     BLOB(Object.class), //
     ANY(/* for ColumnClass.Factor */) //
     ;
@@ -474,7 +475,7 @@ public class Schema implements Serializable {
     public static boolean isNumeric(ColumnType colType) {
       switch (colType) {
         case INT:
-        case LONG:
+        case BIGINT:
         case DOUBLE:
         case FLOAT:
           return true;
@@ -488,14 +489,13 @@ public class Schema implements Serializable {
 
   /**
    * The R concept of a column class. A Column class of NUMERIC would be
-   * associate with any of the following types: LONG, FLOAT, DOUBLE.
+   * associate with any of the following types: BIGINT, FLOAT, DOUBLE.
    */
   public enum ColumnClass {
-    NUMERIC(ColumnType.LONG, ColumnType.FLOAT, ColumnType.DOUBLE), //
+    NUMERIC(ColumnType.TINYINT, ColumnType.SMALLINT, ColumnType.INT, ColumnType.BIGINT, ColumnType.FLOAT, ColumnType.DOUBLE, ColumnType.DECIMAL), //
     CHARACTER(ColumnType.STRING), //
     LOGICAL(ColumnType.BOOLEAN), //
-    FACTOR(ColumnType.ANY) //
-
+    FACTOR(ColumnType.ANY) // ??
     ;
 
     private List<ColumnType> mTypes = Lists.newArrayList();

@@ -3,8 +3,6 @@ package io.ddf.analytics;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import io.ddf.DDF;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
@@ -12,7 +10,6 @@ import io.ddf.misc.ADDFFunctionalGroupHandler;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -152,7 +149,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("select corr(%s, %s) from @this", xColumnName, yColumnName);
     if (!Strings.isNullOrEmpty(command)) {
       List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute correlation of %s and %s from table %%s", xColumnName, yColumnName));
+              String.format("Unable to compute correlation of %s and %s from table %%s", xColumnName, yColumnName));
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         corr = Double.parseDouble(result.get(0));
         return corr;
@@ -213,7 +210,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
     switch (colType) {
       case INT:
-      case LONG:
+      case BIGINT:
         return String.format("PERCENTILE(%s, array(0, 1, 0.25, 0.5, 0.75))", columnName);
 
       case DOUBLE:

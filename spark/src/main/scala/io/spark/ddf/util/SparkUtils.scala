@@ -215,7 +215,7 @@ object SparkUtils {
       case FloatType  => Schema.ColumnType.FLOAT
       case DoubleType => Schema.ColumnType.DOUBLE
       case TimestampType => Schema.ColumnType.TIMESTAMP
-      case LongType     => Schema.ColumnType.LONG
+      case LongType     => Schema.ColumnType.BIGINT
       case BooleanType  => Schema.ColumnType.LOGICAL
       case StructType(_) => Schema.ColumnType.STRUCT
       case ArrayType(_, _) => Schema.ColumnType.ARRAY

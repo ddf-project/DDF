@@ -91,7 +91,7 @@ object GetMultiFactor {
               case ColumnType.DOUBLE => Option(x.asInstanceOf[Double].toString)
               case ColumnType.STRING => Option(x.asInstanceOf[String])
               case ColumnType.FLOAT => Option(x.asInstanceOf[Float].toString)
-              case ColumnType.BIGINT | ColumnType.LONG => Option(x.asInstanceOf[Long].toString)
+              case ColumnType.BIGINT => Option(x.asInstanceOf[Long].toString)
               case unknown => x match {
                 case y: java.lang.Integer => Option(y.toString)
                 case y: java.lang.Double => Option(y.toString)
