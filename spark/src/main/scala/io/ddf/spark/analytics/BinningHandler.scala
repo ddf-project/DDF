@@ -20,7 +20,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
   def parseDouble(r: Row) = try {r.get(0).toString.toDouble } catch { case _ => None }
 
-  override def getVectorHistogramImpl(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
+  override def getVectorHistogram(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
     val projectedDDF: DDF = mDDF.VIEWS.project(columnName)
     val rdd: RDD[Row] = projectedDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
     val rdd1 = rdd.map(r => {try {r.get(0).toString.toDouble } catch { case _ => None }})
@@ -38,6 +38,24 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     }
     bins.toList.asJava
 
+  }
+
+  override def getVectorApproxHistogram(columnName: String, numBins: Int): java.util.List[AStatisticsSupporter.HistogramBin] = {
+    val command: String = s"select histogram_numeric($columnName,$numBins) from @this"
+
+    mLog.info(">>>> getVectorHistogram command = " + command)
+    val ddf: DDF = this.getDDF.sql2ddf(command)
+    mLog.info(ddf.VIEWS.head(1).toString)
+    val rddbins = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]].collect
+    val histbins = rddbins(0).get(0).asInstanceOf[ArrayBuffer[Row]]
+
+    val bins = histbins.map(r => {
+      val b = new AStatisticsSupporter.HistogramBin
+      b.setX(r.get(0).asInstanceOf[Double])
+      b.setY(r.get(1).asInstanceOf[Double])
+      b
+    })
+    return bins.toList.asJava
   }
 
   override def binningImpl(column: String, binningTypeString: String, numBins: Int, inputBreaks: Array[Double], includeLowest: Boolean,
@@ -148,8 +166,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
   def getIntervalsFromNumBins(colName: String, bins: Int): Array[Double] = {
     val cmd = "SELECT min(%s), max(%s) FROM %s".format(colName, colName, mDDF.getTableName)
-    val res: Array[Double] = mDDF.sql2txt(cmd, "").get(0).replace("ArrayBuffer", "").
-      replace("(", "").replace(")", "").replace(", ", "\t").split("\t").map(x ⇒ x.toDouble)
+    val res: Array[Double] = mDDF.sql2txt(cmd, "").get(0).split("\t").map(x ⇒ x.toDouble)
     val (min, max) = (res(0), res(1))
     val eachInterval = (max - min) / bins
     val probs: Array[Double] = Array.fill[Double](bins + 1)(0)
@@ -182,7 +199,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     pArray.foreach(x ⇒ cmd = cmd + x.toString + ",")
     cmd = cmd.take(cmd.length - 1)
     cmd = String.format("min(%s), percentile_approx(%s, array(%s)), max(%s)", colName, colName, cmd, colName)
-    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replaceAll("ArrayBuffer|\\(|\\)|,", "").split("\t| ").
+    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t").
       map(x ⇒ x.toDouble)
   }
 
