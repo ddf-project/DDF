@@ -114,6 +114,7 @@ public class SqlHandler extends ASqlHandler {
   //TODO SparkSql
   @Override
   public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
+    //System.out.println("run sql2txt: \n" + command);
     DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
     String[] strResult = SparkUtils.jsonForComplexType(rdd, "\t");
     return Arrays.asList(strResult);

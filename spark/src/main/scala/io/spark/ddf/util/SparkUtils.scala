@@ -131,8 +131,9 @@ object SparkUtils {
    */
   def jsonForComplexType(df: DataFrame, sep: String): Array[String] = {
     val schema = df.schema
-    val df1: RDD[String] = df.map(r => rowToJSON(schema, r, sep))
-    df1.collect()
+    //val df1: RDD[String] = df.map(r => rowToJSON(schema, r, sep)) // run in parallel
+    //df1.collect()
+    df.collect().map(r => rowToJSON(schema, r, sep)) // run sequentially
   }
 
   private def rowToJSON(rowSchema: StructType, row: Row, separator: String): String = {

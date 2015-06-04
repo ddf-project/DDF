@@ -20,6 +20,7 @@ class SampleSuite extends ATestSuite {
     val ddf = manager.sql2ddf("select * from mtcars")
     val sample = ddf.VIEWS.getRandomSample(0.5, false, 1)
     //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
+    println("sample: ")
     sample.VIEWS.head(3).foreach(println)
   }
 }
