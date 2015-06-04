@@ -16,12 +16,10 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
     // TODO Auto-generated constructor stub
   }
 
-  public List<AStatisticsSupporter.HistogramBin> getVectorHistogram(String column, int numBins) throws DDFException{
-    List<AStatisticsSupporter.HistogramBin> bins = getVectorHistogramImpl(column, numBins);
-    return bins;
-  }
+  public abstract List<AStatisticsSupporter.HistogramBin> getVectorHistogram(String column, int numBins)
+          throws DDFException;
 
-  public abstract List<AStatisticsSupporter.HistogramBin> getVectorHistogramImpl(String column, int numBins)
+  public abstract List<AStatisticsSupporter.HistogramBin> getVectorApproxHistogram(String column, int numBins)
           throws DDFException;
 
   public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
