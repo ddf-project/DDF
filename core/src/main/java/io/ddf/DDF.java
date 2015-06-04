@@ -980,9 +980,13 @@ public abstract class DDF extends ALoggable //
     return this.getStatisticsSupporter().getVectorMean(columnName);
   }
 
+  // for backward compatibility
   public List<HistogramBin> getVectorHistogram_Hive(String columnName, int numBins) throws DDFException {
+    return getVectorApproxHistogram(columnName, numBins);
+  }
+  public List<HistogramBin> getVectorApproxHistogram(String columnName, int numBins) throws DDFException {
     // TODO need to check columnName
-    return this.getStatisticsSupporter().getVectorHistogram(columnName, numBins);
+    return this.getBinningHandler().getVectorApproxHistogram(columnName, numBins);
 
   }
 
