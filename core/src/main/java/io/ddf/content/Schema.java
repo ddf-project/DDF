@@ -414,7 +414,8 @@ public class Schema implements Serializable {
     TIMESTAMP(java.sql.Timestamp.class),
     DATE(java.sql.Date.class),
     ARRAY(scala.collection.Seq.class),
-    STRUCT(Object.class),
+    STRUCT(Objects.class),
+    //STRUCT(org.apache.spark.sql.Row.class), // TODO review
     MAP(scala.collection.Map.class),
     BLOB(Object.class), //
     ANY(/* for ColumnClass.Factor */) //
@@ -474,10 +475,38 @@ public class Schema implements Serializable {
 
     public static boolean isNumeric(ColumnType colType) {
       switch (colType) {
+        case TINYINT:
+        case SMALLINT:
         case INT:
         case BIGINT:
         case DOUBLE:
         case FLOAT:
+        case DECIMAL:
+          return true;
+
+        default:
+          return false;
+      }
+    }
+
+    public static boolean isInteger(ColumnType colType) {
+      switch (colType) {
+        case TINYINT:
+        case SMALLINT:
+        case INT:
+        case BIGINT:
+         return true;
+
+        default:
+          return false;
+      }
+    }
+
+    public static boolean isDecimal(ColumnType colType) {
+      switch (colType) {
+        case DOUBLE:
+        case FLOAT:
+        case DECIMAL:
           return true;
 
         default:
@@ -488,8 +517,8 @@ public class Schema implements Serializable {
 
 
   /**
-   * The R concept of a column class. A Column class of NUMERIC would be
-   * associate with any of the following types: BIGINT, FLOAT, DOUBLE.
+   * The R concept of a column class.
+   * // TODO review and update @huan @freeman @nhanitvn
    */
   public enum ColumnClass {
     NUMERIC(ColumnType.TINYINT, ColumnType.SMALLINT, ColumnType.INT, ColumnType.BIGINT, ColumnType.FLOAT, ColumnType.DOUBLE, ColumnType.DECIMAL), //

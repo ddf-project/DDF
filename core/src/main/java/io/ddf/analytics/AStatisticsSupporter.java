@@ -212,19 +212,12 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
   private String fiveNumFunction(String columnName) {
     ColumnType colType = this.getDDF().getColumn(columnName).getType();
 
-    switch (colType) {
-      case INT:
-      case BIGINT:
+    if(ColumnType.isInteger(colType))
         return String.format("PERCENTILE(%s, array(0, 1, 0.25, 0.5, 0.75))", columnName);
-
-      case DOUBLE:
-      case FLOAT:
+    else if(ColumnType.isDecimal(colType))
         return String.format("MIN(%s), MAX(%s), PERCENTILE_APPROX(%s, array(0.25, 0.5, 0.75))", columnName, columnName,
             columnName);
-
-      default:
-        return "";
-    }
+    return "";
   }
 
   public static class HistogramBin {
@@ -344,15 +337,13 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     }
 
     String pParams = "";
-    List<Schema.ColumnType> wholeNumbers = Arrays.asList(ColumnType.BIGINT, ColumnType.INT, ColumnType.LONG);
-    List<Schema.ColumnType> decimals = Arrays.asList(ColumnType.FLOAT, ColumnType.DOUBLE);
     ColumnType columnType = this.getDDF().getColumn(columnName).getType();
     mLog.info("Column type: " + columnType.name());
 
     if (!pValues.isEmpty()) {
-      if (wholeNumbers.contains(columnType)) {
+      if (ColumnType.isInteger(columnType)) {
         pParams = "percentile(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "))";
-      } else if (decimals.contains(columnType)) {
+      } else if (ColumnType.isDecimal(columnType)) {
         pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), " + B.toString()
             + ")";
       } else {

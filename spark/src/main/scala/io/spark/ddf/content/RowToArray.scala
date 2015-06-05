@@ -23,6 +23,7 @@ import org.apache.spark.sql.catalyst.expressions.Row
 //  }
 //}
 
+// TODO review @huan
 trait RowToArray {
   def rowToArrayDouble(row: Row, columns: Array[Column]): Array[Double] = {
     var i = 0

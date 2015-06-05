@@ -15,6 +15,7 @@ trait ObjectToDoubleMapper {
     ).toArray
   }
 
+  // TODO review @huan @freeman
   private def getDoubleMapper(colType: ColumnType): Object ⇒ Option[Double] = {
     colType match {
       case ColumnType.DOUBLE ⇒ {
