@@ -8,6 +8,7 @@ import org.apache.spark.sql.Row
 import io.ddf.content.Schema.{ColumnType, Column}
 import scala.collection.JavaConversions._
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.types.ArrayType
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -45,9 +46,9 @@ object ArrayObject2DataFrame {
       case ColumnType.BINARY => StructField(column.getName, BinaryType, true)
       case ColumnType.TIMESTAMP => StructField(column.getName, TimestampType, true)
       case ColumnType.DATE => StructField(column.getName, DateType, true)
-      case ColumnType.STRUCT => StructField(column.getName, StructType(_), true)
-      case ColumnType.ARRAY => StructField(column.getName, ArrayType(_,_), true)
-      case ColumnType.MAP => StructField(column.getName, MapType(_,_,_), true)
+//      case ColumnType.STRUCT => StructField(column.getName, StructType(_), true) // @huan
+//      case ColumnType.ARRAY => StructField(column.getName, ArrayType(_, _), true)
+//      case ColumnType.MAP => StructField(column.getName, MapType(_, _, _), true)
     }
   }
 }

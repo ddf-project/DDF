@@ -489,7 +489,7 @@ public class Schema implements Serializable {
       }
     }
 
-    public static boolean isInteger(ColumnType colType) {
+    public static boolean isIntegral(ColumnType colType) {
       switch (colType) {
         case TINYINT:
         case SMALLINT:
@@ -502,7 +502,7 @@ public class Schema implements Serializable {
       }
     }
 
-    public static boolean isDecimal(ColumnType colType) {
+    public static boolean isFractional(ColumnType colType) {
       switch (colType) {
         case DOUBLE:
         case FLOAT:

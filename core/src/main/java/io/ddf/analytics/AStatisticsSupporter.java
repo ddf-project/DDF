@@ -4,7 +4,6 @@ package io.ddf.analytics;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
-import io.ddf.content.Schema;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
@@ -12,7 +11,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler implements ISupportStatistics {
 
@@ -212,9 +210,9 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
   private String fiveNumFunction(String columnName) {
     ColumnType colType = this.getDDF().getColumn(columnName).getType();
 
-    if(ColumnType.isInteger(colType))
+    if(ColumnType.isIntegral(colType))
         return String.format("PERCENTILE(%s, array(0, 1, 0.25, 0.5, 0.75))", columnName);
-    else if(ColumnType.isDecimal(colType))
+    else if(ColumnType.isFractional(colType))
         return String.format("MIN(%s), MAX(%s), PERCENTILE_APPROX(%s, array(0.25, 0.5, 0.75))", columnName, columnName,
             columnName);
     return "";
@@ -341,9 +339,9 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     mLog.info("Column type: " + columnType.name());
 
     if (!pValues.isEmpty()) {
-      if (ColumnType.isInteger(columnType)) {
+      if (ColumnType.isIntegral(columnType)) {
         pParams = "percentile(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "))";
-      } else if (ColumnType.isDecimal(columnType)) {
+      } else if (ColumnType.isFractional(columnType)) {
         pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), " + B.toString()
             + ")";
       } else {

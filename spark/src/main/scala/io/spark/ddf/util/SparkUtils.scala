@@ -18,11 +18,8 @@ import java.util.{List => JList}
 import io.ddf.content.Schema.Column
 import com.google.common.collect.Lists
 import java.util.ArrayList
-import scala.util
 import io.ddf.exception.DDFException
 import scala.collection.JavaConverters._
-import scala.util
-import org.apache.spark.sql.types._
 
 /**
   */
