@@ -130,15 +130,15 @@ public class Config {
         ;
 
         config.getSection("spark") //
-            .set("DDF", "io.ddf.spark.SparkDDF") //
-            .set("DDFManager", "io.ddf.spark.SparkDDFManager") //
-            .set("ISupportStatistics", "io.ddf.spark.analytics.BasicStatisticsSupporter") //
-            .set("IHandleMetaData", "io.ddf.spark.content.MetaDataHandler") //
-            .set("IHandleRepresentations", "io.ddf.spark.content.RepresentationHandler") //
-            .set("IHandleSchema", "io.ddf.spark.content.SchemaHandler") //
-            .set("IHandleSql", "io.ddf.spark.etl.SqlHandler") //
-            .set("IHandleViews", "io.ddf.spark.content.ViewHandler") //
-            .set("ISupportML", "io.ddf.spark.ml.MLSupporter") //
+            .set("DDF", "io.spark.ddf.SparkDDF") //
+            .set("DDFManager", "io.spark.ddf.SparkDDFManager") //
+            .set("ISupportStatistics", "io.spark.ddf.analytics.BasicStatisticsSupporter") //
+            .set("IHandleMetaData", "io.spark.ddf.content.MetaDataHandler") //
+            .set("IHandleRepresentations", "io.spark.ddf.content.RepresentationHandler") //
+            .set("IHandleSchema", "io.spark.ddf.content.SchemaHandler") //
+            .set("IHandleSql", "io.spark.ddf.etl.SqlHandler") //
+            .set("IHandleViews", "io.spark.ddf.content.ViewHandler") //
+            .set("ISupportML", "io.spark.ddf.ml.MLSupporter") //
         ;
 
         sConfigHandler.setConfig(config);
