@@ -68,9 +68,9 @@ echo
 echo "###########################"
 echo "# Start DDF server #"
 echo "###########################"
-nohup ${DIR}/exe/spark-class -Dpa.security=false -Dbigr.multiuser=false -Dlog.dir=${LOG_DIR} io.spark.ddf.examples.rest.Server  > ddf.out 2>&1 &
+nohup ${DIR}/exe/spark-class -Dpa.security=false -Dbigr.multiuser=false -Dlog.dir=${LOG_DIR} io.ddf.spark.examples.rest.Server  > ddf.out 2>&1 &
 echo
 
 sleep 5
-pgrep -fl io.spark.ddf.examples.rest.Server >/dev/null 2>&1 || echo "Error: No 'Server' Java process found. Something is wrong"
+pgrep -fl io.ddf.spark.examples.rest.Server >/dev/null 2>&1 || echo "Error: No 'Server' Java process found. Something is wrong"
 
