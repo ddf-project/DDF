@@ -50,6 +50,12 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
     println("---flattened_ddf values:")
     val lfddf = fddf.sql2txt("select * from @this limit 3", "")
     lfddf.asScala.toList.foreach(println)
+
+    println("---sample from flattened_ddf:")
+    val sample = ddf.VIEWS.getRandomSample(0.1, false, 1)
+    println("sample: " + sample)
+    //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
+    sample.VIEWS.head(3).asScala.toList.foreach(println)
   }
 
   test("test some stats functions on flattened DDF") {
