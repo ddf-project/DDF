@@ -72,32 +72,14 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     }
   }
 
-  // this is the old implementation of getRandomSample
-  private def getRandomSample1(percent: Double, withReplacement: Boolean, seed: Int): DDF = {
-    val columns = mDDF.getSchema.getColumns
-    val schema = new Schema(mDDF.getSchemaHandler.newTableName(), columns)
-    val manager = this.getManager
-    val sampleRdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row]).sample(withReplacement, percent, seed)
-    val sampleDDF = manager.newDDF(manager, sampleRdd, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
-    mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-    manager.addDDF(sampleDDF)
-    sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)
-    sampleDDF
-  }
-
-  // this is rewritten to handle complex data type
   override def getRandomSample(percent: Double, withReplacement: Boolean, seed: Int): DDF = {
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     val sample_df = df.sample(withReplacement, percent, seed)
     val schema = SchemaHandler.getSchemaFromDataFrame(sample_df)
-    schema.setTableName(mDDF.getSchemaHandler.newTableName()) // why this line of code helps?
+    schema.setTableName(mDDF.getSchemaHandler.newTableName()) // this line of code helps manager add new DDF properly
     val manager = this.getManager
     val sampleDDF = manager.newDDF(manager, sample_df, Array(classOf[DataFrame]), manager.getNamespace, null, schema)
-    //println("table name: " + sampleDDF.getUUID)
-    //println(manager.getDDF(sampleDDF.getUUID)) //--> null
     mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-    //manager.addDDF(sampleDDF)
-    //println(manager.getDDF(sampleDDF.getUUID))
     sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)
     sampleDDF
   }
