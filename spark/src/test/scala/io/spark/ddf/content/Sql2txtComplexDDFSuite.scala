@@ -53,7 +53,7 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
 
     println("---sample from flattened_ddf:")
     val sample = ddf.VIEWS.getRandomSample(0.1, false, 1)
-    println("sample: " + sample)
+    println("sample: ")
     //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
     sample.VIEWS.head(3).asScala.toList.foreach(println)
   }
