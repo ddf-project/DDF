@@ -1,4 +1,4 @@
-package io.spark.content
+package io.ddf.spark.content
 
 import com.esotericsoftware.kryo.Kryo
 import org.apache.spark.serializer.{KryoRegistrator => SparkKryoRegistrator}
