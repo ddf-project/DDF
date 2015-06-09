@@ -7,7 +7,7 @@ import io.ddf.DDF
 import io.ddf.content.IHandleViews
 import scala.collection.JavaConverters._
 import io.ddf.content.Schema
-import io.spark.ddf.{SparkDDFManager, SparkDDF}
+import io.ddf.spark.{SparkDDFManager, SparkDDF}
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.rdd.RDD
 
