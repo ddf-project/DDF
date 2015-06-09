@@ -78,6 +78,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    */
   protected Map<String, DDF> mDDFs = new ConcurrentHashMap<String, DDF>();
 
+  protected Map<String, String> Uris =  new ConcurrentHashMap<String, String>();
+
   protected Map<String, IModel> mModels = new ConcurrentHashMap<String, IModel>();
 
   public void addDDF(DDF ddf) throws DDFException {
@@ -111,7 +113,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
-    ddf.setName(name);
+    if(!Strings.isNullOrEmpty(name)) {
+      ddf.setName(name);
+      this.Uris.put(ddf.getUri(), ddf.getUUID());
+    } else {
+      throw new DDFException(String.format("DDF's name cannot be null or empty"));
+    }
   }
 
   public synchronized void setDDFUUID(DDF ddf, String uuid) throws DDFException{
@@ -123,16 +130,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   public DDF getDDFByURI(String uri) throws DDFException {
-    DDF result = null;
-    for(DDF ddf: mDDFs.values()) {
-      if(!Strings.isNullOrEmpty(ddf.getUri()) && ddf.getUri().equals(uri)) {
-        result = ddf;
-      }
+    String uuid = this.Uris.get(uri);
+    if(Strings.isNullOrEmpty(uuid)) {
+      throw new DDFException(String.format("Cannot find ddf with uri %s", uri));
     }
-    if(result == null) throw new DDFException(String.format("Cannot find ddf with uri %s", uri));
-    else {
-      return result;
-    }
+    return this.getDDF(uuid);
   }
 
   public void addModel(IModel model) {
