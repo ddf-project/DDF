@@ -94,9 +94,13 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.mDDFs.values().toArray(new DDF[] {});
   }
 
-  public DDF getDDF(String uuid) {
+  public DDF getDDF(String uuid) throws DDFException {
     DDF data = mDDFs.get(uuid);
-    return data;
+    if(data == null) {
+      throw new DDFException(String.format("Cannot find ddf with uuid %s", uuid));
+    } else {
+      return data;
+    }
   }
 
   public DDF getDDFByName(String name) throws DDFException {
