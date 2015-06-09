@@ -88,6 +88,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public void removeDDF(DDF ddf) throws DDFException {
     mDDFs.remove(ddf.getUUID());
+    Uris.remove(ddf.getUri());
   }
 
   public DDF[] listDDFs() {
