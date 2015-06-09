@@ -110,11 +110,23 @@ public class StatisticsSupporterTest extends BaseTest {
 
     createTableMtcars();
     DDF ddf_movie = manager.sql2ddf("select * from mtcars");
-    //Double[] pArray = { 0.3, 0.5, 0.7, 1.0 };
-    Double[] pArray = { 1.0 , 0.3};
-    Double[] expectedQuantiles = { 801.0, 1416.0, 1644.0, 2107.0 };
+
+    Double[] pArray = {0.3, 0.5};
     Double[] quantiles = ddf_movie.getVectorQuantiles("mpg", pArray);
-    System.out.println("Quantiles: " + StringUtils.join(quantiles, ", "));
+    //System.out.println("Quantiles of " + StringUtils.join(pArray, ", ") + ": " + StringUtils.join(quantiles, ", "));
+    Assert.assertArrayEquals(new Double[]{15.68, 18.95}, quantiles);
+
+    Double[] pArray1 = { 1.0 , 0.3};
+    quantiles = ddf_movie.getVectorQuantiles("mpg", pArray1);
+    //System.out.println("Quantiles of " + StringUtils.join(pArray1, ", ") + ": " + StringUtils.join(quantiles, ", "));
+    Assert.assertArrayEquals(new Double[]{33.9, 15.68}, quantiles);
+
+    Double[] pArray2 = { 0.0, 1.0 , 0.0, 0.3};
+    quantiles = ddf_movie.getVectorQuantiles("mpg", pArray2);
+    //System.out.println("Quantiles of " + StringUtils.join(pArray2, ", ") + ": " + StringUtils.join(quantiles, ", "));
+    Assert.assertArrayEquals(new Double[]{10.4, 33.9, 10.4, 15.68}, quantiles);
+
+
   }
 
   @Test
