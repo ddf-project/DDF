@@ -92,5 +92,14 @@ public class BaseTest {
         manager.sql2txt("load data local inpath '../resources/test/ratings.data' into table ratings");
     }
 
+    public void createTableMtcars() throws DDFException {
+        manager.sql2txt("drop table if exists mtcars");
+
+        manager.sql2txt("CREATE TABLE mtcars ("
+                + "mpg double, cyl int, disp double, hp int, drat double, wt double, qsec double, vs int, am int, gear int, carb int"
+                + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '");
+
+        manager.sql2txt("load data local inpath '../resources/test/mtcars' into table mtcars");
+    }
 
 }
