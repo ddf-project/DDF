@@ -25,11 +25,11 @@ DDFManager <- function(engine="spark") {
   new("DDFManager", engine=engine)
 }
 
-#' Execute a HiveQL
+#' Execute a HiveQL and return results as character
 #' 
-#' @param x a DistributedDataFrame object
+#' @param x a DDFManager object
 #' @param sql a HiveQL
-#' @return a list of strings
+#' @return a character vector
 #' @export
 setGeneric("sql",
            function(x, sql, ...) {
@@ -50,7 +50,7 @@ setMethod("sql",
 
 #' Execute a HiveQL and return a DistributedDataFrame
 #' 
-#' @param x a DistributedDataFrame
+#' @param x a DDFManager object
 #' @param sql the query, only support SELECT ones
 #' @return a DistributedDataFrame
 #' @export
