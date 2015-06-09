@@ -103,6 +103,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     }
   }
 
+  public boolean hasDDF(String uuid) {
+    DDF ddf = mDDFs.get(uuid);
+    return ddf != null;
+  }
+
   public DDF getDDFByName(String name) throws DDFException {
     DDF result= null;
     for(DDF ddf: mDDFs.values()) {
@@ -125,13 +130,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     }
   }
 
-  public synchronized void setDDFUUID(DDF ddf, String uuid) throws DDFException{
-    try {
-      this.getDDF(uuid);
-    } catch(DDFException e) {
+  public synchronized void setDDFUUID(DDF ddf, String uuid) throws DDFException {
+    if(this.hasDDF(uuid)) {
+      throw new DDFException(String.format("DDF with uuid %s already exists", uuid));
+    } else {
       ddf.setUUID(uuid);
     }
-    throw new DDFException(String.format("DDF with uuid %s already exists", uuid));
   }
 
   public DDF getDDFByURI(String uri) throws DDFException {
