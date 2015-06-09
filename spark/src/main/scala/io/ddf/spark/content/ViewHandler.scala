@@ -76,7 +76,6 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     val sample_df = df.sample(withReplacement, percent, seed)
     val schema = SchemaHandler.getSchemaFromDataFrame(sample_df)
-    schema.setTableName(mDDF.getSchemaHandler.newTableName()) // this line of code helps manager add new DDF properly
     val manager = this.getManager
     val sampleDDF = manager.newDDF(manager, sample_df, Array(classOf[DataFrame]), manager.getNamespace, null, schema)
     mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
