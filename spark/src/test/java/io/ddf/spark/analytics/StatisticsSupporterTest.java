@@ -96,11 +96,37 @@ public class StatisticsSupporterTest extends BaseTest {
   public void testVectorQuantiles() throws DDFException {
     System.out.println(">>>>> testVectorQuantiles");
     // Double[] quantiles = ddf1.getVectorQuantiles("deptime", {0.3, 0.5, 0.7});
-    Double[] pArray = { 0.3, 0.5, 0.7 };
-    Double[] expectedQuantiles = { 801.0, 1416.0, 1644.0 };
+    Double[] pArray = { 0.3, 0.5, 0.7, 1.0 };
+
+    Double[] expectedQuantiles = { 801.0, 1416.0, 1644.0, 2107.0 };
     Double[] quantiles = ddf1.getVectorQuantiles("deptime", pArray);
     System.out.println("Quantiles: " + StringUtils.join(quantiles, ", "));
     Assert.assertArrayEquals(expectedQuantiles, quantiles);
+  }
+
+  @Test
+  public void testVectorQuantilesWithDecimalCol() throws DDFException {
+    System.out.println(">>>>> testVectorQuantiles with ApproxQuantile for Decimal columns");
+
+    createTableMtcars();
+    DDF ddf_movie = manager.sql2ddf("select * from mtcars");
+
+    Double[] pArray = { 0.0, 0.3, 0.5, 0.3, 1.0};
+    Double[] quantiles = ddf_movie.getVectorQuantiles("mpg", pArray);
+    //System.out.println("Quantiles of " + StringUtils.join(pArray, ", ") + ": " + StringUtils.join(quantiles, ", "));
+    Assert.assertArrayEquals(new Double[]{10.4, 15.68, 18.95, 15.68, 33.9}, quantiles);
+
+    // check if wrong quantile for 0.0
+    Double[] pArray1 = {0.0, 0.3};
+    quantiles = ddf_movie.getVectorQuantiles("mpg", pArray1);
+    //System.out.println("Quantiles of " + StringUtils.join(pArray1, ", ") + ": " + StringUtils.join(quantiles, ", "));
+    Assert.assertArrayEquals(new Double[]{10.4, 15.68}, quantiles);
+
+    // check if causing exception
+    Double[] pArray2 = { 1.0 , 0.3}; // {0.1, 0.0, 0.3}
+    quantiles = ddf_movie.getVectorQuantiles("mpg", pArray2);
+    //System.out.println("Quantiles of " + StringUtils.join(pArray2, ", ") + ": " + StringUtils.join(quantiles, ", "));
+    Assert.assertArrayEquals(new Double[]{33.9, 15.68}, quantiles);
   }
 
   @Test
