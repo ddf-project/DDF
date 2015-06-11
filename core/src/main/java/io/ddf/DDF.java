@@ -156,7 +156,6 @@ public abstract class DDF extends ALoggable //
    */
   protected void initialize(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name,
       Schema schema) throws DDFException {
-
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
     this.getRepresentationHandler().set(data, typeSpecs);
@@ -170,9 +169,10 @@ public abstract class DDF extends ALoggable //
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
 
+    manager.setDDFUUID(this, DDFUtils.generateObjectName(this));
+
     if(!Strings.isNullOrEmpty(name)) manager.setDDFName(this, name);
 
-    manager.setDDFUUID(this, DDFUtils.generateObjectName(this));
     // Facades
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
