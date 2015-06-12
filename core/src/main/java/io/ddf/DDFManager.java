@@ -76,63 +76,45 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   /**
    * List of existing DDFs
    */
-  protected Map<String, DDF> mDDFs = new ConcurrentHashMap<String, DDF>();
+
+  protected DDFCache mDDFCache = new DDFCache();
 
   protected Map<String, IModel> mModels = new ConcurrentHashMap<String, IModel>();
 
   public void addDDF(DDF ddf) throws DDFException {
-    mDDFs.put(ddf.getUUID(), ddf);
+    mDDFCache.addDDF(ddf);
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
-    mDDFs.remove(ddf.getUUID());
+    mDDFCache.removeDDF(ddf);
   }
 
   public DDF[] listDDFs() {
-    return this.mDDFs.values().toArray(new DDF[] {});
+    return mDDFCache.listDDFs();
   }
 
-  public DDF getDDF(String uuid) {
-    DDF data = mDDFs.get(uuid);
-    return data;
+  public DDF getDDF(String uuid) throws DDFException {
+    return mDDFCache.getDDF(uuid);
+  }
+
+  public boolean hasDDF(String uuid) {
+    return mDDFCache.hasDDF(uuid);
   }
 
   public DDF getDDFByName(String name) throws DDFException {
-    DDF result= null;
-    for(DDF ddf: mDDFs.values()) {
-      if(!Strings.isNullOrEmpty(ddf.getName()) && ddf.getName().equals(name)) {
-        result = ddf;
-      }
-    }
-    if(result == null) throw new DDFException(String.format("Cannot find ddf with name %s", name));
-    else {
-      return result;
-    }
+    return mDDFCache.getDDFByName(name);
   }
 
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
-    ddf.setName(name);
+    mDDFCache.setDDFName(ddf, name);
   }
 
-  public synchronized void setDDFUUID(DDF ddf, String uuid) throws DDFException{
-    DDF existedDDF = this.getDDF(uuid);
-    if(existedDDF != null) {
-      throw new DDFException(String.format("DDF with uuid % already exists", uuid));
-    }
-    ddf.setUUID(uuid);
+  public synchronized void setDDFUUID(DDF ddf, String uuid) throws DDFException {
+    mDDFCache.setDDFUUID(ddf, uuid);
   }
 
   public DDF getDDFByURI(String uri) throws DDFException {
-    DDF result = null;
-    for(DDF ddf: mDDFs.values()) {
-      if(!Strings.isNullOrEmpty(ddf.getUri()) && ddf.getUri().equals(uri)) {
-        result = ddf;
-      }
-    }
-    if(result == null) throw new DDFException(String.format("Cannot find ddf with uri %s", uri));
-    else {
-      return result;
-    }
+    return mDDFCache.getDDFByUri(uri);
   }
 
   public void addModel(IModel model) {
@@ -187,9 +169,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return manager;
   }
 
-
   private DDF mDummyDDF;
-
 
   protected DDF getDummyDDF() throws DDFException {
     if (mDummyDDF == null) mDummyDDF = this.newDDF(this);
