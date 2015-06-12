@@ -405,12 +405,14 @@ public class Schema implements Serializable {
     SMALLINT(Short.class),
     INT(Integer.class),
     BIGINT(Long.class),
+    LONG(Long.class), // temporarily kept for backward compatibility with PA
     FLOAT(Float.class),
     DOUBLE(Double.class),
     DECIMAL(java.math.BigDecimal.class),
     STRING(String.class),
     BINARY(Byte[].class),
     BOOLEAN(Boolean.class),
+    LOGICAL(Boolean.class), // temporarily kept for backward compatibility with PA
     TIMESTAMP(java.sql.Timestamp.class),
     DATE(java.sql.Date.class),
     ARRAY(scala.collection.Seq.class),
@@ -479,6 +481,7 @@ public class Schema implements Serializable {
         case SMALLINT:
         case INT:
         case BIGINT:
+        case LONG:
         case DOUBLE:
         case FLOAT:
         case DECIMAL:
@@ -495,6 +498,7 @@ public class Schema implements Serializable {
         case SMALLINT:
         case INT:
         case BIGINT:
+        case LONG:
          return true;
 
         default:
@@ -521,9 +525,9 @@ public class Schema implements Serializable {
    * // TODO review and update @huan @freeman @nhanitvn
    */
   public enum ColumnClass {
-    NUMERIC(ColumnType.TINYINT, ColumnType.SMALLINT, ColumnType.INT, ColumnType.BIGINT, ColumnType.FLOAT, ColumnType.DOUBLE, ColumnType.DECIMAL), //
+    NUMERIC(ColumnType.TINYINT, ColumnType.SMALLINT, ColumnType.INT, ColumnType.BIGINT, ColumnType.LONG, ColumnType.FLOAT, ColumnType.DOUBLE, ColumnType.DECIMAL), //
     CHARACTER(ColumnType.STRING), //
-    LOGICAL(ColumnType.BOOLEAN), //
+    LOGICAL(ColumnType.BOOLEAN, ColumnType.LOGICAL), //
     FACTOR(ColumnType.ANY) // ??
     ;
 
