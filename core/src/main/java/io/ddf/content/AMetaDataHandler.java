@@ -4,6 +4,7 @@
 package io.ddf.content;
 
 
+import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
@@ -88,8 +89,10 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
   }
 
   public void copyMetaData(DDF ddf) throws DDFException {
-    this.getDDF().getManager().setDDFUUID(ddf, ddf.getUUID());
-    this.getDDF().getManager().setDDFName(ddf, ddf.getName());
+    this.getDDF().getManager().setDDFUUID(this.getDDF(), ddf.getUUID());
+    if(!Strings.isNullOrEmpty(ddf.getName())) {
+      this.getDDF().getManager().setDDFName(this.getDDF(), ddf.getName());
+    }
     this.copyFactor(ddf);
   }
 
