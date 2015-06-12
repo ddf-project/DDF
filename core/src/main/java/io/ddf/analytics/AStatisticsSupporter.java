@@ -26,16 +26,21 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
   private Summary[] basicStats;
 
+  private SimpleSummary[] simpleSummary;
 
   protected abstract Summary[] getSummaryImpl() throws DDFException;
 
-
+  protected abstract SimpleSummary[] getSimpleSummaryImpl() throws DDFException;
 
   public Summary[] getSummary() throws DDFException {
     this.basicStats = getSummaryImpl();
     return basicStats;
   }
 
+  public SimpleSummary[] getSimpleSummary() throws DDFException {
+    this.simpleSummary = this.getSimpleSummaryImpl();
+    return simpleSummary;
+  }
 
   @Override
   public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException {
