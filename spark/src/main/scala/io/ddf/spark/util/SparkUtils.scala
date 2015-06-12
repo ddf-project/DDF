@@ -123,25 +123,86 @@ object SparkUtils {
     }
 
   }
+//
+//  def jsonForComplexType(df: DataFrame, sep: String): Array[String] = {
+//    df2txt(df, sep)
+//  }
 
   /**
    *
    * @param df
+   * @param sep the separator to separate adjacent column
    * @return an Array of string showing the dataframe with complex column-object replaced by json string
    */
-  def jsonForComplexType(df: DataFrame, sep: String): Array[String] = {
+  def df2txt(df: DataFrame, sep: String): Array[String] = {
     val schema = df.schema
     //val df1: RDD[String] = df.map(r => rowToJSON(schema, r, sep)) // run in parallel
     //df1.collect()
-    df.collect().map(r => rowToJSON(schema, r, sep)) // run sequentially
+    df.collect().map(r => row2txt(schema, r, sep)) // run sequentially
   }
 
-  private def rowToJSON(rowSchema: StructType, row: Row, separator: String): String = {
+  /**
+   *
+   * @param rowSchema
+   * @param row
+   * @param separator
+   * @return
+   */
+  def row2txt(rowSchema: StructType, row: Row, separator: String): String = {
+    val writer = new CharArrayWriter()
+    val gen = new JsonFactory().createGenerator(writer).setRootValueSeparator(null)
+    var i = 0
+    rowSchema.zip(row.toSeq).foreach {
+      case (field, v) =>
+        if(i > 0)
+          gen.writeRaw(separator)
+        i = i+1
+        if(v == null)
+          gen.writeNull()
+        else if(field.dataType.isPrimitive)
+          gen.writeRaw(v.toString)
+        else
+          data2json(field.dataType, v, gen)
+    }
+    gen.close()
+    writer.toString
+  }
+
+  /**
+   * get value of a cell as string
+   *
+   * @param dataType
+   * @param data
+   * @return
+   */
+  def cell2txt(dataType: DataType, data: Any): String = {
     val writer = new CharArrayWriter()
     val gen = new JsonFactory().createGenerator(writer).setRootValueSeparator(null)
 
-    def valWriter: (DataType, Any) => Unit = {
-      case (_, null) | (NullType, _)  => gen.writeNull()
+    if(data == null)
+      gen.writeNull()
+    else if(dataType.isPrimitive)
+      gen.writeRaw(data.toString)
+    else
+      data2json(dataType, data, gen)
+
+    gen.close()
+    writer.toString
+  }
+
+  /**
+   * A recursive function to output json string for a SparkSQL data object
+   *
+   * @param dataType data-type of the data
+   * @param data the data object
+   * @param gen JsonGenerator that write value in appropriate format
+   */
+  private def data2json(dataType: DataType, data: Any, gen: JsonGenerator, isFirst: Boolean = false): Unit = { 
+    if(isFirst)
+      gen.flush()
+    
+    (dataType,data) match {
+      case (_, null) | (NullType, _) => gen.writeNull()
       case (StringType, v: String) => gen.writeString(v)
       case (TimestampType, v: java.sql.Timestamp) => gen.writeString(v.toString)
       case (IntegerType, v: Int) => gen.writeNumber(v)
@@ -154,18 +215,18 @@ object SparkUtils {
       case (BinaryType, v: Array[Byte]) => gen.writeBinary(v)
       case (BooleanType, v: Boolean) => gen.writeBoolean(v)
       case (DateType, v) => gen.writeString(v.toString)
-      case (udt: UserDefinedType[_], v) => valWriter(udt.sqlType, v)
+      case (udt: UserDefinedType[_], v) => data2json(udt.sqlType, v, gen)
 
-      case (ArrayType(ty, _), v: Seq[_] ) =>
+      case (ArrayType(ty, _), v: Seq[_]) =>
         gen.writeStartArray()
-        v.foreach(valWriter(ty,_))
+        v.foreach(data2json(ty, _, gen))
         gen.writeEndArray()
 
-      case (MapType(kv,vv, _), v: Map[_,_]) =>
+      case (MapType(kv, vv, _), v: Map[_, _]) =>
         gen.writeStartObject()
         v.foreach { p =>
           gen.writeFieldName(p._1.toString)
-          valWriter(vv,p._2)
+          data2json(vv, p._2, gen)
         }
         gen.writeEndObject()
 
@@ -175,29 +236,10 @@ object SparkUtils {
           case (_, null) =>
           case (field, v) =>
             gen.writeFieldName(field.name)
-            valWriter(field.dataType, v)
+            data2json(field.dataType, v, gen)
         }
         gen.writeEndObject()
     }
-
-    var i = 0
-    rowSchema.zip(row.toSeq).foreach {
-      case (_, null) =>
-        if(i > 0)
-          gen.writeRaw(separator)
-        i = i+1
-        gen.writeNull()
-      case (field, v) =>
-        if(i > 0)
-          gen.writeRaw(separator)
-        i = i+1
-        if(field.dataType.isPrimitive)
-          gen.writeRaw(v.toString)
-        else
-          valWriter(field.dataType, v)
-    }
-    gen.close()
-    writer.toString
   }
 
   def getDataFrameWithValidColnames(df: DataFrame): DataFrame = {

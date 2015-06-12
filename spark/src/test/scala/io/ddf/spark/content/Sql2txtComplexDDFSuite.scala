@@ -50,8 +50,41 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
     println("---flattened_ddf values:")
     val lfddf = fddf.sql2txt("select * from @this limit 3", "")
     lfddf.asScala.toList.foreach(println)
+
   }
 
+  test("test getRandomSample for complex type DDF") {
+    println("\n\n ================================= test getRandomSample for complex type DDF")
+    val path = "../resources/test/sleep_data_sample.json"
+    val ddf = json2ddf(path)
+    val fddf: DDF = ddf.getFlattenedDDF()
+
+    println("---sample from complex ddf with percentage:")
+    val sample = ddf.VIEWS.getRandomSample(0.1, false, 1)
+    println("sample: ")
+    //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
+    sample.VIEWS.head(3).asScala.toList.foreach(println)
+
+    println("---sample from complex ddf with num rows:")
+    val sample1 = ddf.VIEWS.getRandomSample(5, false, 1)
+    println("sample: ")
+    //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
+    sample1.asScala.toList.foreach(r => println(r.map(x => x.getClass.getName).mkString(",")))
+
+    println("---sample from flattened ddf with percentage:")
+    val sample2 = fddf.VIEWS.getRandomSample(0.1, false, 1)
+    println("sample: ")
+    //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
+    sample2.VIEWS.head(3).asScala.toList.foreach(println)
+
+    println("---sample from flattened ddf with num rows:")
+    val sample3 = fddf.VIEWS.getRandomSample(5, false, 1)
+    println("sample: ")
+    //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
+    sample3.asScala.toList.foreach(r => println(r.map(x => x.getClass.getName).mkString(",")))
+  }
+
+/*
   test("test some stats functions on flattened DDF") {
     println("\n\n ================================= test some stats functions on flattened DDF")
     val path = "../resources/test/sleep_data_sample.json"
@@ -79,8 +112,7 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
     Assert.assertEquals(85.5, sum(0).stdev(), 0.01)
     Assert.assertEquals(100, sum(0).count(), 0.01)
   }
-
-
+*/
 
   def json2ddf(path:String): DDF = {
     val sqlCtx = manager.getHiveContext
