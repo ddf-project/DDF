@@ -7,8 +7,8 @@ import io.ddf.DDF
 import io.ddf.content.IHandleViews
 import scala.collection.JavaConverters._
 import io.ddf.content.Schema
-import io.ddf.spark.SparkDDF
-import org.apache.spark.sql.Row
+import io.ddf.spark.{SparkDDFManager, SparkDDF}
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.rdd.RDD
 
 /**
@@ -54,7 +54,6 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
   val MAX_SAMPLE_SIZE = 1000000;
 
   override def getRandomSample(numSamples: Int, withReplacement: Boolean, seed: Int): java.util.List[Array[Object]] = {
-
     if (numSamples > MAX_SAMPLE_SIZE) {
       throw new IllegalArgumentException("Number of samples is currently limited to %d".format(MAX_SAMPLE_SIZE))
     } else {
@@ -74,13 +73,12 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
   }
 
   override def getRandomSample(percent: Double, withReplacement: Boolean, seed: Int): DDF = {
-    val columns = mDDF.getSchema.getColumns
-    val schema = new Schema(mDDF.getSchemaHandler.newTableName(), columns)
+    val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    val sample_df = df.sample(withReplacement, percent, seed)
+    val schema = SchemaHandler.getSchemaFromDataFrame(sample_df)
     val manager = this.getManager
-    val sampleRdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row]).sample(withReplacement, percent, seed)
-    val sampleDDF = manager.newDDF(manager, sampleRdd, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
+    val sampleDDF = manager.newDDF(manager, sample_df, Array(classOf[DataFrame]), manager.getNamespace, null, schema)
     mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-    manager.addDDF(sampleDDF)
     sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)
     sampleDDF
   }
