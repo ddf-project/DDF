@@ -536,7 +536,24 @@ public class Schema implements Serializable {
    *
    */
   public enum DataFormat {
-    SQL, CSV, TSV, JSON
+    UNDEF, SQL, CSV, TSV, JSON, PQT;
+
+    public static DataFormat fromInt(int x) {
+      switch(x) {
+        case 1:
+          return SQL;
+        case 2:
+          return CSV;
+        case 3:
+          return TSV;
+        case 4:
+          return JSON;
+        case 5:
+          return PQT;
+        default:
+          return UNDEF;
+      }
+    }
   }
 
 
