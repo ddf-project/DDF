@@ -37,11 +37,13 @@ object ArrayObject2DataFrame {
       case ColumnType.SMALLINT => StructField(column.getName, ShortType, true)
       case ColumnType.INT => StructField(column.getName, IntegerType, true)
       case ColumnType.BIGINT => StructField(column.getName, LongType, true)
+      case ColumnType.LONG => StructField(column.getName, LongType, true) // temporary, for backward compatibility
       case ColumnType.FLOAT => StructField(column.getName, FloatType, true)
       case ColumnType.DOUBLE => StructField(column.getName, DoubleType, true)
       case ColumnType.DECIMAL => StructField(column.getName, DecimalType(), true)
       case ColumnType.STRING => StructField(column.getName, StringType, true)
       case ColumnType.BOOLEAN => StructField(column.getName, BooleanType, true)
+      case ColumnType.LOGICAL => StructField(column.getName, BooleanType, true) // temporary, for backward compatibility
       case ColumnType.TIMESTAMP => StructField(column.getName, TimestampType, true)
       case ColumnType.BINARY => StructField(column.getName, BinaryType, true)
       case ColumnType.TIMESTAMP => StructField(column.getName, TimestampType, true)
