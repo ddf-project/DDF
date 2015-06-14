@@ -540,15 +540,15 @@ public class Schema implements Serializable {
 
     public static DataFormat fromInt(int x) {
       switch(x) {
-        case 1:
+        case 0:
           return SQL;
-        case 2:
+        case 1:
           return CSV;
-        case 3:
+        case 2:
           return TSV;
-        case 4:
+        case 3:
           return JSON;
-        case 5:
+        case 4:
           return PQT;
         default:
           return UNDEF;
