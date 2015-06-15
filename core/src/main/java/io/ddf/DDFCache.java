@@ -77,7 +77,7 @@ public class DDFCache {
 
   public DDF getDDFByUri(String uri) throws DDFException {
     UUID uuid = this.mUris.get(uri);
-    if(uuid != null) {
+    if(uuid == null) {
       throw new DDFException(String.format("Cannot find ddf with uri %s", uri));
     }
     return this.getDDF(uuid);
