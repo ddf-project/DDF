@@ -169,7 +169,7 @@ public abstract class DDF extends ALoggable //
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
 
-    manager.setDDFUUID(this, DDFUtils.generateObjectName(this));
+    manager.setDDFUUID(this, UUID.randomUUID());
 
     if(!Strings.isNullOrEmpty(name)) manager.setDDFName(this, name);
 
@@ -192,7 +192,7 @@ public abstract class DDF extends ALoggable //
 
   @Expose private String mName;
 
-  @Expose private String uuid;
+  @Expose private UUID uuid;
   /**
    * @return the namespace this DDF belongs in
    * @throws DDFException
@@ -265,9 +265,9 @@ public abstract class DDF extends ALoggable //
     return "ddf";
   }
 
-  public String getUUID() {return uuid;}
+  public UUID getUUID() {return uuid;}
 
-  protected void setUUID(String uuid) {this.uuid = uuid;}
+  protected void setUUID(UUID uuid) {this.uuid = uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).

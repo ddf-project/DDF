@@ -93,11 +93,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return mDDFCache.listDDFs();
   }
 
-  public DDF getDDF(String uuid) throws DDFException {
+  public DDF getDDF(UUID uuid) throws DDFException {
     return mDDFCache.getDDF(uuid);
   }
 
-  public boolean hasDDF(String uuid) {
+  public boolean hasDDF(UUID uuid) {
     return mDDFCache.hasDDF(uuid);
   }
 
@@ -109,7 +109,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     mDDFCache.setDDFName(ddf, name);
   }
 
-  public synchronized void setDDFUUID(DDF ddf, String uuid) throws DDFException {
+  public synchronized void setDDFUUID(DDF ddf, UUID uuid) throws DDFException {
     mDDFCache.setDDFUUID(ddf, uuid);
   }
 
