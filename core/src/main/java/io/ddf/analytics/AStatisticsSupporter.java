@@ -26,16 +26,21 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
   private Summary[] basicStats;
 
+  private SimpleSummary[] simpleSummary;
 
   protected abstract Summary[] getSummaryImpl() throws DDFException;
 
-
+  protected abstract SimpleSummary[] getSimpleSummaryImpl() throws DDFException;
 
   public Summary[] getSummary() throws DDFException {
     this.basicStats = getSummaryImpl();
     return basicStats;
   }
 
+  public SimpleSummary[] getSimpleSummary() throws DDFException {
+    this.simpleSummary = this.getSimpleSummaryImpl();
+    return simpleSummary;
+  }
 
   @Override
   public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException {
@@ -328,23 +333,12 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     if (Strings.isNullOrEmpty(columnName)) {
       throw new DDFException("Column name must not be empty");
     }
-    List<Double> pValues = Arrays.asList(percentiles);
-
-    String min = "";
-    boolean hasZero = false;
-    if (Double.compare(pValues.get(0), 0.0) == 0) {
-      min = "min(" + columnName + ")";
-      pValues = pValues.subList(1, pValues.size());
-      hasZero = true;
-    }
-
-    boolean hasOne = false;
-    String max = "";
-    if (Double.compare(pValues.get(pValues.size() - 1), 1.0) == 0) {
-      max = "max(" + columnName + ")";
-      pValues = pValues.subList(0, pValues.size() - 1);
-      hasOne = true;
-    }
+    Set<Double> pSet = new HashSet(Arrays.asList(percentiles));
+    boolean hasZero = pSet.contains(0.0);
+    boolean hasOne = pSet.contains(1.0);
+    pSet.remove(0.0);
+    pSet.remove(1.0);
+    List<Double> pList = new ArrayList(pSet);
 
     String pParams = "";
     List<Schema.ColumnType> wholeNumbers = Arrays.asList(ColumnType.BIGINT, ColumnType.INT, ColumnType.LONG);
@@ -352,30 +346,26 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     ColumnType columnType = this.getDDF().getColumn(columnName).getType();
     mLog.info("Column type: " + columnType.name());
 
-    if (!pValues.isEmpty()) {
+    List<String> qmm = new ArrayList<String>();
+
+    if (!pList.isEmpty()) {
       if (wholeNumbers.contains(columnType)) {
-        pParams = "percentile(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "))";
+        pParams = "percentile(" + columnName + ", array(" + StringUtils.join(pList, ",") + "))";
       } else if (decimals.contains(columnType)) {
-        pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pValues, ",") + "), " + B.toString()
+        pParams = "percentile_approx(" + columnName + ", array(" + StringUtils.join(pList, ",") + "), " + B.toString()
             + ")";
       } else {
         throw new DDFException("Only support numeric vectors!!!");
       }
-    }
-
-    mLog.info("pParams = {}", pParams);
-    List<String> qmm = new ArrayList<String>();
-    if (!pValues.isEmpty()) {
       qmm.add(pParams);
     }
-    if (min.length() > 0) {
-      // pParams = min + ", " + pParams;
-      qmm.add(min);
-    }
 
-    if (max.length() > 0) {
-      qmm.add(max);
-    }
+    if (hasZero)
+      qmm.add("min(" + columnName + ")");
+
+    if (hasOne)
+      qmm.add("max(" + columnName + ")");
+
 
     String cmd = "SELECT " + StringUtils.join(qmm, ", ") + " FROM @this";
     mLog.info(">>>>>>>>>>>>>> Command String = " + cmd);
@@ -390,21 +380,26 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
         .replace("null", "NULL, NULL, NULL").split("\t");
     mLog.info("Raw info " + StringUtils.join(rs, "\n"));
 
-    Double[] result = new Double[percentiles.length];
     HashMap<Double, Double> mapValues = new HashMap<Double, Double>();
     try {
-      for (int i = 0; i < pValues.size(); i++) {
-        mapValues.put(pValues.get(i), Double.parseDouble(convertedResults[i]));
+      for (int i = 0; i < pList.size(); i++) {
+        mapValues.put(pList.get(i), Double.parseDouble(convertedResults[i]));
       }
-      if (hasZero) {
-        mapValues.put(0.0, Double.parseDouble(convertedResults[convertedResults.length - 2]));
-      }
-      if (hasOne) {
+
+      if (hasZero && hasOne) {
         mapValues.put(1.0, Double.parseDouble(convertedResults[convertedResults.length - 1]));
+        mapValues.put(0.0, Double.parseDouble(convertedResults[convertedResults.length - 2]));
+      } else if (hasOne) {
+        mapValues.put(1.0, Double.parseDouble(convertedResults[convertedResults.length - 1]));
+      } else if (hasZero) {
+        mapValues.put(0.0, Double.parseDouble(convertedResults[convertedResults.length - 1]));
       }
+
     } catch (NumberFormatException nfe) {
       throw new DDFException("Cannot parse the returned values from vector quantiles query", nfe);
     }
+
+    Double[] result = new Double[percentiles.length];
     for (int i = 0; i < percentiles.length; i++) {
       result[i] = mapValues.get(percentiles[i]);
     }

@@ -156,7 +156,6 @@ public abstract class DDF extends ALoggable //
    */
   protected void initialize(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name,
       Schema schema) throws DDFException {
-
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
     this.getRepresentationHandler().set(data, typeSpecs);
@@ -170,9 +169,10 @@ public abstract class DDF extends ALoggable //
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
 
-    manager.setDDFName(this, name);
+    manager.setDDFUUID(this, UUID.randomUUID());
 
-    manager.setDDFUUID(this, DDFUtils.generateObjectName(this));
+    if(!Strings.isNullOrEmpty(name)) manager.setDDFName(this, name);
+
     // Facades
     this.ML = new MLFacade(this, this.getMLSupporter());
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
@@ -192,7 +192,7 @@ public abstract class DDF extends ALoggable //
 
   @Expose private String mName;
 
-  @Expose private String uuid;
+  @Expose private UUID uuid;
   /**
    * @return the namespace this DDF belongs in
    * @throws DDFException
@@ -234,6 +234,7 @@ public abstract class DDF extends ALoggable //
    */
   protected void setName(String name) throws DDFException {
     if(name != null) validateName(name);
+
     this.mName = name;
   }
 
@@ -264,9 +265,9 @@ public abstract class DDF extends ALoggable //
     return "ddf";
   }
 
-  public String getUUID() {return uuid;}
+  public UUID getUUID() {return uuid;}
 
-  protected void setUUID(String uuid) {this.uuid = uuid;}
+  protected void setUUID(UUID uuid) {this.uuid = uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).

@@ -79,7 +79,7 @@ echo "SPARK_MEM = "$SPARK_MEM
 
 SPARK_JAVA_OPTS="-Dspark.storage.memoryFraction=0.6"
 SPARK_JAVA_OPTS+=" -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
-SPARK_JAVA_OPTS+=" -Dspark.serializer=org.apache.spark.serializer.KryoSerializer -Dspark.kryo.registrator=io.spark.content.KryoRegistrator"
+SPARK_JAVA_OPTS+=" -Dspark.serializer=org.apache.spark.serializer.KryoSerializer -Dspark.kryo.registrator=io.ddf.spark.content.KryoRegistrator"
 SPARK_JAVA_OPTS+=" -Dlog4j.configuration=ddf-log4j.properties"
 SPARK_JAVA_OPTS+=" -Dspark.local.dir=${TMP_DIR}"
 SPARK_JAVA_OPTS+=" -Dspark.ui.port=30001"
