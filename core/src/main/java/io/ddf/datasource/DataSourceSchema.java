@@ -17,6 +17,7 @@ public abstract class DataSourceSchema {
   public void setColumns(List<Schema.Column> columns) {
     this.mColumns = columns;
   }
+
   public List<Schema.Column> getColumns() {
     return this.mColumns;
   }

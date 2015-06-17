@@ -11,15 +11,18 @@ abstract public class DataSourceDescriptor {
 
   private DataSourceSchema mDataSourceSchema;
 
-  private DataSourceURI mDataSourceUri;
+  private IDataSourceURI mIDataSourceUri;
 
   private IDataSourceCredentials mDataSourceCredentials;
 
-  public DataSourceDescriptor(DataSourceURI dataSourceURI, IDataSourceCredentials dataSourceCredentials,
-      DataSourceSchema dataSourceSchema) {
-    this.mDataSourceUri = dataSourceURI;
+  private FileFormat mFileFormat;
+
+  public DataSourceDescriptor(IDataSourceURI IDataSourceURI, IDataSourceCredentials dataSourceCredentials,
+      DataSourceSchema dataSourceSchema, FileFormat fileFormat) {
+    this.mIDataSourceUri = IDataSourceURI;
     this.mDataSourceCredentials = dataSourceCredentials;
     this.mDataSourceSchema = dataSourceSchema;
+    this.mFileFormat = fileFormat;
   }
 
 
@@ -31,12 +34,12 @@ abstract public class DataSourceDescriptor {
     return this.mDataSourceSchema;
   }
 
-  public void setDataSourceUri(DataSourceURI dataSourceUri) {
-    this.mDataSourceUri = dataSourceUri;
+  public void setDataSourceUri(IDataSourceURI IDataSourceUri) {
+    this.mIDataSourceUri = IDataSourceUri;
   }
 
-  public DataSourceURI getDataSourceUri() {
-    return this.mDataSourceUri;
+  public IDataSourceURI getDataSourceUri() {
+    return this.mIDataSourceUri;
   }
 
   public void setDataSourceCredentials(IDataSourceCredentials dataSourceCredentials) {
@@ -45,6 +48,14 @@ abstract public class DataSourceDescriptor {
 
   public IDataSourceCredentials getDataSourceCredentials() {
     return this.mDataSourceCredentials;
+  }
+
+  public void setFileFormat(FileFormat fileFormat) {
+    this.mFileFormat = fileFormat;
+  }
+
+  public FileFormat getFileFormat() {
+    return this.mFileFormat;
   }
 
   public abstract DDF load(DDFManager manager);
