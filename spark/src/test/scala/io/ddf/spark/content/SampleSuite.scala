@@ -16,7 +16,7 @@ class SampleSuite extends ATestSuite {
     assert(sample.length == 10)
   }
 
-  test("test sample with percentage") {
+  test("test sample with fraction") {
     val ddf = manager.sql2ddf("select * from mtcars")
     val sample = ddf.VIEWS.getRandomSample(0.5, false, 1)
     //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})

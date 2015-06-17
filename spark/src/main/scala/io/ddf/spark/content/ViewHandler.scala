@@ -72,16 +72,20 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     }
   }
 
-  override def getRandomSample(percent: Double, withReplacement: Boolean, seed: Int): DDF = {
-    val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-    val sample_df = df.sample(withReplacement, percent, seed)
-    val schema = SchemaHandler.getSchemaFromDataFrame(sample_df)
-    schema.setTableName(mDDF.getSchemaHandler.newTableName())
-    val manager = this.getManager
-    val sampleDDF = manager.newDDF(manager, sample_df, Array(classOf[DataFrame]), manager.getNamespace, null, schema)
-    mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-    sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)
-    sampleDDF
+  override def getRandomSample(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
+    if (fraction < 0 || fraction > 1) {
+      throw new IllegalArgumentException("Sampling fraction must be on [0,1]")
+    } else {
+      val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+      val sample_df = df.sample(withReplacement, fraction, seed)
+      val schema = SchemaHandler.getSchemaFromDataFrame(sample_df)
+      schema.setTableName(mDDF.getSchemaHandler.newTableName())
+      val manager = this.getManager
+      val sampleDDF = manager.newDDF(manager, sample_df, Array(classOf[DataFrame]), manager.getNamespace, null, schema)
+      mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
+      sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)
+      sampleDDF
+    }
   }
 }
 
