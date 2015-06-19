@@ -29,8 +29,6 @@ public interface ISupportStatistics extends IHandleDDFFunctionalGroup {
 
   public double getVectorCovariance(String xColumnName, String yColumnName) throws DDFException;
 
-  //public List<HistogramBin> getVectorHistogram(String columnName, int numBins) throws DDFException;
-
   public Double getVectorMin(String columnName) throws DDFException;
 
   public Double getVectorMax(String columnName) throws DDFException;

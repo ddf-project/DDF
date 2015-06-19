@@ -75,6 +75,7 @@ object GetMultiFactor {
   //    }
   //  }
 
+  // TODO review (what is this for?) @huan @freeman
   class ArraryObjectMultiFactorMapper(indexsWithTypes: List[(JInt, ColumnType)])
     extends Function1[Iterator[Array[Object]], Iterator[JMap[JInt, JMap[String, JInt]]]] with Serializable {
     @Override
@@ -87,11 +88,14 @@ object GetMultiFactor {
           val (idx, typ) = typeIter.next()
           val value: Option[String] = Option(row(idx)) match {
             case Some(x) => typ match {
+              case ColumnType.TINYINT => Option(x.asInstanceOf[Byte].toString)
+              case ColumnType.SMALLINT => Option(x.asInstanceOf[Short].toString)
               case ColumnType.INT => Option(x.asInstanceOf[Int].toString)
+              case ColumnType.BIGINT => Option(x.asInstanceOf[Long].toString)
               case ColumnType.DOUBLE => Option(x.asInstanceOf[Double].toString)
-              case ColumnType.STRING => Option(x.asInstanceOf[String])
+              case ColumnType.DECIMAL => Option(x.asInstanceOf[java.math.BigDecimal].toString)
               case ColumnType.FLOAT => Option(x.asInstanceOf[Float].toString)
-              case ColumnType.BIGINT | ColumnType.LONG => Option(x.asInstanceOf[Long].toString)
+              case ColumnType.STRING => Option(x.asInstanceOf[String])
               case unknown => x match {
                 case y: java.lang.Integer => Option(y.toString)
                 case y: java.lang.Double => Option(y.toString)

@@ -12,6 +12,7 @@ import scala.collection.mutable.ArrayBuffer
 import org.rosuda.REngine._
 
 /**
+ * // TODO review. What is this for?
   */
 class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
 

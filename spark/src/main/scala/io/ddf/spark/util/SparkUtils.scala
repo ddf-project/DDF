@@ -18,11 +18,8 @@ import java.util.{List => JList}
 import io.ddf.content.Schema.Column
 import com.google.common.collect.Lists
 import java.util.ArrayList
-import scala.util
 import io.ddf.exception.DDFException
 import scala.collection.JavaConverters._
-import scala.util
-import org.apache.spark.sql.types._
 
 /**
   */
@@ -253,13 +250,18 @@ object SparkUtils {
   def spark2DDFType(colType: DataType): Schema.ColumnType = {
     //println(colType)
     colType match {
+      case ByteType => Schema.ColumnType.TINYINT
+      case ShortType => Schema.ColumnType.SMALLINT
       case IntegerType => Schema.ColumnType.INT
-      case StringType => Schema.ColumnType.STRING
+      case LongType     => Schema.ColumnType.BIGINT
       case FloatType  => Schema.ColumnType.FLOAT
       case DoubleType => Schema.ColumnType.DOUBLE
+      case DecimalType() => Schema.ColumnType.DECIMAL
+      case StringType => Schema.ColumnType.STRING
+      case BooleanType  => Schema.ColumnType.BOOLEAN
+      case BinaryType => Schema.ColumnType.BINARY
       case TimestampType => Schema.ColumnType.TIMESTAMP
-      case LongType     => Schema.ColumnType.LONG
-      case BooleanType  => Schema.ColumnType.LOGICAL
+      case DateType => Schema.ColumnType.DATE
       case StructType(_) => Schema.ColumnType.STRUCT
       case ArrayType(_, _) => Schema.ColumnType.ARRAY
       case MapType(_, _, _) => Schema.ColumnType.MAP

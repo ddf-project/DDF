@@ -31,6 +31,7 @@ class ArrayDouble2ArrayObject(@transient ddf: DDF) extends ConvertFunction(ddf) 
     new Representation(rddArrObj, RepresentationHandler.RDD_ARR_OBJECT.getTypeSpecsString)
   }
 
+  // TODO review @huan @freeman
   private def getDouble2ObjectMapper(colType: ColumnType): Double => Object = {
     colType match {
       case ColumnType.DOUBLE => {

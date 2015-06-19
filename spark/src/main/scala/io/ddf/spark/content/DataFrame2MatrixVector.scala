@@ -88,10 +88,20 @@ class DataFrame2MatrixVector(@transient ddf: DDF) extends ConvertFunction(ddf) {
     }
   }
 
+  // TODO review @huan @freeman @nhan
   def getDoubleExtractor(columns: Array[Column]): Array[(Row, Int) => Double] = {
     columns.map {
       col => col.getType match {
+        case ColumnType.TINYINT => {
+          (row: Row, idx: Int) => row.getByte(idx).toDouble
+        }
+        case ColumnType.SMALLINT => {
+          (row: Row, idx: Int) => row.getInt(idx).toDouble
+        }
         case ColumnType.INT => {
+          (row: Row, idx: Int) => row.getInt(idx).toDouble
+        }
+        case ColumnType.BIGINT => {
           (row: Row, idx: Int) => row.getInt(idx).toDouble
         }
         case ColumnType.DOUBLE => {
@@ -100,7 +110,11 @@ class DataFrame2MatrixVector(@transient ddf: DDF) extends ConvertFunction(ddf) {
         case ColumnType.FLOAT => {
           (row: Row, idx: Int) => row.getFloat(idx).toDouble
         }
-        case ColumnType.LOGICAL => {
+//        getDecimal is available only in Spark 1.3.1
+//        case ColumnType.DECIMAL => {
+//          (row: Row, idx: Int) => row.getDecimal(idx).toDouble
+//        }
+        case ColumnType.BOOLEAN => {
           (row: Row, idx: Int) => if (row.getBoolean(idx)) 1.0 else 0.0
         }
         case ColumnType.STRING => {
