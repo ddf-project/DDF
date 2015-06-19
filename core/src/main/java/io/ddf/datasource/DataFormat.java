@@ -1,15 +1,22 @@
 package io.ddf.datasource;
 
-
-/**
- */
-
 public enum DataFormat {
-  UNDEF(-1), SQL(0), CSV(1), TSV(2), JSON(3), PARQUET(4);
+  UNDEF, SQL, CSV, TSV, JSON, PQT;
 
-  private int value;
-
-  private DataFormat(int value) {
-    this.value = value;
+  public static DataFormat fromInt(int x) {
+    switch(x) {
+      case 0:
+        return SQL;
+      case 1:
+        return CSV;
+      case 2:
+        return TSV;
+      case 3:
+        return JSON;
+      case 4:
+        return PQT;
+      default:
+        return UNDEF;
+    }
   }
 }

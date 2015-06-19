@@ -22,7 +22,7 @@ import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.IHandlePersistence.IPersistible;
 import io.ddf.content.IHandleRepresentations;
 import io.ddf.content.Schema;
-import io.ddf.content.Schema.DataFormat;
+import io.ddf.datasource.DataFormat;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
@@ -158,15 +158,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     String className = Config.getValue(engineName, ConfigConstant.FIELD_DDF_MANAGER);
     if (Strings.isNullOrEmpty(className)) return null;
 
-    DDFManager manager;
     try {
-      manager = (DDFManager) Class.forName(className).newInstance();
+      return (DDFManager) Class.forName(className).newInstance();
 
     } catch (Exception e) {
       throw new DDFException("Cannot get DDFManager for engine " + engineName, e);
     }
-
-    return manager;
   }
 
   private DDF mDummyDDF;
