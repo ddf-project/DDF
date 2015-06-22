@@ -30,7 +30,9 @@ public class MutabilityHandler extends ADDFFunctionalGroupHandler implements IHa
     DDF curDDF = this.getDDF();
     curDDF.getRepresentationHandler().reset();
     curDDF.getRepresentationHandler().setRepresentations(newddf.getRepresentationHandler().getAllRepresentations());
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
     curDDF.getSchemaHandler().setSchema(newddf.getSchema());
+
     return curDDF;
   }
 }
