@@ -6,7 +6,7 @@ package io.ddf.spark.etl;
 
 import io.ddf.DDF;
 import io.ddf.content.Schema;
-import io.ddf.content.Schema.DataFormat;
+import io.ddf.datasource.DataFormat;
 import io.ddf.etl.ASqlHandler;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.SparkDDFManager;

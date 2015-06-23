@@ -3,7 +3,7 @@ package io.ddf.etl;
 
 import io.ddf.DDF;
 import io.ddf.content.Schema;
-import io.ddf.content.Schema.DataFormat;
+import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 
 import java.util.List;
