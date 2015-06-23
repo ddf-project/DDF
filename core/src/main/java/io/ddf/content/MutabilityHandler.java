@@ -26,19 +26,13 @@ public class MutabilityHandler extends ADDFFunctionalGroupHandler implements IHa
 
   @Override
   public DDF updateInplace(DDF newddf) throws DDFException {
+    //copy content of newddf to this ddf
     DDF curDDF = this.getDDF();
     curDDF.getRepresentationHandler().reset();
     curDDF.getRepresentationHandler().setRepresentations(newddf.getRepresentationHandler().getAllRepresentations());
-
-    //    String oldname = curDDF.getSchemaHandler().getTableName();
-    //
-    //    this.getManager().sql2txt(String.format("DROP TABLE IF EXISTS %s", oldname));
-
-    //must copy the factor information from curDDF to new ddf
-    newddf.getManager().removeDDF(curDDF);
-    newddf.getMetaDataHandler().copyMetaData(curDDF);
-
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
     curDDF.getSchemaHandler().setSchema(newddf.getSchema());
+
     return curDDF;
   }
 }
