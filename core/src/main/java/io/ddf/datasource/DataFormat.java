@@ -19,4 +19,20 @@ public enum DataFormat {
         return UNDEF;
     }
   }
+
+  public static DataFormat fromString(String x) {
+    if (x.equalsIgnoreCase("SQL")) {
+      return SQL;
+    } else if (x.equalsIgnoreCase("CSV")) {
+      return CSV;
+    } else if (x.equalsIgnoreCase("TSV")) {
+      return TSV;
+    } else if (x.equalsIgnoreCase("JSON")) {
+      return JSON;
+    } else if (x.equalsIgnoreCase("PQT") || x.equalsIgnoreCase("parquet")) {
+      return PQT;
+    } else {
+      return UNDEF;
+    }
+  }
 }
