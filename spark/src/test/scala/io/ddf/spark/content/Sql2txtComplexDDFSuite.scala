@@ -40,7 +40,7 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
 
     println("---ddf values:")
     val lddf = ddf.sql2txt("select * from @this limit 3", "")
-    lddf.asScala.toList.foreach(println)
+    lddf.getRows.asScala.toList.foreach(println)
 
     val fddf: DDF = ddf.getFlattenedDDF()
     val fddf_cols = fddf.getSchema.getColumnNames.toString
@@ -49,7 +49,7 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
 
     println("---flattened_ddf values:")
     val lfddf = fddf.sql2txt("select * from @this limit 3", "")
-    lfddf.asScala.toList.foreach(println)
+    lfddf.getRows.asScala.toList.foreach(println)
 
   }
 

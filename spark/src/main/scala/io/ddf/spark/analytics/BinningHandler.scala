@@ -166,7 +166,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
   def getIntervalsFromNumBins(colName: String, bins: Int): Array[Double] = {
     val cmd = "SELECT min(%s), max(%s) FROM %s".format(colName, colName, mDDF.getTableName)
-    val res: Array[Double] = mDDF.sql2txt(cmd, "").get(0).split("\t").map(x ⇒ x.toDouble)
+    val res: Array[Double] = mDDF.sql2txt(cmd, "").getRows.get(0).split("\t").map(x ⇒ x.toDouble)
     val (min, max) = (res(0), res(1))
     val eachInterval = (max - min) / bins
     val probs: Array[Double] = Array.fill[Double](bins + 1)(0)
@@ -199,7 +199,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     pArray.foreach(x ⇒ cmd = cmd + x.toString + ",")
     cmd = cmd.take(cmd.length - 1)
     cmd = String.format("min(%s), percentile_approx(%s, array(%s)), max(%s)", colName, colName, cmd, colName)
-    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t").
+    mDDF.sql2txt("SELECT " + cmd + " FROM @this", "").getRows.get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t").
       map(x ⇒ x.toDouble)
   }
 

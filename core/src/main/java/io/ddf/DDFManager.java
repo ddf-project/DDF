@@ -23,6 +23,7 @@ import io.ddf.content.IHandlePersistence.IPersistible;
 import io.ddf.content.IHandleRepresentations;
 import io.ddf.content.Schema;
 import io.ddf.content.Schema.DataFormat;
+import io.ddf.content.SqlResult;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
@@ -340,17 +341,17 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   @Override
-  public List<String> sql2txt(String command) throws DDFException {
+  public SqlResult sql2txt(String command) throws DDFException {
     return this.sql2txt(command, null);
   }
 
   @Override
-  public List<String> sql2txt(String command, Integer maxRows) throws DDFException {
+  public SqlResult sql2txt(String command, Integer maxRows) throws DDFException {
     return this.sql2txt(command, maxRows, null);
   }
 
   @Override
-  public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
+  public SqlResult sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
     return this.getDummyDDF().getSqlHandler().sql2txt(command, maxRows, dataSource);
   }
 

@@ -123,7 +123,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
     return Long
         .parseLong(this.getDDF()
             .sql2txt(String.format("SELECT COUNT(*) FROM %%s WHERE %s IS NULL", column), "Unable to run the query.")
-            .get(0));
+            .getRows().get(0));
   }
 
 

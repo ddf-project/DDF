@@ -334,7 +334,7 @@ public abstract class DDF extends ALoggable //
   }
 
   // ///// Execute a sqlcmd
-  public List<String> sql2txt(String sqlCommand, String errorMessage) throws DDFException {
+  public SqlResult sql2txt(String sqlCommand, String errorMessage) throws DDFException {
     try {
       sqlCommand = sqlCommand.replace("@this", this.getTableName());
       return this.getManager().sql2txt(String.format(sqlCommand, this.getTableName()));
