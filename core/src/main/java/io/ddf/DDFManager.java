@@ -23,6 +23,7 @@ import io.ddf.content.IHandlePersistence.IPersistible;
 import io.ddf.content.IHandleRepresentations;
 import io.ddf.content.Schema;
 import io.ddf.datasource.DataFormat;
+import io.ddf.content.SqlResult;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
@@ -33,10 +34,8 @@ import io.ddf.ml.IModel;
 import io.ddf.ml.ISupportML;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
-import scala.tools.jline.internal.Log;
 
 import java.lang.reflect.Constructor;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -337,18 +336,18 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   @Override
-  public List<String> sql2txt(String command) throws DDFException {
-    return this.sql2txt(command, null);
+  public SqlResult sql(String command) throws DDFException {
+    return this.sql(command, null);
   }
 
   @Override
-  public List<String> sql2txt(String command, Integer maxRows) throws DDFException {
-    return this.sql2txt(command, maxRows, null);
+  public SqlResult sql(String command, Integer maxRows) throws DDFException {
+    return this.sql(command, maxRows, null);
   }
 
   @Override
-  public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
-    return this.getDummyDDF().getSqlHandler().sql2txt(command, maxRows, dataSource);
+  public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException {
+    return this.getDummyDDF().getSqlHandler().sql(command, maxRows, dataSource);
   }
 
   // //// Persistence handling //////

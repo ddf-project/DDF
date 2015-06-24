@@ -59,7 +59,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       // a fivenumsummary of an Double/Float column is in the format "min \t max \t[1st_quantile, median, 3rd_quantile]"
       // or "min \t max \t null"s
       String[] rs = this.getDDF()
-          .sql2txt(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).get(0)
+          .sql(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).getRows().get(0)
           .replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t| ");
 
 
@@ -88,7 +88,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     String command = String.format("select var_samp(%s) from @this", columnName);
     if (!Strings.isNullOrEmpty(command)) {
       List<String> result = this.getDDF()
-          .sql2txt(command, String.format("Unable to compute the variance of the given column from table %%s"));
+          .sql(command, String.format("Unable to compute the variance of the given column from table %%s")).getRows();
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         Double a = Double.parseDouble(result.get(0));
         sd[0] = a;
@@ -106,7 +106,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
     if (!Strings.isNullOrEmpty(command)) {
       List<String> result = this.getDDF()
-          .sql2txt(command, String.format("Unable to compute the mean of the given column from table %%s"));
+          .sql(command, String.format("Unable to compute the mean of the given column from table %%s")).getRows();
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         mean = Double.parseDouble(result.get(0));
         return mean;
@@ -122,7 +122,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
     if (!Strings.isNullOrEmpty(command)) {
       List<String> result = this.getDDF()
-          .sql2txt(command, String.format("Unable to compute the minimum value of the given column from table %%s"));
+          .sql(command, String.format("Unable to compute the minimum value of the given column from table %%s")).getRows();
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         min = Double.parseDouble(result.get(0));
         return min;
@@ -138,7 +138,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
     if (!Strings.isNullOrEmpty(command)) {
       List<String> result = this.getDDF()
-          .sql2txt(command, String.format("Unable to compute the maximum value of the given column from table %%s"));
+          .sql(command, String.format("Unable to compute the maximum value of the given column from table %%s")).getRows();
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         max = Double.parseDouble(result.get(0));
         return max;
@@ -152,8 +152,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     double corr = 0.0;
     String command = String.format("select corr(%s, %s) from @this", xColumnName, yColumnName);
     if (!Strings.isNullOrEmpty(command)) {
-      List<String> result = this.getDDF().sql2txt(command,
-              String.format("Unable to compute correlation of %s and %s from table %%s", xColumnName, yColumnName));
+      List<String> result = this.getDDF().sql(command,
+              String.format("Unable to compute correlation of %s and %s from table %%s", xColumnName, yColumnName)).getRows();
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         corr = Double.parseDouble(result.get(0));
         return corr;
@@ -167,8 +167,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     double cov = 0.0;
     String command = String.format("select  covar_samp(%s, %s) from @this", xColumnName, yColumnName);
     if (!Strings.isNullOrEmpty(command)) {
-      List<String> result = this.getDDF().sql2txt(command,
-          String.format("Unable to compute covariance of %s and %s from table %%s", xColumnName, yColumnName));
+      List<String> result = this.getDDF().sql(command,
+          String.format("Unable to compute covariance of %s and %s from table %%s", xColumnName, yColumnName)).getRows();
       if (result != null && !result.isEmpty() && result.get(0) != null) {
         System.out.println(">>>>> parseDouble: " + result.get(0));
         cov = Double.parseDouble(result.get(0));
@@ -328,7 +328,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     mLog.info(">>>>>>>>>>>>>> Command String = " + cmd);
 
 
-    List<String> rs = getDDF().sql2txt(cmd, "Cannot get vector quantiles from SQL queries");
+    List<String> rs = getDDF().sql(cmd, "Cannot get vector quantiles from SQL queries").getRows();
     if (rs == null || rs.size() == 0) {
       throw new DDFException("Cannot get vector quantiles from SQL queries");
     }

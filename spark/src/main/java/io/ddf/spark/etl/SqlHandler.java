@@ -7,6 +7,7 @@ package io.ddf.spark.etl;
 import io.ddf.DDF;
 import io.ddf.content.Schema;
 import io.ddf.datasource.DataFormat;
+import io.ddf.content.SqlResult;
 import io.ddf.etl.ASqlHandler;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.SparkDDFManager;
@@ -93,21 +94,23 @@ public class SqlHandler extends ASqlHandler {
 
 
   @Override
-  public List<String> sql2txt(String command) throws DDFException {
-    return this.sql2txt(command, null, null);
+  public SqlResult sql(String command) throws DDFException {
+    return this.sql(command, null, null);
   }
 
   @Override
-  public List<String> sql2txt(String command, Integer maxRows) throws DDFException {
-    return this.sql2txt(command, maxRows, null);
+  public SqlResult sql(String command, Integer maxRows) throws DDFException {
+    return this.sql(command, maxRows, null);
   }
 
   //TODO SparkSql
   @Override
-  public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
-    //System.out.println("run sql2txt: \n" + command);
+  public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException {
+    //System.out.println("run sql: \n" + command);
     DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
+    Schema schema = SparkUtils.schemaFromDataFrame(rdd);
+
     String[] strResult = SparkUtils.df2txt(rdd, "\t");
-    return Arrays.asList(strResult);
+    return new SqlResult(schema,Arrays.asList(strResult));
   }
 }

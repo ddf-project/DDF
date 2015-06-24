@@ -12,8 +12,8 @@ class MLlibIntegrationSuite extends ATestSuite {
     createTableAirlineWithNA()
     createTableAirline()
 
-    manager.sql2txt("drop table if exists airline_delayed")
-    manager.sql2txt("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline")
+    manager.sql("drop table if exists airline_delayed")
+    manager.sql("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline")
 
     //for glm
     val ddfTrain3 = manager.sql2ddf("select " +

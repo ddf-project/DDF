@@ -14,12 +14,12 @@ public class MetricsTests {
   public void testConfusionMatrix() throws DDFException {
     DDFManager manager = DDFManager.get("spark");
     try {
-      manager.sql2txt("drop table if exists airline");
+      manager.sql("drop table if exists airline");
     } catch (Exception e) {
       System.out.println(e);
     }
 
-    manager.sql2txt("create table airline (Year int,Month int,DayofMonth int,"
+    manager.sql("create table airline (Year int,Month int,DayofMonth int,"
         + "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,"
         + "CRSArrTime int,UniqueCarrier string, FlightNum int, "
         + "TailNum string, ActualElapsedTime int, CRSElapsedTime int, "
@@ -29,7 +29,7 @@ public class MetricsTests {
         + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
         + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','");
 
-    manager.sql2txt("load data local inpath '../resources/test/airline.csv' into table airline");
+    manager.sql("load data local inpath '../resources/test/airline.csv' into table airline");
 
     DDF ddf = manager.sql2ddf("select " +
         "distance, depdelay, if (arrdelay > 10.89, 1, 0) as delayed from airline");

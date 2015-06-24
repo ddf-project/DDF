@@ -13,8 +13,6 @@ import io.ddf.util.Utils;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  *
@@ -55,7 +53,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
 
     String sqlCmd = String.format("SELECT CORR(%s, %s) FROM %s", columnA, columnB, this.getDDF().getTableName());
     try {
-      List<String> rs = this.getManager().sql2txt(sqlCmd);
+      List<String> rs = this.getManager().sql(sqlCmd).getRows();
       return Utils.roundUp(Double.parseDouble(rs.get(0)));
 
     } catch (Exception e) {
@@ -87,7 +85,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     }
 
     try {
-      List<String> result = this.getManager().sql2txt(sqlCmd);
+      List<String> result = this.getManager().sql(sqlCmd).getRows();
       return AggregationResult.newInstance(result, numUnaggregatedFields);
 
     } catch (Exception e) {
@@ -106,7 +104,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
   @Override
   public double aggregateOnColumn(AggregateFunction function, String column) throws DDFException {
     return Double.parseDouble(this.getManager()
-        .sql2txt(String.format("SELECT %s from %s", function.toString(column), this.getDDF().getTableName())).get(0));
+        .sql(String.format("SELECT %s from %s", function.toString(column), this.getDDF().getTableName())).getRows().get(0));
   }
 
   //dplyr-like

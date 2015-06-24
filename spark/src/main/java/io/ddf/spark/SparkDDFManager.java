@@ -250,8 +250,8 @@ public class SparkDDFManager extends DDFManager {
     String tableName = "tbl" + String.valueOf(Math.abs(rand.nextLong()));
     String cmd = "CREATE TABLE " + tableName + "(" + StringUtils.join(metaInfos, ", ")
         + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY '" + fieldSeparator + "'";
-    sql2txt(cmd);
-    sql2txt("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
+    sql(cmd);
+    sql("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
         "INTO TABLE " + tableName);
     return sql2ddf("SELECT * FROM " + tableName);
   }
