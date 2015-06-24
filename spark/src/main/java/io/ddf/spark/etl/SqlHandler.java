@@ -6,7 +6,7 @@ package io.ddf.spark.etl;
 
 import io.ddf.DDF;
 import io.ddf.content.Schema;
-import io.ddf.content.Schema.DataFormat;
+import io.ddf.datasource.DataFormat;
 import io.ddf.content.SqlResult;
 import io.ddf.etl.ASqlHandler;
 import io.ddf.exception.DDFException;
@@ -17,9 +17,6 @@ import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
-import org.apache.spark.sql.types.DataType;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
 import scala.collection.Seq;
 
 import java.util.Arrays;
