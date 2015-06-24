@@ -43,7 +43,6 @@ import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.AggregateTypes.AggregateField;
 import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
-import io.ddf.util.DDFUtils;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
 
@@ -334,10 +333,10 @@ public abstract class DDF extends ALoggable //
   }
 
   // ///// Execute a sqlcmd
-  public SqlResult sql2txt(String sqlCommand, String errorMessage) throws DDFException {
+  public SqlResult sql(String sqlCommand, String errorMessage) throws DDFException {
     try {
       sqlCommand = sqlCommand.replace("@this", this.getTableName());
-      return this.getManager().sql2txt(String.format(sqlCommand, this.getTableName()));
+      return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }

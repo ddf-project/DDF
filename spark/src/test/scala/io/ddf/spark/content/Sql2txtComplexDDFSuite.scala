@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 
 /**
   */
-class Sql2txtComplexDDFSuite extends ATestSuite {
+class sqlComplexDDFSuite extends ATestSuite {
 
   /*
   test("test printout value of complex type dataframe using json") {
@@ -30,8 +30,8 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
   }
   */
 
-  test("test sql2txt with json for complex type DDF") {
-    println("\n\n ================================= test sql2txt with json for complex type DDF")
+  test("test sql with json for complex type DDF") {
+    println("\n\n ================================= test sql with json for complex type DDF")
     val path = "../resources/test/sleep_data_sample.json"
     val ddf = json2ddf(path)
     val ddf_cols = ddf.getSchema.getColumnNames.toString
@@ -39,7 +39,7 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
     Assert.assertEquals("[id, cid, created_at, data, itype, ts, u_at, uid]", ddf_cols)
 
     println("---ddf values:")
-    val lddf = ddf.sql2txt("select * from @this limit 3", "")
+    val lddf = ddf.sql("select * from @this limit 3", "")
     lddf.getRows.asScala.toList.foreach(println)
 
     val fddf: DDF = ddf.getFlattenedDDF()
@@ -48,7 +48,7 @@ class Sql2txtComplexDDFSuite extends ATestSuite {
     Assert.assertEquals("[id_oid, cid, created_at_date, data_bookmarkTime, data_isFirstSleepOfDay, data_normalizedSleepQuality, data_realDeepSleepTimeInMinutes, data_realEndTime, data_realSleepTimeInMinutes, data_realStartTime, data_sleepStateChanges, itype, ts, u_at_date, uid_oid]", fddf_cols)
 
     println("---flattened_ddf values:")
-    val lfddf = fddf.sql2txt("select * from @this limit 3", "")
+    val lfddf = fddf.sql("select * from @this limit 3", "")
     lfddf.getRows.asScala.toList.foreach(println)
 
   }

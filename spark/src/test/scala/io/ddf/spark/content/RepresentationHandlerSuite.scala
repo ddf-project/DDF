@@ -30,8 +30,8 @@ class RepresentationHandlerSuite extends ATestSuite {
   }
 
   test("Can get RDD[LabeledPoint]") {
-    manager.sql2txt("drop table if exists airline_delayed")
-    manager.sql2txt("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline")
+    manager.sql("drop table if exists airline_delayed")
+    manager.sql("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline")
     val ddf = manager.sql2ddf("select " +
       "distance/1000, arrdelay/100, depdelay/100, delayed from airline_delayed").asInstanceOf[SparkDDF]
     val rddLabeledPoint = ddf.getRDD(classOf[LabeledPoint])

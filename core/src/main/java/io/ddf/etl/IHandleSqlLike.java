@@ -86,7 +86,7 @@ public interface IHandleSqlLike {
    *
    * @return the List<String> with loaded data content
    */
-  public SqlResult sql2txt(String command) throws DDFException;
+  public SqlResult sql(String command) throws DDFException;
 
   /**
    * Executes the given command and stores the results into a List<String> which already has a
@@ -97,7 +97,7 @@ public interface IHandleSqlLike {
    * @param maxRows
    * @return the List<String> with loaded data content
    */
-  public SqlResult sql2txt(String command, Integer maxRows) throws DDFException;
+  public SqlResult sql(String command, Integer maxRows) throws DDFException;
 
   /**
    * Executes the given command and stores the results into a List<String> using the given
@@ -108,5 +108,5 @@ public interface IHandleSqlLike {
    * @param dataSource The dataSource (URI) of the data, e.g., jdbc://xxx
    * @return
    */
-  public SqlResult sql2txt(String command, Integer maxRows, String dataSource) throws DDFException;
+  public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException;
 }

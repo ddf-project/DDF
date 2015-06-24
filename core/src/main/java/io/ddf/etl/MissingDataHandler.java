@@ -122,7 +122,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
   private long numberOfNAPerColumn(String column) throws DDFException {
     return Long
         .parseLong(this.getDDF()
-            .sql2txt(String.format("SELECT COUNT(*) FROM %%s WHERE %s IS NULL", column), "Unable to run the query.")
+            .sql(String.format("SELECT COUNT(*) FROM %%s WHERE %s IS NULL", column), "Unable to run the query.")
             .getRows().get(0));
   }
 

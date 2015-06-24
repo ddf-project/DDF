@@ -50,7 +50,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   @Override
   public List<String> head(int numRows) throws DDFException {
-    return this.getDDF().sql2txt(String.format("SELECT * FROM @this LIMIT %d", numRows),
+    return this.getDDF().sql(String.format("SELECT * FROM @this LIMIT %d", numRows),
         String.format("Unable to fetch %d row(s) from table %%s", numRows)).getRows();
   }
 

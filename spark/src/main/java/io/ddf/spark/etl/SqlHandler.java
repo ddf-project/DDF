@@ -94,19 +94,19 @@ public class SqlHandler extends ASqlHandler {
 
 
   @Override
-  public SqlResult sql2txt(String command) throws DDFException {
-    return this.sql2txt(command, null, null);
+  public SqlResult sql(String command) throws DDFException {
+    return this.sql(command, null, null);
   }
 
   @Override
-  public SqlResult sql2txt(String command, Integer maxRows) throws DDFException {
-    return this.sql2txt(command, maxRows, null);
+  public SqlResult sql(String command, Integer maxRows) throws DDFException {
+    return this.sql(command, maxRows, null);
   }
 
   //TODO SparkSql
   @Override
-  public SqlResult sql2txt(String command, Integer maxRows, String dataSource) throws DDFException {
-    //System.out.println("run sql2txt: \n" + command);
+  public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException {
+    //System.out.println("run sql: \n" + command);
     DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
     Schema schema = SparkUtils.schemaFromDataFrame(rdd);
 
