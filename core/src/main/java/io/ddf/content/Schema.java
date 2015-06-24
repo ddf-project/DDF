@@ -568,15 +568,6 @@ public class Schema implements Serializable {
     }
   }
 
-
-  /**
-   *
-   */
-  public enum DataFormat {
-    SQL, CSV, TSV, JSON
-  }
-
-
   public static class DummyCoding implements Serializable {
     private HashMap<Integer, HashMap<String, java.lang.Double>> mapping = new HashMap<Integer, HashMap<String, java.lang.Double>>();
     private Map<String, Map<String, java.lang.Double>> mColNameMapping = null;
