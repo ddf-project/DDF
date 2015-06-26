@@ -3,7 +3,8 @@ package io.ddf.etl;
 
 import io.ddf.DDF;
 import io.ddf.content.Schema;
-import io.ddf.content.Schema.DataFormat;
+import io.ddf.datasource.DataFormat;
+import io.ddf.content.SqlResult;
 import io.ddf.exception.DDFException;
 
 import java.util.List;
@@ -85,7 +86,7 @@ public interface IHandleSqlLike {
    *
    * @return the List<String> with loaded data content
    */
-  public List<String> sql2txt(String command) throws DDFException;
+  public SqlResult sql(String command) throws DDFException;
 
   /**
    * Executes the given command and stores the results into a List<String> which already has a
@@ -96,7 +97,7 @@ public interface IHandleSqlLike {
    * @param maxRows
    * @return the List<String> with loaded data content
    */
-  public List<String> sql2txt(String command, Integer maxRows) throws DDFException;
+  public SqlResult sql(String command, Integer maxRows) throws DDFException;
 
   /**
    * Executes the given command and stores the results into a List<String> using the given
@@ -107,5 +108,5 @@ public interface IHandleSqlLike {
    * @param dataSource The dataSource (URI) of the data, e.g., jdbc://xxx
    * @return
    */
-  public List<String> sql2txt(String command, Integer maxRows, String dataSource) throws DDFException;
+  public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException;
 }

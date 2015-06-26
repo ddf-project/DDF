@@ -1,6 +1,7 @@
 package io.ddf.spark.etl;
 
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
@@ -164,5 +165,13 @@ public class TransformationHandlerTest extends BaseTest {
   public void testConflictingColumnDefinitions2() throws DDFException {
     ddf.setMutable(true);
     ddf.Transform.transformUDF("distance=100, distance");
+  }
+
+  @Test
+  public void testMutableDDFBug() throws DDFException {
+    ddf.setMutable(true);
+    manager.setDDFName(ddf, "ddf_testMutableDDFBug");
+    ddf.Transform.transformUDF("col1 = (arrtime - deptime)");
+    ddf.Transform.transformUDF("col2 = (arrtime - arrdelay)");
   }
 }

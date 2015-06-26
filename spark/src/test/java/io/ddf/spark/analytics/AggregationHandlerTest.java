@@ -25,7 +25,6 @@ public class AggregationHandlerTest extends BaseTest {
 
   @Test
   public void testSimpleAggregate() throws DDFException {
-
     // aggregation: select year, month, min(depdelay), max(arrdelay) from airline group by year, month;
     // Assert.assertEquals(13, ddf.aggregate("year, month, mean(depdelay), median(arrdelay)").size());
     Assert.assertEquals(13, ddf.aggregate("year, month, avg(depdelay), stddev(arrdelay)").size());
