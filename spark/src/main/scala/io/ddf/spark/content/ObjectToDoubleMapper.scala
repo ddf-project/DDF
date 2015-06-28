@@ -21,9 +21,24 @@ trait ObjectToDoubleMapper {
       case ColumnType.DOUBLE ⇒ {
         case obj ⇒ if (obj != null) Some(obj.asInstanceOf[Double]) else None
       }
+      case ColumnType.FLOAT ⇒ {
+        case obj ⇒ if (obj != null) Some(obj.asInstanceOf[Float].toDouble) else None
+      }
+
+      case ColumnType.TINYINT ⇒ {
+        case obj ⇒ if (obj != null) Some(obj.asInstanceOf[Byte].toDouble) else None
+      }
+
+      case ColumnType.SMALLINT ⇒ {
+        case obj ⇒ if (obj != null) Some(obj.asInstanceOf[Short].toDouble) else None
+      }
 
       case ColumnType.INT ⇒ {
         case obj ⇒ if (obj != null) Some(obj.asInstanceOf[Int].toDouble) else None
+      }
+
+      case ColumnType.BIGINT ⇒ {
+        case obj ⇒ if (obj != null) Some(obj.asInstanceOf[Long].toDouble) else None
       }
 
       case ColumnType.STRING ⇒ {
