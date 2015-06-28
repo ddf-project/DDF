@@ -82,6 +82,23 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
       "INTO TABLE airline")
   }
 
+  // to test new data types
+  def createTableAirline_ColTypes() {
+    manager.sql("set shark.test.data.path=../resources")
+    manager.sql("drop table if exists airline_type")
+    manager.sql("create table airline (Year int,Month tinyint,DayofMonth smallint," +
+      "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
+      "CRSArrTime int,UniqueCarrier string, FlightNum bigint, " +
+      "TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +
+      "AirTime int, ArrDelay int, DepDelay int, Origin string, " +
+      "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, " +
+      "CancellationCode string, Diverted string, CarrierDelay int, " +
+      "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
+    )
+    manager.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineBig.csv' " +
+      "INTO TABLE airline")
+  }
+
   def createTableAirlineWithNA() {
     manager.sql("set shark.test.data.path=../resources")
     manager.sql("drop table if exists airlineWithNA")
