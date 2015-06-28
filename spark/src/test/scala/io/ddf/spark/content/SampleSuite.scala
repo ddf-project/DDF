@@ -6,7 +6,7 @@ import scala.collection.JavaConversions._
  */
 class SampleSuite extends ATestSuite {
   createTableMtcars()
-  test("test sample with numrows to return array") {
+  test("test sample with numrows") {
     val ddf = manager.sql2ddf("select * from mtcars")
     val sample = ddf.VIEWS.getRandomSample(10)
 
@@ -16,7 +16,7 @@ class SampleSuite extends ATestSuite {
     assert(sample.length == 10)
   }
 
-  test("test sample with percentage to return ddf") {
+  test("test sample with percentage") {
     val ddf = manager.sql2ddf("select * from mtcars")
     val sample = ddf.VIEWS.getRandomSample(0.5, false, 1)
     //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
@@ -24,17 +24,15 @@ class SampleSuite extends ATestSuite {
     sample.VIEWS.head(3).foreach(println)
   }
 
-  test("test sample with percentage to return array with invalid parameter") {
-    val ddf = manager.sql2ddf("select * from mtcars")
-
+  test("test sample with percentage when percentage is invalid") {
     try {
+      val ddf = manager.sql2ddf("select * from mtcars")
       val sample = ddf.VIEWS.getRandomSample(5.0, false, 1)
-      println(sample)
       //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
       println("sample: ")
-      //sample.VIEWS.head(3).foreach(println)
+      sample.VIEWS.head(3).foreach(println)
     } catch {
-      case e:Exception => println("exception caught: " + e)
+      case e: Exception => println("exception caught: " + e)
     }
   }
 }
