@@ -96,7 +96,7 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
       "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
     )
     manager.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineBig.csv' " +
-      "INTO TABLE airline")
+      "INTO TABLE airline_type")
   }
 
   def createTableAirlineWithNA() {
