@@ -29,10 +29,9 @@ class SampleSuite extends ATestSuite {
 
     try {
       val sample = ddf.VIEWS.getRandomSample(5.0, false, 1)
-      println(sample)
       //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
       println("sample: ")
-      //sample.VIEWS.head(3).foreach(println)
+      sample.VIEWS.head(3).foreach(println)
     } catch {
       case e:Exception => println("exception caught: " + e)
     }
