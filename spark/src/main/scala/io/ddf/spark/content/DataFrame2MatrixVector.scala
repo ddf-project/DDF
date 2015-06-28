@@ -105,15 +105,15 @@ class DataFrame2MatrixVector(@transient ddf: DDF) extends ConvertFunction(ddf) {
           (row: Row, idx: Int) => row.getInt(idx).toDouble
         }
         case ColumnType.DOUBLE => {
-          (row: Row, idx: Int) => row.getDouble(idx).toDouble
+          (row: Row, idx: Int) => row.getDouble(idx)
         }
         case ColumnType.FLOAT => {
           (row: Row, idx: Int) => row.getFloat(idx).toDouble
         }
-        //getDecimal is available only in Spark 1.3.1
-        case ColumnType.DECIMAL => {
-          (row: Row, idx: Int) => row.getDecimal(idx).toDouble
-        }
+//        //getDecimal is available only in Spark 1.3.1
+//        case ColumnType.DECIMAL => {
+//          (row: Row, idx: Int) => row.getDecimal(idx).toDouble
+//        }
         case ColumnType.BOOLEAN => {
           (row: Row, idx: Int) => if (row.getBoolean(idx)) 1.0 else 0.0
         }

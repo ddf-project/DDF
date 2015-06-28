@@ -86,7 +86,7 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
   def createTableAirline_ColTypes() {
     manager.sql("set shark.test.data.path=../resources")
     manager.sql("drop table if exists airline_type")
-    manager.sql("create table airline (Year int,Month tinyint,DayofMonth smallint," +
+    manager.sql("create table airline_type (Year int,Month tinyint,DayofMonth smallint," +
       "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int," +
       "CRSArrTime int,UniqueCarrier string, FlightNum bigint, " +
       "TailNum string, ActualElapsedTime int, CRSElapsedTime int, " +

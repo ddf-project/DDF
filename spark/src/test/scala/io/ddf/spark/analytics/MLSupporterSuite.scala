@@ -21,7 +21,7 @@ class MLSupporterSuite extends ATestSuite {
     manager.shutdown
   }
 
-  test("Test KMeans Prediction") {
+  test("Test KMeans Prediction new Types") {
     createTableAirline_ColTypes()
     val ddf: DDF = manager.sql2ddf("select year, month, dayofmonth, flightnum from airline_type")
     val k: Int = 5
