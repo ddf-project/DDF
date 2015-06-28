@@ -24,11 +24,17 @@ class SampleSuite extends ATestSuite {
     sample.VIEWS.head(3).foreach(println)
   }
 
-  test("test sample with percentage to return array with ill-legal parameter") {
+  test("test sample with percentage to return array with invalid parameter") {
     val ddf = manager.sql2ddf("select * from mtcars")
-    val sample = ddf.VIEWS.getRandomSample(5.0, false, 1)
-    //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
-    println("sample: ")
-    sample.VIEWS.head(3).foreach(println)
+
+    try {
+      val sample = ddf.VIEWS.getRandomSample(5.0, false, 1)
+      println(sample)
+      //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
+      println("sample: ")
+      //sample.VIEWS.head(3).foreach(println)
+    } catch {
+      case e:Exception => println("exception caught: " + e)
+    }
   }
 }
