@@ -68,8 +68,15 @@ public class DDFCache {
     if(this.hasDDF(uuid)) {
       throw new DDFException(String.format("DDF with uuid %s already exists", uuid));
     } else {
+      //remove old key
+      UUID prevUUID = ddf.getUUID();
+      if(prevUUID != null) {
+        mDDFs.remove(prevUUID);
+      }
       ddf.setUUID(uuid);
+      mDDFs.put(uuid, ddf);
       if(ddf.getUri() != null) {
+        mUris.remove(ddf.getUri());
         mUris.put(ddf.getUri(), ddf.getUUID());
       }
     }
