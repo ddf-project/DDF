@@ -37,7 +37,7 @@ class CrossValidationSuite extends ATestSuite {
     val data = manager.getSparkContext.parallelize(arr, 2)
     val schema = new Schema("data", "v1 int");
 
-    val ddf = new SparkDDF(manager, data, classOf[Array[Object]], manager.getNamespace, "data", schema)
+    val ddf = new SparkDDF(manager, data, classOf[Array[Object]], manager.getNamespace, "data1", schema)
     for (seed <- 1 to 3) {
       val betweenFolds = scala.collection.mutable.ArrayBuffer.empty[Set[Array[Object]]]
       for (split <- ddf.ML.CVKFold(5, seed)) {

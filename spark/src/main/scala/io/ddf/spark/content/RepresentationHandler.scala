@@ -3,22 +3,21 @@
  */
 package io.ddf.spark.content
 
-import java.lang.Class
-import io.ddf.spark.{SparkDDFManager, SparkDDF}
-
-import scala.reflect.Manifest
-import scala.collection.JavaConversions._
-import io.ddf.spark.content.RepresentationHandler._
-import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.rdd.RDD
-import org.apache.spark.mllib.recommendation.Rating
-import io.ddf.content.{ RepresentationHandler ⇒ RH, Representation }
-import org.rosuda.REngine._
 import io.ddf._
+import io.ddf.content.{Representation, RepresentationHandler => RH}
+import io.ddf.spark.SparkDDF
+import io.ddf.spark.content.RepresentationHandler._
 import io.ddf.types.TupleMatrixVector
-import org.apache.spark.sql.{DataFrame, SchemaRDD}
+import org.apache.spark.mllib.linalg.Vector
+import org.apache.spark.mllib.recommendation.Rating
+import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.expressions.Row
+import org.rosuda.REngine._
+
+import scala.collection.JavaConversions._
+import scala.reflect.Manifest
 
 /**
  * RDD-based SparkRepresentationHandler
@@ -66,7 +65,7 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
       kv ⇒ if (kv._2 != null) {
         kv._2.getValue match {
           case rdd: RDD[_] => f(rdd)
-          case _           =>
+          case _ =>
         }
       } //f(kv._2.asInstanceOf[RDD[_]])
     }
@@ -74,13 +73,13 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
 
   /**
    * Cache SchemaRDD in memory
-   * */
+   **/
   override def cache(isLazy: Boolean) = {
     val ddf = this.getDDF.asInstanceOf[SparkDDF]
     ddf.saveAsTable()
     val dataFrame = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     dataFrame.persist()
-    if(!isLazy) {
+    if (!isLazy) {
       dataFrame.count()
     }
   }
@@ -99,19 +98,15 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
     forAllReps({
       rdd: RDD[_] ⇒
         if (rdd != null) {
-          rdd match {
-            case dataFrame: DataFrame => {
-              if(dataFrame.sqlContext.isCached(this.getDDF.getTableName)) {
-                dataFrame.sqlContext.uncacheTable(this.getDDF.getTableName)
-              }
-            }
-            case rd: RDD[_] =>   {
-              mLog.info(this.getClass() + ": Unpersisting " + rd.toString())
-              rd.unpersist(false)
-            }
-          }
+          mLog.info(this.getClass() + ": Unpersisting " + rdd.toString())
+          rdd.unpersist(false)
         }
     })
+    
+    val dataFrame = this.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    if (dataFrame != null) {
+      dataFrame.unpersist()
+    }
   }
 }
 
