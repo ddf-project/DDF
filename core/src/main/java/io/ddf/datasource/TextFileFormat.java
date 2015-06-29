@@ -3,10 +3,7 @@ package io.ddf.datasource;
 
 /**
  */
-
-public class FileFormat {
-
-  private DataFormat format;
+public class TextFileFormat extends FileFormat {
 
   private boolean header;
 
@@ -36,13 +33,5 @@ public class FileFormat {
 
   public void setHeader(boolean header) {
     this.header = header;
-  }
-
-  public DataFormat getFormat() {
-    return this.format;
-  }
-
-  public void setFormat(DataFormat format) {
-    this.format = format;
   }
 }

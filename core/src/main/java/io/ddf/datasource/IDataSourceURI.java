@@ -1,9 +1,11 @@
 package io.ddf.datasource;
 
 
+import java.net.URI;
+
 /**
  */
 interface IDataSourceURI {
 
-  public String getUri();
+  public URI getUri();
 }
