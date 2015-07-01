@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class BasicDDFTests {
 
@@ -63,4 +64,28 @@ public class BasicDDFTests {
     }
   }
 
+  @Test(expected = DDFException.class)
+  public void testDDFManagerSetUUID() throws DDFException {
+    DDF ddf = this.getTestDDF();
+    UUID uuid = ddf.getUUID();
+    DDFManager manager =  getDDFManager();
+
+    UUID newUUID = UUID.randomUUID();
+    manager.setDDFUUID(ddf, newUUID);
+    manager.getDDF(uuid);
+  }
+
+  @Test
+  public void testDDFMAnager() throws DDFException {
+    DDF ddf = this.getTestDDF();
+    DDFManager manager = this.getDDFManager();
+    manager.setDDFName(ddf, "myddf");
+
+    UUID newUUID = UUID.randomUUID();
+    manager.setDDFUUID(ddf, newUUID);
+
+    DDF ddf1 = manager.getDDFByURI(ddf.getUri());
+    Assert.assertEquals(ddf1.getUUID(), ddf.getUUID());
+    Assert.assertEquals(ddf1.getUUID(), newUUID);
+  }
 }
