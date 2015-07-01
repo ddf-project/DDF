@@ -11,15 +11,15 @@ abstract public class DataSourceDescriptor {
 
   private DataSourceSchema mDataSourceSchema;
 
-  private IDataSourceURI mIDataSourceUri;
+  private DataSourceURI mIDataSourceUri;
 
   private IDataSourceCredentials mDataSourceCredentials;
 
   private FileFormat mFileFormat;
 
-  public DataSourceDescriptor(IDataSourceURI IDataSourceURI, IDataSourceCredentials dataSourceCredentials,
+  public DataSourceDescriptor(DataSourceURI dataSourceURI, IDataSourceCredentials dataSourceCredentials,
       DataSourceSchema dataSourceSchema, FileFormat fileFormat) {
-    this.mIDataSourceUri = IDataSourceURI;
+    this.mIDataSourceUri = dataSourceURI;
     this.mDataSourceCredentials = dataSourceCredentials;
     this.mDataSourceSchema = dataSourceSchema;
     this.mFileFormat = fileFormat;
@@ -34,11 +34,11 @@ abstract public class DataSourceDescriptor {
     return this.mDataSourceSchema;
   }
 
-  public void setDataSourceUri(IDataSourceURI IDataSourceUri) {
-    this.mIDataSourceUri = IDataSourceUri;
+  public void setDataSourceUri(DataSourceURI dataSourceUri) {
+    this.mIDataSourceUri = dataSourceUri;
   }
 
-  public IDataSourceURI getDataSourceUri() {
+  public DataSourceURI getDataSourceUri() {
     return this.mIDataSourceUri;
   }
 

@@ -5,11 +5,18 @@ package io.ddf.datasource;
  */
 public class TextFileFormat extends FileFormat {
 
-  private boolean header;
+  private boolean hasheader;
 
   private String delimiter;
 
   private String quote;
+
+  public TextFileFormat(DataFormat format, boolean hasHeader, String delimiter, String quote) {
+    super(format);
+    this.hasheader = hasHeader;
+    this.delimiter = delimiter;
+    this.quote = quote;
+  }
 
   public String getDelimiter() {
     return this.delimiter;
@@ -27,11 +34,11 @@ public class TextFileFormat extends FileFormat {
     this.quote = quote;
   }
 
-  public boolean getHeader() {
-    return this.header;
+  public boolean getHasHeader() {
+    return this.hasheader;
   }
 
-  public void setHeader(boolean header) {
-    this.header = header;
+  public void setHasHeader(boolean hasheader) {
+    this.hasheader = hasheader;
   }
 }
