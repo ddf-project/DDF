@@ -22,6 +22,8 @@ import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.IHandlePersistence.IPersistible;
 import io.ddf.content.IHandleRepresentations;
 import io.ddf.content.Schema;
+import io.ddf.content.Schema.Column;
+import io.ddf.content.SqlTypedResult;
 import io.ddf.datasource.DataFormat;
 import io.ddf.content.SqlResult;
 import io.ddf.etl.IHandleSqlLike;
@@ -34,7 +36,19 @@ import io.ddf.ml.IModel;
 import io.ddf.ml.ISupportML;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
+import net.sf.jsqlparser.statement.describe.DescribeTable;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.show.ShowColumns;
+import net.sf.jsqlparser.statement.show.ShowTables;
+import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
+import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -345,9 +359,37 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.sql(command, maxRows, null);
   }
 
+
+
   @Override
   public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException {
-    return this.getDummyDDF().getSqlHandler().sql(command, maxRows, dataSource);
+    return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource);
+  }
+
+  // @TODO: Pay attention here.
+  public SqlResult sql(String command, Integer maxRows, String dataSource, String namespace) throws DDFException {
+    return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, namespace);
+  }
+
+  public SqlResult sql(String command, Integer maxRows, String dataSource, List<String> uriList) throws DDFException {
+    return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, uriList);
+  }
+
+  @Override
+  public SqlTypedResult sqlTyped(String command) throws DDFException {
+    return this.sqlTyped(command, null);
+  }
+
+  @Override
+  public SqlTypedResult sqlTyped(String command, Integer maxRows) throws DDFException {
+    return this.sqlTyped(command, maxRows, null);
+  }
+
+  @Override
+  public SqlTypedResult sqlTyped(String command, Integer maxRows, String dataSource) throws DDFException {
+    // @Note This is another possible solution, which I think is more stable.
+    // return this.getDummyDDF().getSqlHandler().sqlTyped(command, maxRows, dataSource);
+    return new SqlTypedResult(sql(command, maxRows, dataSource));
   }
 
   // //// Persistence handling //////
