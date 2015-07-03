@@ -68,7 +68,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
   }
 
   public SqlResult sqlHandle(String command, Integer maxRows, String dataSource) throws DDFException {
-    return this.sqlHandle(command, maxRows, dataSource, (TableNameReplacer)null);
+    return this.sqlHandle(command, maxRows, dataSource, new TableNameReplacer(this.getManager()));
   }
 
   public SqlResult sqlHandle(String command, Integer maxRows,
@@ -100,8 +100,10 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         return this.describeTable(((DescribeTable)statement).getName().getName());
       } else {
         // Standard SQL.
+
         tableNameReplacer.run(statement);
         // TODO: Awakward here.
+        System.out.println(statement.toString());
         return this.sql(statement.toString(), maxRows, dataSource);
       }
     } catch (JSQLParserException e) {
@@ -115,7 +117,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public DDF sql2ddfHandle(String command, Schema schema,
                            String dataSource, DataFormat dataFormat) throws DDFException {
-    return sql2ddfHandle(command, schema, dataSource, dataFormat, (TableNameReplacer)null);
+    return sql2ddfHandle(command, schema, dataSource, dataFormat, new TableNameReplacer(this.getManager()));
   }
   public DDF sql2ddfHandle(String command, Schema schema,
                            String dataSource, DataFormat dataFormat, String namespace) throws DDFException {
@@ -140,7 +142,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       if (!(statement instanceof Select)) {
         throw  new DDFException("Only select is allowed in this function");
       } else {
-        return this.sql2ddf(command, schema, dataSource, dataFormat);
+        tableNameReplacer.run(statement);
+        return this.sql2ddf(statement.toString(), schema, dataSource, dataFormat);
       }
     } catch (JSQLParserException e) {
       // It's neither standard SQL nor allowed DDL.

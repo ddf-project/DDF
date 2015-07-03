@@ -45,7 +45,14 @@ import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.describe.DescribeTable;
+import net.sf.jsqlparser.statement.show.ShowColumns;
+import net.sf.jsqlparser.statement.show.ShowTables;
 
+import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -336,7 +343,17 @@ public abstract class DDF extends ALoggable //
   public SqlResult sql(String sqlCommand, String errorMessage) throws DDFException {
     try {
       sqlCommand = sqlCommand.replace("@this", this.getTableName());
+      // TODO: what is format?
       return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
+    } catch (Exception e) {
+      throw new DDFException(String.format(errorMessage, this.getTableName()), e);
+    }
+  }
+
+  public SqlTypedResult sqlTyped(String sqlCommand, String errorMessage) throws  DDFException {
+    try {
+      sqlCommand = sqlCommand.replace("@this", this.getTableName());
+      return this.getManager().sqlTyped(String.format(sqlCommand, this.getTableName()));
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }

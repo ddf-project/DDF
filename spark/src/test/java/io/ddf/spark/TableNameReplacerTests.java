@@ -2,11 +2,21 @@ package io.ddf.spark;
 
 import io.ddf.DDF;
 import io.ddf.DDFManager;
+import io.ddf.TableNameReplacer;
+import io.ddf.content.Schema;
+import io.ddf.content.SqlResult;
 import io.ddf.exception.DDFException;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.StringReader;
+import java.util.Arrays;
 
 
 /**
@@ -14,8 +24,15 @@ import org.junit.Test;
  */
 public class TableNameReplacerTests {
 
+
+
+
+    public static DDFManager manager;
+    public static CCJSqlParserManager parser;
+
     @Test
     public void testRun() throws DDFException {
+        /**
         createTableAirline();
         DDF ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, "
                 + "depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
@@ -27,9 +44,99 @@ public class TableNameReplacerTests {
         Assert.assertEquals(ddf, manager.getDDF(ddf.getUUID()));
 
         // ddf.getSummary() check what's this
+         */
     }
 
-    public static DDFManager manager;
+
+    @Test
+    public void testCondition0() throws  DDFException {
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        String sqlcmd = "Select * from tableA;";
+        Statement statement = null;
+        try {
+            statement = parser.parse(new StringReader(sqlcmd));
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+            assert(false);
+        }
+        tableNameReplacer.run(statement);
+    }
+
+    @Test
+    public  void testCondition1() throws  DDFException {
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        String sqlcmd = "select SUM(ddf://adatao/a.b) from ddf://adatao/a group by ddf://adatao/a.a";
+        Statement statement = null;
+        try {
+            statement = parser.parse(new StringReader(sqlcmd));
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+            assert(false);
+        }
+
+        tableNameReplacer.run(statement);
+        System.out.println(statement.toString());
+    }
+
+    @Test
+    public void testCondition2() throws  DDFException {
+        TableNameReplacer tableNameReplacer  = new TableNameReplacer(manager, "adatao");
+        String sqlcmd = "select a.b from a";
+        Statement statement = null;
+        try {
+            statement = parser.parse(new StringReader(sqlcmd));
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+            assert(false);
+        }
+        tableNameReplacer.run(statement);
+        System.out.println(statement.toString());
+
+    }
+
+    @Test
+    public void testCondition3() throws  DDFException {
+        String[] uris={"ddf://adatao/a", "ddf://adatao/b"};
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager, Arrays.asList(uris));
+        String sqlcmd = "select {1}.a,{2}.b from {1}";
+        Statement statement = null;
+
+        try {
+            statement = parser.parse(new StringReader(sqlcmd));
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+            assert(false);
+        }
+
+        tableNameReplacer.run(statement);
+        System.out.println(statement.toString());
+    }
+
+    @Test
+    public  void testLoading() throws  DDFException {
+        manager.sql("drop table if exists airline");
+
+        manager.sql("create table airline (Year int,Month int,DayofMonth int,"
+                + "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,"
+                + "CRSArrTime int,UniqueCarrier string, FlightNum int, "
+                + "TailNum string, ActualElapsedTime int, CRSElapsedTime int, "
+                + "AirTime int, ArrDelay int, DepDelay int, Origin string, "
+                + "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, "
+                + "CancellationCode string, Diverted string, CarrierDelay int, "
+                + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
+               + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','");
+
+        manager.sql("load data local inpath '/Users/Jing/Github/DDF/resources/test/airline.csv' into table airline");
+
+        DDF ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, "
+                + "depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
+        this.manager.setDDFName(ddf, "airlineDDF");
+        String[] testStr={"ddf://adatao/airlineDDF"};
+        SqlResult ret = manager.sql("select SUM({1}.year) from {1}", null, null, Arrays.asList(testStr));
+        System.out.println(ddf.getUri());
+        System.out.println(ddf.getTableName());
+
+    }
 
     // static Logger LOG;
 
@@ -39,6 +146,14 @@ public class TableNameReplacerTests {
         Thread.sleep(1000);
         // LOG = LoggerFactory.getLogger(BaseTest.class);
         manager = DDFManager.get("spark");
+        Schema schema = new Schema("tablename1", "d  d,d  d");
+        DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "a",
+                schema);
+        Schema schema2 = new Schema("tablename2", "d  d,d  d");
+        DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "b",
+                schema2);
+
+        parser = new CCJSqlParserManager();
     }
 
     @AfterClass
@@ -61,6 +176,9 @@ public class TableNameReplacerTests {
                 + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','");
 
         manager.sql("load data local inpath '../resources/test/airline.csv' into table airline");
+        DDF ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, "
+                + "depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
+
 
     }
 

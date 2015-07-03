@@ -346,11 +346,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   @Override
   public DDF sql2ddf(String command, Schema schema, String dataSource, DataFormat dataFormat) throws DDFException {
-    return this.getDummyDDF().getSqlHandler().sql2ddf(command, schema, dataSource, dataFormat);
+    return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat);
   }
 
   @Override
   public SqlResult sql(String command) throws DDFException {
+    System.out.println("dfsfds");
     return this.sql(command, null);
   }
 

@@ -123,6 +123,7 @@ object RootBuild extends Build {
     //"org.scalatest" %% "scalatest" % "1.9.1" % "test",
     //"org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
     "com.novocode" % "junit-interface" % "0.10" % "test",
+    "net.sf" % "jsqlparser" % "0.9.4",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
     //"org.antlr" % "antlr" % "3.4", // needed by shark.SharkDriver.compile
     // needed by Hive

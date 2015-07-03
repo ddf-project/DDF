@@ -118,17 +118,6 @@ public class SqlHandler extends ASqlHandler {
     return new SqlResult(schema,Arrays.asList(strResult));
   }
 
-  //TODO
-  @Override
-  public SqlResult sql(String command, Integer maxRows, String dataSource, String namespace) throws DDFException {
-    return null;
-  }
-
-  @Override
-  public SqlResult sql(String command, Integer maxRows, String dataSource, List<String> uriList) throws DDFException {
-    return null;
-  }
-
   @Override
   public SqlTypedResult sqlTyped(String command) throws DDFException {
     return this.sqlTyped(command, null, null);

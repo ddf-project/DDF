@@ -146,6 +146,4 @@ public interface IHandleSqlLike {
   public SqlTypedResult sqlTyped(String command, Integer maxRows, String dataSource) throws DDFException;
 
 
-
-
 }
