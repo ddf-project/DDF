@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
-FWDIR="$(cd `dirname $0`/..; pwd)"
+# This script is not really necessary
 
-export DDF_HOME=$FWDIR/..
+if [ -z "$DDF_HOME" ]; then
+  FWDIR="$(cd `dirname $0`/..; pwd)"
+
+  export DDF_HOME=$FWDIR/..
+fi
+
 echo $DDF_HOME
-export PYTHONPATH=$PYTHONPATH:$FWDIR/package:$FWDIR/lib/py4j0.8.2.1.jar:$FWDIR/lib/py4j-0.8.2.1-src.zip
-echo $PYTHONPATH
 
+# This is not absolutely needed. The module will figure it out if user doesn't supply those configurations
 export JAVA_OPTS="-Dlog4j.configuration=file:${DDF_HOME}/core/conf/local/ddf-local-log4j.properties -Xms128m -Xmx512m -XX:MaxPermSize=512m"
 
 if [[ "$1" =~ \.py$ ]]; then
