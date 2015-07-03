@@ -20,8 +20,10 @@ def start_gateway_server():
         javaopts = javaopts.split()
     else:
         javaopts = []
-    #command = ["java", "-classpath", classPath] + ["-Dlog4j.configuration=file:"+ DDF_HOME + "/core/conf/local/ddf-local-log4j.properties"] + ["py4j.GatewayServer", "--die-on-broken-pipe", "0"]
+    #command = ["java", "-classpath", classPath] + ["-Dlog4j.configuration=file:"+ DDF_HOME
+    # + "/core/conf/local/ddf-local-log4j.properties"] + ["py4j.GatewayServer", "--die-on-broken-pipe", "0"]
     command = ["java", "-classpath", classPath] + javaopts + ["py4j.GatewayServer", "--die-on-broken-pipe", "0"]
+
     
     proc = Popen(command, stdout = PIPE, stdin = PIPE, preexec_fn = preexec_func)
     # get the port of the GatewayServer

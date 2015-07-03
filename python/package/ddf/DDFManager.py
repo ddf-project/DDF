@@ -1,8 +1,8 @@
-'''
+"""
 Created on Jun 22, 2014
 
 @author: nhanitvn
-'''
+"""
 
 from ddf.DDF import DDF
 from ddf.gateway import start_gateway_server
@@ -25,7 +25,7 @@ class DDFManager(object):
         """
         Execute a sql command and return a list of strings
         """
-        return self._jdm.sql2txt(command)
+        return self._jdm.sql(command)
     
     
     def sql2ddf(self, command):
