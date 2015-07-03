@@ -202,7 +202,8 @@ object RootBuild extends Build {
       "com.novocode" % "junit-interface" % "0.10" % "test",	
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
       "com.googlecode.matrix-toolkits-java" % "mtj" % "0.9.14",
-      "commons-io" % "commons-io" % "1.3.2",
+      "net.sf" % "jsqlparser" % "0.9.4", 
+	"commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
 
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
