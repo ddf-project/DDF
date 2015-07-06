@@ -43,3 +43,4 @@ R.Rproj
 
 # python stuffs
 *.pyc
+python/docs-build/
