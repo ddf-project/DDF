@@ -5,8 +5,8 @@ FWDIR="$(cd `dirname $0`; pwd)"
 
 # Copy jar files to package's inst/java directory
 SCALA_VERSION="2.10"
-SPARK_VERSION="0.9"
-DDF_VERSION="1.0"
+SPARK_VERSION="1.2"
+DDF_VERSION="1.2-adatao"
 TARGET_DIR="$FWDIR/../spark/target/scala-$SCALA_VERSION"
 
 if [ ! -f "$TARGET_DIR/ddf_spark_$SCALA_VERSION-$DDF_VERSION.jar" ]; then
