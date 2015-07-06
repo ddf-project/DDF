@@ -351,7 +351,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   @Override
   public SqlResult sql(String command) throws DDFException {
-    System.out.println("dfsfds");
     return this.sql(command, null);
   }
 
