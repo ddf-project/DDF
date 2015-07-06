@@ -14,7 +14,7 @@ Then we will need to set the `$DDF_HOME` environment variable:
     $ cd <DDF_DIRECTORY>
     $ export DDF_HOME=`pwd`
     
-To make the `DDF_HOME` variable to be available for all working session, we can add the following command into 
+**Optional**: to make the `DDF_HOME` variable to be available for all working session, we can add the following command into 
 the `~/.bash_profile` (on MacOS) or `~/.profile` (on other Unix systems):
     
     export DDF_HOME=<DDF_DIRECTORY>
@@ -28,8 +28,10 @@ or if you don't set the `DDF_HOME` variable previously:
 
     $ cd <DDF_DIRECTORY>/python
     $ DDF_HOME=../ ipython
-        
-then we cam start playing with the DDF API:
+
+Of course, `python` will work just fine if you don't have `IPython`.
+
+Now inside the Python interpreter, the DDF API is ready for usage:
 
     >>> import ddf
     >>> from ddf import DDFManager, DDF_HOME
