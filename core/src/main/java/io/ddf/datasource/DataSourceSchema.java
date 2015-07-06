@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  */
-public abstract class DataSourceSchema {
+public class DataSourceSchema {
   private List<Schema.Column> mColumns;
 
   public DataSourceSchema(List<Schema.Column> columns) {
