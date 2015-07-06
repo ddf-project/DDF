@@ -4,22 +4,32 @@ Distributed DataFrame
 1. Installation
 ---------------
 
-Assume that you already successfully built DDF. Then you will need to set the `$DDF_HOME` environment variable.
+Assume that the DDF package is already successfully built. We need to install the requirements for `pyddf`:
 
-    $ cd <YOUR_DDF_DIRECTORY>
+    $ cd <DDF_DIRECTORY>/python
+    $ pip install -r requirements.txt
+    
+Then we will need to set the `$DDF_HOME` environment variable:
+
+    $ cd <DDF_DIRECTORY>
     $ export DDF_HOME=`pwd`
     
-You might also want to add the following command into your `~/.bash_profile` or `~/.profile` depending on your OS:
+To make the `DDF_HOME` variable to be available for all working session, we can add the following command into 
+the `~/.bash_profile` (on MacOS) or `~/.profile` (on other Unix systems):
     
-    export DDF_HOME=<YOUR_DDF_DIRECTORY>
+    export DDF_HOME=<DDF_DIRECTORY>
     
-Now you can open your Python interpreter (of course you don't need to set `DDF_HOME` if you already export that
-variable in your environment):
+Now open your Python interpreter:
 
-    $ cd <YOUR_DDF_DIRECTORY>/python
-    $ DDF_HOME=../ ipython
+    $ cd <DDF_DIRECTORY>/python
+    $ ipython
     
-and start playing with DDF API:
+or if you don't set the `DDF_HOME` variable previously:
+
+    $ cd <DDF_DIRECTORY>/python
+    $ DDF_HOME=../ ipython
+        
+then we cam start playing with the DDF API:
 
     >>> import ddf
     >>> from ddf import DDFManager, DDF_HOME
@@ -50,7 +60,7 @@ and start playing with DDF API:
     >>> ddf.sample(10)
 
     >>> dm.shutdown()
-    
+
 2. Run tests
 ------------
 
