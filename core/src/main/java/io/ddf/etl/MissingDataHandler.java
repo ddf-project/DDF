@@ -164,50 +164,58 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
   }
 
   private String fillNAWithValueSQL(String value, AggregateFunction function, Map<String, String> columnsToValues,
-      List<String> columns) throws DDFException {
+      List<String> columnsToFill) throws DDFException {
     StringBuffer caseCmd = new StringBuffer("");
+    // Preserve all columns
+    List<String> columns = this.getDDF().getColumnNames();
+
     for (String col : columns) {
-      if (!Strings.isNullOrEmpty(value)) { // fill by value
+      if (columnsToFill.contains(col)) {
+        if (!Strings.isNullOrEmpty(value)) { // fill by value
 
-        if (this.getDDF().getColumn(col).isNumeric()) {
-          caseCmd.append(fillNACaseSql(col, value));
-        } else {
-          caseCmd.append(fillNACaseSql(col, String.format("'%s'", value)));
-        }
-
-      } else if (MapUtils.isNotEmpty(columnsToValues)) { // fill different values for different columns
-        Set<String> keys = columnsToValues.keySet();
-
-        if (keys.contains(col)) {
-          String filledValue = columnsToValues.get(col);
           if (this.getDDF().getColumn(col).isNumeric()) {
-            caseCmd.append(fillNACaseSql(col, filledValue));
+            caseCmd.append(fillNACaseSql(col, value));
           } else {
-            caseCmd.append(fillNACaseSql(col, String.format("'%s'", filledValue)));
+            caseCmd.append(fillNACaseSql(col, String.format("'%s'", value)));
           }
-        } else {
-          caseCmd.append(String.format("%s,", col));
-        }
-      } else {// fill by function
-        if (function != null) {// fill by function
-          Column curColumn = this.getDDF().getColumn(col);
-          if (this.getDDF().getColumn(col).isNumeric()) {
-            double filledValue = this.getDDF().getAggregationHandler().aggregateOnColumn(function, col);
-            if (curColumn.getType() == ColumnType.DOUBLE) {
+
+        } else if (MapUtils.isNotEmpty(columnsToValues)) { // fill different values for different columns
+          Set<String> keys = columnsToValues.keySet();
+
+          if (keys.contains(col)) {
+            String filledValue = columnsToValues.get(col);
+            if (this.getDDF().getColumn(col).isNumeric()) {
               caseCmd.append(fillNACaseSql(col, filledValue));
             } else {
-              caseCmd.append(fillNACaseSql(col, Math.round(filledValue)));
+              caseCmd.append(fillNACaseSql(col, String.format("'%s'", filledValue)));
             }
-
           } else {
             caseCmd.append(String.format("%s,", col));
           }
-        } else {
-          throw new DDFException("Unsupported or incorrect aggregate function.");
+        } else {// fill by function
+          if (function != null) {// fill by function
+            Column curColumn = this.getDDF().getColumn(col);
+            if (this.getDDF().getColumn(col).isNumeric()) {
+              double filledValue = this.getDDF().getAggregationHandler().aggregateOnColumn(function, col);
+              if (curColumn.getType() == ColumnType.DOUBLE) {
+                caseCmd.append(fillNACaseSql(col, filledValue));
+              } else {
+                caseCmd.append(fillNACaseSql(col, Math.round(filledValue)));
+              }
+
+            } else {
+              caseCmd.append(String.format("%s,", col));
+            }
+          } else {
+            throw new DDFException("Unsupported or incorrect aggregate function.");
+          }
         }
+      } else {
+        caseCmd.append(String.format("%s,", col));
       }
+
     }
-    caseCmd.setLength(caseCmd.length() - 1); // remove the last "+"
+    caseCmd.setLength(caseCmd.length() - 1); // remove the last ","
     String sqlCmd = String.format("SELECT %s FROM %%s", caseCmd.toString());
     return sqlCmd;
   }
