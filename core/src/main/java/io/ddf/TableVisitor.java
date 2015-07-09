@@ -80,7 +80,7 @@ public class TableVisitor
         if (plainSelect.getWhere() != null) {
             plainSelect.getWhere().accept(this);
 	}
-	
+
 	if (plainSelect.getGroupByColumnReferences() != null) {
             for (Iterator groupByIt = plainSelect.getGroupByColumnReferences().iterator();
                  groupByIt.hasNext(); ) {
@@ -95,7 +95,7 @@ public class TableVisitor
                 OrderByElement orderByElement = (OrderByElement) orderByIt.next();
                 orderByElement.accept(this);
             }
-        }	
+        }
 
     }
 

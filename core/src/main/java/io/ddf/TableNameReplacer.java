@@ -8,7 +8,9 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.select.Select;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +18,7 @@ import java.util.regex.Pattern;
 /**
  * Created by jing on 6/25/15.
  * This class is used to check every table name that appears in the statement and do corresponding replacement.
- * It extentds the TableVisitor class and should override the visit function.
+ * It extends the TableVisitor class and should override the visit function.
  */
 public class TableNameReplacer extends TableVisitor {
     // The URI regex representation.
@@ -25,6 +27,8 @@ public class TableNameReplacer extends TableVisitor {
     private String namespace = null;
     // The URI List.
     private List<String> uriList = null;
+    // The UUID List.
+    private List<UUID> uuidList = null;
     // The DDFManager.
     private DDFManager ddfManager = null;
 
@@ -32,15 +36,25 @@ public class TableNameReplacer extends TableVisitor {
     /**
      * @brief Constructor.
      * @param ddfManager The DDFManager.
+     * @Note The default uri regex matches "ddf://". So we don't specify the urigex, we will
+     * have default one the match.
      */
     public TableNameReplacer(DDFManager ddfManager) {
         this.ddfManager = ddfManager;
     }
 
+    /**
+     * @brief Constructor
+     * @param ddfManager
+     * @param namespace The namespace. When we are handling tablename, if ddf:// regex match fail
+     *                  and {number} match fail, and namespace is specified, the tablename will be
+     *                  converted to ddf://namespace/tablename automatically.
+     */
     public TableNameReplacer(DDFManager ddfManager, String namespace) {
         this.ddfManager = ddfManager;
         this.namespace = namespace;
     }
+
 
     public TableNameReplacer(DDFManager ddfManager, String namespace, String uriRegex) {
         this.ddfManager = ddfManager;
@@ -48,6 +62,11 @@ public class TableNameReplacer extends TableVisitor {
         this.uriPattern = Pattern.compile(uriRegex);
     }
 
+    /**
+     * @brief Constructor.
+     * @param ddfManager
+     * @param uriList The list of uri.
+     */
     public TableNameReplacer(DDFManager ddfManager, List<String> uriList) {
         this.ddfManager = ddfManager;
         this.uriList = uriList;
@@ -59,6 +78,14 @@ public class TableNameReplacer extends TableVisitor {
         this.uriList = uriList;
     }
 
+    /**
+     * @brief Constructor. Combination replacer, it will check dd://, {number}, tablename format
+     * respectively.
+     * @param ddfManager
+     * @param namespace
+     * @param uriRegex
+     * @param uriList
+     */
     public TableNameReplacer(DDFManager ddfManager, String namespace, String uriRegex, List<String> uriList) {
         this.ddfManager = ddfManager;
         this.namespace = namespace;
@@ -66,18 +93,29 @@ public class TableNameReplacer extends TableVisitor {
         this.uriList = uriList;
     }
 
+    /**
+     * @brief Constructor.
+     * @param ddfManager
+     * @param uuidList The list of uuids.
+     */
+    public TableNameReplacer(DDFManager ddfManager, UUID[] uuidList) {
+        this.ddfManager = ddfManager;
+        this.uuidList = Arrays.asList(uuidList);
+    }
 
     /**
      * @brief Run the replacer.
      * @param statement The SQL statement.
+     * @brief The new statement.
      */
-    public void run(Statement statement) {
+    public Statement run(Statement statement) {
         if (statement instanceof Select) {
             ((Select) statement).getSelectBody().accept(this);
         } else if (statement instanceof DescribeTable){
             ((DescribeTable)statement).accept(this);
             // TODO: Handler for other statments.
         }
+        return statement;
     }
 
     /**
@@ -105,28 +143,39 @@ public class TableNameReplacer extends TableVisitor {
                 // The second situation.
                 String uri = "ddf://".concat(namespace.concat("/").concat(name));
                 table.setName(this.ddfManager.getDDFByURI(uri).getTableName());
-            } else if (uriList != null) {
+            } else if (uriList != null || uuidList != null) {
                 // The third situation.
                 Pattern indexPattern = Pattern.compile("\\{\\d+\\}");
                 Matcher indexMatcher = indexPattern.matcher(name);
                 if (indexMatcher.matches()) {
-                    // TODO: Exception here?
-                    String number = name.substring(name.indexOf('{') + 1, name.indexOf('}'));
+                    // TODO: Add exception handler here.
+                    String number = name.substring(name.indexOf('{') + 1, name.indexOf('}')).trim();
                     int index = Integer.parseInt(number);
-                    if (index < 1 || index > uriList.size()) {
-                        throw new DDFException(new ArrayIndexOutOfBoundsException());
-                    } else {
-                        table.setName(this.ddfManager.getDDFByURI(uriList.get(index-1)).getTableName());
+                    if (index < 1) {
+                        throw new DDFException("In the SQL command, " +
+                                "if you use {number} as index, the number should begin from 1");
                     }
-                } else {
-                    // TODO: what will happen here?
+                    if (null == uriList) {
+                        if (index > uuidList.size()) {
+                            throw new DDFException(new ArrayIndexOutOfBoundsException());
+                        } else {
+                            table.setName(this.ddfManager.getDDF(uuidList.get(index - 1)).getTableName());
+                        }
+                    } else {
+                        if (index > uriList.size()) {
+                            throw new DDFException(new ArrayIndexOutOfBoundsException());
+                        } else {
+                            table.setName(this.ddfManager.getDDFByURI(uriList.get(index - 1)).getTableName());
+                        }
+                    }
                 }
             } else {
-                // TODO: Recheck whether we can  directly have table here.
+                // No modification.
             }
         } catch (Exception e) {
 
         }
+
     }
 
     /**
@@ -163,4 +212,8 @@ public class TableNameReplacer extends TableVisitor {
     public void setUriList(List<String> uriList) {
         this.uriList = uriList;
     }
+
+    public List<UUID> getUuidLsit() { return uuidList;}
+
+    public void setUuidList(List<UUID> uuidList) {this.uuidList = uuidList;}
 }

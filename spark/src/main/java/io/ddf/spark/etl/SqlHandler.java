@@ -118,6 +118,7 @@ public class SqlHandler extends ASqlHandler {
     return new SqlResult(schema,Arrays.asList(strResult));
   }
 
+
   @Override
   public SqlTypedResult sqlTyped(String command) throws DDFException {
     return this.sqlTyped(command, null, null);

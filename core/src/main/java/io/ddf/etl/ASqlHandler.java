@@ -23,6 +23,7 @@ import org.apache.avro.generic.GenericData;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  */
@@ -70,24 +71,50 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
     return new SqlResult(schema, ret);
   }
 
-  public SqlResult sqlHandle(String command, Integer maxRows, String dataSource) throws DDFException {
-    return this.sqlHandle(command, maxRows, dataSource, new TableNameReplacer(this.getManager()));
+  public SqlResult sqlHandle(String command,
+                             Integer maxRows,
+                             String dataSource) throws DDFException {
+    return this.sqlHandle(command,
+                          maxRows,
+                          dataSource,
+                          new TableNameReplacer(this.getManager()));
   }
 
-  public SqlResult sqlHandle(String command, Integer maxRows,
-                       String dataSource, String namespace) throws DDFException {
-    return this.sqlHandle(command, maxRows, dataSource,
-            new TableNameReplacer(this.getManager(), namespace));
+  public SqlResult sqlHandle(String command,
+                             Integer maxRows,
+                              String dataSource,
+                             String namespace) throws DDFException {
+    return this.sqlHandle(command,
+                          maxRows,
+                          dataSource,
+                          new TableNameReplacer(this.getManager(), namespace));
   }
 
-  public SqlResult sqlHandle(String command, Integer maxRows,
-                       String dataSource, List<String> uriList) throws DDFException {
-    return this.sqlHandle(command, maxRows, dataSource,
-            new TableNameReplacer(this.getManager(), uriList));
+  public SqlResult sqlHandle(String command,
+                             Integer maxRows,
+                             String dataSource,
+                             List<String> uriList) throws DDFException {
+    return this.sqlHandle(command,
+                          maxRows,
+                          dataSource,
+                          new TableNameReplacer(this.getManager(), uriList));
   }
 
-  public SqlResult sqlHandle(String sqlcmd, Integer maxRows, String dataSource,
-                       TableNameReplacer tableNameReplacer) throws DDFException {
+
+  public SqlResult sqlHandle(String command,
+                             Integer maxRows,
+                             String dataSource,
+                             UUID[] uuidList) throws DDFException {
+    return this.sqlHandle(command,
+                          maxRows,
+                          dataSource,
+                          new TableNameReplacer(this.getManager(), uuidList));
+  }
+
+  public SqlResult sqlHandle(String sqlcmd,
+                             Integer maxRows,
+                             String dataSource,
+                             TableNameReplacer tableNameReplacer) throws DDFException {
     if (dataSource != null) {
       // TODO.
       return null;
@@ -115,21 +142,56 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
   }
 
 
-  public DDF sql2ddfHandle(String command, Schema schema,
-                           String dataSource, DataFormat dataFormat) throws DDFException {
-    return sql2ddfHandle(command, schema, dataSource, dataFormat, new TableNameReplacer(this.getManager()));
+  public DDF sql2ddfHandle(String command,
+                           Schema schema,
+                           String dataSource,
+                           DataFormat dataFormat) throws DDFException {
+    return sql2ddfHandle(command,
+                         schema,
+                         dataSource,
+                         dataFormat,
+                         new TableNameReplacer(this.getManager()));
   }
-  public DDF sql2ddfHandle(String command, Schema schema,
-                           String dataSource, DataFormat dataFormat, String namespace) throws DDFException {
-    return sql2ddfHandle(command, schema, dataSource, dataFormat, new TableNameReplacer(getManager(), namespace));
-  }
-  public DDF sql2ddfHandle(String command, Schema schema,
-                           String dataSource, DataFormat dataFormat, List<String> uriList) throws DDFException {
-    return sql2ddfHandle(command, schema, dataSource, dataFormat, new TableNameReplacer(getManager(), uriList));
+  public DDF sql2ddfHandle(String command,
+                           Schema schema,
+                           String dataSource,
+                           DataFormat dataFormat,
+                           String namespace) throws DDFException {
+    return sql2ddfHandle(command,
+                         schema,
+                         dataSource,
+                         dataFormat,
+                         new TableNameReplacer(getManager(), namespace));
   }
 
-  public DDF sql2ddfHandle(String command, Schema schema,
-                           String dataSource, DataFormat dataFormat,
+  public DDF sql2ddfHandle(String command,
+                           Schema schema,
+                           String dataSource,
+                           DataFormat dataFormat,
+                           List<String> uriList) throws DDFException {
+    return sql2ddfHandle(command,
+                         schema,
+                         dataSource,
+                         dataFormat,
+                         new TableNameReplacer(getManager(), uriList));
+  }
+
+  public DDF sql2ddfHandle(String command,
+                           Schema schema,
+                           String dataSource,
+                           DataFormat dataFormat,
+                           UUID[] uuidList) throws DDFException {
+      return sql2ddfHandle(command,
+                           schema,
+                           dataSource,
+                           dataFormat,
+                           new TableNameReplacer(getManager(), uuidList));
+  }
+
+  public DDF sql2ddfHandle(String command,
+                           Schema schema,
+                           String dataSource,
+                           DataFormat dataFormat,
                            TableNameReplacer tableNameReplacer) throws DDFException {
     if (dataSource != null) {
       // TODO

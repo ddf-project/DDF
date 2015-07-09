@@ -351,9 +351,17 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat);
   }
 
+  public DDF sql2ddf(String command, String namespace) throws DDFException {
+    return this.sql2ddf(command, null, null, null, namespace);
+  }
+
   public DDF sql2ddf(String command, Schema schema,
                      String dataSource, DataFormat dataFormat, String namespace) throws DDFException {
     return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, namespace);
+  }
+
+  public DDF sql2ddf(String command, List<String> uriList) throws DDFException {
+    return this.sql2ddf(command, null, null, null, uriList);
   }
 
   public DDF sql2ddf(String command, Schema schema,
@@ -361,9 +369,21 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, uriList);
   }
 
+  public DDF sql2ddf(String command, UUID[] uuidList) throws  DDFException {
+      return this.sql2ddf(command, null, null, null, uuidList);
+  }
+
+  public DDF sql2ddf(String command,
+                     Schema schema,
+                     String dataSource,
+                     DataFormat dataFormat,
+                     UUID[] uuidList) throws DDFException {
+    return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, uuidList);
+  }
+
   @Override
   public SqlResult sql(String command) throws DDFException {
-    return this.sql(command, null);
+    return this.sql(command, (Integer) null);
   }
 
   @Override
@@ -372,19 +392,33 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
 
-
   @Override
   public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException {
     return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource);
   }
 
-  // @TODO: Pay attention here.
+  public SqlResult sql(String command, String namespace) throws DDFException {
+    return this.sql(command, null, null, namespace);
+  }
+
   public SqlResult sql(String command, Integer maxRows, String dataSource, String namespace) throws DDFException {
     return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, namespace);
   }
 
+  public SqlResult sql(String command, List<String> uriList) throws DDFException {
+    return this.sql(command, null, null, uriList);
+  }
+
   public SqlResult sql(String command, Integer maxRows, String dataSource, List<String> uriList) throws DDFException {
     return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, uriList);
+  }
+
+  public SqlResult sql(String command, UUID[] uuidList) throws DDFException {
+    return this.sql(command, null, null, uuidList);
+  }
+
+  public SqlResult sql(String command, Integer maxRows, String dataSource, UUID[] uuidList) throws DDFException {
+    return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, uuidList);
   }
 
   @Override

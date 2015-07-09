@@ -51,7 +51,8 @@ public class TableNameReplacerTests {
     @Test
     public void testCondition0() throws  DDFException {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
-        String sqlcmd = "Select * from tableA;";
+        // String sqlcmd = "describe table ddf://adatao/a";
+        String sqlcmd = "select sum(depdelay) from ddf://adatao/airline group by year order by year";
         Statement statement = null;
         try {
             statement = parser.parse(new StringReader(sqlcmd));
@@ -60,6 +61,7 @@ public class TableNameReplacerTests {
             assert(false);
         }
         tableNameReplacer.run(statement);
+        System.out.println(statement.toString());
     }
 
     @Test
@@ -131,11 +133,18 @@ public class TableNameReplacerTests {
         DDF ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, "
                 + "depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
         this.manager.setDDFName(ddf, "airlineDDF");
-        String[] testStr={"ddf://adatao/airlineDDF"};
-        SqlResult ret = manager.sql("select SUM({1}.year) from {1}", null, null, Arrays.asList(testStr));
-        System.out.println(ddf.getUri());
-        System.out.println(ddf.getTableName());
+        //String[] testStr={"ddf://adatao/airlineDDF"};
+        //SqlResult ret = manager.sql("select SUM({1}.year) from {1}", null, null, Arrays.asList(testStr));
+        //System.out.println(ddf.getUri());
+        //System.out.println(ddf.getTableName());
+        //SqlResult ret = manager.sql("show tables");
 
+        //SqlResult describeRet = manager.sql("describe table ddf://adatao/airlineDDF");
+
+        DDF sql2ddfRet = manager.sql2ddf("select * from ddf://adatao/airlineDDF");
+        // DDF sql2ddfRet = manager.sql2ddf("select * from ddf://adatao/airlineDDF");
+        // DDF sql2ddfRet = manager.sql2ddf("select * from ddf://adatao/airlineDDF");
+        int a = 1;
     }
 
     // static Logger LOG;
@@ -153,6 +162,8 @@ public class TableNameReplacerTests {
         DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "b",
                 schema2);
 
+       // manager.addDDF(null);
+        manager.sql("show tables");
         parser = new CCJSqlParserManager();
     }
 
