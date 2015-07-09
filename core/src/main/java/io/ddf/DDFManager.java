@@ -351,6 +351,16 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat);
   }
 
+  public DDF sql2ddf(String command, Schema schema,
+                     String dataSource, DataFormat dataFormat, String namespace) throws DDFException {
+    return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, namespace);
+  }
+
+  public DDF sql2ddf(String command, Schema schema,
+                     String dataSource, DataFormat dataFormat, List<String> uriList) throws DDFException {
+    return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, uriList);
+  }
+
   @Override
   public SqlResult sql(String command) throws DDFException {
     return this.sql(command, null);

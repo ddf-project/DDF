@@ -14,6 +14,7 @@ public interface IHandleSql extends IHandleSqlLike, IHandleDDFFunctionalGroup {
     public SqlResult sqlHandle(String command, Integer maxRows, String dataSource) throws DDFException;
     public SqlResult sqlHandle(String command, Integer maxRows, String dataSource, String namespace) throws DDFException;
     public SqlResult sqlHandle(String command, Integer maxRows, String dataSource, List<String> uriList) throws DDFException;
+    //public SqlResult sqlHandle(String command, Integer maxRows, String dataSource, List<DDF> ddfList) throws DDFException;
 
     public DDF sql2ddfHandle(String command, Schema schema,
                              String dataSource, DataFormat dataFormat) throws DDFException;
@@ -23,4 +24,7 @@ public interface IHandleSql extends IHandleSqlLike, IHandleDDFFunctionalGroup {
 
     public DDF sql2ddfHandle(String command, Schema schema,
                              String dataSource, DataFormat dataFormat, List<String> uriList) throws DDFException;
+
+    //public DDF sql2ddfHandle(String command, Schema schema,
+    //                         String dataSource, DataFormat dataFormat, List<DDF> ddfList) throws DDFException;
 }

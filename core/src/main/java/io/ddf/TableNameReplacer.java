@@ -5,6 +5,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.types.SpecialSerDes;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.select.Select;
 
 import java.util.List;
@@ -73,7 +74,8 @@ public class TableNameReplacer extends TableVisitor {
     public void run(Statement statement) {
         if (statement instanceof Select) {
             ((Select) statement).getSelectBody().accept(this);
-        } else {
+        } else if (statement instanceof DescribeTable){
+            ((DescribeTable)statement).accept(this);
             // TODO: Handler for other statments.
         }
     }

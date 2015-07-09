@@ -8,8 +8,25 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.SetStatement;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.StatementVisitor;
+import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.alter.Alter;
+import net.sf.jsqlparser.statement.create.index.CreateIndex;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
+import net.sf.jsqlparser.statement.create.view.CreateView;
+import net.sf.jsqlparser.statement.delete.Delete;
+import net.sf.jsqlparser.statement.describe.DescribeTable;
+import net.sf.jsqlparser.statement.drop.Drop;
+import net.sf.jsqlparser.statement.execute.Execute;
+import net.sf.jsqlparser.statement.insert.Insert;
+import net.sf.jsqlparser.statement.replace.Replace;
 import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.show.ShowColumns;
+import net.sf.jsqlparser.statement.show.ShowTables;
+import net.sf.jsqlparser.statement.truncate.Truncate;
+import net.sf.jsqlparser.statement.update.Update;
 
 import java.util.Iterator;
 
@@ -21,7 +38,7 @@ import java.util.Iterator;
  */
 public class TableVisitor
         implements SelectVisitor, FromItemVisitor, ExpressionVisitor,
-        ItemsListVisitor, OrderByVisitor, SelectItemVisitor {
+        ItemsListVisitor, OrderByVisitor, SelectItemVisitor, StatementVisitor {
 
     /**
      * @brief Visit the statement. This is the function that should be called
@@ -31,6 +48,8 @@ public class TableVisitor
     public void visit(Statement statement) {
         if (statement instanceof Select) {
             ((Select) statement).getSelectBody().accept(this);
+        } else if (statement instanceof DescribeTable) {
+            ((DescribeTable)statement).accept(this);
         }
         // TODO: Add more type support here.
     }
@@ -73,8 +92,8 @@ public class TableVisitor
         if (plainSelect.getOrderByElements() != null) {
             for (Iterator orderByIt = plainSelect.getOrderByElements().iterator();
                  orderByIt.hasNext(); ) {
-                Expression orderBy = (Expression) orderByIt.next();
-                orderBy.accept(this);
+                OrderByElement orderByElement = (OrderByElement) orderByIt.next();
+                orderByElement.accept(this);
             }
         }	
 
@@ -133,6 +152,7 @@ public class TableVisitor
     }
 
     public void visit(Function function) {
+        if (function.getParameters() == null) return;
     	for (Expression exp : function.getParameters().getExpressions()) {
             exp.accept(this);
         }
@@ -376,5 +396,90 @@ public class TableVisitor
     @Override
     public void visit(SelectExpressionItem selectExpressionItem) {
         selectExpressionItem.getExpression().accept(this);
+    }
+
+    @Override
+    public void visit(Select select) {
+
+    }
+
+    @Override
+    public void visit(Delete delete) {
+
+    }
+
+    @Override
+    public void visit(Update update) {
+
+    }
+
+    @Override
+    public void visit(Insert insert) {
+
+    }
+
+    @Override
+    public void visit(Replace replace) {
+
+    }
+
+    @Override
+    public void visit(Drop drop) {
+
+    }
+
+    @Override
+    public void visit(Truncate truncate) {
+
+    }
+
+    @Override
+    public void visit(CreateIndex createIndex) {
+
+    }
+
+    @Override
+    public void visit(CreateTable createTable) {
+
+    }
+
+    @Override
+    public void visit(CreateView createView) {
+
+    }
+
+    @Override
+    public void visit(Alter alter) {
+
+    }
+
+    @Override
+    public void visit(Statements statements) {
+
+    }
+
+    @Override
+    public void visit(Execute execute) {
+
+    }
+
+    @Override
+    public void visit(SetStatement setStatement) {
+
+    }
+
+    @Override
+    public void visit(ShowTables showTables) {
+        // Supposed not to do anything.
+    }
+
+    @Override
+    public void visit(ShowColumns showColumns) {
+
+    }
+
+    @Override
+    public void visit(DescribeTable describeTable) {
+        describeTable.getName().accept(this);
     }
 }

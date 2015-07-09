@@ -7,20 +7,18 @@ package io.ddf.etl;
 import io.ddf.DDF;
 import io.ddf.TableNameReplacer;
 import io.ddf.content.Schema;
+import io.ddf.content.Schema.Column;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.show.ShowTables;
-import net.sf.jsqlparser.util.deparser.SelectDeParser;
+import org.apache.avro.generic.GenericData;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -41,10 +39,13 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
   public SqlResult showTables() {
     List<String> tableNames = new ArrayList<String>();
     for (DDF ddf : this.getManager().listDDFs()) {
-      tableNames.add(ddf.getTableName());
+      if (ddf.getName() != null) {
+        tableNames.add(ddf.getName());
+      }
     }
-    // TODO: What schema should we use. Will this have problem if we convert it to sqlTyped.
-    Schema schema = new Schema(null, "table_name");
+    List<Column> columnList = new ArrayList<Column>();
+    columnList.add(new Column("table_name", Schema.ColumnType.STRING));
+    Schema schema = new Schema("tables", columnList);
     return new SqlResult(schema, tableNames);
   }
 
@@ -62,8 +63,10 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       Schema.Column col = ddf.getColumn(ddf.getColumnName(colIdx));
       ret.add(col.getName().concat("\t").concat(col.getType().toString()));
     }
-    // TODO.
-    Schema schema = new Schema(null, "column_name".concat("\t").concat("column_value_type"));
+    List<Column> columnList = new ArrayList<Column>();
+    columnList.add(new Column("column_name", Schema.ColumnType.STRING));
+    columnList.add(new Column("value_type", Schema.ColumnType.STRING));
+    Schema schema = new Schema("table_info", columnList);
     return new SqlResult(schema, ret);
   }
 
@@ -86,7 +89,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
   public SqlResult sqlHandle(String sqlcmd, Integer maxRows, String dataSource,
                        TableNameReplacer tableNameReplacer) throws DDFException {
     if (dataSource != null) {
-      // TODO
+      // TODO.
       return null;
     }
     CCJSqlParserManager parserManager = new CCJSqlParserManager();
@@ -100,10 +103,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         return this.describeTable(((DescribeTable)statement).getName().getName());
       } else {
         // Standard SQL.
-
         tableNameReplacer.run(statement);
-        // TODO: Awakward here.
-        System.out.println(statement.toString());
         return this.sql(statement.toString(), maxRows, dataSource);
       }
     } catch (JSQLParserException e) {

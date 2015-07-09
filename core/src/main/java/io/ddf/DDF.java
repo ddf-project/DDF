@@ -51,8 +51,8 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.show.ShowColumns;
 import net.sf.jsqlparser.statement.show.ShowTables;
-
 import java.io.StringReader;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
