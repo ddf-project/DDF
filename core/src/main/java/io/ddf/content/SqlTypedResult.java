@@ -1,7 +1,6 @@
 package io.ddf.content;
 
 
-import java.sql.SQLType;
 import java.util.ArrayList;
 import java.util.List;
 
