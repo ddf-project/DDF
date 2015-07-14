@@ -46,10 +46,15 @@ public class TableVisitor
      */
     public void visit(Statement statement) throws Exception {
         if (statement instanceof Select) {
-            for (WithItem withItem : ((Select) statement).getWithItemsList()) {
-                withItem.accept(this);
+            Select select = (Select) statement;
+            if (select.getWithItemsList() != null) {
+                for (WithItem withItem : ((Select) statement).getWithItemsList()) {
+                    withItem.accept(this);
+                }
             }
-            ((Select) statement).getSelectBody().accept(this);
+            if (select.getSelectBody() != null) {
+                select.getSelectBody().accept(this);
+            }
         } else if (statement instanceof DescribeTable) {
             ((DescribeTable)statement).accept(this);
         }
@@ -67,12 +72,15 @@ public class TableVisitor
      */
     public void visit(PlainSelect plainSelect) throws Exception {
         // Select selectItem From fromItem, joinItem Where whereClause.
-
-        for (SelectItem selectItem : plainSelect.getSelectItems()) {
-            selectItem.accept(this);
+        if (plainSelect.getSelectItems() != null) {
+            for (SelectItem selectItem : plainSelect.getSelectItems()) {
+                selectItem.accept(this);
+            }
         }
 
-        plainSelect.getFromItem().accept(this);
+        if (plainSelect.getFromItem() != null) {
+            plainSelect.getFromItem().accept(this);
+        }
 
         if (plainSelect.getJoins() != null) {
             for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
@@ -160,8 +168,10 @@ public class TableVisitor
 
     public void visit(SubSelect subSelect) throws Exception {
         subSelect.getSelectBody().accept(this);
-        for (WithItem withItem : subSelect.getWithItemsList()) {
-            visit(withItem);
+        if (subSelect.getWithItemsList() != null) {
+            for (WithItem withItem : subSelect.getWithItemsList()) {
+                visit(withItem);
+            }
         }
     }
 
@@ -180,7 +190,9 @@ public class TableVisitor
     }
 
     public void visit(Column tableColumn) throws Exception {
-        tableColumn.getTable().accept(this);
+        if (tableColumn.getTable() != null) {
+            tableColumn.getTable().accept(this);
+        }
     }
 
     public void visit(Division division) throws Exception {

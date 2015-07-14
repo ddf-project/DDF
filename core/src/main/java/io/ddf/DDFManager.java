@@ -18,14 +18,12 @@ package io.ddf;
 
 
 import com.google.common.base.Strings;
+import io.basic.ddf.content.PersistenceHandler;
+import io.ddf.content.*;
 import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.IHandlePersistence.IPersistible;
-import io.ddf.content.IHandleRepresentations;
-import io.ddf.content.Schema;
 
-import io.ddf.content.SqlTypedResult;
 import io.ddf.datasource.DataFormat;
-import io.ddf.content.SqlResult;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
@@ -460,4 +458,18 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public abstract DDF loadTable(String fileURL, String fieldSeparator) throws DDFException;
 
+  /**
+   * @brief Restore the ddf given uri.
+   * @param ddfURI The URI of ddf.
+   * @return The ddf.
+   */
+  public DDF restoreDDF(String ddfURI) {
+    try {
+      IHandlePersistence persistenceHandler = this.getDummyDDF().getPersistenceHandler();
+      if (persistenceHandler)
+    } catch (DDFException e) {
+      e.printStackTrace();
+    }
+
+  }
 }
