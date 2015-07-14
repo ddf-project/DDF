@@ -143,7 +143,7 @@ public class TableNameReplacer extends TableVisitor {
         } else if (namespace != null) {
             // The second situation.
             String uri = "ddf://".concat(namespace.concat("/").concat(name));
-            if (this.ddfManager.getDDFByURI(name) == null) {
+            if (this.ddfManager.getDDFByURI(uri) == null) {
                 throw new Exception("ERROR: There is no ddf with uri:" + name);
             }
             table.setName(this.ddfManager.getDDFByURI(uri).getTableName());
