@@ -1,12 +1,12 @@
 package io.ddf;
 
-import io.ddf.TableVisitor;
-import io.ddf.exception.DDFException;
-import io.ddf.types.SpecialSerDes;
+
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectItem;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -108,9 +108,9 @@ public class TableNameReplacer extends TableVisitor {
      * @param statement The SQL statement.
      * @brief The new statement.
      */
-    public Statement run(Statement statement) {
+    public Statement run(Statement statement) throws Exception {
         if (statement instanceof Select) {
-            ((Select) statement).getSelectBody().accept(this);
+            visit(statement);
         } else if (statement instanceof DescribeTable){
             ((DescribeTable)statement).accept(this);
             // TODO: Handler for other statments.
@@ -130,50 +130,57 @@ public class TableNameReplacer extends TableVisitor {
      * combined. For example, select {1}.a from ddf://adatao/ddfA, ddfList={"ddf://adatao/ddfB"}.
      * @param table The table that is visiting.
      */
-    public void visit(Table table) {
+    public void visit(Table table) throws Exception {
         if (null == table || null == table.getName()) return;
         String name = table.getName();
         Matcher matcher = this.uriPattern.matcher(name);
-        try {
-            if (matcher.matches()) {
-                // The first situation.
-                // TODO: consider about exception here.
-                table.setName(this.ddfManager.getDDFByURI(name).getTableName());
-            } else if (namespace != null) {
-                // The second situation.
-                String uri = "ddf://".concat(namespace.concat("/").concat(name));
-                table.setName(this.ddfManager.getDDFByURI(uri).getTableName());
-            } else if (uriList != null || uuidList != null) {
-                // The third situation.
-                Pattern indexPattern = Pattern.compile("\\{\\d+\\}");
-                Matcher indexMatcher = indexPattern.matcher(name);
-                if (indexMatcher.matches()) {
-                    // TODO: Add exception handler here.
-                    String number = name.substring(name.indexOf('{') + 1, name.indexOf('}')).trim();
-                    int index = Integer.parseInt(number);
-                    if (index < 1) {
-                        throw new DDFException("In the SQL command, " +
-                                "if you use {number} as index, the number should begin from 1");
-                    }
-                    if (null == uriList) {
-                        if (index > uuidList.size()) {
-                            throw new DDFException(new ArrayIndexOutOfBoundsException());
-                        } else {
-                            table.setName(this.ddfManager.getDDF(uuidList.get(index - 1)).getTableName());
-                        }
+        if (matcher.matches()) {
+            // The first situation.
+            if (this.ddfManager.getDDFByURI(name) == null) {
+                throw new Exception("ERROR: There is no ddf with uri:" + name);
+            }
+            table.setName(this.ddfManager.getDDFByURI(name).getTableName());
+        } else if (namespace != null) {
+            // The second situation.
+            String uri = "ddf://".concat(namespace.concat("/").concat(name));
+            if (this.ddfManager.getDDFByURI(name) == null) {
+                throw new Exception("ERROR: There is no ddf with uri:" + name);
+            }
+            table.setName(this.ddfManager.getDDFByURI(uri).getTableName());
+        } else if (uriList != null || uuidList != null) {
+            // The third situation.
+            Pattern indexPattern = Pattern.compile("\\{\\d+\\}");
+            Matcher indexMatcher = indexPattern.matcher(name);
+            if (indexMatcher.matches()) {
+                // TODO: Add exception handler here.
+                String number = name.substring(name.indexOf('{') + 1, name.indexOf('}')).trim();
+                int index = Integer.parseInt(number);
+                if (index < 1) {
+                    throw new Exception("In the SQL command, " +
+                            "if you use {number} as index, the number should begin from 1");
+                }
+                if (null == uriList) {
+                    if (index > uuidList.size()) {
+                        throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
-                        if (index > uriList.size()) {
-                            throw new DDFException(new ArrayIndexOutOfBoundsException());
-                        } else {
-                            table.setName(this.ddfManager.getDDFByURI(uriList.get(index - 1)).getTableName());
-                        }
+                        table.setName(this.ddfManager.getDDF(uuidList.get(index - 1)).getTableName());
+                    }
+                } else {
+                    if (index > uriList.size()) {
+                        throw new Exception(new ArrayIndexOutOfBoundsException());
+                    } else {
+                        table.setName(this.ddfManager.getDDFByURI(uriList.get(index - 1)).getTableName());
                     }
                 }
-            } else {
-                // No modification.
             }
-        } catch (Exception e) {
-
+        } else {
+            // No modification.
+        }
+        // Possibly we have table name in TABLESAMPLE.
+        if (table.getSampleClause() != null) {
+            for (SelectItem selectItem : table.getSampleClause().getOnList()) {
+                selectItem.accept(this);
+            }
         }
 
     }

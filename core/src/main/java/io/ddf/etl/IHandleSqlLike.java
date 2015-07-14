@@ -8,7 +8,6 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.content.SqlResult;
 import io.ddf.exception.DDFException;
 
-import java.util.List;
 
 public interface IHandleSqlLike {
 
