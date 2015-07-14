@@ -470,6 +470,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     } catch (DDFException e) {
       e.printStackTrace();
     }
-
+    return null;
   }
 }
