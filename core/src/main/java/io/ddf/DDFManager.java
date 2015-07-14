@@ -314,6 +314,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.sql2ddf(command, null, null, null);
   }
 
+  public DDF sql2ddf(String command, String dataSource) throws  DDFException {
+    return this.sql2ddf(command, null, dataSource, null);
+  }
+
   @Override
   public DDF sql2ddf(String command, Schema schema) throws DDFException {
     return this.sql2ddf(command, schema, null, null);
@@ -339,8 +343,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat);
   }
 
-  public DDF sql2ddf(String command, String namespace) throws DDFException {
-    return this.sql2ddf(command, null, null, null, namespace);
+  public DDF sql2ddf(String command, String dataSouce, String namespace) throws DDFException {
+    return this.sql2ddf(command, null, dataSouce, null, namespace);
   }
 
   public DDF sql2ddf(String command, Schema schema,
@@ -348,8 +352,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, namespace);
   }
 
-  public DDF sql2ddf(String command, List<String> uriList) throws DDFException {
-    return this.sql2ddf(command, null, null, null, uriList);
+  public DDF sql2ddf(String command, String dataSource, List<String> uriList) throws DDFException {
+    return this.sql2ddf(command, null, dataSource, null, uriList);
   }
 
   public DDF sql2ddf(String command, Schema schema,
@@ -357,8 +361,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, uriList);
   }
 
-  public DDF sql2ddf(String command, UUID[] uuidList) throws  DDFException {
-      return this.sql2ddf(command, null, null, null, uuidList);
+  public DDF sql2ddf(String command, String dataSource, UUID[] uuidList) throws  DDFException {
+      return this.sql2ddf(command, null, dataSource, null, uuidList);
   }
 
   public DDF sql2ddf(String command,
@@ -385,24 +389,28 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource);
   }
 
-  public SqlResult sql(String command, String namespace) throws DDFException {
-    return this.sql(command, null, null, namespace);
+  public SqlResult sql(String command, String dataSource) throws DDFException {
+    return this.getDummyDDF().getSqlHandler().sqlHandle(command, null, dataSource);
+  }
+
+  public SqlResult sql(String command, String dataSource, String namespace) throws DDFException {
+    return this.sql(command, null, dataSource, namespace);
   }
 
   public SqlResult sql(String command, Integer maxRows, String dataSource, String namespace) throws DDFException {
     return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, namespace);
   }
 
-  public SqlResult sql(String command, List<String> uriList) throws DDFException {
-    return this.sql(command, null, null, uriList);
+  public SqlResult sql(String command, String dataSource, List<String> uriList) throws DDFException {
+    return this.sql(command, null, dataSource, uriList);
   }
 
   public SqlResult sql(String command, Integer maxRows, String dataSource, List<String> uriList) throws DDFException {
     return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, uriList);
   }
 
-  public SqlResult sql(String command, UUID[] uuidList) throws DDFException {
-    return this.sql(command, null, null, uuidList);
+  public SqlResult sql(String command, String dataSource, UUID[] uuidList) throws DDFException {
+    return this.sql(command, null, dataSource, uuidList);
   }
 
   public SqlResult sql(String command, Integer maxRows, String dataSource, UUID[] uuidList) throws DDFException {

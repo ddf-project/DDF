@@ -144,7 +144,7 @@ public class TableNameReplacer extends TableVisitor {
             // The second situation.
             String uri = "ddf://".concat(namespace.concat("/").concat(name));
             if (this.ddfManager.getDDFByURI(uri) == null) {
-                throw new Exception("ERROR: There is no ddf with uri:" + name);
+                throw new Exception("ERROR: There is no ddf with uri: " + name);
             }
             table.setName(this.ddfManager.getDDFByURI(uri).getTableName());
         } else if (uriList != null || uuidList != null) {
@@ -152,7 +152,6 @@ public class TableNameReplacer extends TableVisitor {
             Pattern indexPattern = Pattern.compile("\\{\\d+\\}");
             Matcher indexMatcher = indexPattern.matcher(name);
             if (indexMatcher.matches()) {
-                // TODO: Add exception handler here.
                 String number = name.substring(name.indexOf('{') + 1, name.indexOf('}')).trim();
                 int index = Integer.parseInt(number);
                 if (index < 1) {
@@ -163,26 +162,35 @@ public class TableNameReplacer extends TableVisitor {
                     if (index > uuidList.size()) {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
+                        if (null == this.ddfManager.getDDF(uuidList.get(index - 1))) {
+                            throw new Exception("ERROR: There is no such ddf");
+                        }
                         table.setName(this.ddfManager.getDDF(uuidList.get(index - 1)).getTableName());
                     }
                 } else {
                     if (index > uriList.size()) {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
+                        if (null == this.ddfManager.getDDFByURI(uriList.get(index - 1))) {
+                            throw new Exception("ERROR: There is no ddf with uri: " + uriList.get(index - 1));
+                        }
                         table.setName(this.ddfManager.getDDFByURI(uriList.get(index - 1)).getTableName());
                     }
                 }
+            } else {
+                // Not full uri, no namespace, the index can't match.
+                throw new Exception("ERROR: Can't find the required ddf");
             }
         } else {
             // No modification.
+            throw new Exception("ERROR: The ddf reference should either full uri, ddfname with namespace or list index");
         }
-        // Possibly we have table name in TABLESAMPLE.
+        // We can have table name in TABLESAMPLE clause.
         if (table.getSampleClause() != null) {
             for (SelectItem selectItem : table.getSampleClause().getOnList()) {
                 selectItem.accept(this);
             }
         }
-
     }
 
     /**
