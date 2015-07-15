@@ -27,7 +27,9 @@ import net.sf.jsqlparser.statement.show.ShowTables;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by jing on 6/29/15.
@@ -39,6 +41,7 @@ public class TableVisitor
         implements SelectVisitor, FromItemVisitor, ExpressionVisitor,
         ItemsListVisitor, OrderByVisitor, SelectItemVisitor, StatementVisitor, ClusterByVisitor {
 
+    protected List<String> withTableNameList = new ArrayList<String>();
     /**
      * @brief Visit the statement. This is the function that should be called
      * in the first place.
@@ -158,6 +161,8 @@ public class TableVisitor
     @Override
     public void visit(WithItem withItem) throws Exception {
         // TODO: Redo this later. What's withItem list.
+        // Add with name here.
+        withItem.accept(this);
         withItem.getSelectBody().accept(this);
         if (withItem.getWithItemList() != null) {
             for (SelectItem selectItem : withItem.getWithItemList()) {

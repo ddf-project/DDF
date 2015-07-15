@@ -77,7 +77,7 @@ public class SqlHandler extends ASqlHandler {
     //    RDD<Row> rddRow = null;
     DataFrame rdd = null;
     // TODO: handle other dataSources and dataFormats
-    if (dataSource.equals("SparkSQL")) {
+    if (dataSource == null || dataSource.equals("SparkSQL")) {
       rdd = this.getHiveContext().sql(command);
     } else {
       // TODO

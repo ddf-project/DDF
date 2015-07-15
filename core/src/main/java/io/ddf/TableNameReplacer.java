@@ -6,6 +6,7 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.WithItem;
 
 
 import java.util.Arrays;
@@ -109,6 +110,8 @@ public class TableNameReplacer extends TableVisitor {
      * @brief The new statement.
      */
     public Statement run(Statement statement) throws Exception {
+        // Clear the with table names in case that we run several sql command.
+        this.withTableNameList.clear();
         if (statement instanceof Select) {
             visit(statement);
         } else if (statement instanceof DescribeTable){
@@ -117,6 +120,22 @@ public class TableNameReplacer extends TableVisitor {
         }
         return statement;
     }
+
+    @Override
+    public void visit(WithItem withItem) throws Exception {
+        // TODO: Redo this later. What's withItem list.
+        // Add with name here.
+        if (withItem.getName() != null) {
+            this.withTableNameList.add(withItem.getName());
+        }
+        withItem.getSelectBody().accept(this);
+        if (withItem.getWithItemList() != null) {
+            for (SelectItem selectItem : withItem.getWithItemList()) {
+                selectItem.accept(this);
+            }
+        }
+    }
+
 
     /**
      * @brief Override the visit function. The function takes care of 3 kinds of situation:
@@ -133,6 +152,12 @@ public class TableNameReplacer extends TableVisitor {
     public void visit(Table table) throws Exception {
         if (null == table || null == table.getName()) return;
         String name = table.getName();
+        for (String tablename : this.withTableNameList) {
+            // It a table name appeared in with clause.
+            if (tablename.equals(name)) {
+                return;
+            }
+        }
         Matcher matcher = this.uriPattern.matcher(name);
         if (matcher.matches()) {
             // The first situation.

@@ -466,7 +466,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public DDF restoreDDF(String ddfURI) {
     try {
       IHandlePersistence persistenceHandler = this.getDummyDDF().getPersistenceHandler();
-      // TODO
     } catch (DDFException e) {
       e.printStackTrace();
     }

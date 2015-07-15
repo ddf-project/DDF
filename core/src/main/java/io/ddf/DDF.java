@@ -80,7 +80,6 @@ public abstract class DDF extends ALoggable //
 
   private Date mCreatedTime;
 
-
   /**
    *
    * @param data
@@ -342,9 +341,13 @@ public abstract class DDF extends ALoggable //
   // ///// Execute a sqlcmd
   public SqlResult sql(String sqlCommand, String errorMessage) throws DDFException {
     try {
-      sqlCommand = sqlCommand.replace("@this", this.getTableName());
+      // sqlCommand = sqlCommand.replace("@this", this.getTableName());
       // TODO: what is format?
-      return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
+      // return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
+      sqlCommand = sqlCommand.replace("@this", "{1}");
+      UUID[] uuidList = new UUID[1];
+      uuidList[0] = this.getUUID();
+      return this.getManager().sql(sqlCommand, null, uuidList);
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }
@@ -361,8 +364,12 @@ public abstract class DDF extends ALoggable //
 
   public DDF sql2ddf(String sqlCommand) throws DDFException {
     try {
-      sqlCommand = sqlCommand.replace("@this", this.getTableName());
-      return this.getManager().sql2ddf(sqlCommand);
+      // sqlCommand = sqlCommand.replace("@this", this.getTableName());
+      sqlCommand = sqlCommand.replace("@this", "{1}");
+      UUID[] uuidList = new UUID[1];
+      uuidList[0] = this.getUUID();
+      return  this.getManager().sql2ddf(sqlCommand, null, uuidList);
+      // return this.getManager().sql2ddf(sqlCommand);
     } catch (Exception e) {
       throw new DDFException(String.format("Error executing queries for ddf %s", this.getTableName()), e);
     }

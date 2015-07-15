@@ -213,7 +213,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
             case "SparkSQL":
                 return this.sql2ddf(command, schema, dataSource, dataFormat);
             default:
-                throw new DDFException("ERROR: Unrecognized datasource");
+                throw new DDFException("ERROR: Unrecognized datasource: " + dataSource);
         }
     }
     CCJSqlParserManager parserManager = new CCJSqlParserManager();
