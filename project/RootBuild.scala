@@ -64,11 +64,13 @@ object RootBuild extends Build {
   val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
   val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
-  
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
+  val jdbcProjectName = projectName + "_jdbc"
+
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, jdbc)
   lazy val core = Project("core", file("core"), settings = coreSettings)
   lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core)
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
+  lazy val jdbc = Project("jdbc", file("jdbc"), settings = jdbcSettings) dependsOn (core)
 
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend(Compile)
@@ -557,10 +559,6 @@ object RootBuild extends Build {
     }
   ) ++ assemblySettings ++ extraAssemblySettings
 
-
-
-
-
   def examplesSettings = commonSettings ++ Seq(
     name := examplesProjectName,
     //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
@@ -568,7 +566,12 @@ object RootBuild extends Build {
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch examples/" + targetDir + "/*timestamp") }
   ) ++ assemblySettings ++ extraAssemblySettings
 
-
+  def jdbcSettings = commonSettings ++ Seq(
+    name := jdbcProjectName,
+    // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
+    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch jdbc/" + targetDir + "/*timestamp") },
+    testOptions in Test += Tests.Argument("-oI")
+  ) ++ assemblySettings ++ extraAssemblySettings
 
 
 

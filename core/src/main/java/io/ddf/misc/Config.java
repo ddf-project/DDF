@@ -157,7 +157,8 @@ public class Config {
     
     DDF_INI_ENV_VAR("DDF_INI"), DDF_INI_FILE_NAME("ddf.ini"), DDF_CONFIG_DIR("ddf-conf"),
     
-    ENGINE_NAME_DEFAULT("spark"), ENGINE_NAME_BASIC("basic"), ENGINE_NAME_SPARK("spark"), 
+    ENGINE_NAME_DEFAULT("spark"), ENGINE_NAME_BASIC("basic"), ENGINE_NAME_SPARK("spark"),
+      ENGINE_NAME_SQLLITE("sqllite"), ENGINE_NAME_JDBC("jdbc"),
     
     SECTION_GLOBAL("global"), 
     

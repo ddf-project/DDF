@@ -23,4 +23,6 @@ public class DataSourceURI {
   public URI getUri() {
     return this.mUri;
   }
+
+  public String toString() { return this.mUri.toString(); }
 }
