@@ -78,10 +78,12 @@ public class SqlHandler extends ASqlHandler {
     } else {
       // TODO
     }
+
     if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
         null, schema);
     ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+    ddf.getRepresentationHandler().cache(false);
     return ddf;
   }
 
