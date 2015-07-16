@@ -5,6 +5,7 @@ import io.ddf.DDF;
 import io.ddf.content.Schema;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataFormat;
+import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
 
@@ -27,7 +28,7 @@ public interface IHandleSql extends IHandleSqlLike, IHandleDDFFunctionalGroup {
      */
     public SqlResult sqlHandle(String command,
                                Integer maxRows,
-                               String dataSource) throws DDFException;
+                               DataSourceDescriptor dataSource) throws DDFException;
 
     /**
      * @brief This function is used to handle user-input sql.
@@ -41,7 +42,7 @@ public interface IHandleSql extends IHandleSqlLike, IHandleDDFFunctionalGroup {
      */
     public SqlResult sqlHandle(String command,
                                Integer maxRows,
-                               String dataSource,
+                               DataSourceDescriptor dataSource,
                                String namespace) throws DDFException;
 
 
@@ -61,7 +62,7 @@ public interface IHandleSql extends IHandleSqlLike, IHandleDDFFunctionalGroup {
      */
     public SqlResult sqlHandle(String command,
                                Integer maxRows,
-                               String dataSource,
+                               DataSourceDescriptor dataSource,
                                List<String> uriList) throws DDFException;
 
     /**
@@ -75,7 +76,7 @@ public interface IHandleSql extends IHandleSqlLike, IHandleDDFFunctionalGroup {
      */
     public SqlResult sqlHandle(String command,
                                Integer maxRows,
-                               String dataSource,
+                               DataSourceDescriptor dataSource,
                                UUID[] uuidList) throws DDFException;
 
     /**
@@ -89,24 +90,24 @@ public interface IHandleSql extends IHandleSqlLike, IHandleDDFFunctionalGroup {
      */
     public DDF sql2ddfHandle(String command,
                              Schema schema,
-                             String dataSource,
+                             DataSourceDescriptor dataSource,
                              DataFormat dataFormat) throws DDFException;
 
     public DDF sql2ddfHandle(String command,
                              Schema schema,
-                             String dataSource,
+                             DataSourceDescriptor dataSource,
                              DataFormat dataFormat,
                              String namespace) throws DDFException;
 
     public DDF sql2ddfHandle(String command,
                              Schema schema,
-                             String dataSource,
+                             DataSourceDescriptor dataSource,
                              DataFormat dataFormat,
                              List<String> uriList) throws DDFException;
 
     public DDF sql2ddfHandle(String command,
                              Schema schema,
-                             String dataSource,
+                             DataSourceDescriptor dataSource,
                              DataFormat dataFormat,
                              UUID[] uuidList) throws DDFException;
 

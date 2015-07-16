@@ -10,6 +10,9 @@ import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataFormat;
+import io.ddf.datasource.DataSourceDescriptor;
+import io.ddf.datasource.JDBCDataSourceDescriptor;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
@@ -75,7 +78,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public SqlResult sqlHandle(String command,
                              Integer maxRows,
-                             String dataSource) throws DDFException {
+                             DataSourceDescriptor dataSource) throws DDFException {
     return this.sqlHandle(command,
                           maxRows,
                           dataSource,
@@ -84,7 +87,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public SqlResult sqlHandle(String command,
                              Integer maxRows,
-                              String dataSource,
+                             DataSourceDescriptor dataSource,
                              String namespace) throws DDFException {
     return this.sqlHandle(command,
                           maxRows,
@@ -94,7 +97,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public SqlResult sqlHandle(String command,
                              Integer maxRows,
-                             String dataSource,
+                             DataSourceDescriptor dataSource,
                              List<String> uriList) throws DDFException {
     return this.sqlHandle(command,
                           maxRows,
@@ -105,7 +108,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public SqlResult sqlHandle(String command,
                              Integer maxRows,
-                             String dataSource,
+                             DataSourceDescriptor dataSource,
                              UUID[] uuidList) throws DDFException {
     return this.sqlHandle(command,
                           maxRows,
@@ -115,13 +118,13 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public SqlResult sqlHandle(String sqlcmd,
                              Integer maxRows,
-                             String dataSource,
+                             DataSourceDescriptor dataSource,
                              TableNameReplacer tableNameReplacer) throws DDFException {
     // If the user specifies the datasource, we should directly send the sql
     // command to the sql engine.
     if (dataSource != null) {
-      // TODO. Add datasource handle here.
-        switch (dataSource) {
+        SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
+        switch (sqlDataSourceDescriptor.getDataSource()) {
             case "SparkSQL":
                 return this.sql(sqlcmd, maxRows, dataSource);
             default:
@@ -159,7 +162,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public DDF sql2ddfHandle(String command,
                            Schema schema,
-                           String dataSource,
+                           DataSourceDescriptor dataSource,
                            DataFormat dataFormat) throws DDFException {
     return sql2ddfHandle(command,
                          schema,
@@ -169,7 +172,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
   }
   public DDF sql2ddfHandle(String command,
                            Schema schema,
-                           String dataSource,
+                           DataSourceDescriptor dataSource,
                            DataFormat dataFormat,
                            String namespace) throws DDFException {
     return sql2ddfHandle(command,
@@ -181,7 +184,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public DDF sql2ddfHandle(String command,
                            Schema schema,
-                           String dataSource,
+                           DataSourceDescriptor dataSource,
                            DataFormat dataFormat,
                            List<String> uriList) throws DDFException {
     return sql2ddfHandle(command,
@@ -193,7 +196,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public DDF sql2ddfHandle(String command,
                            Schema schema,
-                           String dataSource,
+                           DataSourceDescriptor dataSource,
                            DataFormat dataFormat,
                            UUID[] uuidList) throws DDFException {
       return sql2ddfHandle(command,
@@ -205,11 +208,12 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   public DDF sql2ddfHandle(String command,
                            Schema schema,
-                           String dataSource,
+                           DataSourceDescriptor dataSource,
                            DataFormat dataFormat,
                            TableNameReplacer tableNameReplacer) throws DDFException {
     if (dataSource != null) {
-        switch (dataSource) {
+        SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
+        switch (sqlDataSourceDescriptor.getDataSource()) {
             case "SparkSQL":
                 return this.sql2ddf(command, schema, dataSource, dataFormat);
             default:

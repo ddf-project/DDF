@@ -6,7 +6,7 @@ import java.net.URI;
 /**
  */
 public class DataSourceURI {
-  private URI mUri;
+  protected URI mUri;
 
   public DataSourceURI(URI uri) {
     this.mUri = uri;

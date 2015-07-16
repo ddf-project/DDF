@@ -6,6 +6,7 @@ import io.ddf.content.Schema;
 import io.ddf.content.SqlTypedResult;
 import io.ddf.datasource.DataFormat;
 import io.ddf.content.SqlResult;
+import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 
 
@@ -51,7 +52,7 @@ public interface IHandleSqlLike {
    * @param dataSource The dataSource (URI) of the data, e.g., jdbc://xxx
    * @return
    */
-  public DDF sql2ddf(String command, Schema schema, String dataSource) throws DDFException;
+  public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource) throws DDFException;
 
   /**
    * Executes the given command and stores the results into a DDF using the given {@link Schema},
@@ -75,7 +76,7 @@ public interface IHandleSqlLike {
    * @param dataFormat
    * @return
    */
-  public DDF sql2ddf(String command, Schema schema, String dataSource, DataFormat dataFormat) throws DDFException;
+  public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource, DataFormat dataFormat) throws DDFException;
 
 
 
@@ -110,7 +111,7 @@ public interface IHandleSqlLike {
    */
 
 
-  public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException;
+  public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource) throws DDFException;
 
 
 
@@ -144,7 +145,7 @@ public interface IHandleSqlLike {
    * @param dataSource The dataSource (URI) of the data, e.g., jdbc://xxx
    * @return the List<List<SqlTypedCell>> with loaded data content
    */
-  public SqlTypedResult sqlTyped(String command, Integer maxRows, String dataSource) throws DDFException;
+  public SqlTypedResult sqlTyped(String command, Integer maxRows, DataSourceDescriptor dataSource) throws DDFException;
 
 
 }
