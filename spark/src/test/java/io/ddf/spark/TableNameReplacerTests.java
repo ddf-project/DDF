@@ -181,24 +181,34 @@ public class TableNameReplacerTests {
           " WHERE ddf://adatao/a.id > 1 AND ddf://adatao/b.id < 3 "
         };
 
+        String[] sortOptions = {
+            " ",
+            " Cluster by ddf://adatao/a.year ",
+            " Distribute By ddf://adatao/a.year Sort by ddf://adatao/a.id "
+        };
+
         for (String selectItem : selectItems) {
             for (String joinType : joinTypes) {
                 for (String joinCond : joinConds) {
                     for (String whereClause : wehereCaluses) {
-                        String sqlcmd = "Select" + selectItem + "from ddf://adatao/a" +
-                                joinType + "ddf://adatao/b" + joinCond + whereClause;
-                        System.out.println(sqlcmd);
-                        try {
-                            Statement statement = testFullURISingle(sqlcmd);
-                            System.out.println(statement.toString());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            assert false;
+                        for (String sortOption : sortOptions) {
+                            String sqlcmd = "Select" + selectItem + "from ddf://adatao/a" +
+                                    joinType + "ddf://adatao/b" + joinCond + whereClause + sortOption;
+                            System.out.println(sqlcmd);
+                            try {
+                                Statement statement = testFullURISingle(sqlcmd);
+                                System.out.println(statement.toString());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                assert false;
+                            }
                         }
                     }
                 }
             }
         }
+
+
     }
 
     /**
