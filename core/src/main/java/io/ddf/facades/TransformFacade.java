@@ -83,6 +83,13 @@ public class TransformFacade implements IHandleTransformations {
     return mTransformationHandler.transformUDF(transformExpressions, columns);
   }
 
+  /**
+   * Create a new column or overwrite an existing one.
+   *
+   * @param transformExpression the expression in format column=expression
+   * @return a DDF
+   * @throws DDFException
+   */
   public DDF transformUDF(String transformExpression) throws DDFException {
     return transformUDF(transformExpression, null);
   }
