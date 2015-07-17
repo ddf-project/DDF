@@ -229,8 +229,10 @@ public class TableNameReplacer extends TableVisitor {
         }
         // We can have table name in TABLESAMPLE clause.
         if (table.getSampleClause() != null) {
-            for (SelectItem selectItem : table.getSampleClause().getOnList()) {
-                selectItem.accept(this);
+            if (table.getSampleClause().getOnList() != null) {
+                for (SelectItem selectItem : table.getSampleClause().getOnList()) {
+                    selectItem.accept(this);
+                }
             }
         }
     }

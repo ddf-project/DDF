@@ -134,6 +134,10 @@ public class TableVisitor
                 visit(sortByElement);
             }
         }
+
+        if (plainSelect.getHaving() != null) {
+            plainSelect.getHaving().accept(this);
+        }
     }
 
     private void visit(SortByElement sortByElement) throws  Exception {
@@ -556,4 +560,5 @@ public class TableVisitor
     public void visit(ClusterByElement clusterByElement) throws Exception {
         clusterByElement.getExpression().accept(this);
     }
+
 }

@@ -81,15 +81,18 @@ public class SqlHandler extends ASqlHandler {
     // TODO: handle other dataSources and dataFormats
     if (dataSource != null) {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
-      if (sqlDataSourceDescriptor != null && sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")) {
-        rdd = this.getHiveContext().sql(command);
-      } else {
-        throw new DDFException("Incorrect datasource");
+      if (sqlDataSourceDescriptor != null) {
+        if (!sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")) {
+          throw new DDFException("Incorrect datasource");
+        }
       }
-    } else {
-      throw new DDFException("No availabe datasource information");
     }
+    //else {
+    //  throw new DDFException("No availabe datasource information");
+    //}
 
+
+    rdd = this.getHiveContext().sql(command);
     if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
         null, schema);
@@ -122,14 +125,18 @@ public class SqlHandler extends ASqlHandler {
     DataFrame rdd = null;
     if (dataSource != null) {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
-      if (sqlDataSourceDescriptor != null && sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")) {
-        rdd = this.getHiveContext().sql(command);
-      } else {
-        throw new DDFException("Incorrect datasource");
+      if (sqlDataSourceDescriptor != null) {
+        if (!sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")) {
+          throw new DDFException("Incorrect datasource");
+        }
       }
-    } else {
-      throw new DDFException("No availabe datasource information");
     }
+    //else {
+    //  throw new DDFException("No availabe datasource information");
+    //}
+
+
+    rdd = this.getHiveContext().sql(command);
     Schema schema = SparkUtils.schemaFromDataFrame(rdd);
 
     String[] strResult = SparkUtils.df2txt(rdd, "\t");
