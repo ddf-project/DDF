@@ -9,11 +9,8 @@ import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
+
+import java.util.*;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
 
@@ -98,9 +95,9 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return flattenDDF(null);
   }
 
-  public DDF transformUDF(String RExp, List<String> columns) throws DDFException {
+  public DDF transformUDF(List<String> RExps, List<String> columns) throws DDFException {
     String sqlCmd = String.format("SELECT %s FROM %s",
-        RToSqlUdf(RExp, columns, this.getDDF().getSchema().getColumns()),
+        RToSqlUdf(RExps, columns, this.getDDF().getSchema().getColumns()),
         this.getDDF().getTableName());
 
     DDF newddf = this.getManager().sql2ddf(sqlCmd);
@@ -113,8 +110,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     }
   }
 
-  public DDF transformUDF(String RExp) throws DDFException {
-    return transformUDF(RExp, null);
+  public DDF transformUDF(List<String> RExps) throws DDFException {
+    return transformUDF(RExps, null);
   }
 
   /**
@@ -124,7 +121,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
    * @return "(arrtime - crsarrtime) as foobar, (distance / airtime) as speed
    */
 
-  public static String RToSqlUdf(String RExp, List<String> selectedColumns, List<Column> existingColumns) {
+  public static String RToSqlUdf(List<String> RExps, List<String> selectedColumns, List<Column> existingColumns) {
     List<String> udfs = Lists.newArrayList();
     Map<String, String> newColToDef = new HashMap<String, String>();
     boolean updateOnConflict = (selectedColumns == null || selectedColumns.isEmpty());
@@ -144,7 +141,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     }
 
     Set<String> newColsInRExp = new HashSet<String>();
-    for (String str : RExp.split(",(?![^()]*+\\))")) {
+    for (String str : RExps) {
       String[] udf = str.split("[=~](?![^()]*+\\))");
       String newCol = (udf.length > 1) ?
         udf[0].trim().replaceAll("\\W", "") :
@@ -177,7 +174,13 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return selectStr.substring(0, selectStr.length() - 1);
   }
 
-  public static String RToSqlUdf(String RExp) {
+  public static String RToSqlUdf(List<String> RExp) {
     return RToSqlUdf(RExp, null, null);
+  }
+
+  public static String RToSqlUdf(String RExp) {
+    List<String> RExps = new ArrayList<String>();
+    RExps.add(RExp);
+    return RToSqlUdf(RExps, null, null);
   }
 }
