@@ -123,12 +123,18 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
     // If the user specifies the datasource, we should directly send the sql
     // command to the sql engine.
     if (dataSource != null) {
+        // TODO: add support for other datasource.
         SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
-        switch (sqlDataSourceDescriptor.getDataSource()) {
-            case "SparkSQL":
-                return this.sql(sqlcmd, maxRows, dataSource);
-            default:
-                throw new DDFException("ERROR: Unrecognized datasource");
+        if (sqlDataSourceDescriptor == null) {
+            throw  new DDFException("ERROR: Handling datasource");
+        }
+        if (sqlDataSourceDescriptor.getDataSource() != null) {
+            switch (sqlDataSourceDescriptor.getDataSource()) {
+                case "SparkSQL":
+                    return this.sql(sqlcmd, maxRows, dataSource);
+                default:
+                    throw new DDFException("ERROR: Unrecognized datasource");
+            }
         }
     }
     CCJSqlParserManager parserManager = new CCJSqlParserManager();
@@ -213,11 +219,16 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                            TableNameReplacer tableNameReplacer) throws DDFException {
     if (dataSource != null) {
         SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
-        switch (sqlDataSourceDescriptor.getDataSource()) {
-            case "SparkSQL":
-                return this.sql2ddf(command, schema, dataSource, dataFormat);
-            default:
-                throw new DDFException("ERROR: Unrecognized datasource: " + dataSource);
+        if (sqlDataSourceDescriptor == null) {
+            throw  new DDFException("ERROR: Handling datasource");
+        }
+        if (sqlDataSourceDescriptor.getDataSource() != null) {
+            switch (sqlDataSourceDescriptor.getDataSource()) {
+                case "SparkSQL":
+                    return this.sql2ddf(command, schema, dataSource, dataFormat);
+                default:
+                    throw new DDFException("ERROR: Unrecognized datasource: " + dataSource);
+            }
         }
     }
     CCJSqlParserManager parserManager = new CCJSqlParserManager();

@@ -4,7 +4,6 @@ package io.ddf.datasource;
  * author: daoduchuan
  */
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,95 +18,6 @@ import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 
 
-class S3DataSourceCredentials implements IDataSourceCredentials {
-  private String credentials;
-  private String awsKeyID;
-  private String awsScretKey;
-
-  public S3DataSourceCredentials(String awsKeyID, String awsSecretKey) {
-    this.awsKeyID = awsKeyID;
-    this.awsScretKey = awsSecretKey;
-    this.credentials = awsKeyID + ":" + awsSecretKey;
-  }
-
-  /**
-   * @brief Getters and Setters.
-   */
-
-  public String getCredentials() {
-    return credentials;
-  }
-
-  public void setCredentials(String credentials) {
-    this.credentials = credentials;
-  }
-
-  public String getAwsKeyID() {
-    return awsKeyID;
-  }
-
-  public void setAwsKeyID(String awsKeyID) {
-    this.awsKeyID = awsKeyID;
-  }
-
-  public String getAwsScretKey() {
-    return awsScretKey;
-  }
-
-  public void setAwsScretKey(String awsScretKey) {
-    this.awsScretKey = awsScretKey;
-  }
-}
-
-class S3DataSourceURI extends DataSourceURI {
-  private String awsKeyID = null;
-  private String awsSecretKey = null;
-
-  public S3DataSourceURI(String uri) throws URISyntaxException {
-    super(new URI(uri));
-  }
-
-  public S3DataSourceURI(URI uri) {
-    super(uri);
-  }
-
-  public void setAwsKeyID(String awsKeyID) {
-    this.awsKeyID = awsKeyID;
-  }
-
-  public String getAwsKeyID() {
-    return this.awsKeyID;
-  }
-
-  public void setAwsSecretKey(String awsSecretKey) {
-    this.awsSecretKey = awsSecretKey;
-  }
-
-  public String getAwsSecretKey() {
-    return this.awsSecretKey;
-  }
-
-  @Override
-  public URI getUri() {
-    if (this.awsKeyID != null && this.awsSecretKey != null) {
-      String creds = this.awsKeyID + ":" + this.awsSecretKey + "@";
-      try {
-        return new URI("s3n://" + creds + this.getUri().toString());
-      } catch (URISyntaxException e) {
-        e.printStackTrace();
-      }
-    } else {
-      try {
-        return new URI("s3n://" + this.getUri().toString());
-      } catch (URISyntaxException e) {
-        e.printStackTrace();
-      }
-    }
-    return null;
-  }
-}
-
-
 public class S3DataSourceDescriptor extends DataSourceDescriptor {
   private S3DataSourceURI uri;
   private S3DataSourceCredentials credentials;
@@ -120,8 +30,6 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
     uri.setAwsKeyID(credentials.getAwsKeyID());
     uri.setAwsSecretKey(credentials.getAwsScretKey());
   }
-
-
 
 
   @Override

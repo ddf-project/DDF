@@ -10,19 +10,30 @@ import io.ddf.DDFManager;
 
 import java.net.URISyntaxException;
 
-class JDBCDataSourceCredentials implements IDataSourceCredentials {
-  String username;
-  String password;
-
-  public JDBCDataSourceCredentials(String username, String password) {
-      this.username = username;
-      this.password = password;
-  }
-}
 
 public class JDBCDataSourceDescriptor extends DataSourceDescriptor {
+  private JDBCDataSourceCredentials credentials;
+  private String dbTable;
   public JDBCDataSourceDescriptor(DataSourceURI uri, JDBCDataSourceCredentials credentials, String dbTable) {
     super(uri, credentials, null, null);
+    this.credentials = credentials;
+    this.dbTable = dbTable;
+  }
+
+  public JDBCDataSourceCredentials getCredentials() {
+    return credentials;
+  }
+
+  public void setCredentials(JDBCDataSourceCredentials credentials) {
+    this.credentials = credentials;
+  }
+
+  public String getDbTable() {
+    return dbTable;
+  }
+
+  public void setDbTable(String dbTable) {
+    this.dbTable = dbTable;
   }
 
   public JDBCDataSourceDescriptor(String uri, String username, String password, String dbTable) throws URISyntaxException {

@@ -15,16 +15,17 @@ import io.ddf.exception.DDFException;
 /**
  * author: daoduchuan, namma
  */
-public abstract class DataSourceManager {
+public  class DataSourceManager {
 
-  public DDF load(DataSourceDescriptor dataSourceDescriptor,
+  public  DDF load(DataSourceDescriptor dataSourceDescriptor,
                   DDFManager manager) throws DDFException {
-    return this.load(dataSourceDescriptor, manager, true);
+    return load(dataSourceDescriptor, manager, true);
   }
-  public DDF load(DataSourceDescriptor dataSourceDescriptor,
+
+  // To override
+  public  DDF load(DataSourceDescriptor dataSourceDescriptor,
                   DDFManager manager,
                   Boolean persist) throws DDFException {
-    // TODO
     Class sourceClass = dataSourceDescriptor.getClass();
     DDF ddf = null;
     if (sourceClass.equals(S3DataSourceDescriptor.class)) {
@@ -41,36 +42,18 @@ public abstract class DataSourceManager {
     return ddf;
   }
 
-  /**
-  public DDF load(, manager: DDFManager, persist: Boolean = true): DDF = {
-    val ddf = source match {
-      case s3: S3DataSourceDescriptor => loadFromS3(s3, manager)
-      case hdfs: HDFSDataSourceDescriptor => loadFromHDFS(hdfs, manager)
-      case jdbc: JDBCDataSourceDescriptor => loadFromJDBC(jdbc, manager)
-      case sql: SQLDataSourceDescriptor => loadFromSQL(sql, manager)
-      case _ => throw new DDFException(s"Cannot find datasource ${source.getClass}")
-    }
-    ddf.getMetaDataHandler.setDataSourceDescriptor(source)
-    val lineage = new DataSourceLineageNode(source = source)
-    ddf.getMetaDataHandler.setLineage(lineage)
-    if(persist) {
-      ddf.getLineageHandler().persistHead()
-      ddf.getPersistenceHandler.persistMetaData()
-    }
-    ddf
-  }*/
 
-  private DDF loadSpecialFormat(DataFormat format,
+  public DDF loadSpecialFormat(DataFormat format,
                                 URI fileURI,
                                 DDFManager manager) {
-    return this.loadSpecialFormat(format,
-                                  fileURI,
-                                  manager,
-                                  false);
+    return loadSpecialFormat(format,
+            fileURI,
+            manager,
+            false);
   }
 
-  // Override
-  private DDF loadSpecialFormat(DataFormat format,
+  // To override
+  public DDF loadSpecialFormat(DataFormat format,
                                 URI fileURI,
                                 DDFManager manager,
                                 Boolean flatten) {
@@ -78,8 +61,10 @@ public abstract class DataSourceManager {
   }
 
 
-  private DDF loadTextFile(DataSourceDescriptor dataSource,
+  public DDF loadTextFile(DataSourceDescriptor dataSource,
                            DDFManager manager) {
+      // TODO: discuss about extract a function to generate the sql command.
+  /**
     String hiveTableName = UUID.randomUUID().toString().replace("-", "_");
     StringBuilder stringBuilder = new StringBuilder();
     List<Schema.Column> columnList = dataSource.getDataSourceSchema().getColumns();
@@ -102,31 +87,32 @@ public abstract class DataSourceManager {
     URI uri = dataSource.getDataSourceUri().getUri();
     String sqlCmd = "create external table " + hiveTableName + " (" + schemaStr  + ") "
             + serdesString + " STORED AS TEXTFILE LOCATION '"+ uri.toString() + "'";
+   **/
     // override;
     return null;
   }
 
 
-  private DDF loadFromS3(S3DataSourceDescriptor dataSource, DDFManager manager) {
-    return this.loadExternalFile(dataSource,
+  public DDF loadFromS3(S3DataSourceDescriptor dataSource, DDFManager manager) {
+    return loadExternalFile(dataSource,
             dataSource.getFileFormat().getFormat(),
             dataSource.getDataSourceUri().getUri(),
             manager);
   }
 
-  private DDF loadFromHDFS(HDFSDataSourceDescriptor dataSource, DDFManager manager) {
-    return this.loadExternalFile(dataSource,
-                                 dataSource.getFileFormat().getFormat(),
-                                 dataSource.getDataSourceUri().getUri(),
-                                 manager);
+  public DDF loadFromHDFS(HDFSDataSourceDescriptor dataSource, DDFManager manager) {
+    return loadExternalFile(dataSource,
+            dataSource.getFileFormat().getFormat(),
+            dataSource.getDataSourceUri().getUri(),
+            manager);
   }
 
-  // TODO:override.
-  private DDF loadFromJDBC(JDBCDataSourceDescriptor dataSource, DDFManager manager) {
+  // To override.
+  public DDF loadFromJDBC(JDBCDataSourceDescriptor dataSource, DDFManager manager) {
     return null;
   }
 
-  private DDF loadFromSQL(SQLDataSourceDescriptor dataSource, DDFManager manager) throws DDFException {
+  public DDF loadFromSQL(SQLDataSourceDescriptor dataSource, DDFManager manager) throws DDFException {
     if (dataSource.getNamespace() != null) {
       // manager.sql2ddf(dataSource.sqlCmd, null , null, null, dataSource.namespace)
       return manager.sql2ddf(dataSource.getSqlCommand(), dataSource, dataSource.getNamespace());
@@ -144,7 +130,7 @@ public abstract class DataSourceManager {
   }
 
 
-  private DDF loadExternalFile(DataSourceDescriptor dataSource, DataFormat dataFormat, URI fileURI, DDFManager manager) {
+  public DDF loadExternalFile(DataSourceDescriptor dataSource, DataFormat dataFormat, URI fileURI, DDFManager manager) {
 
     DDF ddf;
     if (dataFormat.equals(DataFormat.JSON)) {
@@ -152,7 +138,7 @@ public abstract class DataSourceManager {
     } else {
         ddf = loadTextFile(dataSource, manager);
     }
-    // TODO override
+    // To override
     // ddf.getMetaDataHandler().setDataSourceDescriptor(dataSource)
     return ddf;
   }

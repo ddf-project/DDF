@@ -6,6 +6,7 @@ package io.ddf.datasource;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,11 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
   private String  namespace;
   private List<String> uriList;
   private List<String> uuidList;
+
+  public SQLDataSourceDescriptor(DataSourceURI uri, IDataSourceCredentials credentials,
+                                 DataSourceSchema schema, FileFormat format) {
+    super(uri, credentials, schema, format);
+  }
 
   public SQLDataSourceDescriptor(DataSourceURI uri, IDataSourceCredentials credentials,
                                  DataSourceSchema schema, FileFormat format, String sqlcmd,

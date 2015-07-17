@@ -464,12 +464,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @param ddfURI The URI of ddf.
    * @return The ddf.
    */
-  public DDF restoreDDF(String ddfURI) {
-    try {
-      IHandlePersistence persistenceHandler = this.getDummyDDF().getPersistenceHandler();
-    } catch (DDFException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
+  public abstract DDF getOrRestoreDDFUri(String ddfURI) throws DDFException;
+
+  public abstract DDF getOrRestoreDDF(UUID uuid) throws DDFException;
+
 }
