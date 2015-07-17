@@ -90,6 +90,36 @@ public class TableNameReplacerTests {
             assert false;
         }
 
+        sqlcmd = "SELECT unix_timestamp(from_unixtime(round(timestamp) - 7*3600, 'yyyy-MM-dd HH'), 'yyyy-MM-dd HH') time,\n" +
+                "        avg(observationnum_temp) avgTemp, \n" +
+                "        avg(observationnum_temp_min_24hour) avg24HMinTemp, \n" +
+                "        avg(observationnum_temp_max_24hour) avg24HMaxTemp\n" +
+                "FROM cod_sample2 \n" +
+                "WHERE latitude > 30 and latitude < 40 and longtitude > -125 and longtitude < -115\n" +
+                "GROUP BY unix_timestamp(from_unixtime(round(timestamp) - 7*3600, 'yyyy-MM-dd HH'), 'yyyy-MM-dd HH')\n" +
+                "HAVING time is not null\n" +
+                "ORDER BY time";
+        try {
+            Statement statement = parser.parse(new StringReader(sqlcmd));
+            System.out.println(statement.toString());
+        } catch (JSQLParserException e) {
+            e.printStackTrace();;
+            assert false;
+        }
+
+        sqlcmd = "select *\n" +
+                "from (select country_cd, count(1) c from location_thunderbird group by country_cd) tmp\n" +
+                "order by c desc\n" +
+                "limit 10";
+
+        try {
+            Statement statement = parser.parse(new StringReader(sqlcmd));
+            System.out.println(statement.toString());
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+            assert false;
+        }
+
     }
 
     /**
@@ -115,6 +145,60 @@ public class TableNameReplacerTests {
             assert(false);
         }
         assert(statement.toString().equals("SELECT SUM(tablename1.b) FROM tablename1 GROUP BY tablename1.a"));
+    }
+
+    public Statement testFullURISingle(String sqlcmd) throws Exception {
+        Statement statement = parser.parse(new StringReader(sqlcmd));
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        return tableNameReplacer.run(statement);
+    }
+    @Test
+    public void batchTestFullURI() throws DDFException {
+        String[] selectItems = {
+               " * ",
+               " ddf://adatao/a.year ",
+               " round(ddf://adatao/a.year) ",
+               " year "
+        };
+
+        String[] joinTypes = {
+                " , ",
+                " join ",
+                " LEFT OUTER JOIN ",
+                " LEFT JOIN ",
+                " RIGHT OUTER JOIN ",
+                " FULL OUTER JOIN ",
+                " CROSS JOIN "
+        };
+
+        String[] joinConds = {
+                " ",
+                " ON ddf://adatao/a.id = ddf://adatao/b.id "
+        };
+
+        String[] wehereCaluses = {
+          " WHERE year > id ",
+          " WHERE ddf://adatao/a.id > 1 AND ddf://adatao/b.id < 3 "
+        };
+
+        for (String selectItem : selectItems) {
+            for (String joinType : joinTypes) {
+                for (String joinCond : joinConds) {
+                    for (String whereClause : wehereCaluses) {
+                        String sqlcmd = "Select" + selectItem + "from ddf://adatao/a" +
+                                joinType + "ddf://adatao/b" + joinCond + whereClause;
+                        System.out.println(sqlcmd);
+                        try {
+                            Statement statement = testFullURISingle(sqlcmd);
+                            System.out.println(statement.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            assert false;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
