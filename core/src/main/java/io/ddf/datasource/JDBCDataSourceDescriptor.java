@@ -21,7 +21,7 @@ public class JDBCDataSourceDescriptor extends DataSourceDescriptor {
     private String mUserName;
     private String mPassword;
 
-    public void JDBCDataSourceCredentials(String username, String password){
+    public JDBCDataSourceCredentials(String username, String password){
       mUserName = username;
       mPassword = password;
     }
