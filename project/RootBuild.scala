@@ -34,11 +34,12 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-  val rootVersion = if(YARN_ENABLED) {
-    "1.2-adatao"
-  } else {
-    "1.2-mesos"
-  }
+  val rootVersion = "1.3.0-SNAPSHOT"
+  //val rootVersion = if(YARN_ENABLED) {
+  //  "1.2-adatao"
+  //} else {
+  //  "1.2-mesos"
+  //}
 
   val projectOrganization = rootOrganization + "." + projectName
 
@@ -125,6 +126,7 @@ object RootBuild extends Build {
     //"org.scalatest" %% "scalatest" % "1.9.1" % "test",
     //"org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
     "com.novocode" % "junit-interface" % "0.10" % "test",
+    "net.sf" % "jsqlparser" % "0.9.7",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
     //"org.antlr" % "antlr" % "3.4", // needed by shark.SharkDriver.compile
     // needed by Hive
@@ -203,7 +205,8 @@ object RootBuild extends Build {
       "com.novocode" % "junit-interface" % "0.10" % "test",	
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
       "com.googlecode.matrix-toolkits-java" % "mtj" % "0.9.14",
-      "commons-io" % "commons-io" % "1.3.2",
+      "net.sf" % "jsqlparser" % "0.9.7", 
+	"commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
 
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),

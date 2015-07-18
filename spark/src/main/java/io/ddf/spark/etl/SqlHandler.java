@@ -6,19 +6,25 @@ package io.ddf.spark.etl;
 
 import io.ddf.DDF;
 import io.ddf.content.Schema;
+import io.ddf.content.SqlTypedCell;
+import io.ddf.content.SqlTypedResult;
 import io.ddf.datasource.DataFormat;
 import io.ddf.content.SqlResult;
+import io.ddf.datasource.DataSourceDescriptor;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.etl.ASqlHandler;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.SparkDDFManager;
 import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.util.SparkUtils;
+import org.apache.avro.generic.GenericData;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 import scala.collection.Seq;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 //import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -57,7 +63,7 @@ public class SqlHandler extends ASqlHandler {
   }
 
   @Override
-  public DDF sql2ddf(String command, Schema schema, String dataSource) throws DDFException {
+  public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource) throws DDFException {
     return this.sql2ddf(command, schema, dataSource, null);
   }
 
@@ -68,16 +74,25 @@ public class SqlHandler extends ASqlHandler {
 
   //TODO: SparkSql
   @Override
-  public DDF sql2ddf(String command, Schema schema, String dataSource, DataFormat dataFormat) throws DDFException {
+  public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource, DataFormat dataFormat) throws DDFException {
     //    TableRDD tableRdd = null;
     //    RDD<Row> rddRow = null;
     DataFrame rdd = null;
     // TODO: handle other dataSources and dataFormats
-    if (dataSource == null) {
-      rdd = this.getHiveContext().sql(command);
-    } else {
-      // TODO
+    if (dataSource != null) {
+      SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
+      if (sqlDataSourceDescriptor != null) {
+        if (!sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")) {
+          throw new DDFException("Incorrect datasource");
+        }
+      }
     }
+    //else {
+    //  throw new DDFException("No availabe datasource information");
+    //}
+
+
+    rdd = this.getHiveContext().sql(command);
     if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
         null, schema);
@@ -105,12 +120,60 @@ public class SqlHandler extends ASqlHandler {
 
   //TODO SparkSql
   @Override
-  public SqlResult sql(String command, Integer maxRows, String dataSource) throws DDFException {
-    //System.out.println("run sql: \n" + command);
-    DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
+  public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource) throws DDFException {
+    // TODO: handle other dataSources and dataFormats
+    DataFrame rdd = null;
+    if (dataSource != null) {
+      SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
+      if (sqlDataSourceDescriptor != null) {
+        if (!sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")) {
+          throw new DDFException("Incorrect datasource");
+        }
+      }
+    }
+    //else {
+    //  throw new DDFException("No availabe datasource information");
+    //}
+
+
+    rdd = this.getHiveContext().sql(command);
     Schema schema = SparkUtils.schemaFromDataFrame(rdd);
 
     String[] strResult = SparkUtils.df2txt(rdd, "\t");
     return new SqlResult(schema,Arrays.asList(strResult));
   }
+
+
+  @Override
+  public SqlTypedResult sqlTyped(String command) throws DDFException {
+    return this.sqlTyped(command, null, null);
+  }
+
+  @Override
+  public SqlTypedResult sqlTyped(String command, Integer maxRows) throws DDFException {
+    return this.sqlTyped(command, maxRows, null);
+  }
+
+  @Override
+  public SqlTypedResult sqlTyped(String command, Integer maxRows, DataSourceDescriptor dataSource) throws  DDFException {
+    DataFrame rdd = ((SparkDDFManager) this.getManager()).getHiveContext().sql(command);
+    Schema schema = SparkUtils.schemaFromDataFrame(rdd);
+
+    int columnSize = schema.getNumColumns();
+    Row[] rddRows = rdd.collect();
+    List<List<SqlTypedCell>> sqlTypedResult = new ArrayList<List<SqlTypedCell>>();
+
+    // Scan every cell and add the type information.
+    for (int rowIdx = 0; rowIdx < rddRows.length; ++rowIdx) {
+      List<SqlTypedCell> row = new ArrayList<SqlTypedCell>();
+      for (int colIdx = 0; colIdx < columnSize; ++ colIdx) {
+        // TODO: Optimize by reducing getType().
+        row.add(new SqlTypedCell(schema.getColumn(colIdx).getType(), rddRows[rowIdx].get(colIdx).toString()));
+      }
+      sqlTypedResult.add(row);
+    }
+
+    return new SqlTypedResult(schema, sqlTypedResult);
+  }
+
 }

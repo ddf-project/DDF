@@ -10,6 +10,7 @@ import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * An implementation of DDFManager with local memory and local storage
@@ -39,5 +40,15 @@ public class BasicDDFManager extends DDFManager {
 
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
     throw new DDFException("Load DDF from table is not supported!");
+  }
+
+  @Override
+  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
+    return null;
+  }
+
+  @Override
+  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
+    return null;
   }
 }

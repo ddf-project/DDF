@@ -5,7 +5,7 @@ import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
-import io.ddf.misc.Config;
+import io.ddf.misc.Config.ConfigConstant;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,17 +19,19 @@ public class JDBCDDFManager extends DDFManager {
   private JDBCDataSourceDescriptor mJdbcDataSource;
   private Connection conn;
 
-  public JDBCDDFManager(JDBCDataSourceDescriptor jdbcDataSource) throws SQLException {
+  public JDBCDDFManager(JDBCDataSourceDescriptor jdbcDataSource) throws SQLException, ClassNotFoundException {
+    /*
+     * Register driver for the JDBC connector
+     */
+    String driver = System.getProperty(ConfigConstant.JDBC_DRIVER_PROPERTY.toString(),
+        ConfigConstant.DEFAULT_JDBC_DRIVER.toString());
+    Class.forName(driver);
+
     mJdbcDataSource = jdbcDataSource;
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
         mJdbcDataSource.getDataSourceCredentials().getUserName(),
         mJdbcDataSource.getDataSourceCredentials().getPassword());
   }
-
-  //private url =  "jdbc:salesforce:User=bhan@adatao.com;Password=KualaLumpur123!@#;SecurityToken=OgBwt0V2NU3fltKAse4sJdmga;";
-  //val username = "bhan@adatao.com";
-  //val password = "KualaLumpur123!@#";
-
 
   /**
    * Class representing column metadata of a JDBC source
@@ -114,7 +116,7 @@ public class JDBCDDFManager extends DDFManager {
   }
 
   @Override public String getEngine() {
-    return Config.ConfigConstant.ENGINE_NAME_JDBC.toString();
+    return ConfigConstant.ENGINE_NAME_JDBC.toString();
   }
 
   /**

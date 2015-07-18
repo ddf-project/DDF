@@ -45,6 +45,13 @@ import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.describe.DescribeTable;
+import net.sf.jsqlparser.statement.show.ShowColumns;
+import net.sf.jsqlparser.statement.show.ShowTables;
+import java.io.StringReader;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -72,7 +79,6 @@ public abstract class DDF extends ALoggable //
   private static final long serialVersionUID = -2198317495102277825L;
 
   private Date mCreatedTime;
-
 
   /**
    *
@@ -335,8 +341,22 @@ public abstract class DDF extends ALoggable //
   // ///// Execute a sqlcmd
   public SqlResult sql(String sqlCommand, String errorMessage) throws DDFException {
     try {
+      // sqlCommand = sqlCommand.replace("@this", this.getTableName());
+      // TODO: what is format?
+      // return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
+      sqlCommand = sqlCommand.replace("@this", "{1}");
+      UUID[] uuidList = new UUID[1];
+      uuidList[0] = this.getUUID();
+      return this.getManager().sql(sqlCommand, null, uuidList);
+    } catch (Exception e) {
+      throw new DDFException(String.format(errorMessage, this.getTableName()), e);
+    }
+  }
+
+  public SqlTypedResult sqlTyped(String sqlCommand, String errorMessage) throws  DDFException {
+    try {
       sqlCommand = sqlCommand.replace("@this", this.getTableName());
-      return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
+      return this.getManager().sqlTyped(String.format(sqlCommand, this.getTableName()));
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }
@@ -344,8 +364,12 @@ public abstract class DDF extends ALoggable //
 
   public DDF sql2ddf(String sqlCommand) throws DDFException {
     try {
-      sqlCommand = sqlCommand.replace("@this", this.getTableName());
-      return this.getManager().sql2ddf(sqlCommand);
+      // sqlCommand = sqlCommand.replace("@this", this.getTableName());
+      sqlCommand = sqlCommand.replace("@this", "{1}");
+      UUID[] uuidList = new UUID[1];
+      uuidList[0] = this.getUUID();
+      return  this.getManager().sql2ddf(sqlCommand, null, uuidList);
+      // return this.getManager().sql2ddf(sqlCommand);
     } catch (Exception e) {
       throw new DDFException(String.format("Error executing queries for ddf %s", this.getTableName()), e);
     }
