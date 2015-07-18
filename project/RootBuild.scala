@@ -207,7 +207,8 @@ object RootBuild extends Build {
       "org.easymock" % "easymock" % "3.1" % "test",
 
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
-      "mysql" % "mysql-connector-java" % "5.1.25"
+      "mysql" % "mysql-connector-java" % "5.1.25",
+      "cdata.jdbc" % "saleforce" % "1.0"
     ),
 
 
