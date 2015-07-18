@@ -12,6 +12,8 @@ import io.ddf.etl.TransformationHandler;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.BaseTest;
 import org.junit.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class TransformationHandlerTest extends BaseTest {
@@ -132,7 +134,11 @@ public class TransformationHandlerTest extends BaseTest {
     ddf.setMutable(false);
 
     // multiple expressions, column name with special characters
-    DDF ddf3 = ddf.Transform.transformUDF("arrtime-deptime, (speed^*- = distance/(arrtime-deptime)", cols);
+    List<String> expressions = new ArrayList<String>();
+    expressions.add("arrtime-deptime");
+    expressions.add("(speed^*- = distance/(arrtime-deptime)");
+
+    DDF ddf3 = ddf.Transform.transformUDF(expressions, cols);
     Assert.assertEquals(31, ddf3.getNumRows());
     Assert.assertEquals(6, ddf3.getNumColumns());
     Assert.assertEquals("speed", ddf3.getColumnName(5));
@@ -142,7 +148,10 @@ public class TransformationHandlerTest extends BaseTest {
 
     List<String> lcols = Lists.newArrayList("distance", "arrtime", "deptime");
     String s0 = "new_col = if(arrdelay=15,1,0)";
-    String s1 = "new_col = if(arrdelay=15,1,0),v ~ (arrtime-deptime),distance/(arrtime-deptime)";
+    List<String> s1 = new ArrayList<String> ();
+    s1.add("new_col = if(arrdelay=15,1,0)");
+    s1.add("v ~ (arrtime-deptime)");
+    s1.add("distance/(arrtime-deptime)");
     String s2 = "arr_delayed=if(arrdelay=\"yes\",1,0)";
     String s3 = "origin_sfo = case origin when \'SFO\' then 1 else 0 end ";
     Assert.assertEquals("(if(arrdelay=15,1,0)) as new_col,((arrtime-deptime)) as v,(distance/(arrtime-deptime))",
@@ -152,6 +161,18 @@ public class TransformationHandlerTest extends BaseTest {
     DDF ddf2 = ddf.Transform.transformUDF(s1, lcols);
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(6, ddf2.getNumColumns());
+
+    Assert.assertEquals("(regexp_extract('yyyy/mm/dd', '.*/([^/])+', 1)) as dt",
+        TransformationHandler.RToSqlUdf("dt=regexp_extract('yyyy/mm/dd', '.*/([^/])+', 1)"));
+
+    Assert.assertEquals("(regexp_extract('hh:mm:ss', '([^:])+:.*', 1)) as dt",
+        TransformationHandler.RToSqlUdf("dt=regexp_extract('hh:mm:ss', '([^:])+:.*', 1)"));
+
+    Assert.assertEquals("(regexp_extract('hh:mm:ss', '.*\\\\+([^+])+', 1)) as dt",
+        TransformationHandler.RToSqlUdf("dt=regexp_extract('hh:mm:ss', '.*\\\\+([^+])+', 1)"));
+
+
+
   }
 
   @Test(expected=RuntimeException.class)
@@ -164,7 +185,10 @@ public class TransformationHandlerTest extends BaseTest {
   @Test(expected=RuntimeException.class)
   public void testConflictingColumnDefinitions2() throws DDFException {
     ddf.setMutable(true);
-    ddf.Transform.transformUDF("distance=100, distance");
+    List<String> s = new ArrayList<String> ();
+    s.add("distance=100");
+    s.add("distance");
+    ddf.Transform.transformUDF(s);
   }
 
   @Test

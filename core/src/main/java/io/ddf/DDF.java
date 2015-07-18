@@ -363,6 +363,10 @@ public abstract class DDF extends ALoggable //
     return this.getTransformationHandler().flattenDDF();
   }
 
+  public DDF transform(List<String> transformExpressions) throws DDFException {
+    return Transform.transformUDF(transformExpressions);
+  }
+
   public DDF transform(String transformExpression) throws DDFException {
     return Transform.transformUDF(transformExpression);
   }
