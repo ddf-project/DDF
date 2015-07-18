@@ -418,6 +418,8 @@ public class TableVisitor
     @Override
     public void visit(RegExpMySQLOperator regExpMySQLOperator) throws Exception {
         // TODO: Not supported.
+        regExpMySQLOperator.getLeftExpression().accept(this);
+        regExpMySQLOperator.getRightExpression().accept(this);
     }
 
     @Override

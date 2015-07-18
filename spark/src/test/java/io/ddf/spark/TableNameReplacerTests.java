@@ -152,6 +152,7 @@ public class TableNameReplacerTests {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         return tableNameReplacer.run(statement);
     }
+
     @Test
     public void batchTestFullURI() throws DDFException {
         String[] selectItems = {
@@ -342,6 +343,69 @@ public class TableNameReplacerTests {
                 sqlDataSourceDescriptor);
         this.manager.setDDFName(ddf, "airlineDDF");
         DDF sql2ddfRet = manager.sql2ddf("select * from ddf://adatao/airlineDDF");
+    }
+
+    @Test
+    public void BatchTestArithOps() {
+        String[] arithOps = {"+", "-", "*", "/", "%", "&", "|", "^"};
+        String sqlcmd = "select ddf://adatao/a.id %s ddf://adatao/a.id2 from ddf://adatao/a";
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(this.manager);
+        for (String arithOp : arithOps) {
+            String newSqlCmd = String.format(sqlcmd, arithOp);
+            Statement statement = null;
+            try {
+                statement = this.testFullURISingle(newSqlCmd);
+                System.out.println(statement);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Test
+    public void BatchTestRelationalOps() {
+        String[] relationalOps = {"=", "<=>", "<>", "!=", "<", "<=", ">", ">="};
+        String sqlcmd = "select * from ddf://adatao/a where ddf://adatao/a.id %s ddf://adatao/a.id2";
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(this.manager);
+        for (String relationalOp : relationalOps) {
+            String newSqlCmd = String.format(sqlcmd, relationalOp);
+            try {
+                Statement statement = this.testFullURISingle(newSqlCmd);
+                System.out.println(statement);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        String[] relationalLiterals = {
+                " ddf://adatao/a.id between ddf://adatao/a.id1 and ddf://adatao/a.id2 ",
+                " ddf://adatao/a.id not between ddf://adatao/a.id1 and ddf://adatao/a.id2 ",
+                " ddf://adatao/a.id is null ",
+                " ddf://adatao/a.id is not null ",
+                " ddf://adatao/a.id LIKE ddf://adatao/a.id2 ",
+                " ddf://adatao/a.id RLIKE ddf://adatao/a.id2 ",
+                " ddf://adatao/a.id REGEXP ddf://adatao/a.id2 ",
+        };
+
+        for (String literal : relationalLiterals) {
+            String newSqlCmd = "Select * from ddf://adatao/a where " + literal;
+            try {
+                Statement statement = this.testFullURISingle(newSqlCmd);
+                System.out.println(statement);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        String testSqlCmd = "select * from ddf://adatao/a where ddf://adatao/a.id regexp ddf://adatao/a.id2";
+        try {
+
+            Statement newStat = parser.parse(new StringReader(testSqlCmd));
+            newStat = tableNameReplacer.run(newStat);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // static Logger LOG;
