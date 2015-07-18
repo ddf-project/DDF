@@ -13,7 +13,24 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by freeman on 7/15/15.
+ * The DDF manager for JDBC connector
+ *
+ * DDF can be created directly on each table on the JDBC connector. We call these DDFs: <b>direct DDF</b>.
+ * <br><br>
+ *
+ * If <code>ddf.jdbc.autocreate = true</code>, a DDF will be generated automatically for each table,
+ * else DDF will be created through <code>createDDF(String tableName)</code>.<br><br>
+ *
+ * Note that <code>ddf@jdbc</code> still follow the general rules of DDF on using SQLHandler.
+ * That is a sql query that does not specify source will by default only apply to DDFs not
+ * the underlying JDBC database. <br><br>
+ *
+ * <i>Creating (temporary) DDFs</i>: to avoid polluting the original database, newly <b>created DDF</b> will be stored in a separate
+ * database, which is specified by <code>ddf.jdbc.created.ddf.database</code>. This database is hidden from users of DDF.
+ * Note that, from user point of view, the <b>created DDF</b> are the same as the direct DDF in the sense
+ * that they can query both of them in the same query (e.g. join, where clause etc.)<br><br>
+ *
+ *
  */
 public class JDBCDDFManager extends DDFManager {
 
@@ -67,6 +84,10 @@ public class JDBCDDFManager extends DDFManager {
   }
 
   @Override public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
+    throw new DDFException("Load DDF from file is not supported!");
+  }
+
+  public DDF createDDF(String tableName) throws DDFException {
     return null;
   }
 

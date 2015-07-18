@@ -39,7 +39,7 @@ public class BasicDDFManager extends DDFManager {
   }
 
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
-    throw new DDFException("Load DDF from table is not supported!");
+    throw new DDFException("Load DDF from file is not supported!");
   }
 
   @Override

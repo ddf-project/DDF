@@ -45,13 +45,6 @@ import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.describe.DescribeTable;
-import net.sf.jsqlparser.statement.show.ShowColumns;
-import net.sf.jsqlparser.statement.show.ShowTables;
-import java.io.StringReader;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -787,7 +780,7 @@ public abstract class DDF extends ALoggable //
   /**
    * Instantiate a new {@link ADDFFunctionalGroupHandler} given its class name
    *
-   * @param className
+   * @param theInterface
    * @return
    * @throws ClassNotFoundException
    * @throws NoSuchMethodException

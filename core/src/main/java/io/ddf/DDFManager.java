@@ -457,6 +457,15 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getPersistenceHandler().load(uri);
   }
 
+  /**
+   * Create DDF from a file
+   * TODO: we should change the name of this function to match its functionality
+   *
+   * @param fileURL
+   * @param fieldSeparator
+   * @return
+   * @throws DDFException
+   */
   public abstract DDF loadTable(String fileURL, String fieldSeparator) throws DDFException;
 
   /**

@@ -33,7 +33,7 @@ public class SQLHandler extends ASqlHandler {
   @Override public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource) throws DDFException {
     return null;
   }
-.
+
   @Override public DDF sql2ddf(String command, Schema schema, DataFormat dataFormat) throws DDFException {
     return null;
   }
