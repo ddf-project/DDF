@@ -4,6 +4,7 @@ import io.ddf.exception.DDFException;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * author: daoduchuan, namma
@@ -32,10 +33,14 @@ public class DataSourceResolver {
     }
   }
 
+  private static String getOrDefault(Map<String, String> map, String key, String defaultVal){
+    return map.containsKey(key) ? map.get(key) : defaultVal;
+  }
+
   public static S3DataSourceDescriptor resolveS3(HashMap<String, String> options) throws DDFException {
     String uri = options.get("uri");
-    String awsKeyID = options.getOrDefault("awsKeyID", "");
-    String awsSecretKey = options.getOrDefault("awsSecretKey", "");
+    String awsKeyID = getOrDefault(options,"awsKeyID", "");
+    String awsSecretKey = getOrDefault(options,"awsSecretKey", "");
     String schema = options.get("schema");
     // TODO format null?
     DataFormat format = DataFormat.fromInt(Integer.parseInt(options.get("dataFormat")));
@@ -43,10 +48,10 @@ public class DataSourceResolver {
       String serde = options.get("serde");
       return new S3DataSourceDescriptor(uri, awsKeyID, awsSecretKey, schema, serde, format);
     } else {
-      String hasHeaderString = options.getOrDefault("hasheader", "false");
+      String hasHeaderString = getOrDefault(options,"hasheader", "false");
       Boolean hasheader = Boolean.valueOf(hasHeaderString);
-      String delim = options.getOrDefault("delim", ",");
-      String quote = options.getOrDefault("quote", "\"");
+      String delim = getOrDefault(options,"delim", ",");
+      String quote = getOrDefault(options,"quote", "\"");
       return new S3DataSourceDescriptor(uri, awsKeyID, awsSecretKey, schema, format, hasheader, delim, quote);
     }
   }
@@ -54,16 +59,16 @@ public class DataSourceResolver {
 
   public static HDFSDataSourceDescriptor resolveHDFS(HashMap<String, String> options) throws DDFException, URISyntaxException {
     String uri = options.get("uri");
-    String schema = options.getOrDefault("schema", null);
-    String originalSource = options.getOrDefault("originalSource", "hdfs");
+    String schema = getOrDefault(options,"schema", null);
+    String originalSource = getOrDefault(options,"originalSource", "hdfs");
     DataFormat format = DataFormat.fromInt(Integer.parseInt(options.get("dataFormat")));
     if(options.containsKey("serde")) {
       String serde = options.get("serde");
       return new HDFSDataSourceDescriptor(uri, schema, serde, originalSource, format);
     } else {
-      String delim = options.getOrDefault("delim", ",");
-      String quote = options.getOrDefault("quote", "\"");
-      Boolean hasHeader = Boolean.parseBoolean(options.getOrDefault("hasheader", "false"));
+      String delim = getOrDefault(options,"delim", ",");
+      String quote = getOrDefault(options,"quote", "\"");
+      Boolean hasHeader = Boolean.parseBoolean(getOrDefault(options,"hasheader", "false"));
       return new HDFSDataSourceDescriptor(uri, schema, format, hasHeader, delim, quote, originalSource);
     }
   }
@@ -83,10 +88,10 @@ public class DataSourceResolver {
 
   public static SQLDataSourceDescriptor resolveSQL(HashMap<String, String> options) {
     String sql = options.get("sqlCmd");
-    String namespace = options.getOrDefault("namespace", null);
-    String uriListStr = options.getOrDefault("uriListStr", null);
-    String uuidListStr = options.getOrDefault("uuidListStr", null);
-    String dataSource = options.getOrDefault("dataSource", null);
+    String namespace = getOrDefault(options,"namespace", null);
+    String uriListStr = getOrDefault(options,"uriListStr", null);
+    String uuidListStr = getOrDefault(options,"uuidListStr", null);
+    String dataSource = getOrDefault(options,"dataSource", null);
     // val ddfList = options("ddfList")
     return new SQLDataSourceDescriptor(sql, dataSource, namespace, uriListStr, uuidListStr);
   }

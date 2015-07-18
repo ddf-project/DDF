@@ -10,6 +10,7 @@ import io.ddf.misc.Config.ConfigConstant;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by freeman on 7/15/15.
@@ -29,8 +30,8 @@ public class JDBCDDFManager extends DDFManager {
 
     mJdbcDataSource = jdbcDataSource;
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
-        mJdbcDataSource.getDataSourceCredentials().getUserName(),
-        mJdbcDataSource.getDataSourceCredentials().getPassword());
+        mJdbcDataSource.getCredentials().getUserName(),
+        mJdbcDataSource.getCredentials().getPassword());
   }
 
   /**
@@ -69,6 +70,14 @@ public class JDBCDDFManager extends DDFManager {
     return null;
   }
 
+  @Override public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
+    return null;
+  }
+
+  @Override public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
+    return null;
+  }
+
   /**
    *
    * @param
@@ -95,6 +104,7 @@ public class JDBCDDFManager extends DDFManager {
    * @throws SQLException
    * @TODO: refactor to make it reusable on any JDBC connector
    */
+
   public List<JDBCColumnMetaData> getTableMetaData(String tableName) throws SQLException {
     //assert(conn != null, "");
     DatabaseMetaData dbMetaData = conn.getMetaData();

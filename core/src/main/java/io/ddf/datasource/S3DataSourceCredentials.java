@@ -6,11 +6,11 @@ package io.ddf.datasource;
 public class S3DataSourceCredentials implements IDataSourceCredentials {
     private String credentials;
     private String awsKeyID;
-    private String awsScretKey;
+    private String awsSecretKey;
 
     public S3DataSourceCredentials(String awsKeyID, String awsSecretKey) {
         this.awsKeyID = awsKeyID;
-        this.awsScretKey = awsSecretKey;
+        this.awsSecretKey = awsSecretKey;
         this.credentials = awsKeyID + ":" + awsSecretKey;
     }
 
@@ -35,10 +35,11 @@ public class S3DataSourceCredentials implements IDataSourceCredentials {
     }
 
     public String getAwsScretKey() {
-        return awsScretKey;
+        return awsSecretKey;
     }
 
     public void setAwsScretKey(String awsScretKey) {
-        this.awsScretKey = awsScretKey;
+        this.awsSecretKey = awsScretKey;
     }
+
 }
