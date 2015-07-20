@@ -8,6 +8,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.misc.Config.ConfigConstant;
 
 import java.sql.*;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
