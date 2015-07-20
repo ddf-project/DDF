@@ -17,7 +17,7 @@ public interface IHandleMetaData extends IHandleDDFFunctionalGroup {
 
   public void copyFactor(DDF ddf)  throws DDFException;
 
-  public void copyMetaData(DDF ddf) throws DDFException;
+  public void copy(IHandleMetaData otherMetaData) throws DDFException;
 
   // return true if ddf is in use
   // false otherwise

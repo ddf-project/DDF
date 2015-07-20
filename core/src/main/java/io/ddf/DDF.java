@@ -93,6 +93,8 @@ public abstract class DDF extends ALoggable //
     this.initialize(manager, data, typeSpecs, namespace, name, schema);
   }
 
+  abstract public DDF copy() throws DDFException;
+
   protected DDF(DDFManager manager, DDFManager defaultManagerIfNull) throws DDFException {
     this(manager != null ? manager : defaultManagerIfNull, null, null, null, null, null);
   }
@@ -106,7 +108,6 @@ public abstract class DDF extends ALoggable //
   protected DDF(DDFManager manager) throws DDFException {
     this(manager, sDummyManager);
   }
-
 
   /**
    * cache for data computed from the DDF, e.g., ML models, DDF summary
