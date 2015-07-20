@@ -165,8 +165,9 @@ public class Config {
     FIELD_RUNTIME_DIR("RuntimeDir"), FIELD_NAMESPACE("Namespace"), FIELD_DDF("DDF"), FIELD_DDF_MANAGER("DDFManager"),
     FIELD_BASIC_PERSISTENCE_DIRECTORY("BasicPersistenceDir"),
 
-    JDBC_DRIVER_PROPERTY("ddf.jdbc.driver"), DEFAULT_JDBC_DRIVER("com.mysql.jdbc"),
-    SFDC_JDBC_DRIVER_PROPERTY("ddf.sfdc.jdbc.driver"), DEFAULT_SFDC_JDBC_DRIVER("cdata.jdbc")
+    JDBC_DRIVER("Driver"), DEFAULT_JDBC_DRIVER("com.mysql.jdbc"),
+    SFDC_JDBC_DRIVER("Driver"), DEFAULT_SFDC_JDBC_DRIVER("cdata.jdbc.salesforce.SalesforceDriver"),
+    JDBC_DDF_AUTOCREATE("DDFAutoCreate")
     ;
     // @formatter:on
 

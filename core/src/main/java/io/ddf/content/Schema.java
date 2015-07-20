@@ -397,9 +397,6 @@ public class Schema implements Serializable {
   }
 
 
-  /**
-   * The R concept of a column "type", such as STRING, INT, BIGINT, etc.
-   */
   public enum ColumnType {
     TINYINT(Byte.class),
     SMALLINT(Short.class),

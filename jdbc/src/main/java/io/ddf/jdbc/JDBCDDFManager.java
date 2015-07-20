@@ -1,11 +1,15 @@
 package io.ddf.jdbc;
 
 
+import com.google.common.base.Strings;
+import io.ddf.content.Schema;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.Config.ConfigConstant;
+import io.ddf.util.ConfigHandler;
+import io.ddf.util.IHandleConfig;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,7 +22,7 @@ import java.util.UUID;
  * DDF can be created directly on each table on the JDBC connector. We call these DDFs: <b>direct DDF</b>.
  * <br><br>
  *
- * If <code>ddf.jdbc.autocreate = true</code>, a DDF will be generated automatically for each table,
+ * If <code>autocreate = true</code>, a DDF will be generated automatically for each table,
  * else DDF will be created through <code>createDDF(String tableName)</code>.<br><br>
  *
  * Note that <code>ddf@jdbc</code> still follow the general rules of DDF on using SQLHandler.
@@ -30,64 +34,117 @@ import java.util.UUID;
  * Note that, from user point of view, the <b>created DDF</b> are the same as the direct DDF in the sense
  * that they can query both of them in the same query (e.g. join, where clause etc.)<br><br>
  *
- *
+ * TODO (by priority):
+ * 1. create direct DDF (automatically or not)
+ * 2.
  */
 public class JDBCDDFManager extends DDFManager {
 
   private JDBCDataSourceDescriptor mJdbcDataSource;
   private Connection conn;
+  private static IHandleConfig sConfigHandler;
+
+  static {
+    String configFileName = System.getenv(ConfigConstant.DDF_INI_ENV_VAR.toString());
+    if (Strings.isNullOrEmpty(configFileName)) configFileName = ConfigConstant.DDF_INI_FILE_NAME.toString();
+    sConfigHandler = new ConfigHandler(ConfigConstant.DDF_CONFIG_DIR.toString(), configFileName);
+  }
 
   public JDBCDDFManager(JDBCDataSourceDescriptor jdbcDataSource) throws SQLException, ClassNotFoundException {
+
     /*
      * Register driver for the JDBC connector
      */
-    String driver = System.getProperty(ConfigConstant.JDBC_DRIVER_PROPERTY.toString(),
-        ConfigConstant.DEFAULT_JDBC_DRIVER.toString());
+    String driver = sConfigHandler.getValue(this.getEngine(), ConfigConstant.JDBC_DRIVER.toString());
+
     Class.forName(driver);
 
     mJdbcDataSource = jdbcDataSource;
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
         mJdbcDataSource.getCredentials().getUserName(),
         mJdbcDataSource.getCredentials().getPassword());
+
+    boolean isDDFAutoCreate = Boolean.parseBoolean(sConfigHandler.getValue(ConfigConstant.ENGINE_NAME_JDBC.toString(),
+        ConfigConstant.JDBC_DDF_AUTOCREATE.toString()));
+
+    if (isDDFAutoCreate){
+
+    } else {
+
+    }
+
   }
 
   /**
    * Class representing column metadata of a JDBC source
    * @TODO: refactor to make it reusable on any JDBC connector
    */
-  public class JDBCColumnMetaData {
-    private String mName;
-    private Integer mColType;
+  public class ColumnSchema {
+
+    private String name;
+    private Integer colType;
 
     /*
       Since atm the following variables are not used programmatically,
       I keep it as string to avoid multiple type conversions between layers.
        Note: the output from the JDBC connector is string
      */
-    private String mIsNullable;
-    private String mIsAutoIncrement;
-    private String mIsGenerated;
+    private String isNullable;
+    private String isAutoIncrement;
+    private String isGenerated;
 
-    public JDBCColumnMetaData(String name, Integer colType, String isNullable,
-        String isAutoIncrement, String isGenerated) {
-      this.mName = name;
-      this.mColType = colType;
-      this.mIsNullable = isNullable;
-      this.mIsAutoIncrement = isAutoIncrement;
-      this.mIsGenerated = isGenerated;
+    public ColumnSchema(String name, Integer colType, String isNullable, String isAutoIncrement, String isGenerated) {
+      this.name = name;
+      this.colType = colType;
+      this.isNullable = isNullable;
+      this.isAutoIncrement = isAutoIncrement;
+      this.isGenerated = isGenerated;
+    }
+
+    /**
+     *
+     * @return DDF Column type
+     */
+    Schema.ColumnType getDDFType() throws DDFException {
+      switch(colType) {
+        case Types.ARRAY: return Schema.ColumnType.ARRAY;
+        case Types.BIGINT:  return Schema.ColumnType.BIGINT; 
+        case Types.BINARY: return Schema.ColumnType.BINARY;
+        case Types.BOOLEAN: return Schema.ColumnType.BOOLEAN;
+        case Types.CHAR: return Schema.ColumnType.STRING;
+        case Types.DATE: return Schema.ColumnType.DATE;
+        case Types.DECIMAL: return Schema.ColumnType.DECIMAL;
+        case Types.DOUBLE: return Schema.ColumnType.DOUBLE;
+        case Types.FLOAT: return Schema.ColumnType.FLOAT;
+        case Types.INTEGER: return Schema.ColumnType.INT;
+        case Types.LONGVARCHAR: return Schema.ColumnType.STRING; //TODO: verify
+        case Types.NUMERIC: return Schema.ColumnType.DECIMAL;
+        case Types.NVARCHAR: return Schema.ColumnType.STRING; //TODO: verify
+        case Types.SMALLINT: return Schema.ColumnType.INT;
+        case Types.TIMESTAMP: return Schema.ColumnType.TIMESTAMP;
+        case Types.TINYINT: return Schema.ColumnType.INT;
+        default: throw new DDFException(String.format("Type not support %s", colType));
+        //TODO: complete for other types
+      }
+    }
+
+    public String getName() {
+      return name;
     }
 
     @Override public String toString() {
-      return String.format("[name: %s, type: %s, isNullable: %s, isAutoIncrement: %s, isGenerated: %s]",
-          mName, mColType, mIsNullable, mIsAutoIncrement, mIsGenerated);
+      return String.format("[name: %s, type: %s, isNullable: %s, isAutoIncrement: %s, isGenerated: %s]", name, colType,
+          isNullable, isAutoIncrement, isGenerated);
     }
   }
+
+  public class TableSchema extends ArrayList<ColumnSchema> {}
 
   @Override public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
     throw new DDFException("Load DDF from file is not supported!");
   }
 
-  public DDF createDDF(String tableName) throws DDFException {
+  public DDF DDF(String tableName) throws DDFException {
     return null;
   }
 
@@ -106,7 +163,7 @@ public class JDBCDDFManager extends DDFManager {
    *
    * @TODO: refactor to make it reusable on any JDBC connector
    */
-  public List<String> listTables() throws SQLException {
+  public List<String> showTables() throws SQLException {
 
     //assert(conn != null, "");
     DatabaseMetaData dbMetaData = conn.getMetaData();
@@ -126,24 +183,24 @@ public class JDBCDDFManager extends DDFManager {
    * @TODO: refactor to make it reusable on any JDBC connector
    */
 
-  public List<JDBCColumnMetaData> getTableMetaData(String tableName) throws SQLException {
+  public TableSchema getTableSchema(String tableName) throws SQLException {
     //assert(conn != null, "");
     DatabaseMetaData dbMetaData = conn.getMetaData();
     //assert(tableName != null, "Table name cannot be null");
 
-    ResultSet tblSchema  = dbMetaData.getColumns(null, null, tableName, null);
-    List<JDBCColumnMetaData> tblMetaData = new ArrayList<JDBCColumnMetaData>();
+    ResultSet tblSchemaResult  = dbMetaData.getColumns(null, null, tableName, null);
+    TableSchema tblSchema = new TableSchema();
 
-    while(tblSchema.next()) {
-      JDBCColumnMetaData colMetaData  = new JDBCColumnMetaData(tblSchema.getString("COLUMN_NAME"),
-          tblSchema.getInt("DATA_TYPE"),
-          tblSchema.getString("IS_NULLABLE"),
-          tblSchema.getString("IS_AUTOINCREMENT"),
-          tblSchema.getString("IS_GENERATEDCOLUMN")
+    while(tblSchemaResult.next()) {
+      ColumnSchema colSchema  = new ColumnSchema(tblSchemaResult.getString("COLUMN_NAME"),
+          tblSchemaResult.getInt("DATA_TYPE"),
+          tblSchemaResult.getString("IS_NULLABLE"),
+          tblSchemaResult.getString("IS_AUTOINCREMENT"),
+          tblSchemaResult.getString("IS_GENERATEDCOLUMN")
       );
-      tblMetaData.add(colMetaData);
+      tblSchema.add(colSchema);
     }
-    return tblMetaData;
+    return tblSchema;
   }
 
   @Override public String getEngine() {
