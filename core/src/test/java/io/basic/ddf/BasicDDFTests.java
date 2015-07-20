@@ -88,4 +88,16 @@ public class BasicDDFTests {
     Assert.assertEquals(ddf1.getUUID(), ddf.getUUID());
     Assert.assertEquals(ddf1.getUUID(), newUUID);
   }
+
+  @Test(expected = DDFException.class)
+  public void testRenamingDDF() throws DDFException {
+    DDF ddf = this.getTestDDF();
+    DDFManager manager = this.getDDFManager();
+    manager.setDDFName(ddf, "myddf1");
+
+    String uri1 = ddf.getUri();
+    manager.setDDFName(ddf, "myddf2");
+    
+    manager.getDDFByURI(uri1);
+  }
 }
