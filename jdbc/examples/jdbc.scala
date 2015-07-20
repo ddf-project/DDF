@@ -5,7 +5,7 @@
 
 import io.ddf.datasource.{DataSourceURI, JDBCDataSourceDescriptor}
 import io.ddf.datasource.JDBCDataSourceDescriptor.JDBCDataSourceCredentials
-import io.ddf.jdbc.JDBCDDFManager
+import io.ddf.jdbc.{JDBCDDF, JDBCDDFManager}
 import io.ddf.misc.Config.ConfigConstant
 
 //System.setProperty(ConfigConstant.JDBC_DRIVER_PROPERTY.toString, "cdata.jdbc.salesforce.SalesforceDriver")
@@ -19,5 +19,7 @@ val manager = new JDBCDDFManager(sourceDescriptor)
 
 val listTables = manager.showTables()
 
+val ddf = new JDBCDDF(manager, "adatao", "account", "Account");
 
-println(listTables)
+println(ddf.getColumnNames);
+//println(listTables)

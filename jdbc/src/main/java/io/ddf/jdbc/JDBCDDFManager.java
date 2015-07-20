@@ -123,7 +123,8 @@ public class JDBCDDFManager extends DDFManager {
         case Types.SMALLINT: return Schema.ColumnType.INT;
         case Types.TIMESTAMP: return Schema.ColumnType.TIMESTAMP;
         case Types.TINYINT: return Schema.ColumnType.INT;
-        default: throw new DDFException(String.format("Type not support %s", colType));
+        case Types.VARCHAR: return Schema.ColumnType.STRING; //TODO: verify
+        default: throw new DDFException(String.format("Type not support %s", JDBCUtils.getSqlTypeName(colType)));
         //TODO: complete for other types
       }
     }

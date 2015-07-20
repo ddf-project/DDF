@@ -1,17 +1,20 @@
 package io.ddf.jdbc;
 
 
+import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
+import io.ddf.facades.MLFacade;
+import io.ddf.facades.RFacade;
+import io.ddf.facades.TransformFacade;
+import io.ddf.facades.ViewsFacade;
 import io.ddf.jdbc.JDBCDDFManager.TableSchema;
 import io.ddf.jdbc.JDBCDDFManager.ColumnSchema;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by freeman on 7/17/15.
@@ -43,6 +46,7 @@ public class JDBCDDF extends DDF {
     //build DDF schema from table schema
     TableSchema tableSchema = manager.getTableSchema(tableName);
     Schema ddfSchema = buildDDFSchema(tableSchema);
+    this.initialize(manager, null, null, namespace, name, ddfSchema, tableName);
   }
 
   private Schema buildDDFSchema(TableSchema tableSchema) throws DDFException {

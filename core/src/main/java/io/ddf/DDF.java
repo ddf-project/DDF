@@ -156,7 +156,9 @@ public abstract class DDF extends ALoggable //
       Schema schema) throws DDFException {
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
-    this.getRepresentationHandler().set(data, typeSpecs);
+    if (typeSpecs != null) {
+      this.getRepresentationHandler().set(data, typeSpecs);
+    }
 
     this.getSchemaHandler().setSchema(schema);
     if(schema!= null && schema.getTableName() == null) {
@@ -179,6 +181,27 @@ public abstract class DDF extends ALoggable //
     this.mCreatedTime = new Date();
   }
 
+  /**
+   *
+   * @param manager
+   * @param data
+   * @param typeSpecs
+   * @param namespace
+   * @param name
+   * @param schema
+   * @param tableName: name of the underlying table that representing the DDF
+   * @throws DDFException
+   */
+  protected void initialize(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name,
+      Schema schema, String tableName) throws DDFException {
+
+    initialize(manager, data, typeSpecs, namespace, name, schema);
+
+    if(schema != null && tableName != null) {
+      schema.setTableName(tableName);
+    }
+
+  }
 
   // ////// Instance Fields & Methods ////////
 
@@ -209,8 +232,7 @@ public abstract class DDF extends ALoggable //
 
 
   /**
-   * @param namespace
-   *          the namespace to place this DDF in
+   * @param namespace the namespace to place this DDF in
    */
   @Override
   public void setNamespace(String namespace) {
@@ -218,7 +240,6 @@ public abstract class DDF extends ALoggable //
   }
 
   /**
-   *
    * @return the name of this DDF
    */
   @Override
@@ -227,8 +248,7 @@ public abstract class DDF extends ALoggable //
   }
 
   /**
-   * @param name
-   *          the DDF name to set
+   * @param name the DDF name to set
    */
   protected void setName(String name) throws DDFException {
     if(name != null) validateName(name);
@@ -291,7 +311,6 @@ public abstract class DDF extends ALoggable //
   }
 
   /**
-   *
    * @return The engine name we are built on, e.g., "spark" or "java_collections"
    */
   public String getEngine() {
@@ -385,7 +404,6 @@ public abstract class DDF extends ALoggable //
   }
 
   /**
-   *
    * @param columnA
    * @param columnB
    * @return correlation value of columnA and columnB
@@ -399,8 +417,7 @@ public abstract class DDF extends ALoggable //
    * Compute aggregation which is equivalent to SQL aggregation statement like
    * "SELECT a, b, sum(c), max(d) FROM e GROUP BY a, b"
    *
-   * @param fields
-   *          a string includes aggregated fields and functions, e.g "a, b, sum(c), max(d)"
+   * @param fields a string includes aggregated fields and functions, e.g "a, b, sum(c), max(d)"
    * @return
    * @throws DDFException
    */
