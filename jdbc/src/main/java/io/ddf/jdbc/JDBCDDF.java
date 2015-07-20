@@ -55,7 +55,7 @@ public class JDBCDDF extends DDF {
 
     while(schemaIter.hasNext()){
       ColumnSchema jdbcColSchema = schemaIter.next();
-      Schema.ColumnType colType = jdbcColSchema.getDDFType(); //TODO: verify if throwing exception makes sense
+      Schema.ColumnType colType = JDBCUtils.getDDFType(jdbcColSchema.getColType()); //TODO: verify if throwing exception makes sense
       String colName = jdbcColSchema.getName();
       cols.add(new Schema.Column(colName, colType));
     }

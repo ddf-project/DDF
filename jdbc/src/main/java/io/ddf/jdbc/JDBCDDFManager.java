@@ -25,7 +25,7 @@ import java.util.UUID;
  * If <code>autocreate = true</code>, a DDF will be generated automatically for each table,
  * else DDF will be created through <code>createDDF(String tableName)</code>.<br><br>
  *
- * Note that <code>ddf@jdbc</code> still follow the general rules of DDF on using SQLHandler.
+ * Note that <code>ddf@jdbc</code> still follow the general rules of DDF on using JDBCSqlHandler.
  * That is a sql query that does not specify source will by default only apply to DDFs not
  * the underlying JDBC database. <br><br>
  *
@@ -76,6 +76,30 @@ public class JDBCDDFManager extends DDFManager {
   }
 
   /**
+   * Getters and Setters.
+   * @return
+   */
+  public JDBCDataSourceDescriptor getJdbcDataSource() {
+    return mJdbcDataSource;
+  }
+
+  public Connection getConn() {
+    return conn;
+  }
+
+  public void setConn(Connection conn) {
+    this.conn = conn;
+  }
+
+  public static IHandleConfig getConfigHandler() {
+    return sConfigHandler;
+  }
+
+  public static void setConfigHandler(IHandleConfig sConfigHandler) {
+    JDBCDDFManager.sConfigHandler = sConfigHandler;
+  }
+
+  /**
    * Class representing column metadata of a JDBC source
    * @TODO: refactor to make it reusable on any JDBC connector
    */
@@ -101,36 +125,21 @@ public class JDBCDDFManager extends DDFManager {
       this.isGenerated = isGenerated;
     }
 
-    /**
-     *
-     * @return DDF Column type
-     */
-    Schema.ColumnType getDDFType() throws DDFException {
-      switch(colType) {
-        case Types.ARRAY: return Schema.ColumnType.ARRAY;
-        case Types.BIGINT:  return Schema.ColumnType.BIGINT; 
-        case Types.BINARY: return Schema.ColumnType.BINARY;
-        case Types.BOOLEAN: return Schema.ColumnType.BOOLEAN;
-        case Types.CHAR: return Schema.ColumnType.STRING;
-        case Types.DATE: return Schema.ColumnType.DATE;
-        case Types.DECIMAL: return Schema.ColumnType.DECIMAL;
-        case Types.DOUBLE: return Schema.ColumnType.DOUBLE;
-        case Types.FLOAT: return Schema.ColumnType.FLOAT;
-        case Types.INTEGER: return Schema.ColumnType.INT;
-        case Types.LONGVARCHAR: return Schema.ColumnType.STRING; //TODO: verify
-        case Types.NUMERIC: return Schema.ColumnType.DECIMAL;
-        case Types.NVARCHAR: return Schema.ColumnType.STRING; //TODO: verify
-        case Types.SMALLINT: return Schema.ColumnType.INT;
-        case Types.TIMESTAMP: return Schema.ColumnType.TIMESTAMP;
-        case Types.TINYINT: return Schema.ColumnType.INT;
-        case Types.VARCHAR: return Schema.ColumnType.STRING; //TODO: verify
-        default: throw new DDFException(String.format("Type not support %s", JDBCUtils.getSqlTypeName(colType)));
-        //TODO: complete for other types
-      }
-    }
 
     public String getName() {
       return name;
+    }
+
+    /**
+     * @Getter and Setter.
+     * @return
+     */
+    public Integer getColType() {
+      return colType;
+    }
+
+    public void setColType(Integer colType) {
+      this.colType = colType;
     }
 
     @Override public String toString() {
