@@ -21,18 +21,6 @@ import java.util.*;
  */
 public class JDBCDDF extends DDF {
 
-  public JDBCDDF(DDFManager manager, String namespace, String name, Schema schema) throws DDFException {
-    throw new DDFException("Unsupported constructor");
-  }
-
-  public JDBCDDF(DDFManager manager) throws DDFException {
-    throw new DDFException("Unsupported constructor");
-  }
-
-  public JDBCDDF() throws DDFException {
-    throw new DDFException("Unsupported constructor");
-  }
-
   /**
    *  Create a DDF from a table
    *
@@ -49,13 +37,22 @@ public class JDBCDDF extends DDF {
     this.initialize(manager, null, null, namespace, name, ddfSchema, tableName);
   }
 
+  /**
+   * Signature without RDD, useful for creating a dummy DDF used by DDFManager
+   *
+   * @param manager
+   */
+  public JDBCDDF(DDFManager manager) throws DDFException {
+    super(manager);
+  }
+
   private Schema buildDDFSchema(TableSchema tableSchema) throws DDFException {
     List<Schema.Column> cols = new ArrayList<>();
     Iterator<ColumnSchema> schemaIter = tableSchema.iterator();
 
     while(schemaIter.hasNext()){
       ColumnSchema jdbcColSchema = schemaIter.next();
-      Schema.ColumnType colType = jdbcColSchema.getDDFType(); //TODO: verify if throwing exception makes sense
+      Schema.ColumnType colType = JDBCUtils.getDDFType(jdbcColSchema.getColType()); //TODO: verify if throwing exception makes sense
       String colName = jdbcColSchema.getName();
       cols.add(new Schema.Column(colName, colType));
     }

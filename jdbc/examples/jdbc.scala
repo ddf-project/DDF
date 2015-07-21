@@ -8,7 +8,6 @@ import io.ddf.datasource.JDBCDataSourceDescriptor.JDBCDataSourceCredentials
 import io.ddf.jdbc.{JDBCDDF, JDBCDDFManager}
 import io.ddf.misc.Config.ConfigConstant
 
-//System.setProperty(ConfigConstant.JDBC_DRIVER_PROPERTY.toString, "cdata.jdbc.salesforce.SalesforceDriver")
 
 val sourceDescriptor = new JDBCDataSourceDescriptor(
   new DataSourceURI("jdbc:salesforce:User=bhan@adatao.com;Password=KualaLumpur123!@#;SecurityToken=OgBwt0V2NU3fltKAse4sJdmga;"),
@@ -17,9 +16,14 @@ val sourceDescriptor = new JDBCDataSourceDescriptor(
 
 val manager = new JDBCDDFManager(sourceDescriptor)
 
-val listTables = manager.showTables()
-
-val ddf = new JDBCDDF(manager, "adatao", "account", "Account");
-
-println(ddf.getColumnNames);
+//val listTables = manager.showTables()
 //println(listTables)
+
+val ddf = new JDBCDDF(manager, "adatao/saleforce", "account", "Account");
+println(ddf.getColumnNames);
+
+val res = ddf.sql("select * from ddf://adatao/saleforce/account limit 10", "")
+println(res)
+
+
+
