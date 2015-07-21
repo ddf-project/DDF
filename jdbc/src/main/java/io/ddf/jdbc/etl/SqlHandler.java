@@ -81,19 +81,19 @@ public class SqlHandler extends ASqlHandler {
         return new SqlResult(null, null);
       }
       List<Schema.Column> columnList = new ArrayList<Schema.Column>();
-      for (int colIdx = 0; colIdx < colSize; ++colIdx) {
+      for (int colIdx = 1; colIdx < colSize; ++colIdx) {
         columnList.add(new Schema.Column(rsmd.getColumnName(colIdx),
             JDBCUtils.getDDFType(rsmd.getColumnType(colIdx))));
       }
 
       // TODO: check the table name please.
       // Generate the schema;
-      Schema schema = new Schema(rsmd.getTableName(0), columnList);
+      Schema schema = new Schema(rsmd.getTableName(1), columnList);
       List<String> result = new ArrayList<String>();
       StringBuilder sb = new StringBuilder();
 
       while (rs.next()) {
-        sb.append(rs.getObject(0).toString());
+        sb.append(rs.getObject(1).toString());
         for (int colIdx = 1; colIdx < colSize; ++colIdx) {
           sb.append("\t").append(rs.getObject(colIdx).toString());
         }
