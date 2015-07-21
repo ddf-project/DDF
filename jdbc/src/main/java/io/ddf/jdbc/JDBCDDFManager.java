@@ -106,6 +106,7 @@ public class JDBCDDFManager extends DDFManager {
      * @return DDF Column type
      */
     Schema.ColumnType getDDFType() throws DDFException {
+      //TODO: review data type support
       switch(colType) {
         case Types.ARRAY: return Schema.ColumnType.ARRAY;
         case Types.BIGINT:  return Schema.ColumnType.BIGINT; 
