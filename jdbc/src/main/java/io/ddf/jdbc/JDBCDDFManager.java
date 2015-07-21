@@ -120,6 +120,9 @@ public class JDBCDDFManager extends DDFManager {
       this.isGenerated = isGenerated;
     }
 
+    public ColumnSchema(String name, Integer colType, String isNullable, String isAutoIncrement) {
+      this(name, colType, isNullable, isAutoIncrement, null);
+    }
 
     public String getName() {
       return name;
@@ -244,8 +247,8 @@ public class JDBCDDFManager extends DDFManager {
       ColumnSchema colSchema  = new ColumnSchema(tblSchemaResult.getString("COLUMN_NAME"),
           tblSchemaResult.getInt("DATA_TYPE"),
           tblSchemaResult.getString("IS_NULLABLE"),
-          tblSchemaResult.getString("IS_AUTOINCREMENT"),
-          tblSchemaResult.getString("IS_GENERATEDCOLUMN")
+          tblSchemaResult.getString("IS_AUTOINCREMENT")
+          //tblSchemaResult.getString("IS_GENERATEDCOLUMN")
       );
       tblSchema.add(colSchema);
     }

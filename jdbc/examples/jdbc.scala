@@ -9,9 +9,14 @@ import io.ddf.jdbc.{JDBCDDF, JDBCDDFManager}
 import io.ddf.misc.Config.ConfigConstant
 
 
-val sourceDescriptor = new JDBCDataSourceDescriptor(
+var sourceDescriptor = new JDBCDataSourceDescriptor(
   new DataSourceURI("jdbc:salesforce:User=bhan@adatao.com;Password=KualaLumpur123!@#;SecurityToken=OgBwt0V2NU3fltKAse4sJdmga;"),
   new JDBCDataSourceCredentials("bhan@adatao.com", "KualaLumpur123!@#"),
+  null)
+
+sourceDescriptor = new JDBCDataSourceDescriptor(
+  new DataSourceURI("jdbc:mysql://localhost:3306/pinsights"),
+  new JDBCDataSourceCredentials("root", ""),
   null)
 
 val manager = new JDBCDDFManager(sourceDescriptor)
@@ -19,11 +24,16 @@ val manager = new JDBCDDFManager(sourceDescriptor)
 //val listTables = manager.showTables()
 //println(listTables)
 
-val ddf = new JDBCDDF(manager, "adatao/saleforce", "account", "Account");
+//val ddf = new JDBCDDF(manager, "adatao/saleforce", "account", "Account");
+//println(ddf.getColumnNames);
+//
+//val res = ddf.sql("select * from ddf://adatao/saleforce/account limit 10", "")
+//println(res)
+
+val ddf = new JDBCDDF(manager, "adatao/pi", "users", "users");
 println(ddf.getColumnNames);
 
-val res = ddf.sql("select * from ddf://adatao/saleforce/account limit 10", "")
+val res = ddf.sql("select * from ddf://adatao/pi/users limit 10", "")
 println(res)
-
 
 

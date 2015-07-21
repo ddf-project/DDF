@@ -99,6 +99,7 @@ public class JDBCUtils {
       case Types.BIGINT:  return Schema.ColumnType.BIGINT;
       case Types.BINARY: return Schema.ColumnType.BINARY;
       case Types.BOOLEAN: return Schema.ColumnType.BOOLEAN;
+      case Types.BIT: return Schema.ColumnType.BOOLEAN; //TODO: verify
       case Types.CHAR: return Schema.ColumnType.STRING;
       case Types.DATE: return Schema.ColumnType.DATE;
       case Types.DECIMAL: return Schema.ColumnType.DECIMAL;
