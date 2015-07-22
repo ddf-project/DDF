@@ -124,6 +124,10 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
     // command to the sql engine.
     if (dataSource != null) {
         // TODO: add support for other datasource.
+        if (dataSource instanceof JDBCDataSourceDescriptor) {
+            // It's the jdbc datasource.
+            return this.sql(sqlcmd, maxRows, dataSource);
+        }
         SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
         if (sqlDataSourceDescriptor == null) {
             throw  new DDFException("ERROR: Handling datasource");
@@ -218,6 +222,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                            DataFormat dataFormat,
                            TableNameReplacer tableNameReplacer) throws DDFException {
     if (dataSource != null) {
+        if (dataSource instanceof JDBCDataSourceDescriptor) {
+            return this.sql2ddf(command, schema, dataSource, dataFormat);
+        }
         SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
         if (sqlDataSourceDescriptor == null) {
             throw  new DDFException("ERROR: Handling datasource");
