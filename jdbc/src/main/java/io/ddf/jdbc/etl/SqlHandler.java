@@ -81,7 +81,7 @@ public class SqlHandler extends ASqlHandler {
         return new SqlResult(null, null);
       }
       List<Schema.Column> columnList = new ArrayList<Schema.Column>();
-      for (int colIdx = 1; colIdx < colSize; ++colIdx) {
+      for (int colIdx = 1; colIdx <= colSize; ++colIdx) {
         columnList.add(new Schema.Column(rsmd.getColumnName(colIdx),
             JDBCUtils.getDDFType(rsmd.getColumnType(colIdx))));
       }
@@ -93,9 +93,17 @@ public class SqlHandler extends ASqlHandler {
       StringBuilder sb = new StringBuilder();
 
       while (rs.next()) {
-        sb.append(rs.getObject(1).toString());
-        for (int colIdx = 1; colIdx < colSize; ++colIdx) {
-          sb.append("\t").append(rs.getObject(colIdx).toString());
+        //sb.append(rs.getObject(1).toString());
+        for (int colIdx = 1; colIdx <= colSize; ++colIdx) {
+          Object obj = rs.getObject(colIdx);
+          if (obj != null) {
+            sb.append(obj.toString());
+          } else {
+            sb.append("null"); //TODO: how to append NULL
+          }
+          if (colIdx < colSize) {
+            sb.append("\t");
+          }
         }
         result.add(sb.toString());
         sb.delete(0, sb.length());
