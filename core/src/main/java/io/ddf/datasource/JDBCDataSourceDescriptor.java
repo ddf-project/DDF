@@ -6,7 +6,7 @@ import io.ddf.DDFManager;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.DataSourceURI;
 
-public class JDBCDataSourceDescriptor extends DataSourceDescriptor {
+public class JDBCDataSourceDescriptor extends SQLDataSourceDescriptor {
   private JDBCDataSourceCredentials credentials;
   private String dbTable;
 
