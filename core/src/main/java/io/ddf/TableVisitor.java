@@ -88,9 +88,11 @@ public class TableVisitor
         if (plainSelect.getJoins() != null) {
             for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
                 Join join = (Join) joinsIt.next();
+                join.getOnExpression().accept(this);
                 join.getRightItem().accept(this);
             }
         }
+        
         if (plainSelect.getWhere() != null) {
             plainSelect.getWhere().accept(this);
 	    }
@@ -328,11 +330,26 @@ public class TableVisitor
     }
 
     public void visit(CaseExpression caseExpression) throws Exception {
-        // Supposed no to do anything.
+        if (caseExpression.getSwitchExpression()!= null) {
+            caseExpression.getSwitchExpression().accept(this);
+        }
+        if (caseExpression.getWhenClauses()!= null) {
+            for (Expression exp : caseExpression.getWhenClauses()) {
+                exp.accept(this);
+            }
+        }
+
+        if (caseExpression.getElseExpression() != null) {
+            caseExpression.getElseExpression().accept(this);
+        }
     }
 
     public void visit(WhenClause whenClause) throws Exception {
-        // Supposed no to do anything.
+        if (whenClause == null) return;
+        if (whenClause.getWhenExpression() != null)
+            whenClause.getWhenExpression().accept(this);
+        if (whenClause.getThenExpression() != null)
+            whenClause.getThenExpression().accept(this);
     }
 
     public void visit(AllComparisonExpression allComparisonExpression) throws Exception {
