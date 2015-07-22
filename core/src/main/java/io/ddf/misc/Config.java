@@ -141,6 +141,13 @@ public class Config {
             .set("ISupportML", "io.ddf.spark.ml.MLSupporter") //
         ;
 
+          // TODO
+        config.getSection("jdbc") //
+            .set("DDF", "io.ddf.jdbc.JDBCDDF") //
+            .set("DDFManager", "io.ddf.jdbc.JDBCDDFManager") //
+            .set("IHandleSql", "io.ddf.jdbc.etl.SqlHandler") //
+          ;
+
         sConfigHandler.setConfig(config);
       }
     }

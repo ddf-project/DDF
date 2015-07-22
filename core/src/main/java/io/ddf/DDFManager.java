@@ -155,13 +155,24 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @throws Exception
    */
   public static DDFManager get(String engineName) throws DDFException {
-    if (Strings.isNullOrEmpty(engineName)) engineName = ConfigConstant.ENGINE_NAME_DEFAULT.toString();
+    if (Strings.isNullOrEmpty(engineName)) {
+      engineName = ConfigConstant.ENGINE_NAME_DEFAULT.toString();
+    }
 
     String className = Config.getValue(engineName, ConfigConstant.FIELD_DDF_MANAGER);
-    if (Strings.isNullOrEmpty(className)) return null;
+    // if (Strings.isNullOrEmpty(className)) return null;
+    if (Strings.isNullOrEmpty(className)) {
+      throw new DDFException("ERROR: in jdbc ddfmanger, class name is " + className +
+      "when enginename is : " + engineName );
+    }
 
     try {
-      return (DDFManager) Class.forName(className).newInstance();
+      DDFManager testmanager = (DDFManager) Class.forName(className).newInstance();
+      if (testmanager == null) {
+        throw new DDFException("ERROR: testmanager is null");
+      }
+      return testmanager;
+      // return (DDFManager) Class.forName(className).newInstance();
 
     } catch (Exception e) {
       throw new DDFException("Cannot get DDFManager for engine " + engineName, e);

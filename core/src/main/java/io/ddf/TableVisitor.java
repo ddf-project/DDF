@@ -92,7 +92,7 @@ public class TableVisitor
                 join.getRightItem().accept(this);
             }
         }
-        
+
         if (plainSelect.getWhere() != null) {
             plainSelect.getWhere().accept(this);
 	    }
