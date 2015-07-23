@@ -25,6 +25,7 @@ import io.ddf.content.IHandlePersistence.IPersistible;
 
 import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
@@ -328,6 +329,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.sql2ddf(command, null, null, null);
   }
 
+  public DDF sql2ddf(String command, String dataSource) throws DDFException {
+    return this.sql2ddf(command, new SQLDataSourceDescriptor(null, dataSource, null, null, null));
+  }
+
   public DDF sql2ddf(String command, DataSourceDescriptor dataSource) throws  DDFException {
     return this.sql2ddf(command, null, dataSource, null);
   }
@@ -390,6 +395,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   @Override
   public SqlResult sql(String command) throws DDFException {
     return this.sql(command, (Integer) null);
+  }
+
+  public SqlResult sql(String command, String dataSource) throws DDFException {
+    return this.sql(command, new SQLDataSourceDescriptor(null, dataSource,null, null, null));
   }
 
   @Override
