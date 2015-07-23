@@ -126,7 +126,7 @@ object RootBuild extends Build {
     //"org.scalatest" %% "scalatest" % "1.9.1" % "test",
     //"org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
     "com.novocode" % "junit-interface" % "0.10" % "test",
-    "net.sf" % "jsqlparser" % "0.9.7",
+    "net.sf" % "jsqlparser" % "0.9.8.1",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
     //"org.antlr" % "antlr" % "3.4", // needed by shark.SharkDriver.compile
     // needed by Hive
@@ -205,7 +205,7 @@ object RootBuild extends Build {
       "com.novocode" % "junit-interface" % "0.10" % "test",	
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
       "com.googlecode.matrix-toolkits-java" % "mtj" % "0.9.14",
-      "net.sf" % "jsqlparser" % "0.9.7", 
+      "net.sf" % "jsqlparser" % "0.9.8.1", 
 	"commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
 

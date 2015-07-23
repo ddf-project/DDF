@@ -108,7 +108,7 @@ class ComplexTypeDDFSuite extends ATestSuite {
     fddf.VIEWS.head(3).asScala.toList.foreach(println)
 
     println("\n---- Query 4 elements from the flattenedDDF")
-    val qdata = fddf.sql2ddf(s"select data_bookmarkTime from ${fddf.getTableName} limit 4")
+    val qdata = fddf.sql2ddf(s"select data_bookmarkTime from @this limit 4")
     println("---query result from a flattened ddf: ")
     println("schema: " + qdata.getSchema.getColumnNames)
     println("data:")

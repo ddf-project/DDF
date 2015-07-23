@@ -221,6 +221,7 @@ public class TableNameReplacer extends TableVisitor {
                 }
             } else {
                 // Not full uri, no namespace, the index can't match.
+                System.out.println("ddf name is:" + table.getName());
                 throw new Exception("ERROR: Can't find the required ddf");
             }
         } else {

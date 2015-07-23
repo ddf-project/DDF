@@ -27,47 +27,6 @@ public class TableNameReplacerTests {
     public static CCJSqlParserManager parser;
 
 
-    /**
-     * @brief Test complex query with full uri.
-     * @throws DDFException
-     */
-    @Test
-    public void testComplexQuery() throws  DDFException {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
-        String sqlcmd =
-                "With p as " +
-                "(Select * from ddf://adatao/a) " +
-                "select sum(ddf://adatao/a.depdelay) " +
-                "from ddf://adatao/a  TABLESAMPLE(100 percent), ddf://adatao/b " +
-                "on ddf://adatao.a.id = ddf:/adatao/b.id " +
-                "where ddf://adatao/a.id > 1 AND ddf://adatao/a.id < 3 or ddf://adatao/a.year > 2000 " +
-                "group by ddf://adatao/a.year " +
-                "having sum(ddf://adatao/a.depdelay) < 100 " +
-                "order by ddf://adatao/a.year";
-        Statement statement = null;
-        try {
-            statement = parser.parse(new StringReader(sqlcmd));
-        } catch (JSQLParserException e) {
-            e.printStackTrace();
-            assert(false);
-        }
-        try {
-            statement = tableNameReplacer.run(statement);
-        } catch (Exception e) {
-            e.printStackTrace();
-            assert(false);
-        }
-        assert(statement.toString().equals("WITH p AS (SELECT * FROM tablename1) " +
-                "SELECT sum(tablename1.depdelay) " +
-                "FROM tablename1 TABLESAMPLE(100 percent), tablename2 " +
-                "WHERE tablename1.id > 1 " +
-                "AND tablename1.id < 3 " +
-                "OR tablename1.year > 2000 " +
-                "GROUP BY tablename1.year " +
-                "HAVING sum(tablename1.depdelay) < 100 " +
-                "ORDER BY tablename1.year"));
-    }
-
     @Test
     public void testRealQuery() {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
@@ -84,10 +43,9 @@ public class TableNameReplacerTests {
                 "ORDER BY hour";
         try {
             Statement statement = parser.parse(new StringReader(sqlcmd));
-            System.out.println(statement.toString());
+            // System.out.println(statement.toString());
         } catch (JSQLParserException e) {
             e.printStackTrace();
-            assert false;
         }
 
         sqlcmd = "SELECT unix_timestamp(from_unixtime(round(timestamp) - 7*3600, 'yyyy-MM-dd HH'), 'yyyy-MM-dd HH') time,\n" +
@@ -101,7 +59,7 @@ public class TableNameReplacerTests {
                 "ORDER BY time";
         try {
             Statement statement = parser.parse(new StringReader(sqlcmd));
-            System.out.println(statement.toString());
+            // System.out.println(statement.toString());
         } catch (JSQLParserException e) {
             e.printStackTrace();;
             assert false;
@@ -114,13 +72,49 @@ public class TableNameReplacerTests {
 
         try {
             Statement statement = parser.parse(new StringReader(sqlcmd));
-            System.out.println(statement.toString());
+            // System.out.println(statement.toString());
         } catch (JSQLParserException e) {
             e.printStackTrace();
             assert false;
         }
 
     }
+
+
+    /**
+     * @brief Test complex query with full uri.
+     * @throws DDFException
+     */
+    @Test
+    public void testComplexQuery() throws  DDFException {
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        String sqlcmd =
+                "With p as " +
+                "(Select * from ddf://adatao/a) " +
+                "select sum(ddf://adatao/a.depdelay) " +
+                "from ddf://adatao/a  TABLESAMPLE(100 percent), ddf://adatao/b " +
+                "on ddf://adatao/a.id = ddf://adatao/b.id " +
+                "where ddf://adatao/a.id > 1 AND ddf://adatao/a.id < 3 or ddf://adatao/a.year > 2000 " +
+                "group by ddf://adatao/a.year " +
+                "having sum(ddf://adatao/a.depdelay) < 100 " +
+                "order by ddf://adatao/a.year";
+        Statement statement = null;
+        try {
+            statement = parser.parse(new StringReader(sqlcmd));
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+            assert(false);
+        }
+        try {
+            statement = tableNameReplacer.run(statement);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            assert (false);
+            //assert(false);
+        }
+    }
+
 
     /**
      * @brief Test full uri replacement.
@@ -195,10 +189,10 @@ public class TableNameReplacerTests {
                         for (String sortOption : sortOptions) {
                             String sqlcmd = "Select" + selectItem + "from ddf://adatao/a" +
                                     joinType + "ddf://adatao/b" + joinCond + whereClause + sortOption;
-                            System.out.println(sqlcmd);
+                            // System.out.println(sqlcmd);
                             try {
                                 Statement statement = testFullURISingle(sqlcmd);
-                                System.out.println(statement.toString());
+                                // System.out.println(statement.toString());
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 assert false;
@@ -355,7 +349,7 @@ public class TableNameReplacerTests {
             Statement statement = null;
             try {
                 statement = this.testFullURISingle(newSqlCmd);
-                System.out.println(statement);
+                // System.out.println(statement);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -372,7 +366,7 @@ public class TableNameReplacerTests {
             String newSqlCmd = String.format(sqlcmd, relationalOp);
             try {
                 Statement statement = this.testFullURISingle(newSqlCmd);
-                System.out.println(statement);
+                // System.out.println(statement);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -391,7 +385,7 @@ public class TableNameReplacerTests {
             String newSqlCmd = "Select * from ddf://adatao/a where " + literal;
             try {
                 Statement statement = this.testFullURISingle(newSqlCmd);
-                System.out.println(statement);
+                // System.out.println(statement);
             } catch (Exception e) {
                 e.printStackTrace();
             }

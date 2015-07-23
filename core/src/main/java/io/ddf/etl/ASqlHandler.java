@@ -166,7 +166,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       // e.printStackTrace();
       // Just pass it to lower level SE.
       // return this.sql(sqlcmd, maxRows, dataSource);
-        System.out.println(sqlcmd);
+      // System.out.println(sqlcmd);
       throw  new DDFException(e);
     }
   }
@@ -254,7 +254,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       // It's neither standard SQL nor allowed DDL.
       // e.printStackTrace();
       // Just pass it to lower level SE.
-        System.out.println(command);
+      // System.out.println(command);
       throw new DDFException(e);
     }
   }
