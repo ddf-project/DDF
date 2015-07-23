@@ -111,8 +111,8 @@ class RepresentationHandlerSuite extends ATestSuite {
     for (split <- ddf.ML.CVKFold(5, 10)) {
       val train = split(0).asInstanceOf[SparkDDF]
       val test = split(1).asInstanceOf[SparkDDF]
-      val ddf1 = train.sql2ddf("select month, year, dayofmonth from @this", "SparkSQL")
-      val ddf2 = test.sql2ddf("select * from @this", "SparkSQL")
+      val ddf1 = train.sql2ddf("select month, year, dayofmonth from @this")
+      val ddf2 = test.sql2ddf("select * from @this")
 
       assert(ddf1 != null)
       assert(ddf2 != null)
@@ -136,7 +136,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     val rddREXP = newDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
     assert(newDDF != null)
     val st = newDDF.VIEWS.head(32)
-    val ddf1 = newDDF.sql2ddf("select * from @this", "SparkSQL")
+    val ddf1 = newDDF.sql2ddf("select * from @this")
 
     assert(ddf1.getNumRows == 32)
     assert(ddf1 != null)

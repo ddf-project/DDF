@@ -22,6 +22,7 @@ import net.sf.jsqlparser.statement.drop.Drop;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.show.ShowTables;
 
+import java.awt.*;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,6 +166,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       // e.printStackTrace();
       // Just pass it to lower level SE.
       // return this.sql(sqlcmd, maxRows, dataSource);
+        System.out.println(sqlcmd);
       throw  new DDFException(e);
     }
   }
@@ -252,6 +254,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       // It's neither standard SQL nor allowed DDL.
       // e.printStackTrace();
       // Just pass it to lower level SE.
+        System.out.println(command);
       throw new DDFException(e);
     }
   }

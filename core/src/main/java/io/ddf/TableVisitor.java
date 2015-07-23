@@ -88,7 +88,9 @@ public class TableVisitor
         if (plainSelect.getJoins() != null) {
             for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
                 Join join = (Join) joinsIt.next();
-                join.getOnExpression().accept(this);
+                if (join.getOnExpression() != null) {
+                    join.getOnExpression().accept(this);
+                }
                 join.getRightItem().accept(this);
             }
         }
