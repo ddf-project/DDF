@@ -1,6 +1,5 @@
 package io.ddf.jdbc;
 
-
 import com.google.common.base.Strings;
 import io.ddf.content.Schema;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
@@ -50,6 +49,7 @@ public class JDBCDDFManager extends DDFManager {
     sConfigHandler = new ConfigHandler(ConfigConstant.DDF_CONFIG_DIR.toString(), configFileName);
   }
 
+  public JDBCDDFManager()  {}
   public JDBCDDFManager(JDBCDataSourceDescriptor jdbcDataSource) throws SQLException, ClassNotFoundException {
     /*
      * Register driver for the JDBC connector

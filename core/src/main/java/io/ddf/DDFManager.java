@@ -163,7 +163,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     // if (Strings.isNullOrEmpty(className)) return null;
     if (Strings.isNullOrEmpty(className)) {
       throw new DDFException("ERROR: in jdbc ddfmanger, class name is " + className +
-      "when enginename is : " + engineName );
+      " when enginename is : " + engineName );
     }
 
     try {
@@ -175,7 +175,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       // return (DDFManager) Class.forName(className).newInstance();
 
     } catch (Exception e) {
-      throw new DDFException("Cannot get DDFManager for engine " + engineName, e);
+      // throw new DDFException("Cannot get DDFManager for engine " + engineName, e);
+      e.printStackTrace();
+      throw new DDFException("Cannot get DDFManager for engine " + engineName + " classname "
+              + className + " " + e.getMessage());
+
     }
   }
 
