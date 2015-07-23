@@ -357,6 +357,7 @@ public abstract class DDF extends ALoggable //
       // TODO: what is format?
       // return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
       sqlCommand = sqlCommand.replace("@this", "{1}");
+      sqlCommand = String.format(sqlCommand, "{1}");
       UUID[] uuidList = new UUID[1];
       uuidList[0] = this.getUUID();
       return this.getManager().sql(sqlCommand, null, uuidList);
@@ -378,6 +379,7 @@ public abstract class DDF extends ALoggable //
     try {
       // sqlCommand = sqlCommand.replace("@this", this.getTableName());
       sqlCommand = sqlCommand.replace("@this", "{1}");
+      sqlCommand = String.format(sqlCommand, "{1}");
       UUID[] uuidList = new UUID[1];
       uuidList[0] = this.getUUID();
       return  this.getManager().sql2ddf(sqlCommand, null, uuidList);

@@ -139,7 +139,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
       mLog.info("SQL Command: " + sqlCmd);
 
       try {
-        DDF resultDDF = this.getManager().sql2ddf(sqlCmd);
+        DDF resultDDF = this.getManager().sql2ddf(sqlCmd, this.getEngine());
         return resultDDF;
 
       } catch (Exception e) {

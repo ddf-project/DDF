@@ -55,7 +55,7 @@ class CrossValidationSuite extends ATestSuite {
   }
 
   test("test with airline table") {
-    val ddf = manager.sql2ddf("select * from airline").asInstanceOf[SparkDDF]
+    val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
     val tableName = ddf.getTableName
     for (split <- ddf.ML.CVKFold(5, 10)) {
 
