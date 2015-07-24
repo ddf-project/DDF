@@ -179,6 +179,7 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
    */
   @Override
   public void reset() {
+    this.uncacheAll();
     mReps.clear();
     this.setDefaultDataType((Class<?>[]) null);
   }
