@@ -113,6 +113,10 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
     return ret;
   }
 
+  public S3DataSourceDescriptor(String uri, String awsKeyID, String awsSecretKey, String schema, String serdes) throws DDFException {
+    this(uri, awsKeyID, awsSecretKey, schema, serdes, DataFormat.CSV);
+  }
+
   public S3DataSourceDescriptor(String uri,
                                 String awsKeyID,
                                 String awsSecretKey,

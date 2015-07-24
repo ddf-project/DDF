@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class DataSourceResolver {
   public static DataSourceDescriptor resolve(String source,
-                        HashMap<String, String> options) throws DDFException, URISyntaxException {
+                        Map<String, String> options) throws DDFException, URISyntaxException {
     switch (source) {
       case "S3": {
         return resolveS3(options);
@@ -37,7 +37,7 @@ public class DataSourceResolver {
     return map.containsKey(key) ? map.get(key) : defaultVal;
   }
 
-  public static S3DataSourceDescriptor resolveS3(HashMap<String, String> options) throws DDFException {
+  public static S3DataSourceDescriptor resolveS3(Map<String, String> options) throws DDFException {
     String uri = options.get("uri");
     String awsKeyID = getOrDefault(options,"awsKeyID", "");
     String awsSecretKey = getOrDefault(options,"awsSecretKey", "");
@@ -57,7 +57,7 @@ public class DataSourceResolver {
   }
 
 
-  public static HDFSDataSourceDescriptor resolveHDFS(HashMap<String, String> options) throws DDFException, URISyntaxException {
+  public static HDFSDataSourceDescriptor resolveHDFS(Map<String, String> options) throws DDFException, URISyntaxException {
     String uri = options.get("uri");
     String schema = getOrDefault(options,"schema", null);
     String originalSource = getOrDefault(options,"originalSource", "hdfs");
@@ -73,7 +73,7 @@ public class DataSourceResolver {
     }
   }
 
-  public static JDBCDataSourceDescriptor resolveJDBC(HashMap<String, String> options) throws DDFException {
+  public static JDBCDataSourceDescriptor resolveJDBC(Map<String, String> options) throws DDFException {
     String uri = options.get("uri");
     String username = options.get("username");
     String password = options.get("password");
@@ -86,7 +86,7 @@ public class DataSourceResolver {
     }
   }
 
-  public static SQLDataSourceDescriptor resolveSQL(HashMap<String, String> options) {
+  public static SQLDataSourceDescriptor resolveSQL(Map<String, String> options) {
     String sql = options.get("sqlCmd");
     String namespace = getOrDefault(options,"namespace", null);
     String uriListStr = getOrDefault(options,"uriListStr", null);

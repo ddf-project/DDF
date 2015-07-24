@@ -34,6 +34,10 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
     this.uuidList = uuidList;
   }
 
+  public SQLDataSourceDescriptor(String sqlCommand) {
+    this(sqlCommand, null, null, null, null);
+  }
+
   public SQLDataSourceDescriptor(String sqlCommand, String dataSource, String namespace, String uriListStr,
                                  String uuidListStr) {
     super(null, null, null, null);
