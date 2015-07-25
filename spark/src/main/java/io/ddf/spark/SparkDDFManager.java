@@ -16,10 +16,7 @@ import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //import shark.SharkEnv;
 //import shark.api.JavaSharkContext;
@@ -254,6 +251,16 @@ public class SparkDDFManager extends DDFManager {
     sql("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
         "INTO TABLE " + tableName);
     return sql2ddf("SELECT * FROM " + tableName);
+  }
+
+  @Override
+  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
+    return null;
+  }
+
+  @Override
+  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
+    return null;
   }
 
   /**

@@ -157,13 +157,16 @@ public class Config {
     
     DDF_INI_ENV_VAR("DDF_INI"), DDF_INI_FILE_NAME("ddf.ini"), DDF_CONFIG_DIR("ddf-conf"),
     
-    ENGINE_NAME_DEFAULT("spark"), ENGINE_NAME_BASIC("basic"), ENGINE_NAME_SPARK("spark"), 
+    ENGINE_NAME_DEFAULT("spark"), ENGINE_NAME_BASIC("basic"), ENGINE_NAME_SPARK("spark"),
+      ENGINE_NAME_SQLLITE("sqllite"), ENGINE_NAME_JDBC("jdbc"),
     
     SECTION_GLOBAL("global"), 
     
     FIELD_RUNTIME_DIR("RuntimeDir"), FIELD_NAMESPACE("Namespace"), FIELD_DDF("DDF"), FIELD_DDF_MANAGER("DDFManager"),
-    FIELD_BASIC_PERSISTENCE_DIRECTORY("BasicPersistenceDir")
-    
+    FIELD_BASIC_PERSISTENCE_DIRECTORY("BasicPersistenceDir"),
+
+    JDBC_DRIVER_PROPERTY("ddf.jdbc.driver"), DEFAULT_JDBC_DRIVER("com.mysql.jdbc"),
+    SFDC_JDBC_DRIVER_PROPERTY("ddf.sfdc.jdbc.driver"), DEFAULT_SFDC_JDBC_DRIVER("cdata.jdbc")
     ;
     // @formatter:on
 
