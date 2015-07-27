@@ -37,6 +37,7 @@ import io.ddf.ml.ISupportML;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
 
+import javax.activation.DataSource;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,6 +74,80 @@ import java.util.concurrent.ConcurrentHashMap;
  * possible, in an engine-dependent manner.
  */
 public abstract class DDFManager extends ALoggable implements IDDFManager, IHandleSqlLike, ISupportPhantomReference {
+
+  public enum  EngineType {
+    ENGINE_SPARK("spark"),
+    ENGINE_JDBC("jdbc");
+
+    private final String typeName;
+    EngineType(String typeName) {
+      this.typeName = typeName;
+    }
+
+    public String getTypeName() {
+      return this.typeName;
+    }
+  }
+
+  // The engine name, should be unique.
+  private String engineName;
+
+  // DataSourceDescriptor.
+  private DataSourceDescriptor mDataSourceDescriptor;
+  // DDFCordinator.
+  private DDFCordinator mDDFCordinator;
+
+
+  public String getEngineName() {
+    return engineName;
+  }
+
+  // TODO: We should be careful about engine name. Because all the ddfs are
+  // using engine name.
+  public void setEngineName(String engineName) {
+    this.engineName = engineName;
+  }
+
+  public DDFCordinator getDDFCordinator() {
+    return mDDFCordinator;
+  }
+
+  public void setDDFCordinator(DDFCordinator ddfCordinator) {
+    this.mDDFCordinator = ddfCordinator;
+  }
+
+  public DataSourceDescriptor getDataSourceDescriptor() {
+    return mDataSourceDescriptor;
+  }
+
+  public void setDataSourceDescriptor(DataSourceDescriptor
+                                               dataSourceDescriptor) {
+    this.mDataSourceDescriptor = dataSourceDescriptor;
+  }
+
+  /**
+   * @brief Return the engine the uri is in.
+   * @param ddfURI The ddf uri.
+   * @return The engine name.
+   */
+  public String getEngineNameOfDDF(String ddfURI) throws DDFException {
+    String[] stringArrays = ddfURI.split("/");
+    // Test here.
+    if (stringArrays.length <= 2) {
+      throw new DDFException("Can't get engine from the uri");
+    }
+    return stringArrays[2];
+  }
+
+  /**
+   * @brief Tranfer the ddf from another engine. This should be override by
+   * subclass.
+   * @param fromEngine The engine where the ddf is.
+   * @param ddfuri The ddfuri.
+   * @return The new ddf.
+   */
+  public abstract DDF transfer(String fromEngine, String ddfuri) throws DDFException;
+
 
   /**
    * List of existing DDFs
@@ -143,9 +218,55 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     this.startup();
   }
 
+  // TODO: check the correctness here.
+  public DDFManager(DataSourceDescriptor dataSourceDescriptor) {
+      this.startup();
+  }
+
+  public DDFManager(DataSourceDescriptor dataSourceDescriptor,
+                    String engineName) {
+    this.setEngineName(engineName);
+    this.startup();
+  }
+
   public DDFManager(String namespace) {
     this.setNamespace(namespace);
     this.startup();
+  }
+
+  public static DDFManager get(String engineType, DataSourceDescriptor dataSourceDescriptor)
+          throws DDFException {
+    if (Strings.isNullOrEmpty(engineType)) {
+      engineType = ConfigConstant.ENGINE_NAME_DEFAULT.toString();
+    }
+
+    String className = Config.getValue(engineType, ConfigConstant
+            .FIELD_DDF_MANAGER);
+    // if (Strings.isNullOrEmpty(className)) return null;
+    if (Strings.isNullOrEmpty(className)) {
+      throw new DDFException("ERROR: in jdbc ddfmanger, class name is " + className +
+              " when enginename is : " + engineType );
+    }
+
+    try {
+      Class[] classType = new Class[1];
+      classType[0] = DataSourceDescriptor.class;
+      DDFManager testmanager = (DDFManager) Class.forName(className)
+              .getDeclaredConstructor(classType).newInstance(dataSourceDescriptor);
+      if (testmanager == null) {
+        throw new DDFException("ERROR: testmanager is null");
+      }
+      return testmanager;
+      // return (DDFManager) Class.forName(className).newInstance();
+
+    } catch (Exception e) {
+      // throw new DDFException("Cannot get DDFManager for engine " + engineName, e);
+      e.printStackTrace();
+      throw new DDFException("Cannot get DDFManager for engine " +
+              engineType + " classname "
+              + className + " " + e.getMessage());
+
+    }
   }
 
   /**
@@ -168,7 +289,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     }
 
     try {
-      DDFManager testmanager = (DDFManager) Class.forName(className).newInstance();
+      Class testclass = Class.forName(className);
+      if (testclass == null) {
+        throw new DDFException("test class is null");
+      }
+      DDFManager testmanager = (DDFManager) testclass.newInstance();
       if (testmanager == null) {
         throw new DDFException("ERROR: testmanager is null");
       }
@@ -203,24 +328,40 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @return
    * @throws DDFException
    */
-  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
+  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
+                    String engineName, String namespace, String name, Schema
+                            schema)
       throws DDFException {
 
     // @formatter:off
     DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class, Object.class,
-				Class[].class, String.class, String.class, Schema.class },
-				new Object[] { manager, data, typeSpecs, namespace, name,
+				Class[].class, String.class, String.class, String.class, Schema
+                    .class },
+				new Object[] { manager, data, typeSpecs, engineName,
+                        namespace, name,
 						schema });
     return ddf;
   }
 
-  public DDF newDDF(Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
+  // TODO: For back compatability.
+  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
+                    String namespace, String name, Schema schema) throws DDFException {
+    return this.newDDF(manager, data, typeSpecs, manager.getEngineName(),
+            namespace, name, schema);
+  }
+
+  public DDF newDDF(Object data, Class<?>[] typeSpecs, String engineName,
+                    String
+                    namespace, String name, Schema schema)
       throws DDFException {
 
     // @formatter:off
     DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class, Object.class,
-						Class[].class, String.class, String.class, Schema.class },
-						new Object[] { this, data, typeSpecs, namespace, name,
+						Class[].class, String.class, String.class, String
+                    .class, Schema.class },
+						new Object[] { this, data, typeSpecs, engineName,
+                                namespace,
+                                name,
 								schema });
     return ddf;
   }

@@ -86,14 +86,17 @@ public abstract class DDF extends ALoggable //
    *          The {@link Schema} of the new DDF
    * @throws DDFException
    */
-  public DDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
+  public DDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
+             String engineName, String namespace, String name, Schema schema)
       throws DDFException {
 
-    this.initialize(manager, data, typeSpecs, namespace, name, schema);
+    this.initialize(manager, data, typeSpecs, engineName, namespace, name,
+            schema);
   }
 
   protected DDF(DDFManager manager, DDFManager defaultManagerIfNull) throws DDFException {
-    this(manager != null ? manager : defaultManagerIfNull, null, null, null, null, null);
+    this(manager != null ? manager : defaultManagerIfNull, null, null, null,
+            null, null, null);
   }
 
   /**
@@ -152,7 +155,8 @@ public abstract class DDF extends ALoggable //
   /**
    * Initialization to be done after constructor assignments, such as setting of the all-important DDFManager.
    */
-  protected void initialize(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name,
+  protected void initialize(DDFManager manager, Object data, Class<?>[]
+          typeSpecs, String engineName, String namespace, String name,
       Schema schema) throws DDFException {
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
@@ -165,6 +169,11 @@ public abstract class DDF extends ALoggable //
       String tableName = this.getSchemaHandler().newTableName();
       schema.setTableName(tableName);
     }
+
+    if (Strings.isNullOrEmpty(engineName)) {
+      engineName = this.getManager().getEngineName();
+    }
+    this.setEngineName(engineName);
 
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
@@ -192,10 +201,11 @@ public abstract class DDF extends ALoggable //
    * @param tableName: name of the underlying table that representing the DDF
    * @throws DDFException
    */
-  protected void initialize(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name,
+  protected void initialize(DDFManager manager, Object data, Class<?>[]
+          typeSpecs, String engineName, String namespace, String name,
       Schema schema, String tableName) throws DDFException {
 
-    initialize(manager, data, typeSpecs, namespace, name, schema);
+    initialize(manager, data, typeSpecs, engineName, namespace, name, schema);
 
     if(schema != null && tableName != null) {
       schema.setTableName(tableName);
@@ -208,6 +218,7 @@ public abstract class DDF extends ALoggable //
 
 
   // //// IGloballyAddressable //////
+  @Expose private String mEngineName;
 
   @Expose private String mNamespace;
 
@@ -239,6 +250,23 @@ public abstract class DDF extends ALoggable //
     this.mNamespace = namespace;
   }
 
+  @Override
+  public String getEngineName() {
+    if (mEngineName == null) {
+      try {
+        mEngineName = this.getManager().getEngineName();
+      } catch (Exception e) {
+        mLog.warn("Can't retrieve engineName for DDF " + this.getName(), e);
+      }
+    }
+    return mEngineName;
+  }
+
+  @Override
+  public void setEngineName(String engineName) {
+    this.mEngineName = engineName;
+  }
+
   /**
    * @return the name of this DDF
    */
@@ -258,6 +286,8 @@ public abstract class DDF extends ALoggable //
 
   //Ensure name is unique
   //Also only allow alphanumberic and dash "-" and underscore "_"
+  // TODO: What's current namespace? Should we allow same name among
+  // different engines?
   private void validateName(String name) throws DDFException {
     Boolean isNameExisted;
     try {

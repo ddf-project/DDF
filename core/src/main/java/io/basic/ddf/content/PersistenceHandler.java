@@ -241,6 +241,7 @@ public class PersistenceHandler extends APersistenceHandler {
     }
 
 
+    private String engineName;
     private String mNamespace;
     private String mName;
 
@@ -264,6 +265,10 @@ public class PersistenceHandler extends APersistenceHandler {
 
       if (parts.length > 1) {
         this.setNamespace(parts[parts.length - 2]);
+      }
+
+      if (parts.length > 2) {
+        this.setEngineName(parts[parts.length-3]);
       }
     }
 
@@ -307,6 +312,16 @@ public class PersistenceHandler extends APersistenceHandler {
     public String getGlobalObjectType() {
       return "persistence_uri";
     }
+
+    @Override
+    public String getEngineName() {
+      return engineName;
+    }
+
+    @Override
+    public void setEngineName(String engineName) {
+      this.engineName = engineName;
+    }
   }
 
 
@@ -325,7 +340,9 @@ public class PersistenceHandler extends APersistenceHandler {
       list.add(new Object[] { this, this.getClass().getName() });
       Schema schema = new Schema(this.getName(), "object BLOB, objectClass STRING");
 
-      BasicDDF ddf = new BasicDDF(list, Object[].class, this.getNamespace(), this.getName(), schema);
+      BasicDDF ddf = new BasicDDF(list, Object[].class, this.getEngineName(),
+              this
+              .getNamespace(), this.getName(), schema);
 
       return ddf;
     }

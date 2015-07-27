@@ -75,7 +75,7 @@ public class Vector<T> implements Serializable {
 
     DDF newDDF = DDFManager.get(engineName) //
         .newDDF(null, (Object) data, new Class[] { Array.class, this.getParameterizedType() }, //
-            null /* namespace */, name, //
+            null/* engineName */, null /* namespace */, name, //
             new Schema(name, String.format("%s %s", name, this.getParameterizedType().getSimpleName())));
 
     this.initialize(newDDF, name);

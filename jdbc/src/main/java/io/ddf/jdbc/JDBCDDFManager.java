@@ -2,6 +2,7 @@ package io.ddf.jdbc;
 
 import com.google.common.base.Strings;
 import io.ddf.content.Schema;
+import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
@@ -43,26 +44,39 @@ public class JDBCDDFManager extends DDFManager {
   private Connection conn;
   private static IHandleConfig sConfigHandler;
 
+
   static {
     String configFileName = System.getenv(ConfigConstant.DDF_INI_ENV_VAR.toString());
     if (Strings.isNullOrEmpty(configFileName)) configFileName = ConfigConstant.DDF_INI_FILE_NAME.toString();
     sConfigHandler = new ConfigHandler(ConfigConstant.DDF_CONFIG_DIR.toString(), configFileName);
   }
 
-  public JDBCDDFManager()  {}
-  public JDBCDDFManager(JDBCDataSourceDescriptor jdbcDataSource) throws SQLException, ClassNotFoundException {
+  @Override
+  public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
+    throw new DDFException("Currently jdbc engine doesn't support transfer");
+  }
+
+  public JDBCDDFManager()  {
+    mLog.info("Initializing jdbddfmanager with no arguments");
+  }
+  public JDBCDDFManager(DataSourceDescriptor dataSourceDescriptor) throws SQLException,
+          ClassNotFoundException {
     /*
      * Register driver for the JDBC connector
      */
+    // TODO: check the correctness here.
+    super(dataSourceDescriptor);
     String driver = sConfigHandler.getValue(this.getEngine(), ConfigConstant.JDBC_DRIVER.toString());
 
     Class.forName(driver);
 
-    mJdbcDataSource = jdbcDataSource;
+    mJdbcDataSource = (JDBCDataSourceDescriptor) dataSourceDescriptor;
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
         mJdbcDataSource.getCredentials().getUserName(),
         mJdbcDataSource.getCredentials().getPassword());
 
+    mLog.info("Set up connection with jdbc : " + mJdbcDataSource
+            .getDataSourceUri().toString());
     boolean isDDFAutoCreate = Boolean.parseBoolean(sConfigHandler.getValue(ConfigConstant.ENGINE_NAME_JDBC.toString(),
         ConfigConstant.JDBC_DDF_AUTOCREATE.toString()));
 

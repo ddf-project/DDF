@@ -411,10 +411,12 @@ public class TableNameReplacerTests {
         manager = DDFManager.get("spark");
         // Add 2 test ddfs.
         Schema schema = new Schema("tablename1", "d  d,d  d");
-        DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "a",
+        DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class
+                }, "spark", "adatao", "a",
                 schema);
         Schema schema2 = new Schema("tablename2", "d  d,d  d");
-        DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "b",
+        DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class
+                }, "spark", "adatao", "b",
                 schema2);
 
         parser = new CCJSqlParserManager();

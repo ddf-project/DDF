@@ -162,16 +162,12 @@ public class TableNameReplacer extends TableVisitor {
         Matcher matcher = this.uriPattern.matcher(name);
         if (matcher.matches()) {
             // The first situation.
-            if (this.ddfManager.getDDFByURI(name) == null) {
-                try {
-                    this.ddfManager.getOrRestoreDDFUri(name);
-                } catch (DDFException e) {
-                    throw new Exception("ERROR: There is no ddf with uri:" + name);
-                }
-            }
+
             table.setName(this.ddfManager.getDDFByURI(name).getTableName());
+
         } else if (namespace != null) {
             // The second situation.
+            // TODO: leave structure here.
             String uri = "ddf://".concat(namespace.concat("/").concat(name));
             if (this.ddfManager.getDDFByURI(uri) == null) {
                 try {
@@ -276,4 +272,38 @@ public class TableNameReplacer extends TableVisitor {
     public List<UUID> getUuidLsit() { return uuidList;}
 
     public void setUuidList(List<UUID> uuidList) {this.uuidList = uuidList;}
+
+
+    /**
+     * @brief This is the main function of ddf-on-x. When the user is
+     * requesting the ddf uri, several situations exist: (1) The user wants
+     * to access the ddf in this engine and the ddf exists, then just return
+     * the local table name. (2) The user wants to access the ddf in this
+     * engine but the ddf doesn't exist, then we should restore the ddf if
+     * possbile. (3) The ddf uri indicates that the ddf is from other engine,
+     * then we should concat other engines to get this ddf and make it a
+     * local table.
+     * @param ddfuri The ddf uri.
+     * @return The local tablename.
+     */
+    String handleDDFURI(String ddfuri) throws Exception {
+        String engineName = this.ddfManager.getEngineNameOfDDF(ddfuri);
+        if (engineName.equals(this.ddfManager.getEngineName())) {
+            // It's in the same engine.
+            DDF ddf = this.ddfManager.getDDFByURI(ddfuri);
+            if ( ddf == null) {
+                try {
+                    // Restore the ddf first.
+                    ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
+                } catch (DDFException e) {
+                    throw new Exception("ERROR: There is no ddf with uri:" + ddfuri);
+                }
+            }
+            return ddf.getTableName();
+        } else {
+            // Transfer from the other engine.
+            DDF ddf = this.ddfManager.transfer(engineName, ddfuri);
+            return ddf.getTableName();
+        }
+    }
 }

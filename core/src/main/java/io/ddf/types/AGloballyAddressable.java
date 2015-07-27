@@ -8,7 +8,8 @@ public abstract class AGloballyAddressable implements IGloballyAddressable {
     if(Strings.isNullOrEmpty(obj.getName())) {
       return null;
     } else {
-      return String.format("%s://%s/%s", obj.getGlobalObjectType(), obj.getNamespace(), obj.getName());
+      return String.format("%s://%s/%s/%s", obj.getGlobalObjectType(), obj
+                      .getEngineName(), obj.getNamespace(), obj.getName());
     }
   }
 

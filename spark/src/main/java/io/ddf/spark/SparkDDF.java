@@ -24,25 +24,45 @@ public class SparkDDF extends DDF {
 
   private static final long serialVersionUID = 7466377156065874568L;
 
+  public SparkDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
+                  String engineName, String namespace, String name, Schema
+                          schema)
+          throws DDFException {
+    super(manager);
+    this.initialize(manager, data, typeSpecs, engineName,
+            namespace, name,
+            schema);
+  }
+
+
+  //  TODO: For backup compatiblity.
   public SparkDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
       throws DDFException {
     super(manager);
-    this.initialize(manager, data, typeSpecs, namespace, name, schema);
+    this.initialize(manager, data, typeSpecs, manager.getEngineName(),
+            namespace, name,
+            schema);
   }
 
-  public <T> SparkDDF(DDFManager manager, RDD<?> rdd, Class<T> unitType, String namespace, String name, Schema schema)
+  public <T> SparkDDF(DDFManager manager, RDD<?> rdd, Class<T> unitType,
+                      String engineName, String namespace, String name, Schema
+                              schema)
       throws DDFException {
 
     super(manager);
     if (rdd == null) throw new DDFException("Non-null RDD is required to instantiate a new SparkDDF");
-    this.initialize(manager, rdd, new Class<?>[] { RDD.class, unitType }, namespace, name, schema);
+    this.initialize(manager, rdd, new Class<?>[] { RDD.class, unitType },
+            engineName, namespace, name, schema);
   }
 
-  public SparkDDF(DDFManager manager, DataFrame rdd, String namespace, String name) throws DDFException {
+  public SparkDDF(DDFManager manager, DataFrame rdd, String engineName, String
+                  namespace, String name) throws DDFException {
     super(manager);
     if (rdd == null) throw new DDFException("Non-null RDD is required to instantiate a new SparkDDF");
     Schema schema = SparkUtils.schemaFromDataFrame(rdd);
-    this.initialize(manager, rdd, new Class<?>[] { DataFrame.class }, namespace, name, schema);
+    this.initialize(manager, rdd, new Class<?>[] { DataFrame.class },
+            engineName,
+            namespace, name, schema);
   }
   /**
    * Signature without RDD, useful for creating a dummy DDF used by DDFManager
