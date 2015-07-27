@@ -74,6 +74,9 @@ public class SparkDDFManager extends DDFManager {
       options.put("password", jdbcCredential.getPassword());
       // TODO: What if sfdc.
       DataFrame rdd = mHiveContext.load("jdbc", options);
+      if (rdd == null) {
+        throw new DDFException("fail use spark datasource api");
+      }
       Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
       DDF ddf = this.newDDF(this, rdd, new Class<?>[]
                       {DataFrame.class}, null, null, null, schema);

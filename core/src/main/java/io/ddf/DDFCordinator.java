@@ -7,6 +7,7 @@ import org.apache.avro.generic.GenericData;
 
 import javax.activation.DataSource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,9 +16,11 @@ import java.util.Map;
  */
 public class DDFCordinator {
     // The ddfmangers.
-    private List<DDFManager> mDDFManagerList;
+    private List<DDFManager> mDDFManagerList
+            = new ArrayList<DDFManager>();
     // The mapping from engine name to ddfmanager.
-    private Map<String, DDFManager> mName2DDFManager;
+    private Map<String, DDFManager> mName2DDFManager
+            = new HashMap<String, DDFManager>();
     // The default engine.
     private String mDefaultEngine;
 
@@ -27,6 +30,22 @@ public class DDFCordinator {
 
     public void setDefaultEngine(String defaultEngine) {
         this.mDefaultEngine = defaultEngine;
+    }
+
+    public Map<String, DDFManager> getName2DDFManager() {
+        return mName2DDFManager;
+    }
+
+    public void setName2DDFManager(Map<String, DDFManager> mName2DDFManager) {
+        this.mName2DDFManager = mName2DDFManager;
+    }
+
+    public List<DDFManager> getDDFManagerList() {
+        return mDDFManagerList;
+    }
+
+    public void setDDFManagerList(List<DDFManager> mDDFManagerList) {
+        this.mDDFManagerList = mDDFManagerList;
     }
 
     /**

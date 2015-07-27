@@ -535,6 +535,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   @Override
   public SqlResult sql(String command) throws DDFException {
+    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
     return this.sql(command, (Integer) null);
   }
 
