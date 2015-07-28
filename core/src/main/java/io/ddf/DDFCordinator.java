@@ -6,10 +6,7 @@ import io.ddf.exception.DDFException;
 import org.apache.avro.generic.GenericData;
 
 import javax.activation.DataSource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jing on 7/23/15.
@@ -46,6 +43,19 @@ public class DDFCordinator {
 
     public void setDDFManagerList(List<DDFManager> mDDFManagerList) {
         this.mDDFManagerList = mDDFManagerList;
+    }
+
+    public DDF getDDF(UUID uuid) {
+        for (DDFManager ddfManager : mDDFManagerList) {
+            try {
+                if (ddfManager.getDDF(uuid) != null) {
+                    return ddfManager.getDDF(uuid);
+                }
+            } catch (DDFException e) {
+                // e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     /**

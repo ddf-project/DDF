@@ -72,6 +72,7 @@ public class JDBCDDFManager extends DDFManager {
     Class.forName(driver);
 
     mJdbcDataSource = (JDBCDataSourceDescriptor) dataSourceDescriptor;
+    this.setDataSourceDescriptor(dataSourceDescriptor);
     if (mJdbcDataSource == null) {
       throw new Exception("JDBCDatasource is null when initializing " +
               "JDBCDDFManager");

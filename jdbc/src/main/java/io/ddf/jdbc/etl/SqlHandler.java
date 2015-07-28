@@ -9,6 +9,7 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.etl.ASqlHandler;
 import io.ddf.exception.DDFException;
+import io.ddf.jdbc.JDBCDDF;
 import io.ddf.jdbc.JDBCDDFManager;
 import io.ddf.jdbc.JDBCUtils;
 
@@ -25,30 +26,43 @@ public class SqlHandler extends ASqlHandler {
   }
 
   @Override public DDF sql2ddf(String command) throws DDFException {
-    return null;
+    return this.sql2ddf(command, null, null, null);
   }
 
   @Override public DDF sql2ddf(String command, Schema schema) throws DDFException {
-    return null;
+    return this.sql2ddf(command, schema, null, null);
   }
 
   @Override public DDF sql2ddf(String command, DataFormat dataFormat) throws DDFException {
-    return null;
+    return this.sql2ddf(command, null, null, dataFormat);
   }
 
   @Override public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource) throws DDFException {
-    return null;
+    return this.sql2ddf(command, schema, dataSource, null);
   }
 
   @Override public DDF sql2ddf(String command, Schema schema, DataFormat dataFormat) throws DDFException {
-    return null;
+    return this.sql2ddf(command, schema, null, dataFormat);
   }
 
   @Override public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource, DataFormat dataFormat)
       throws DDFException {
     // TODO: We can easily run sql, but we should generate ddf from the SqlResult.
-    
-    return null;
+    this.getManager().log("sql2ddf in jdbc");
+    Connection conn = this.getConn();
+    try {
+      Statement statement = conn.createStatement();
+      statement.execute("create table tmptable as (" + command + ")");
+      DDF ddf = new JDBCDDF((JDBCDDFManager)this.getManager(), null, null, null,
+              "tmptable");
+      this.getManager().addDDF(ddf);
+      this.getManager().log("add ddf");
+      return ddf;
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+      throw new DDFException("Unable to generate jdbc ddf");
+    }
   }
 
   /**

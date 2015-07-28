@@ -10,9 +10,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.WithItem;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +31,8 @@ public class TableNameReplacer extends TableVisitor {
     private List<UUID> uuidList = null;
     // The DDFManager.
     private DDFManager ddfManager = null;
-
+    // DDF uri to table name mapping.
+    private Map<String, String> uri2tbl = new HashMap<String, String>();
 
     /**
      * @brief Constructor.
@@ -302,8 +301,11 @@ public class TableNameReplacer extends TableVisitor {
             return ddf.getTableName();
         } else {
             // Transfer from the other engine.
-            DDF ddf = this.ddfManager.transfer(engineName, ddfuri);
-            return ddf.getTableName();
+            if (!uri2tbl.containsKey(ddfuri)) {
+                DDF ddf = this.ddfManager.transfer(engineName, ddfuri);
+                uri2tbl.put(ddfuri, ddf.getTableName());
+            }
+            return uri2tbl.get(ddfuri);
         }
     }
 }

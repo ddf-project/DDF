@@ -25,6 +25,7 @@ import io.ddf.content.IHandlePersistence.IPersistible;
 
 import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
+import io.ddf.datasource.DataSourceManager;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
@@ -257,8 +258,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       classType[0] = DataSourceDescriptor.class;
 
       DDFManager testmanager = (DDFManager) Class.forName(className)
-              .getDeclaredConstructor(classType).newInstance
-              (dataSourceDescriptor);
+              .getDeclaredConstructor(classType).newInstance(dataSourceDescriptor);
       if (testmanager == null) {
         throw new DDFException("ERROR: testmanager is null");
       }
@@ -683,4 +683,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public abstract DDF getOrRestoreDDF(UUID uuid) throws DDFException;
 
+  public DDF load(DataSourceDescriptor ds) throws DDFException {
+    return (new DataSourceManager()).load(ds, this);
+  }
 }

@@ -51,10 +51,11 @@ public class SparkDDFManager extends DDFManager {
   @Override
   public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
     DDFManager fromManager = this.getDDFCordinator().getEngine(fromEngine);
-    mLog.info("Get the engine " + fromEngine + "to transfer ddf : " + ddfuri);
+    mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
     DDF fromDDF = fromManager.getDDFByURI(ddfuri);
     if (fromDDF == null) {
-      throw new DDFException("There is no ddf with uri : " + ddfuri);
+      throw new DDFException("There is no ddf with uri : " + ddfuri + " in " +
+              "another engine");
     }
     String fromTableName = fromDDF.getTableName();
 
@@ -65,13 +66,16 @@ public class SparkDDFManager extends DDFManager {
       JDBCDataSourceDescriptor jdbcDataSourceDescriptor = (JDBCDataSourceDescriptor)
               dataSourceDescriptor;
       Map<String, String> options = new HashMap<String, String>();
-      options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri().toString());
       options.put("dbtable", fromTableName);
       JDBCDataSourceDescriptor.JDBCDataSourceCredentials jdbcCredential =
               jdbcDataSourceDescriptor.getCredentials();
+
+      options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri()
+              .toString() + "?user=" + jdbcCredential.getUserName() +
+              "&password="+jdbcCredential.getPassword());
       // TODO: Pay attention here. Some maybe username?
-      options.put("user", jdbcCredential.getUserName());
-      options.put("password", jdbcCredential.getPassword());
+      // options.put("user", jdbcCredential.getUserName());
+      // options.put("password", jdbcCredential.getPassword());
       // TODO: What if sfdc.
       DataFrame rdd = mHiveContext.load("jdbc", options);
       if (rdd == null) {
