@@ -179,7 +179,6 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
 
   /**
-   * The ugliest thing I've ever written in my life.
    *
    * @param transformFunctions base64-encoded marshaled bytecode of the functions
    * @param destColumns names of the new columns
@@ -197,7 +196,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[PyObject]).asInstanceOf[RDD[PyObject]]
 
-    // process each DF partition in R
+    // process each DF partition in Python
     val rMapped = dfrdd.map {
       partdf ⇒
         try {
@@ -228,7 +227,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
               |
               |def load_code(code_string):
               |  code = marshal.loads(base64.urlsafe_b64decode(code_string))
-              |  return types.FunctionType(code, globals(), "shitty_transformation_function")
+              |  return types.FunctionType(code, globals(), "transformation_function")
               |
               |funcs = [load_code(str(x)) for x in transform_codes]
               |
