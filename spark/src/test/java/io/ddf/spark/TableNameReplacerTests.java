@@ -4,6 +4,8 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.TableNameReplacer;
 import io.ddf.content.Schema;
+import io.ddf.datasource.DataSourceURI;
+import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import net.sf.jsqlparser.JSQLParserException;
@@ -408,7 +410,12 @@ public class TableNameReplacerTests {
     public static void startServer() throws Exception {
         Thread.sleep(1000);
         // LOG = LoggerFactory.getLogger(BaseTest.class);
-        manager = DDFManager.get("spark");
+        // manager = DDFManager.get("spark");
+        manager = DDFManager.get("jdbc", new JDBCDataSourceDescriptor(
+                new DataSourceURI("jdbc:mysql://localhost/testdb"),
+                new JDBCDataSourceDescriptor.JDBCDataSourceCredentials
+                        ("pauser", "papwd"), null
+                        ));
         // Add 2 test ddfs.
         Schema schema = new Schema("tablename1", "d  d,d  d");
         DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class

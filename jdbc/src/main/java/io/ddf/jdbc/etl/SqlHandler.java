@@ -47,6 +47,7 @@ public class SqlHandler extends ASqlHandler {
   @Override public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource, DataFormat dataFormat)
       throws DDFException {
     // TODO: We can easily run sql, but we should generate ddf from the SqlResult.
+    
     return null;
   }
 

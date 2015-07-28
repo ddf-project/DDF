@@ -138,7 +138,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                 case "SparkSQL":case "spark":case "Spark":
                     return this.sql(sqlcmd, maxRows, dataSource);
                 default:
-                    throw new DDFException("ERROR: Unrecognized datasource");
+                    //throw new DDFException("ERROR: Unrecognized datasource");
+                    return this.sql(sqlcmd, maxRows, dataSource);
             }
         }
     }
@@ -153,6 +154,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       } else if (statement instanceof  Select) {
         // Standard SQL.
         statement = tableNameReplacer.run(statement);
+          this.mLog.info("New stat is " + statement.toString());
         return this.sql(statement.toString(), maxRows, dataSource);
       } else if (statement instanceof Drop) {
           // TODO: +rename
@@ -236,7 +238,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                 case "SparkSQL":case "spark":case "Spark":
                     return this.sql2ddf(command, schema, dataSource, dataFormat);
                 default:
-                    throw new DDFException("ERROR: Unrecognized datasource: " + dataSource);
+                    // throw new DDFException("ERROR: Unrecognized datasource:
+                    // " + dataSource);
+                    return this.sql2ddf(command, schema, dataSource, dataFormat);
             }
         }
     }
@@ -248,6 +252,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         throw  new DDFException("ERROR: Only select is allowed in this sql2ddf");
       } else {
         statement = tableNameReplacer.run(statement);
+          this.mLog.info("New stat is " + statement.toString());
         return this.sql2ddf(statement.toString(), schema, dataSource, dataFormat);
       }
     } catch (Exception e) {

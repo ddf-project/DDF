@@ -59,18 +59,23 @@ public class JDBCDDFManager extends DDFManager {
   public JDBCDDFManager()  {
     mLog.info("Initializing jdbddfmanager with no arguments");
   }
-  public JDBCDDFManager(DataSourceDescriptor dataSourceDescriptor) throws SQLException,
-          ClassNotFoundException {
+  public JDBCDDFManager(DataSourceDescriptor dataSourceDescriptor) throws Exception {
     /*
      * Register driver for the JDBC connector
      */
     // TODO: check the correctness here.
     super(dataSourceDescriptor);
+
+    System.out.println("initialize in jdbc");
     String driver = sConfigHandler.getValue(this.getEngine(), ConfigConstant.JDBC_DRIVER.toString());
 
     Class.forName(driver);
 
     mJdbcDataSource = (JDBCDataSourceDescriptor) dataSourceDescriptor;
+    if (mJdbcDataSource == null) {
+      throw new Exception("JDBCDatasource is null when initializing " +
+              "JDBCDDFManager");
+    }
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
         mJdbcDataSource.getCredentials().getUserName(),
         mJdbcDataSource.getCredentials().getPassword());
@@ -86,6 +91,14 @@ public class JDBCDDFManager extends DDFManager {
 
     }
 
+  }
+
+  /**
+   * @brief Close the jdbc connection.
+   * @throws Throwable
+   */
+  protected void finalize() throws Throwable {
+    this.conn.close();
   }
 
   public JDBCDataSourceDescriptor getJdbcDataSource() {

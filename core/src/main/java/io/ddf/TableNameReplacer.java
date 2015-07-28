@@ -162,8 +162,8 @@ public class TableNameReplacer extends TableVisitor {
         Matcher matcher = this.uriPattern.matcher(name);
         if (matcher.matches()) {
             // The first situation.
-
-            table.setName(this.ddfManager.getDDFByURI(name).getTableName());
+            String tablename = this.handleDDFURI(name);
+            table.setName(tablename);
 
         } else if (namespace != null) {
             // The second situation.

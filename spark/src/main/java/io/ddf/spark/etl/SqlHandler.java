@@ -78,13 +78,14 @@ public class SqlHandler extends ASqlHandler {
     //    TableRDD tableRdd = null;
     //    RDD<Row> rddRow = null;
 
-    System.out.println("Execute command: " + command);
+    this.getManager().log("Execute command: " + command);
     DataFrame rdd = null;
     // TODO: handle other dataSources and dataFormats
     if (dataSource != null) {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
       if (sqlDataSourceDescriptor != null) {
-        if (!sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
+        if (sqlDataSourceDescriptor.getDataSource() != null
+            && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
             && !sqlDataSourceDescriptor.getDataSource().equals("Spark")
             && !sqlDataSourceDescriptor.getDataSource().equals("spark")) {
           throw new DDFException("Incorrect datasource");
@@ -127,12 +128,13 @@ public class SqlHandler extends ASqlHandler {
   @Override
   public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource) throws DDFException {
     // TODO: handle other dataSources and dataFormats
-    System.out.println("Execute command: " + command);
+    this.getManager().log("Execute command: " + command);
     DataFrame rdd = null;
     if (dataSource != null) {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
       if (sqlDataSourceDescriptor != null) {
-        if (!sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
+        if (sqlDataSourceDescriptor.getDataSource() != null
+                && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
                 && !sqlDataSourceDescriptor.getDataSource().equals("Spark")
                 && !sqlDataSourceDescriptor.getDataSource().equals("spark")) {
           throw new DDFException("Incorrect datasource");
