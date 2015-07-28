@@ -6,6 +6,7 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
+import io.ddf.spark.etl.udf.DateParse;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -66,6 +67,13 @@ public class SparkDDFManager extends DDFManager {
     mLog.info(">>>> spark.sql.inMemoryColumnarStorage.batchSize= " + batchSize);
     this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", compression);
     this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.batchSize", batchSize);
+
+    // register SparkSQL UDFs
+    this.registerUDFs();
+  }
+
+  private void registerUDFs() {
+    DateParse.register(this.mHiveContext);
   }
 
 
