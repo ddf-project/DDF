@@ -1,6 +1,8 @@
 package io.ddf.spark.etl
 
 import org.apache.spark.sql.DataFrame
+import org.python.core._
+import org.python.util.PythonInterpreter
 
 import scala.collection.JavaConverters._
 import scala.collection.JavaConversions.asScalaIterator
@@ -19,13 +21,13 @@ import org.rosuda.REngine.RList
 import org.rosuda.REngine.Rserve.RConnection
 import org.rosuda.REngine.Rserve.StartRserve
 
-import io.ddf.DDF
-import io.ddf.content.Schema
-import io.ddf.content.Schema.Column
-import io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
-import io.ddf.exception.DDFException
-import io.ddf.spark.util.SparkUtils
-import java.util.{ArrayList, List}
+import _root_.io.ddf.DDF
+import _root_.io.ddf.content.Schema
+import _root_.io.ddf.content.Schema.Column
+import _root_.io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
+import _root_.io.ddf.exception.DDFException
+import _root_.io.ddf.spark.util.SparkUtils
+import java.util.{Properties, ArrayList, List}
 
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
@@ -34,12 +36,12 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     val flattenedColumns: Array[String] = SparkUtils.flattenColumnNamesFromDataFrame(df, selectedColumns)
 
-    val selectColumns:Array[String] = new Array[String](flattenedColumns.length)
+    val selectColumns: Array[String] = new Array[String](flattenedColumns.length)
     // update hive-invalid column names
 
-    for(i <- 0 until flattenedColumns.length) {
+    for (i <- 0 until flattenedColumns.length) {
       selectColumns(i) = flattenedColumns(i).replaceAll("[.]", "_")
-      if(selectColumns(i).charAt(0) == '_') {
+      if (selectColumns(i).charAt(0) == '_') {
         selectColumns(i) = selectColumns(i).substring(1)
       }
       selectColumns(i) = s"${flattenedColumns(i)} as ${selectColumns(i)}"
@@ -132,7 +134,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
       partdf ⇒
         try {
           // check if Rserve is running, if not: start it
-          if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
+          if (!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
           // one connection for each compute job
           val rconn = new RConnection()
 
@@ -175,6 +177,89 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     ddf
   }
 
+
+  /**
+   * The ugliest thing I've ever written in my life.
+   *
+   * @param transformFunctions base64-encoded marshaled bytecode of the functions
+   * @param destColumns names of the new columns
+   * @param sourceColumns names of the source columns
+   * @return
+   */
+  override def transformPython(transformFunctions: Array[String], destColumns: Array[String],
+                               sourceColumns: Array[Array[String]]): DDF = {
+
+    if (transformFunctions.length != destColumns.length || transformFunctions.length != sourceColumns.length ||
+      transformFunctions.length <= 0) {
+      throw new IllegalArgumentException("Lists of destination columns," +
+        " source columns and transform functions must have the same length")
+    }
+
+    val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[PyObject]).asInstanceOf[RDD[PyObject]]
+
+    // process each DF partition in R
+    val rMapped = dfrdd.map {
+      partdf ⇒
+        try {
+          val props = new Properties()
+
+          // prevent: console: Failed to install '': java.nio.charset.UnsupportedCharsetException: cp0.
+          props.put("python.console.encoding", "UTF-8")
+          //don't respect java accessibility, so that we can access protected members on subclasses
+          props.put("python.security.respectJavaAccessibility", "false")
+          // disable site
+          props.put("python.import.site", "false")
+
+          PythonInterpreter.initialize(System.getProperties, props, new Array[String](0))
+
+          val interpreter = new PythonInterpreter()
+
+          // when we do set() for a Array[String] variable, it will become array.array<> in jython,
+          // hence casting is needed in the python code later.
+          // Moreover loops will become awkward because __iter__ doesn't work with array.array
+          interpreter.set("transform_codes", transformFunctions)
+          interpreter.set("src_cols", sourceColumns)
+          interpreter.set("dest_cols", destColumns)
+          interpreter.set("df_part", partdf)
+
+          interpreter.exec(
+            """
+              |import marshal, types, base64
+              |
+              |def load_code(code_string):
+              |  code = marshal.loads(base64.urlsafe_b64decode(code_string))
+              |  return types.FunctionType(code, globals(), "shitty_transformation_function")
+              |
+              |funcs = [load_code(str(x)) for x in transform_codes]
+              |
+              |for f, dest, src in zip(funcs, [x for x in dest_cols], [y for y in src_cols]):
+              |  data_src = tuple(df_part[str(c)] for c in src)
+              |  df_part[str(dest)] = [f(*args) for args in zip(*data_src)]
+              |
+            """.stripMargin
+          )
+          val obj = interpreter.get("df_part")
+
+          interpreter.cleanup()
+          interpreter.close()
+          obj
+        } catch {
+          case e: PyException ⇒ throw new DDFException("Unable to perform Python transformation", e)
+        }
+    }
+
+    // convert Python-processed data partitions back to RDD[Array[Object]]
+    val columnArr = TransformationHandler.PyObjectToColumnList(rMapped)
+
+    val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList)
+
+    val manager = this.getManager
+    val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]], classOf[PyObject]),
+      manager.getNamespace, null, newSchema)
+    mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
+    ddf.getMetaDataHandler.copyFactor(this.getDDF)
+    ddf
+  }
 }
 
 object TransformationHandler {
@@ -214,11 +299,41 @@ object TransformationHandler {
   }
 
   /**
+   * Lots of type casting
+   * @param rdd the RDD
+   * @return an array of Column(s)
+   */
+  def PyObjectToColumnList(rdd: RDD[PyObject]): Array[Column] = {
+    val firstdf = rdd.first()
+
+    if (!firstdf.isMappingType) {
+      throw new DDFException("Expect a dict of lists")
+    }
+
+    val dct = firstdf.asInstanceOf[PyDictionary]
+    val columns = new Array[Column](dct.size())
+    val keys = dct.keys()
+    for (i <- 0 until keys.size()) {
+      val k = keys.get(i).asInstanceOf[String]
+
+      val ddfType = dct.get(k).asInstanceOf[PyList].get(0) match {
+        case v: Integer => "INT"
+        case v: java.lang.Double => "DOUBLE"
+        case v: java.lang.Float => "DOUBLE"
+        case v: java.lang.String => "STRING"
+        case x => throw new DDFException("Only support atomic vectors of type int|float|string")
+      }
+      columns(i) = new Column(k, ddfType)
+    }
+    columns
+  }
+
+  /**
    * Perform map and mapsideCombine phase
    */
   def preShuffleMapper(partdf: REXP, mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean): REXP = {
     // check if Rserve is running, if not: start it
-    if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
+    if (!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
     // one connection for each compute job
     val rconn = new RConnection()
 
@@ -365,7 +480,7 @@ object TransformationHandler {
    */
   def postShufflePartitionMapper(input: Iterator[(String, Iterable[REXP])], reduceFuncDef: String): Iterator[REXP] = {
     // check if Rserve is running, if not: start it
-    if(!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
+    if (!StartRserve.checkLocalRserve()) throw new RuntimeException("Unable to start Rserve")
     val rconn = new RConnection()
 
     // pre-amble

@@ -14,6 +14,7 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.expressions.Row
+import org.python.core.PyObject
 import org.rosuda.REngine._
 
 import scala.collection.JavaConversions._
@@ -38,6 +39,8 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   this.addConvertFunction(RDD_ARR_DOUBLE, RDD_VECTOR, new ArrayDouble2Vector(this.mDDF))
   this.addConvertFunction(RDD_ARR_OBJECT, DATAFRAME, new ArrayObject2DataFrame(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_REXP, new RDDROW2REXP(this.mDDF))
+  this.addConvertFunction(RDD_PYOBJ, RDD_ARR_OBJECT, new PyObj2ArrayObject(this.mDDF))
+  this.addConvertFunction(RDD_ROW, RDD_PYOBJ, new RDDRow2PyObj(this.mDDF))
   this.addConvertFunction(DATAFRAME, RDD_MATRIX_VECTOR, new DataFrame2MatrixVector(this.mDDF))
   this.addConvertFunction(RDD_ROW, DATAFRAME, new Row2DataFrame(this.mDDF))
   this.addConvertFunction(DATAFRAME, RDD_ROW, new DataFrame2RDDRow(this.mDDF))
@@ -120,6 +123,7 @@ object RepresentationHandler {
   val RDD_LABELED_POINT = new Representation(classOf[RDD[_]], classOf[LabeledPoint])
   val RDD_MATRIX_VECTOR = new Representation(classOf[RDD[_]], classOf[TupleMatrixVector])
   val RDD_REXP = new Representation(classOf[RDD[_]], classOf[REXP])
+  val RDD_PYOBJ = new Representation(classOf[RDD[_]], classOf[PyObject])
   val DATAFRAME = new Representation(classOf[DataFrame])
   val RDD_ROW = new Representation(classOf[RDD[_]], classOf[Row])
   val RDD_VECTOR = new Representation(classOf[RDD[_]], classOf[Vector])

@@ -57,6 +57,11 @@ public class TransformFacade implements IHandleTransformations {
   }
 
   @Override
+  public DDF transformPython(String[] transformFunctions, String[] destColumns, String[][] sourceColumns) {
+    return mTransformationHandler.transformPython(transformFunctions, destColumns, sourceColumns);
+  }
+
+  @Override
   public DDF transformScaleMinMax() throws DDFException {
     return mTransformationHandler.transformScaleMinMax();
   }

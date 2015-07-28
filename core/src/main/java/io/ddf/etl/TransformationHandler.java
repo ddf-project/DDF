@@ -79,6 +79,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return null;
   }
 
+  public DDF transformPython(String[] transformFuctions, String[] destColumns, String[][] sourceColumns) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   @Override
   public DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) {
     // TODO Auto-generated method stub
