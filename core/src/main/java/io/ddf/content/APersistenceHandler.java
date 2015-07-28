@@ -25,7 +25,7 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
   private boolean mPersitable = true;
 
   public boolean isPersistable() {
-    if(this.getDDF().getUUID() == null || this.getDDF().getTableName() == null) {
+    if(this.getDDF().getUUID() == null) {
       return false;
     }
     return this.mPersitable;
