@@ -25,6 +25,9 @@ public interface IHandlePersistence extends IHandleDDFFunctionalGroup {
     void afterUnpersisting();
   }
 
+  public boolean isPersistable();
+
+  public void setPersistable(boolean persistable);
 
   /**
    * Returns a list of existing namespaces we have in persistent storage
