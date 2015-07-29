@@ -48,7 +48,7 @@ class FactorSuite extends ATestSuite {
     ddf.getSchemaHandler.computeFactorLevelsAndLevelCounts()
     println(ddf.getSchemaHandler.getColumn("Origin").getType)
     println(ddf.getSchemaHandler.getColumn("Origin").getColumnClass)
-    println(ddf.getSchemaHandler.getColumn("Origin").getOptionalFactor.getLevelCounts.size()
+    println(ddf.getSchemaHandler.getColumn("Origin").getOptionalFactor.getLevelCounts.size())
 
     //assert(ddf.getSchemaHandler.getColumn("cyl").getType == ColumnType.BIGINT)
     //assert(ddf.getSchemaHandler.getColumn("cyl").getColumnClass == ColumnClass.FACTOR)
