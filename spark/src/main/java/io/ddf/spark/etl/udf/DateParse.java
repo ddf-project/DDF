@@ -6,12 +6,13 @@ import org.apache.spark.sql.api.java.UDF2;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
  * A SparkSQL UDF that convert a datetime string in a specific format into a datetime string
- * of format "yyyy-MM-dd HH:mm:ss"
+ * of format "yyyy-MM-dd HH:mm:ss" in UTC time zone
  * <p>
  * Examples:
  * <p>
@@ -35,7 +36,7 @@ public class DateParse {
       try {
         DateTime dt = null;
         if (format.equalsIgnoreCase("iso")) {
-          dt = new DateTime(string);
+          dt = new DateTime(string, DateTimeZone.UTC);
         } else {
           DateTimeFormatter formatter = DateTimeFormat.forPattern(format);
           dt = formatter.parseDateTime(string);
