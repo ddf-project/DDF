@@ -95,7 +95,7 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
       "CancellationCode string, Diverted string, CarrierDelay int, " +
       "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','"
     )
-    manager.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airlineBig.csv' " +
+    manager.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/airline.csv' " +
       "INTO TABLE airline_type")
   }
 
