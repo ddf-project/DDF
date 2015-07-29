@@ -71,7 +71,7 @@ public class SparkDDFManager extends DDFManager {
     // register SparkSQL UDFs
     this.registerUDFs();
   }
-
+  // TODO: Dynamically load UDFs
   private void registerUDFs() {
     DateParse.register(this.mHiveContext);
   }
