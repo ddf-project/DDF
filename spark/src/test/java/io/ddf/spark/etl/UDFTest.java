@@ -60,5 +60,11 @@ public class UDFTest extends BaseTest {
     ddf3 = ddf2.sql2ddf("select date_parse('2015-06-05T01:05:00-0500', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(rows.get(0).equalsIgnoreCase((new DateTime("2015-06-05T01:05:00-0500")).toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))));
+
+    // Make sure the output of data_parse is consumable to other UDFs
+    ddf3 = ddf2.sql2ddf("select hour(date_parse('2015-06-05T01:05:00-0500', \"iso\")) from @this");
+    rows = ddf3.VIEWS.head(1);
+    //System.out.println(rows.get(0));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase((new DateTime("2015-06-05T01:05:00-0500")).hourOfDay().toString()));
   }
 }
