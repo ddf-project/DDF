@@ -51,8 +51,8 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
   public void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
     for (int i = 0; i < xCols.length; i++) {
       Column c = this.getColumn(xCols[i]);
-      System.out.println("column name: " + c.getName() + ", type: " + c.getType().name());
-      if (c.getType() == ColumnType.STRING) {
+      //System.out.println("column name: " + c.getName() + ", type: " + c.getType().name());
+      if (c.getType() == ColumnType.STRING || c.getType() == ColumnType.BOOLEAN) {
         this.setAsFactor(c.getName());
       }
     }
