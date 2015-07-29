@@ -44,6 +44,8 @@ class FactorSuite extends ATestSuite {
 
   test("test set factor for string columns") {
     val ddf = manager.sql2ddf("select * from airlineWithNA")
+    assert(ddf.getSchemaHandler.getColumn("Origin").getType == ColumnType.STRING)
+    assert(ddf.getSchemaHandler.getColumn("Origin").getColumnClass == ColumnClass.CHARACTER)
     ddf.getSchemaHandler.setFactorLevelsForStringColumns(ddf.getSchemaHandler.getColumns.map{col => col.getName}.toArray)
     ddf.getSchemaHandler.computeFactorLevelsAndLevelCounts()
     assert(ddf.getSchemaHandler.getColumn("Origin").getType == ColumnType.STRING)
