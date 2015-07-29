@@ -289,15 +289,14 @@ public class TableNameReplacer extends TableVisitor {
         String engineName = this.ddfManager.getEngineNameOfDDF(ddfuri);
         if (engineName.equals(this.ddfManager.getEngineName())) {
             // It's in the same engine.
-            DDF ddf = this.ddfManager.getDDFByURI(ddfuri);
-            if ( ddf == null) {
-                try {
-                    // Restore the ddf first.
-                    ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
-                } catch (DDFException e) {
-                    throw new Exception("ERROR: There is no ddf with uri:" + ddfuri);
-                }
+            DDF ddf = null;
+            try {
+                // Restore the ddf first.
+                ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
+            } catch (DDFException e) {
+                throw new Exception("ERROR: There is no ddf with uri:" + ddfuri);
             }
+
             return ddf.getTableName();
         } else {
             // Transfer from the other engine.
