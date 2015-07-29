@@ -16,11 +16,25 @@ import io.ddf.jdbc.JDBCUtils;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by freeman on 7/15/15.
  */
 public class SqlHandler extends ASqlHandler {
+
+  static final String AB = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  static Random rnd = new Random();
+
+  String randomString( int len )
+  {
+    StringBuilder sb = new StringBuilder( len );
+    for( int i = 0; i < len; i++ )
+      sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+    return sb.toString();
+  }
+
   public SqlHandler(DDF theDDF) {
     super(theDDF);
   }
@@ -52,16 +66,18 @@ public class SqlHandler extends ASqlHandler {
     Connection conn = this.getConn();
     try {
       Statement statement = conn.createStatement();
-      statement.execute("create table tmptable as (" + command + ")");
+      String randomTbName = this.randomString(24);
+      this.getManager().log("create table " + randomTbName);
+      statement.execute("create table "+ randomTbName + " as (" + command +
+              ")");
       DDF ddf = new JDBCDDF((JDBCDDFManager)this.getManager(), null, null, null,
-              "tmptable");
+             randomTbName);
       this.getManager().addDDF(ddf);
       this.getManager().log("add ddf");
       return ddf;
-
     } catch (SQLException e) {
       e.printStackTrace();
-      throw new DDFException("Unable to generate jdbc ddf");
+      throw new DDFException("Unable to generate jdbc ddf " + e.getMessage());
     }
   }
 
