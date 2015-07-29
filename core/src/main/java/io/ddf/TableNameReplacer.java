@@ -162,24 +162,21 @@ public class TableNameReplacer extends TableVisitor {
         Matcher matcher = this.uriPattern.matcher(name);
         if (matcher.matches()) {
             // The first situation.
-            if (this.ddfManager.getDDFByURI(name) == null) {
                 try {
                     this.ddfManager.getOrRestoreDDFUri(name);
                 } catch (DDFException e) {
                     throw new Exception("ERROR: There is no ddf with uri:" + name);
                 }
-            }
             table.setName(this.ddfManager.getDDFByURI(name).getTableName());
         } else if (namespace != null) {
             // The second situation.
             String uri = "ddf://".concat(namespace.concat("/").concat(name));
-            if (this.ddfManager.getDDFByURI(uri) == null) {
                 try {
                     this.ddfManager.getOrRestoreDDFUri(uri);
                 } catch (DDFException e) {
                     throw new Exception("ERROR: There is no ddf with uri:" + uri);
                 }
-            }
+
             table.setName(this.ddfManager.getDDFByURI(uri).getTableName());
         } else if (uriList != null || uuidList != null) {
             // The third situation.
@@ -196,26 +193,24 @@ public class TableNameReplacer extends TableVisitor {
                     if (index > uuidList.size()) {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
-                        if (null == this.ddfManager.getDDF(uuidList.get(index - 1))) {
                             try {
                                 this.ddfManager.getOrRestoreDDF(uuidList.get(index - 1));
                             } catch (DDFException e) {
                                 throw new Exception("ERROR: There is no ddf with uri:" + uuidList.get(index - 1).toString());
                             }
-                        }
+
                         table.setName(this.ddfManager.getDDF(uuidList.get(index - 1)).getTableName());
                     }
                 } else {
                     if (index > uriList.size()) {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
-                        if (this.ddfManager.getDDFByURI(uriList.get(index - 1)) == null) {
                             try {
                                 this.ddfManager.getOrRestoreDDFUri(uriList.get(index - 1));
                             } catch (DDFException e) {
                                 throw new Exception("ERROR: There is no ddf with uri:" + uriList.get(index - 1));
                             }
-                        }
+
                         table.setName(this.ddfManager.getDDFByURI(uriList.get(index - 1)).getTableName());
                     }
                 }

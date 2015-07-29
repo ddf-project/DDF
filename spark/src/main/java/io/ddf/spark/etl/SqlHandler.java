@@ -84,7 +84,8 @@ public class SqlHandler extends ASqlHandler {
     if (dataSource != null) {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
       if (sqlDataSourceDescriptor != null) {
-        if (!sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
+        if (sqlDataSourceDescriptor.getDataSource() != null
+            && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
             && !sqlDataSourceDescriptor.getDataSource().equals("Spark")
             && !sqlDataSourceDescriptor.getDataSource().equals("spark")) {
           throw new DDFException("Incorrect datasource");
@@ -131,7 +132,8 @@ public class SqlHandler extends ASqlHandler {
     if (dataSource != null) {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
       if (sqlDataSourceDescriptor != null) {
-        if (!sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
+        if (sqlDataSourceDescriptor != null
+            && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
                 && !sqlDataSourceDescriptor.getDataSource().equals("Spark")
                 && !sqlDataSourceDescriptor.getDataSource().equals("spark")) {
           throw new DDFException("Incorrect datasource");

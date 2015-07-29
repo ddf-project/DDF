@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SQLDataSourceDescriptor extends DataSourceDescriptor {
-  private String sqlCommand;
+  private String sqlCmd;
   private String dataSource;
   private String  namespace;
   private List<String> uriList;
@@ -27,7 +27,7 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
                                  String dataSource, String namespace, List<String> uriList,
                                  List<String> uuidList) {
     super(uri, credentials, schema, format);
-    this.sqlCommand = sqlcmd;
+    this.sqlCmd = sqlcmd;
     this.dataSource = dataSource;
     this.namespace = namespace;
     this.uriList = uriList;
@@ -41,7 +41,7 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
   public SQLDataSourceDescriptor(String sqlCommand, String dataSource, String namespace, String uriListStr,
                                  String uuidListStr) {
     super(null, null, null, null);
-    this.sqlCommand = sqlCommand;
+    this.sqlCmd = sqlCommand;
     this.dataSource = dataSource;
     this.namespace = namespace;
     if (uriListStr != null ) {
@@ -53,13 +53,20 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
     }
   }
 
+//  public SQLDataSourceDescriptor(String sqlCommand, String dataSource, String namespace,
+//      List<String> iuriList, List<String> iuuidList) {
+//    this.sqlCmd = sqlCommand;
+//    this.dataSource = dataSource;
+//    this.namespace = namespace;
+//
+//  }
   // Getters and Setters.
   public String getSqlCommand() {
-    return sqlCommand;
+    return sqlCmd;
   }
 
   public void setSqlCommand(String sqlCommand) {
-    this.sqlCommand = sqlCommand;
+    this.sqlCmd = sqlCommand;
   }
 
   public String getDataSource() {

@@ -149,7 +149,7 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
     }
     this.setDataSourceCredentials(new S3DataSourceCredentials(awsKeyID, awsSecretKey));
     this.setDataSourceSchema(new DataSourceSchema(columns));
-    this.setFileFormat(fileFormat);
+    this.setFileFormat(textFileFormat);
   }
 
   public S3DataSourceDescriptor(String uri,
