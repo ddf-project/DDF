@@ -92,6 +92,8 @@ public abstract class DDF extends ALoggable //
     this.initialize(manager, data, typeSpecs, namespace, name, schema);
   }
 
+  abstract public DDF copy() throws DDFException;
+
   protected DDF(DDFManager manager, DDFManager defaultManagerIfNull) throws DDFException {
     this(manager != null ? manager : defaultManagerIfNull, null, null, null, null, null);
   }
@@ -105,7 +107,6 @@ public abstract class DDF extends ALoggable //
   protected DDF(DDFManager manager) throws DDFException {
     this(manager, sDummyManager);
   }
-
 
   /**
    * cache for data computed from the DDF, e.g., ML models, DDF summary
@@ -399,6 +400,10 @@ public abstract class DDF extends ALoggable //
   }
   public DDF getFlattenedDDF() throws DDFException {
     return this.getTransformationHandler().flattenDDF();
+  }
+
+  public DDF transform(List<String> transformExpressions) throws DDFException {
+    return Transform.transformUDF(transformExpressions);
   }
 
   public DDF transform(String transformExpression) throws DDFException {

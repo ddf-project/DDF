@@ -57,6 +57,9 @@ public class DDFCache {
 
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
     if(!Strings.isNullOrEmpty(name)) {
+      if(!Strings.isNullOrEmpty(ddf.getName())) {
+        this.mUris.remove(ddf.getUri());
+      }
       ddf.setName(name);
       this.mUris.put(ddf.getUri(), ddf.getUUID());
     } else {

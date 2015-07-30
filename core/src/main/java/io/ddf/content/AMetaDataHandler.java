@@ -88,12 +88,9 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
     this.getDDF().getSchemaHandler().computeFactorLevelsAndLevelCounts();
   }
 
-  public void copyMetaData(DDF ddf) throws DDFException {
-    this.getDDF().getManager().setDDFUUID(this.getDDF(), ddf.getUUID());
-    if(!Strings.isNullOrEmpty(ddf.getName())) {
-      this.getDDF().getManager().setDDFName(this.getDDF(), ddf.getName());
-    }
-    this.copyFactor(ddf);
+  public void copy(IHandleMetaData fromMetaData) throws DDFException {
+
+    this.copyFactor(fromMetaData.getDDF());
   }
 
   private HashMap<Integer, ICustomMetaData> mCustomMetaDatas;

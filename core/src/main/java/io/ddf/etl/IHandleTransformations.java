@@ -17,7 +17,15 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
 
   public DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine);
 
-  public DDF transformUDF(String transformExpression, List<String> columns) throws DDFException;
+  /**
+   * Create new columns or overwrite existing ones
+   *
+   * @param transformExpressions A list of expressions, each is in format of column=expression or expression
+   * @param columns
+   * @return
+   * @throws DDFException
+   */
+  public DDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException;
 
   public DDF flattenDDF(String[] columns) throws DDFException;
 

@@ -5,6 +5,7 @@ import io.ddf.DDF;
 import io.ddf.etl.IHandleTransformations;
 import io.ddf.exception.DDFException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TransformFacade implements IHandleTransformations {
@@ -66,11 +67,29 @@ public class TransformFacade implements IHandleTransformations {
   }
 
   @Override
-  public DDF transformUDF(String transformExpression, List<String> columns) throws DDFException {
-    return mTransformationHandler.transformUDF(transformExpression, columns);
+  public DDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException {
+    return mTransformationHandler.transformUDF(transformExpressions, columns);
   }
 
 
+  public DDF transformUDF(List<String> transformExpressions) throws DDFException {
+    return transformUDF(transformExpressions, null);
+  }
+
+
+  public DDF transformUDF(String transformExpression, List<String> columns) throws DDFException {
+    List<String> transformExpressions = new ArrayList<String>();
+    transformExpressions.add(transformExpression);
+    return mTransformationHandler.transformUDF(transformExpressions, columns);
+  }
+
+  /**
+   * Create a new column or overwrite an existing one.
+   *
+   * @param transformExpression the expression in format column=expression
+   * @return a DDF
+   * @throws DDFException
+   */
   public DDF transformUDF(String transformExpression) throws DDFException {
     return transformUDF(transformExpression, null);
   }

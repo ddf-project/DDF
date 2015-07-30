@@ -75,6 +75,10 @@ public class BasicDDF extends DDF {
     super(manager, sDummyBasicDDFManager);
   }
 
+  @Override
+  public DDF copy()throws DDFException {
+    return null;
+  }
   /**
    * For serdes only
    *
