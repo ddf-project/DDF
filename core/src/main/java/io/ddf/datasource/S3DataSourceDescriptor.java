@@ -19,10 +19,6 @@ import io.ddf.exception.DDFException;
 
 
 public class S3DataSourceDescriptor extends DataSourceDescriptor {
-  private S3DataSourceURI uri;
-  private S3DataSourceCredentials credentials;
-  private DataSourceSchema schema;
-  private FileFormat fileFormat;
 
   public S3DataSourceDescriptor(S3DataSourceURI uri, S3DataSourceCredentials credentials,
                                 DataSourceSchema schema, FileFormat fileFormat){
@@ -41,14 +37,15 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
     String delimiterPattern = "'separatorchar'\\s*=\\s*'.*'";
     Pattern pattern = Pattern.compile(delimiterPattern);
     Matcher matcher = pattern.matcher(serdes.toLowerCase());
-    if (matcher.matches()) {
+    if (matcher.find()) {
       // TODO
-      String matchedString = matcher.group();
+      String matchedString = matcher.group(0);
       String str = matchedString.split("\\s*=\\s*")[1];
-      if (str.charAt(0) == '\'') {
+      if (str.startsWith("'")) {
         str = str.substring(1);
       }
-      if (str.charAt(str.length()) == '\'') {
+
+      if (str.endsWith("'")) {
         str = str.substring(0, str.length() - 1);
       }
       return str;
@@ -60,14 +57,15 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
   public static String parseQuote(String serdes) throws DDFException {
     Pattern quotePattern = Pattern.compile("'quotechar'\\s*=\\s*'\\W*'");
     Matcher matcher = quotePattern.matcher(serdes.toLowerCase());
-    if (matcher.matches()) {
+    if (matcher.find()) {
       // TODO
-      String matchedString = matcher.group();
+      String matchedString = matcher.group(0);
       String str = matchedString.split("\\s*=\\s*")[1];
-      if (str.charAt(0) == '\'') {
+
+      if (str.startsWith("'")) {
         str = str.substring(1);
       }
-      if (str.charAt(str.length()) == '\'') {
+      if (str.endsWith("'")) {
         str = str.substring(0, str.length() - 1);
       }
       return str;
@@ -81,8 +79,8 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
     Matcher matcher = propertiesPattern.matcher(serdes.toLowerCase().replace("\n", " "));
     String properties;
     // TODO index?
-    if (matcher.matches()) {
-      properties = matcher.group();
+    if (matcher.find()) {
+      properties = matcher.group(0);
     } else {
       throw new DDFException("Failed to parse serdes string " + serdes);
     }
@@ -135,6 +133,8 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
       List<String> delimandquote = parseQuoteAndDelim(serdes);
       String delim = delimandquote.get(0);
       String quote = delimandquote.get(1);
+      System.out.println(">>> delim = " + delim);
+      System.out.println(">>> quote = " + quote);
       // TODO TAG;
       textFileFormat =  new TextFileFormat(format, false, delim, quote);
     } else {
@@ -176,5 +176,16 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
     this.setDataSourceCredentials(new S3DataSourceCredentials(awsKeyID, awsSecretKey));
     this.setDataSourceSchema(new DataSourceSchema(columns));
     this.setFileFormat(fileFormat);
+  }
+
+  @Override
+  public void setDataSourceCredentials(IDataSourceCredentials creds) {
+    if(creds instanceof S3DataSourceCredentials) {
+      super.setDataSourceCredentials(creds);
+      String awsKeyID = ((S3DataSourceCredentials) creds).getAwsKeyID();
+      String awsSecretKey = ((S3DataSourceCredentials) creds).getAwsScretKey();
+      ((S3DataSourceURI) this.getDataSourceUri()).setAwsKeyID(awsKeyID);
+      ((S3DataSourceURI) this.getDataSourceUri()).setAwsSecretKey(awsSecretKey);
+    }
   }
 }
