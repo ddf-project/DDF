@@ -3,6 +3,7 @@ package io.ddf.datasource;
  * author: daoduchuan, namma
  */
 
+import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
@@ -37,7 +38,7 @@ public class HDFSDataSourceDescriptor extends DataSourceDescriptor {
                                    String originalSource,
                                    DataFormat format) throws DDFException, URISyntaxException {
     List<Schema.Column> columnList;
-    if (schema != null) {
+    if (!Strings.isNullOrEmpty(schema)) {
       columnList = new Schema(schema).getColumns();
     } else {
       columnList = null;
@@ -61,7 +62,7 @@ public class HDFSDataSourceDescriptor extends DataSourceDescriptor {
                                   String comment) throws URISyntaxException {
     TextFileFormat textFileFormat = new TextFileFormat(format, hasHeader, delimiter, quote);
     List<Schema.Column> columnList;
-    if (schema != null) {
+    if (!Strings.isNullOrEmpty(schema)) {
       columnList = new Schema(schema).getColumns();
     } else {
       columnList = null;

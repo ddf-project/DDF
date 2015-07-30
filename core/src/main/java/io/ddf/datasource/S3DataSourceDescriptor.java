@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
@@ -122,7 +123,7 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
                                 String serdes,
                                 DataFormat format) throws DDFException {
     List<Schema.Column> columns;
-    if (schema != null) {
+    if (!Strings.isNullOrEmpty(schema)) {
       columns = new Schema(schema).getColumns();
     } else {
       columns = null;
@@ -161,7 +162,7 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
                                 String delimiter,
                                 String quote) throws DDFException {
     List<Schema.Column> columns;
-    if (schema != null) {
+    if (Strings.isNullOrEmpty(schema)) {
       columns = new Schema(schema).getColumns();
     } else {
       columns = null;
