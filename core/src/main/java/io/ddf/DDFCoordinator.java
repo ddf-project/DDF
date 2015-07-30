@@ -18,13 +18,25 @@ public class DDFCoordinator {
             = new HashMap<String, DDFManager>();
     // The default engine.
     private String mDefaultEngine;
+    private String mComputeEngine;
 
     public String getDefaultEngine() {
+        if (mDefaultEngine == null) {
+            mDefaultEngine = "spark";
+        }
         return mDefaultEngine;
     }
 
     public void setDefaultEngine(String defaultEngine) {
         this.mDefaultEngine = defaultEngine;
+    }
+
+    public String getComputeEngine() {
+        return mComputeEngine;
+    }
+
+    public void setComputeEngine(String computeEngine) {
+        mComputeEngine = computeEngine;
     }
 
     public Map<String, DDFManager> getName2DDFManager() {
