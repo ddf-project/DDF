@@ -60,7 +60,7 @@ public class JDBCDDFManager extends DDFManager {
 
     mJdbcDataSource = jdbcDataSource;
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
-        mJdbcDataSource.getCredentials().getUserName(),
+        mJdbcDataSource.getCredentials().getUsername(),
         mJdbcDataSource.getCredentials().getPassword());
 
     boolean isDDFAutoCreate = Boolean.parseBoolean(sConfigHandler.getValue(ConfigConstant.ENGINE_NAME_JDBC.toString(),
