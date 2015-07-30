@@ -162,7 +162,7 @@ public class S3DataSourceDescriptor extends DataSourceDescriptor {
                                 String delimiter,
                                 String quote) throws DDFException {
     List<Schema.Column> columns;
-    if (Strings.isNullOrEmpty(schema)) {
+    if (!Strings.isNullOrEmpty(schema)) {
       columns = new Schema(schema).getColumns();
     } else {
       columns = null;
