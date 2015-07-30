@@ -6,7 +6,6 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.datasource.DataSourceDescriptor;
-import io.ddf.datasource.JDBCDataSourceCredentials;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.content.SchemaHandler;
@@ -50,7 +49,7 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
-    DDFManager fromManager = this.getDDFCordinator().getEngine(fromEngine);
+    DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
     mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
     DDF fromDDF = fromManager.getDDFByURI(ddfuri);
     if (fromDDF == null) {

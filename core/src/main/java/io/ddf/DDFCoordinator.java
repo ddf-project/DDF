@@ -3,15 +3,13 @@ package io.ddf;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
-import org.apache.avro.generic.GenericData;
 
-import javax.activation.DataSource;
 import java.util.*;
 
 /**
  * Created by jing on 7/23/15.
  */
-public class DDFCordinator {
+public class DDFCoordinator {
     // The ddfmangers.
     private List<DDFManager> mDDFManagerList
             = new ArrayList<DDFManager>();
@@ -82,7 +80,7 @@ public class DDFCordinator {
                     engineName);
         }
         manager.setEngineName(engineName);
-        manager.setDDFCordinator(this);
+        manager.setDDFCoordinator(this);
         mDDFManagerList.add(manager);
         mName2DDFManager.put(engineName, manager);
         return manager;

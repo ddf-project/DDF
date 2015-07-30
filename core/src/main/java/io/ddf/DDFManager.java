@@ -18,7 +18,6 @@ package io.ddf;
 
 
 import com.google.common.base.Strings;
-import io.basic.ddf.content.PersistenceHandler;
 import io.ddf.content.*;
 import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.IHandlePersistence.IPersistible;
@@ -38,7 +37,6 @@ import io.ddf.ml.ISupportML;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
 
-import javax.activation.DataSource;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -95,8 +93,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   // DataSourceDescriptor.
   private DataSourceDescriptor mDataSourceDescriptor;
-  // DDFCordinator.
-  private DDFCordinator mDDFCordinator;
+  // DDFCoordinator.
+  private DDFCoordinator mDDFCoordinator;
 
 
   public String getEngineName() {
@@ -109,12 +107,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     this.engineName = engineName;
   }
 
-  public DDFCordinator getDDFCordinator() {
-    return mDDFCordinator;
+  public DDFCoordinator getDDFCoordinator() {
+    return mDDFCoordinator;
   }
 
-  public void setDDFCordinator(DDFCordinator ddfCordinator) {
-    this.mDDFCordinator = ddfCordinator;
+  public void setDDFCoordinator(DDFCoordinator ddfCoordinator) {
+    this.mDDFCoordinator = ddfCoordinator;
   }
 
   public DataSourceDescriptor getDataSourceDescriptor() {
