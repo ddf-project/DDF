@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 /**
  * A SparkSQL UDF that convert a datetime string in a specific format into a datetime string
  * of format "yyyy-MM-dd HH:mm:ss". In case of an ISO datetime string with timezone, the output will be a
- * localized datetime string wrt the corresponding timezone.
+ * local datetime at UTC timezone.
  * <p>
  * Examples:
  * <p>
