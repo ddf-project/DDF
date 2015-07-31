@@ -15,6 +15,7 @@ import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
@@ -161,7 +162,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
           throw  new DDFException("ERROR: Only show tables, describe tables, " +
                   "select, drop, and rename operations are allowed on ddf");
       }
-    } catch (Exception e) {
+    } catch (JSQLParserException e) {
       // It's neither standard SQL nor allowed DDL.
       // e.printStackTrace();
       // Just pass it to lower level SE.
@@ -170,6 +171,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       throw  new DDFException("Please check the syntax. If the query should " +
               "be directly run on engine table, " +
               "please specify dataSource");
+    } catch (Exception e) {
+      throw new DDFException(e.getMessage());
     }
   }
 
@@ -252,7 +255,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         statement = tableNameReplacer.run(statement);
         return this.sql2ddf(statement.toString(), schema, dataSource, dataFormat);
       }
-    } catch (Exception e) {
+    } catch (JSQLParserException e) {
       // It's neither standard SQL nor allowed DDL.
       // e.printStackTrace();
       // Just pass it to lower level SE.
@@ -260,6 +263,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       throw new DDFException("Please check the syntax. If the query should " +
               "be directly run on engine table, " +
               "please specify dataSource");
+    } catch (Exception e) {
+        throw new DDFException(e.getMessage());
     }
   }
 
