@@ -167,7 +167,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       // Just pass it to lower level SE.
       // return this.sql(sqlcmd, maxRows, dataSource);
       // System.out.println(sqlcmd);
-      throw  new DDFException(e);
+      throw  new DDFException("Please check the syntax. If the query should " +
+              "be directly run on engine table, " +
+              "please specify dataSource");
     }
   }
 
@@ -255,7 +257,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       // e.printStackTrace();
       // Just pass it to lower level SE.
       // System.out.println(command);
-      throw new DDFException(e);
+      throw new DDFException("Please check the syntax. If the query should " +
+              "be directly run on engine table, " +
+              "please specify dataSource");
     }
   }
 
