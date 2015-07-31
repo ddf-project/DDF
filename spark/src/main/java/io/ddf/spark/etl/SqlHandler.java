@@ -132,7 +132,7 @@ public class SqlHandler extends ASqlHandler {
     if (dataSource != null) {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
       if (sqlDataSourceDescriptor != null) {
-        if (sqlDataSourceDescriptor != null
+        if (sqlDataSourceDescriptor.getDataSource() != null
             && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
                 && !sqlDataSourceDescriptor.getDataSource().equals("Spark")
                 && !sqlDataSourceDescriptor.getDataSource().equals("spark")) {
