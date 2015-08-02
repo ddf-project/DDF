@@ -19,10 +19,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 import scala.collection.Seq;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 //import org.apache.hadoop.hive.ql.metadata.HiveException;
 
 /**
@@ -85,7 +82,15 @@ public class SqlHandler extends ASqlHandler {
       }
     }
 
-    for (String str : ddf2tb.keySet()) {
+    List<String> sortedNames = new ArrayList<String>(ddf2tb.keySet());
+    Collections.sort(sortedNames, new Comparator<String>() {
+      @Override
+      public int compare(String o1, String o2) {
+        return (o1.length() < o2.length()) ? 1 : -1;
+      }
+    });
+
+    for (String str : sortedNames) {
       command = command.replace(str, ddf2tb.get(str));
     }
     
