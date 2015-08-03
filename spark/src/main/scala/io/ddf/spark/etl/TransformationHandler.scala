@@ -38,7 +38,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     // update hive-invalid column names
 
     for(i <- 0 until flattenedColumns.length) {
-      selectColumns(i) = flattenedColumns(i).replaceAll("[.]", "_")
+      selectColumns(i) = flattenedColumns(i).replaceAll("->", "_")
       if(selectColumns(i).charAt(0) == '_') {
         selectColumns(i) = selectColumns(i).substring(1)
       }
@@ -47,7 +47,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val selectClause = selectColumns.mkString(",")
     //val q = String.format("select %s from %s", selectClause, mDDF.getTableName)
-    val q = s"select $selectClause from ${mDDF.getTableName}"
+    val q = s"select $selectClause from @this"
 
     //println("Query: \n" + q)
 

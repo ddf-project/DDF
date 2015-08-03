@@ -25,7 +25,7 @@ public class UDFTest extends BaseTest {
   public void setUp() throws Exception {
     createTableAirlineWithNA();
 
-    ddf = manager.sql2ddf("select * from airline");
+    ddf = manager.sql2ddf("select * from airline", "SparkSQL");
   }
 
   @Test
