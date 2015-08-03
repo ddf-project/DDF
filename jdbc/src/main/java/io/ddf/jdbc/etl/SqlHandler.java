@@ -68,8 +68,9 @@ public class SqlHandler extends ASqlHandler {
       Statement statement = conn.createStatement();
       String randomTbName = this.randomString(24);
       this.getManager().log("create table " + randomTbName);
-      statement.execute("create table "+ randomTbName + " as (" + command +
-              ")");
+      // statement.execute("create table "+ randomTbName + " as (" + command +
+      //        ")");
+      statement.execute("create view " + randomTbName + " as " + command);
       DDF ddf = new JDBCDDF((JDBCDDFManager)this.getManager(), null, null, null,
              randomTbName);
       this.getManager().addDDF(ddf);

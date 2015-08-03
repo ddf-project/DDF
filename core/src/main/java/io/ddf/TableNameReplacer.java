@@ -164,18 +164,6 @@ public class TableNameReplacer extends TableVisitor {
             String tablename = this.handleDDFURI(name);
             table.setName(tablename);
 
-        } else if (namespace != null) {
-            // The second situation.
-            // TODO: leave structure here.
-            String uri = "ddf://".concat(namespace.concat("/").concat(name));
-            if (this.ddfManager.getDDFByURI(uri) == null) {
-                try {
-                    this.ddfManager.getOrRestoreDDFUri(uri);
-                } catch (DDFException e) {
-                    throw new Exception("ERROR: There is no ddf with uri:" + uri);
-                }
-            }
-            table.setName(this.ddfManager.getDDFByURI(uri).getTableName());
         } else if (uriList != null || uuidList != null) {
             // The third situation.
             Pattern indexPattern = Pattern.compile("\\{\\d+\\}");
@@ -204,14 +192,11 @@ public class TableNameReplacer extends TableVisitor {
                     if (index > uriList.size()) {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
-                        if (this.ddfManager.getDDFByURI(uriList.get(index - 1)) == null) {
-                            try {
-                                this.ddfManager.getOrRestoreDDFUri(uriList.get(index - 1));
-                            } catch (DDFException e) {
-                                throw new Exception("ERROR: There is no ddf with uri:" + uriList.get(index - 1));
-                            }
-                        }
-                        table.setName(this.ddfManager.getDDFByURI(uriList.get(index - 1)).getTableName());
+                        String tablename = this.handleDDFURI(uriList.get
+                                (index - 1));
+                        table.setName(tablename);
+                        this.ddfManager.log("replace ddf uri " + uriList.get
+                                (index-1) + " with " + tablename);
                     }
                 }
             } else {
@@ -219,6 +204,23 @@ public class TableNameReplacer extends TableVisitor {
                 System.out.println("ddf name is:" + table.getName());
                 throw new Exception("ERROR: Can't find the required ddf");
             }
+        } else if (namespace != null) {
+            // The second situation.
+            // TODO: leave structure here.
+            // String uri = "ddf://".concat(this.getDDFManager().getEngineName()
+            //                .concat("/")
+            //).concat
+            //        (namespace.concat("/")
+            //        .concat
+            //        (name));
+            String uri = this.ddfManager.getDDFCoordinator().getURIByName(name);
+            if (uri == null) {
+                throw new Exception("ERROR: There is no ddf with name: " +
+                        name);
+            }
+            this.ddfManager.log("debug1");
+            String tablename = this.handleDDFURI(uri);
+            table.setName(tablename);
         } else {
             // No modification.
             throw new Exception("ERROR: The ddf reference should either full uri, ddfname with namespace or list index");
@@ -244,11 +246,11 @@ public class TableNameReplacer extends TableVisitor {
         this.uriPattern = Pattern.compile(uriRegex);
     }
 
-    public DDFManager getDdfManager() {
+    public DDFManager getDDFManager() {
         return ddfManager;
     }
 
-    public void setDdfManager(DDFManager ddfManager) {
+    public void setDDFManager(DDFManager ddfManager) {
         this.ddfManager = ddfManager;
     }
 
@@ -286,17 +288,27 @@ public class TableNameReplacer extends TableVisitor {
      * @return The local tablename.
      */
     String handleDDFURI(String ddfuri) throws Exception {
+
+        this.ddfManager.log("debug2 " + ddfuri);
         String engineName = this.ddfManager.getEngineNameOfDDF(ddfuri);
         if (engineName.equals(this.ddfManager.getEngineName())) {
             // It's in the same engine.
             DDF ddf = null;
             try {
                 // Restore the ddf first.
-                ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
+                try {
+               // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
+               ddf = this.ddfManager.getDDFByURI(ddfuri);
+                }
+                catch (Exception e) {
+                    this.ddfManager.log("restore error");
+                    throw new DDFException("hah ");
+                }
+                this.ddfManager.log("debug3");
+
             } catch (DDFException e) {
                 throw new Exception("ERROR: There is no ddf with uri:" + ddfuri);
             }
-
             return ddf.getTableName();
         } else {
             // Transfer from the other engine.
@@ -304,6 +316,8 @@ public class TableNameReplacer extends TableVisitor {
                 DDF ddf = this.ddfManager.transfer(engineName, ddfuri);
                 uri2tbl.put(ddfuri, ddf.getTableName());
             }
+
+            this.ddfManager.log("debug4");
             return uri2tbl.get(ddfuri);
         }
     }

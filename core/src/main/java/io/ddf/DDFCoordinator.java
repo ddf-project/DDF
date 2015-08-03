@@ -19,6 +19,16 @@ public class DDFCoordinator {
     // The default engine.
     private String mDefaultEngine;
     private String mComputeEngine;
+    private Map<String, String> mDDFName2URI = new HashMap<String, String>();
+
+
+    public String getURIByName(String name) {
+        return mDDFName2URI.get(name);
+    }
+
+    public void setName2URI(String name, String uri) {
+        mDDFName2URI.put(name, uri);
+    }
 
     public String getDefaultEngine() {
         if (mDefaultEngine == null) {
@@ -53,6 +63,14 @@ public class DDFCoordinator {
 
     public void setDDFManagerList(List<DDFManager> mDDFManagerList) {
         this.mDDFManagerList = mDDFManagerList;
+    }
+
+    public List<String> showEngines() {
+        List<String> ret = new ArrayList<String>();
+        for (DDFManager ddfManager : this.mDDFManagerList) {
+            ret.add(ddfManager.getEngineName());
+        }
+        return ret;
     }
 
     public DDF getDDF(UUID uuid) {
