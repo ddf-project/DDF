@@ -329,7 +329,8 @@ public class TableNameReplacerTests {
                 + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
                + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", sqlDataSourceDescriptor);
 
-        manager.sql("load data local inpath '/Users/Jing/Github/DDF/resources/test/airline.csv' into table airline",
+        manager.sql("load data local inpath '../resources/test/airline.csv' " +
+                        "into table airline",
                 sqlDataSourceDescriptor);
 
         DDF ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, "
