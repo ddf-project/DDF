@@ -1,6 +1,7 @@
 package io.ddf.spark.etl.udf;
 
 
+import io.ddf.spark.util.Utils;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.api.java.UDF2;
 import org.apache.spark.sql.types.DataType;
@@ -10,9 +11,13 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * A SparkSQL UDF that convert a datetime string in a specific format into a datetime string
- * of format "yyyy-MM-dd HH:mm:ss" in UTC time zone
+ * of format "yyyy-MM-dd HH:mm:ss". In case of an ISO datetime string with timezone, the output will be a
+ * local datetime at UTC timezone.
  * <p>
  * Examples:
  * <p>
@@ -28,17 +33,16 @@ import org.joda.time.format.DateTimeFormatter;
  * @return a datetime string in new format, null if there is any error.
  */
 public class DateParse {
-  static String name = "date_parse";
-  static DataType dataTypes = DataTypes.StringType;
+
   static UDF2 udf = new UDF2<String, String, String>() {
     @Override public String call(String string, String format) throws Exception {
 
       try {
         DateTime dt = null;
         if (format.equalsIgnoreCase("iso")) {
-          dt = new DateTime(string, DateTimeZone.UTC);
+          dt = Utils.toDateTimeObject(string);
         } else {
-          DateTimeFormatter formatter = DateTimeFormat.forPattern(format);
+          DateTimeFormatter formatter = DateTimeFormat.forPattern(format).withZoneUTC();
           dt = formatter.parseDateTime(string);
         }
         return dt.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"));
@@ -49,6 +53,6 @@ public class DateParse {
   };
 
   public static void register(SQLContext sqlContext) {
-    sqlContext.udf().register(name, udf, dataTypes);
+    sqlContext.udf().register("date_parse", udf, DataTypes.StringType);
   }
 }

@@ -57,6 +57,7 @@ public class SparkDDF extends DDF {
   public DDF copy() throws DDFException {
     DDF newDDF = this.sql2ddf("select * from @this");
     newDDF.getMetaDataHandler().copy(this.getMetaDataHandler());
+    newDDF.getPersistenceHandler().setPersistable(this.getPersistenceHandler().isPersistable());
     return newDDF;
   }
 

@@ -234,7 +234,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @throws DDFException
    */
   public DDF newDDF(DDFManager manager) throws DDFException {
-    return this.newDDF(new Class<?>[] { DDFManager.class }, new Object[] { manager });
+    DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class }, new Object[] { manager });
+    ddf.getPersistenceHandler().setPersistable(false);
+    return ddf;
   }
 
   /**
@@ -244,7 +246,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @throws DDFException
    */
   public DDF newDDF() throws DDFException {
-    return this.newDDF(new Class<?>[] { DDFManager.class }, new Object[] { this });
+    DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class }, new Object[] { this });
+    ddf.getPersistenceHandler().setPersistable(false);
+    return ddf;
   }
 
   @SuppressWarnings("unchecked")
