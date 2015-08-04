@@ -42,6 +42,7 @@ public class TableVisitor
         ItemsListVisitor, OrderByVisitor, SelectItemVisitor, StatementVisitor, ClusterByVisitor {
 
     protected List<String> withTableNameList = new ArrayList<String>();
+    protected List<String> aliasTableNameList = new ArrayList<>();
     /**
      * @brief Visit the statement. This is the function that should be called
      * in the first place.
@@ -74,6 +75,28 @@ public class TableVisitor
      * @brief The following functions override functions of the interfaces.
      */
     public void visit(PlainSelect plainSelect) throws Exception {
+        if (plainSelect.getFromItem() != null) {
+            if (plainSelect.getFromItem().getAlias() != null) {
+                this.aliasTableNameList.add(plainSelect.getFromItem()
+                        .getAlias().getName());
+            }
+            plainSelect.getFromItem().accept(this);
+        }
+
+        if (plainSelect.getJoins() != null) {
+            for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
+                Join join = (Join) joinsIt.next();
+                if (join.getRightItem().getAlias() != null) {
+                    this.aliasTableNameList.add(join.getRightItem().getAlias
+                            ().getName());
+                }
+                if (join.getOnExpression() != null) {
+                    join.getOnExpression().accept(this);
+                }
+                join.getRightItem().accept(this);
+            }
+        }
+
         // Select selectItem From fromItem, joinItem Where whereClause.
         if (plainSelect.getSelectItems() != null) {
             for (SelectItem selectItem : plainSelect.getSelectItems()) {
@@ -81,19 +104,6 @@ public class TableVisitor
             }
         }
 
-        if (plainSelect.getFromItem() != null) {
-            plainSelect.getFromItem().accept(this);
-        }
-
-        if (plainSelect.getJoins() != null) {
-            for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
-                Join join = (Join) joinsIt.next();
-                if (join.getOnExpression() != null) {
-                    join.getOnExpression().accept(this);
-                }
-                join.getRightItem().accept(this);
-            }
-        }
 
         if (plainSelect.getWhere() != null) {
             plainSelect.getWhere().accept(this);

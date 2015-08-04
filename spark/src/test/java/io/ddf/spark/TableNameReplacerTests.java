@@ -26,7 +26,22 @@ public class TableNameReplacerTests {
     public static DDFManager manager;
     public static CCJSqlParserManager parser;
 
-
+    @Test
+    public void testAlias() {
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        String sqlcmd = "select T0.id from (select tmp.id from ddf://adatao/a" +
+                " " +
+                "tmp) T0";
+        try {
+            Statement statement = parser.parse(new StringReader(sqlcmd));
+            statement = tableNameReplacer.run(statement);
+            System.out.println(statement.toString());
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @Test
     public void testRealQuery() {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);

@@ -159,6 +159,12 @@ public class TableNameReplacer extends TableVisitor {
                 return;
             }
         }
+        for (String tablename : this.aliasTableNameList) {
+            if (tablename.equals(name)) {
+                return;
+            }
+        }
+        
         Matcher matcher = this.uriPattern.matcher(name);
         if (matcher.matches()) {
             // The first situation.
