@@ -351,6 +351,10 @@ public abstract class DDF extends ALoggable //
     return this.mCreatedTime;
   }
 
+  public void setCreatedTime(Date createdTime) {
+    this.mCreatedTime = createdTime;
+  }
+
   // ///// Execute a sqlcmd
   public SqlResult sql(String sqlCommand, String errorMessage) throws DDFException {
     try {
