@@ -213,11 +213,7 @@ public class TableNameReplacer extends TableVisitor {
             //        (namespace.concat("/")
             //        .concat
             //        (name));
-            String uri = this.ddfManager.getDDFCoordinator().getURIByName(name);
-            if (uri == null) {
-                throw new Exception("ERROR: There is no ddf with name: " +
-                        name);
-            }
+            String uri  = "ddf://" + namespace + "/" + name;
             this.ddfManager.log("debug1");
             String tablename = this.handleDDFURI(uri);
             table.setName(tablename);
@@ -297,8 +293,9 @@ public class TableNameReplacer extends TableVisitor {
             try {
                 // Restore the ddf first.
                 try {
-               // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
-               ddf = this.ddfManager.getDDFByURI(ddfuri);
+                   // TODO: fix setDDFName.scala first.
+                   // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
+                  ddf = this.ddfManager.getDDFByURI(ddfuri);
                 }
                 catch (Exception e) {
                     this.ddfManager.log("restore error");

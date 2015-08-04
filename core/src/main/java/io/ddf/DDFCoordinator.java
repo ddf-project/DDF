@@ -14,27 +14,43 @@ public class DDFCoordinator {
     private List<DDFManager> mDDFManagerList
             = new ArrayList<DDFManager>();
     // The mapping from engine name to ddfmanager.
+    private Map<UUID, DDFManager> mUuid2DDFManager
+            = new HashMap<UUID, DDFManager>();
+    private Map<String, DDFManager> mURI2DDFManager
+            = new HashMap<String, DDFManager>();
     private Map<String, DDFManager> mName2DDFManager
             = new HashMap<String, DDFManager>();
     // The default engine.
     private String mDefaultEngine;
     private String mComputeEngine;
-    private Map<String, String> mDDFName2URI = new HashMap<String, String>();
 
-
-    public String getURIByName(String name) {
-        return mDDFName2URI.get(name);
-    }
-
-    public void setName2URI(String name, String uri) {
-        mDDFName2URI.put(name, uri);
-    }
 
     public String getDefaultEngine() {
         if (mDefaultEngine == null) {
             mDefaultEngine = "spark";
         }
         return mDefaultEngine;
+    }
+
+    public void setURI2DDFManager(String uri, DDFManager ddfManager) {
+        ddfManager.log("Set uri2ddfManager with uri: " + uri);
+        mURI2DDFManager.put(uri, ddfManager);
+    }
+
+    public DDFManager getDDFManagerByURI(String uri) throws DDFException {
+        DDFManager dm =  mURI2DDFManager.get(uri);
+        if (dm == null) {
+            throw new DDFException("Can't find ddfmanager for ddf: " + uri);
+        }
+        return dm;
+    }
+
+    public void setUuid2DDFManager(UUID uuid, DDFManager ddfManager) {
+        mUuid2DDFManager.put(uuid, ddfManager);
+    }
+
+    public DDFManager getDDFManagerByUUID(UUID uuid) {
+        return mUuid2DDFManager.get(uuid);
     }
 
     public void setDefaultEngine(String defaultEngine) {

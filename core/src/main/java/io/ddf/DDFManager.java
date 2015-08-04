@@ -134,12 +134,17 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @return The engine name.
    */
   public String getEngineNameOfDDF(String ddfURI) throws DDFException {
-    String[] stringArrays = ddfURI.split("/");
+    // String[] stringArrays = ddfURI.split("/");
     // Test here.
-    if (stringArrays.length <= 2) {
-      throw new DDFException("Can't get engine from the uri");
+    // if (stringArrays.length <= 2) {
+    //   throw new DDFException("Can't get engine from the uri");
+    // }
+    // return stringArrays[2];
+    DDFManager manager = this.getDDFCoordinator().getDDFManagerByURI(ddfURI);
+    if (manager == null) {
+      manager.log("Can't get manager for " + ddfURI);
     }
-    return stringArrays[2];
+    return manager.getEngineName();
   }
 
   /**
@@ -188,10 +193,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
     mDDFCache.setDDFName(ddf, name);
-    mLog.info("set ddfname : " + "ddf://" + this.getEngineName() + "/" +
-            this.getNamespace() + "/" + name);
-    mDDFCoordinator.setName2URI(name, "ddf://" + this.getEngineName() + "/" +
-            this.getNamespace() + "/" + name);
+    mLog.info("set ddfname : " + "ddf://" + this.getNamespace() + "/" + name);
+    mDDFCoordinator.setURI2DDFManager("ddf://" + this.getNamespace() + "/" +
+            name, this);
+    mDDFCoordinator.setUuid2DDFManager(ddf.getUUID(), this);
   }
 
   public synchronized void setDDFUUID(DDF ddf, UUID uuid) throws DDFException {

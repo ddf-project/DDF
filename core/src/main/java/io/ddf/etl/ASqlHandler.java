@@ -23,7 +23,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.show.ShowTables;
 
 import java.awt.*;
-import java.io.StringReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -153,7 +153,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         return this.describeTable(((DescribeTable)statement).getName().getName());
       } else if (statement instanceof  Select) {
         // Standard SQL.
-        statement = tableNameReplacer.run(statement);
+          this.mLog.info("replace: " + sqlcmd);
+          statement = tableNameReplacer.run(statement);
           this.mLog.info("New stat is " + statement.toString());
         return this.sql(statement.toString(), maxRows, dataSource);
       } else if (statement instanceof Drop) {
@@ -165,10 +166,26 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       }
     } catch (Exception e) {
       // It's neither standard SQL nor allowed DDL.
-      // e.printStackTrace();
-      // Just pass it to lower level SE.
-      // return this.sql(sqlcmd, maxRows, dataSource);
-      // System.out.println(sqlcmd);
+        OutputStream os = new OutputStream()
+        {
+            private StringBuilder string = new StringBuilder();
+            @Override
+            public void write(int b) throws IOException {
+                this.string.append((char) b );
+            }
+
+            //Netbeans IDE automatically overrides this toString()
+            public String toStringD(){
+                return this.string.toString();
+            }
+        };
+        e.printStackTrace(new PrintStream(os));
+        this.mLog.info(os.toString());
+
+        // Just pass it to lower level SE.
+        // return this.sql(sqlcmd, maxRows, dataSource);
+        // System.out.println(sqlcmd);
+        this.mLog.info("error: " + sqlcmd);
       throw  new DDFException(e);
     }
   }
@@ -251,6 +268,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       if (!(statement instanceof Select)) {
         throw  new DDFException("ERROR: Only select is allowed in this sql2ddf");
       } else {
+          this.mLog.info("replace: " + command);
         statement = tableNameReplacer.run(statement);
           this.mLog.info("New stat is " + statement.toString());
         return this.sql2ddf(statement.toString(), schema, dataSource, dataFormat);
@@ -260,6 +278,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       // e.printStackTrace();
       // Just pass it to lower level SE.
       // System.out.println(command);
+        this.mLog.info("sqlcmd : " + command);
       throw new DDFException(e);
     }
   }
