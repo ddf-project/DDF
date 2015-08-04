@@ -270,4 +270,24 @@ object SparkUtils {
       case x => throw new DDFException(s"Type not support $x")
     }
   }
+
+  def ddf2SparkType(colType: Schema.ColumnType): DataType = {
+    colType match {
+      case Schema.ColumnType.TINYINT => ByteType
+      case Schema.ColumnType.SMALLINT => ShortType
+      case Schema.ColumnType.INT => IntegerType
+      case Schema.ColumnType.FLOAT => FloatType
+      case Schema.ColumnType.DOUBLE => DoubleType
+      case Schema.ColumnType.DECIMAL => DecimalType()
+      case Schema.ColumnType.STRING => StringType
+      case Schema.ColumnType.BOOLEAN => BooleanType
+      case Schema.ColumnType.BINARY => BinaryType
+      case Schema.ColumnType.TIMESTAMP => TimestampType
+      case Schema.ColumnType.DATE => DateType
+      case Schema.ColumnType.STRUCT => null
+      case Schema.ColumnType.ARRAY => null
+      case Schema.ColumnType.MAP => null
+    }
+  }
+
 }
