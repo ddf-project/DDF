@@ -69,9 +69,20 @@ public class SparkDDFManager extends DDFManager {
       JDBCDataSourceDescriptor.JDBCDataSourceCredentials jdbcCredential =
               jdbcDataSourceDescriptor.getCredentials();
 
-      options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri()
-              .toString() + "?user=" + jdbcCredential.getUserName() +
-              "&password="+jdbcCredential.getPassword());
+      // TODO
+      if (fromManager.getEngine().equals("sfdc")) {
+        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri
+                ().toString());
+        mLog.info("sfdc uri: " + jdbcDataSourceDescriptor.getDataSourceUri()
+                .getUri().toString());
+      } else {
+        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri()
+                .toString() + "?user=" + jdbcCredential.getUserName() +
+                "&password="+jdbcCredential.getPassword());
+
+      }
+
+
       // TODO: Pay attention here. Some maybe username?
       // options.put("user", jdbcCredential.getUserName());
       // options.put("password", jdbcCredential.getPassword());

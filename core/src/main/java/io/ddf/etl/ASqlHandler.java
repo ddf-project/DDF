@@ -175,7 +175,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
             }
 
             //Netbeans IDE automatically overrides this toString()
-            public String toStringD(){
+            public String toString(){
                 return this.string.toString();
             }
         };
@@ -274,6 +274,21 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         return this.sql2ddf(statement.toString(), schema, dataSource, dataFormat);
       }
     } catch (Exception e) {
+        OutputStream os = new OutputStream()
+        {
+            private StringBuilder string = new StringBuilder();
+            @Override
+            public void write(int b) throws IOException {
+                this.string.append((char) b );
+            }
+
+            //Netbeans IDE automatically overrides this toString()
+            public String toString(){
+                return this.string.toString();
+            }
+        };
+        e.printStackTrace(new PrintStream(os));
+        this.mLog.info(os.toString());
       // It's neither standard SQL nor allowed DDL.
       // e.printStackTrace();
       // Just pass it to lower level SE.
