@@ -11,15 +11,19 @@ import io.ddf.datasource.DataSourceURI;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
+import io.ddf.spark.content.SchemaHandler;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
+import org.apache.spark.sql.DataFrame;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -412,9 +416,10 @@ public class TableNameReplacerTests {
     @BeforeClass
     public static void startServer() throws Exception {
         Thread.sleep(1000);
-        DDFCoordinator ddfCoordinator = new DDFCoordinator();
+        // DDFCoordinator ddfCoordinator = new DDFCoordinator();
         // LOG = LoggerFactory.getLogger(BaseTest.class);
         // manager = DDFManager.get("spark");
+        /**
         manager = DDFManager.get("jdbc", new JDBCDataSourceDescriptor(new
                 DataSourceURI("jdbc:mysql://localhost/testdb"), new
                 JDBCDataSourceDescriptor.JDBCDataSourceCredentials("pauser",
@@ -425,8 +430,32 @@ public class TableNameReplacerTests {
             System.out.println("hello");
         }
         DDF ret = manager.sql2ddf("select * from testtable", "jdbc");
-        // Add 2 test ddfs.
+        // Add 2 test ddfs.*/
+
+        System.setProperty("spark.driver.port", Integer.toString(20002));
+        System.setProperty("spark.ui.port", Integer.toString(30001));
+
         DDFManager manager2 = DDFManager.get("spark");
+        SparkDDFManager s2 = (SparkDDFManager)manager2;
+
+        Map<String, String> options = new HashMap<String, String>();
+        options.put("dbtable", "(select * from testtable, testtable2 where " +
+                "testtable.value = testtable2.value2) tmptable");
+
+
+        options.put("url", "jdbc:mysql://localhost/testdb" +
+                        "?user=pauser&password=papwd");
+
+
+        // TODO: Pay attention here. Some maybe username?
+        // options.put("user", jdbcCredential.getUserName());
+        // options.put("password", jdbcCredential.getPassword());
+        // TODO: What if sfdc.
+        DataFrame rdd = s2.getHiveContext().load("jdbc", options);
+        if (rdd == null) {
+            throw new DDFException("fail use spark datasource api");
+        }
+        // Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
         Schema schema = new Schema("tablename1", "d  d,d  d");
         DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class
                 }, "spark", "adatao", "a",
