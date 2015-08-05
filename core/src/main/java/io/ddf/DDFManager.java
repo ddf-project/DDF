@@ -156,6 +156,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    */
   public abstract DDF transfer(String fromEngine, String ddfuri) throws DDFException;
 
+  public  DDF transferByTable(String fromEngine, String tableName)
+          throws  DDFException { return null; }
 
   /**
    * List of existing DDFs

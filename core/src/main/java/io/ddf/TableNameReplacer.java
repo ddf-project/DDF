@@ -33,6 +33,10 @@ public class TableNameReplacer extends TableVisitor {
     private DDFManager ddfManager = null;
     // DDF uri to table name mapping.
     private Map<String, String> uri2tbl = new HashMap<String, String>();
+    private Map<String, List<Table>> uri2TableObj
+            = new HashMap<String, List<Table>>();
+    public Boolean containsLocalTable = false;
+
 
     /**
      * @brief Constructor.
@@ -118,6 +122,27 @@ public class TableNameReplacer extends TableVisitor {
             ((DescribeTable)statement).accept(this);
             // TODO: Handler for other statments.
         }
+        if (containsLocalTable) {
+            // contains local table, can only use local spark.
+            for (String uri : this.uri2TableObj.keySet()) {
+                DDF ddf = this.ddfManager.transfer(this.getDDFManager()
+                                .getEngineNameOfDDF(uri),
+                        uri);
+                for (Table table : this.uri2TableObj.get(uri)) {
+                    table.setName(ddf.getTableName());
+                }
+            }
+        } else {
+            for (String uri : this.uri2TableObj.keySet()) {
+                String fromEngineName = this.ddfManager.getEngineNameOfDDF(uri);
+                DDFManager fromManager = this.ddfManager.getDDFCoordinator()
+                        .getEngine(fromEngineName);
+                DDF ddf = fromManager.getDDFByURI(uri);
+                for (Table table : this.uri2TableObj.get(uri)) {
+                    table.setName(ddf.getTableName());
+                }
+            }
+        }
         return statement;
     }
 
@@ -162,8 +187,15 @@ public class TableNameReplacer extends TableVisitor {
         if (matcher.matches()) {
             // The first situation.
             String tablename = this.handleDDFURI(name);
-            table.setName(tablename);
-
+            if (tablename == null) {
+                // It's not from this engine.
+                if (!this.uri2TableObj.containsKey(name)) {
+                    uri2TableObj.put(name, new ArrayList<Table>());
+                }
+                uri2TableObj.get(name).add(table);
+            } else {
+                table.setName(tablename);
+            }
         } else if (uriList != null || uuidList != null) {
             // The third situation.
             Pattern indexPattern = Pattern.compile("\\{\\d+\\}");
@@ -192,11 +224,20 @@ public class TableNameReplacer extends TableVisitor {
                     if (index > uriList.size()) {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
-                        String tablename = this.handleDDFURI(uriList.get
-                                (index - 1));
-                        table.setName(tablename);
-                        this.ddfManager.log("replace ddf uri " + uriList.get
-                                (index-1) + " with " + tablename);
+                        String uri = uriList.get(index - 1);
+                        String tablename = this.handleDDFURI(uri);
+                        if (tablename == null) {
+                            // It's not from this engine.
+                            if (!this.uri2TableObj.containsKey(uri)) {
+                                uri2TableObj.put(uri, new ArrayList<Table>());
+                            }
+                            uri2TableObj.get(uri).add(table);
+                        } else {
+                            table.setName(tablename);
+
+                            this.ddfManager.log("replace ddf uri " + uriList
+                                    .get(index - 1) + " with " + tablename);
+                        }
                     }
                 }
             } else {
@@ -216,7 +257,15 @@ public class TableNameReplacer extends TableVisitor {
             String uri  = "ddf://" + namespace + "/" + name;
             this.ddfManager.log("debug1");
             String tablename = this.handleDDFURI(uri);
-            table.setName(tablename);
+            if (tablename == null) {
+                // It's not from this engine.
+                if (!this.uri2TableObj.containsKey(uri)) {
+                    uri2TableObj.put(uri, new ArrayList<Table>());
+                }
+                uri2TableObj.get(uri).add(table);
+            } else {
+                table.setName(tablename);
+            }
         } else {
             // No modification.
             throw new Exception("ERROR: The ddf reference should either full uri, ddfname with namespace or list index");
@@ -306,16 +355,19 @@ public class TableNameReplacer extends TableVisitor {
             } catch (DDFException e) {
                 throw new Exception("ERROR: There is no ddf with uri:" + ddfuri);
             }
+            containsLocalTable = true;
             return ddf.getTableName();
         } else {
             // Transfer from the other engine.
-            if (!uri2tbl.containsKey(ddfuri)) {
-                DDF ddf = this.ddfManager.transfer(engineName, ddfuri);
-                uri2tbl.put(ddfuri, ddf.getTableName());
-            }
+            // if (!uri2tbl.containsKey(ddfuri)) {
+            //    DDF ddf = this.ddfManager.transfer(engineName, ddfuri);
+            //    uri2tbl.put(ddfuri, ddf.getTableName());
+            //
+            // }
 
             this.ddfManager.log("debug4");
-            return uri2tbl.get(ddfuri);
+            // return uri2tbl.get(ddfuri);
+            return null;
         }
     }
 }

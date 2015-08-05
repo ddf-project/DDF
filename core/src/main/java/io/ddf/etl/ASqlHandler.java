@@ -155,8 +155,12 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         // Standard SQL.
           this.mLog.info("replace: " + sqlcmd);
           statement = tableNameReplacer.run(statement);
-          this.mLog.info("New stat is " + statement.toString());
-        return this.sql(statement.toString(), maxRows, dataSource);
+          if (tableNameReplacer.containsLocalTable) {
+              this.mLog.info("New stat is " + statement.toString());
+              return this.sql(statement.toString(), maxRows, dataSource);
+          } else {
+
+          }
       } else if (statement instanceof Drop) {
           // TODO: +rename
           return null;

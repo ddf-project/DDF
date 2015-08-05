@@ -48,16 +48,9 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
+  public DDF transferByTable(String fromEngine, String tableName) throws
+          DDFException {
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
-    mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
-    DDF fromDDF = fromManager.getDDFByURI(ddfuri);
-    if (fromDDF == null) {
-      throw new DDFException("There is no ddf with uri : " + ddfuri + " in " +
-              "another engine");
-    }
-    String fromTableName = fromDDF.getTableName();
-
     DataSourceDescriptor dataSourceDescriptor = fromManager
             .getDataSourceDescriptor();
     if (dataSourceDescriptor instanceof JDBCDataSourceDescriptor) {
@@ -65,7 +58,7 @@ public class SparkDDFManager extends DDFManager {
       JDBCDataSourceDescriptor jdbcDataSourceDescriptor = (JDBCDataSourceDescriptor)
               dataSourceDescriptor;
       Map<String, String> options = new HashMap<String, String>();
-      options.put("dbtable", fromTableName);
+      options.put("dbtable", tableName);
       JDBCDataSourceDescriptor.JDBCDataSourceCredentials jdbcCredential =
               jdbcDataSourceDescriptor.getCredentials();
 
@@ -93,13 +86,26 @@ public class SparkDDFManager extends DDFManager {
       }
       Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
       DDF ddf = this.newDDF(this, rdd, new Class<?>[]
-                      {DataFrame.class}, null, null, null, schema);
+              {DataFrame.class}, null, null, null, schema);
       ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
       return ddf;
     } else {
       throw new DDFException("Currently no other DataSourceDescriptor is " +
               "supported");
     }
+  }
+
+  @Override
+  public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
+    DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
+    mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
+    DDF fromDDF = fromManager.getDDFByURI(ddfuri);
+    if (fromDDF == null) {
+      throw new DDFException("There is no ddf with uri : " + ddfuri + " in " +
+              "another engine");
+    }
+    String fromTableName = fromDDF.getTableName();
+    return this.transferByTable(fromEngine, fromTableName);
   }
 
   /**

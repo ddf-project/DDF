@@ -30,6 +30,19 @@ public class TableNameReplacerTests {
     public static DDFManager manager;
     public static CCJSqlParserManager parser;
 
+    @Test void testUnion() {
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        String sqlcmd = "select * from ddf://adatao/a union select * from " +
+                "ddf://adatao/b";
+        try {
+            Statement statement = parser.parse(new StringReader(sqlcmd));
+            // System.out.println(statement.toString());
+            tableNameReplacer.run(statement);
+            int a = 2;
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void testRealQuery() {
@@ -413,6 +426,7 @@ public class TableNameReplacerTests {
         Thread.sleep(1000);
         // LOG = LoggerFactory.getLogger(BaseTest.class);
         // manager = DDFManager.get("spark");
+        /*
         manager = DDFManager.get("jdbc", new JDBCDataSourceDescriptor(new
                 DataSourceURI("jdbc:mysql://localhost/testdb"), new
                 JDBCDataSourceDescriptor.JDBCDataSourceCredentials("pauser",
@@ -422,7 +436,7 @@ public class TableNameReplacerTests {
                 JDBCDataSourceDescriptor) {
             System.out.println("hello");
         }
-        DDF ret = manager.sql2ddf("select * from testtable", "jdbc");
+        DDF ret = manager.sql2ddf("select * from testtable", "jdbc");*/
         // Add 2 test ddfs.
         DDFManager manager2 = DDFManager.get("spark");
         Schema schema = new Schema("tablename1", "d  d,d  d");
