@@ -67,7 +67,7 @@ public class SqlHandler extends ASqlHandler {
     try {
       Statement statement = conn.createStatement();
       String randomTbName = this.randomString(24);
-      this.getManager().log("create table " + randomTbName);
+      this.getManager().log("create table DDFTable_" + randomTbName);
       // statement.execute("create table "+ randomTbName + " as (" + command +
       //        ")");
       statement.execute("create view " + randomTbName + " as " + command);
