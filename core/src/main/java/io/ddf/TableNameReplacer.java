@@ -36,7 +36,7 @@ public class TableNameReplacer extends TableVisitor {
     private Map<String, List<Table>> uri2TableObj
             = new HashMap<String, List<Table>>();
     public Boolean containsLocalTable = false;
-
+    public String fromEngineName = null;
 
     /**
      * @brief Constructor.
@@ -134,7 +134,9 @@ public class TableNameReplacer extends TableVisitor {
             }
         } else {
             for (String uri : this.uri2TableObj.keySet()) {
-                String fromEngineName = this.ddfManager.getEngineNameOfDDF(uri);
+                String fromEngineName2 = this.ddfManager.getEngineNameOfDDF
+                        (uri);
+                this.fromEngineName = fromEngineName2;
                 DDFManager fromManager = this.ddfManager.getDDFCoordinator()
                         .getEngine(fromEngineName);
                 DDF ddf = fromManager.getDDFByURI(uri);

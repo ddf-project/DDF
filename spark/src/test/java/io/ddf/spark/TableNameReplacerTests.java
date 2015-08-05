@@ -37,7 +37,6 @@ public class TableNameReplacerTests {
         try {
             Statement statement = parser.parse(new StringReader(sqlcmd));
             // System.out.println(statement.toString());
-            tableNameReplacer.run(statement);
             int a = 2;
         } catch (JSQLParserException e) {
             e.printStackTrace();
