@@ -86,7 +86,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
     var intervals = createIntervals(breaks, includeLowest, right)
 
-    var newddf = mDDF.getManager().sql2ddf(createTransformSqlCmd(column, intervals, includeLowest, right))
+    var newddf = mDDF.getManager().sql2ddf(createTransformSqlCmd(column, intervals, includeLowest, right), this.getEngine)
 
     //    mDDF.getManager().addDDF(newddf)
 
@@ -165,7 +165,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
   }
 
   def getIntervalsFromNumBins(colName: String, bins: Int): Array[Double] = {
-    val cmd = "SELECT min(%s), max(%s) FROM %s".format(colName, colName, mDDF.getTableName)
+    val cmd = "SELECT min(%s), max(%s) FROM %s".format(colName, colName, "@this")
     val res: Array[Double] = mDDF.sql(cmd, "").getRows.get(0).split("\t").map(x ⇒ x.toDouble)
     val (min, max) = (res(0), res(1))
     val eachInterval = (max - min) / bins

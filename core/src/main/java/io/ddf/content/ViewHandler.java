@@ -124,7 +124,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   private DDF sql2ddf(String sqlCommand, String errorMessage) throws DDFException {
     try {
-      return this.getManager().sql2ddf(String.format(sqlCommand, this.getDDF().getTableName()));
+      return this.getManager().sql2ddf(String.format(sqlCommand, this.getDDF().getTableName()), this.getEngine());
 
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getDDF().getTableName()), e);
@@ -149,7 +149,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
     mLog.info("sql = {}", sqlCmd);
 
-    DDF subset = this.getManager().sql2ddf(sqlCmd);
+    DDF subset = this.getManager().sql2ddf(sqlCmd, this.getEngine());
 
     subset.getMetaDataHandler().copyFactor(this.getDDF());
     return subset;

@@ -29,7 +29,8 @@ public class BasicDDFTests {
     String namespace = null; // use default
     String name = this.getClass().getSimpleName();
     Schema schema = new Schema(name, "name string, value string");
-    DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[].class, namespace, name, schema);
+    DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[]
+            .class, null, namespace, name, schema);
     return ddf;
   }
 

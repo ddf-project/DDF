@@ -107,7 +107,7 @@ object SparkUtils {
   }
 
   private def flattenColumnNamesFromStruct(structField: StructField, resultList: ArrayBuffer[String], curColName: String): Unit = {
-    val colName = if(curColName == "") structField.name else (curColName + "." + structField.name)
+    val colName = if(curColName == "") structField.name else (curColName + "->" + structField.name)
     val dType = structField.dataType
 
     if(dType.typeName != "struct") {

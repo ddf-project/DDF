@@ -22,7 +22,9 @@ public class BinningHandlerTest extends BaseTest {
     createTableAirline();
 
     DDF ddf = manager
-        .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
+        .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, " +
+                "distance, arrdelay, depdelay, carrierdelay, weatherdelay, " +
+                "nasdelay, securitydelay, lateaircraftdelay from airline", "SparkSQL");
 
     DDF newddf = ddf.binning("dayofweek", "EQUALINTERVAL", 2, null, true, true);
 

@@ -19,7 +19,9 @@ public class AggregationHandlerTest extends BaseTest {
     createTableAirline();
 
     ddf = manager
-        .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline");
+        .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, " +
+                "distance, arrdelay, depdelay, carrierdelay, weatherdelay, " +
+                "nasdelay, securitydelay, lateaircraftdelay from airline", "SparkSQL");
   }
 
 

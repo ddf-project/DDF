@@ -25,6 +25,7 @@ abstract public class DataSourceDescriptor {
     this.mFileFormat = fileFormat;
   }
 
+  public DataSourceDescriptor() {}
 
   public void setDataSourceSchema(DataSourceSchema dataSourceSchema) {
     this.mDataSourceSchema = dataSourceSchema;

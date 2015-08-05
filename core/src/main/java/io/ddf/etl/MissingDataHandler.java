@@ -60,7 +60,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
         sqlCmd = dropNARowSQL(numcols, columns);
       }
 
-      newddf = this.getManager().sql2ddf(String.format(sqlCmd, this.getDDF().getTableName()));
+      newddf = this.getManager().sql2ddf(String.format(sqlCmd, this.getDDF().getTableName()),this.getEngine());
 
     } else if (axis == Axis.COLUMN) { // drop column with NA
       List<String> cols = Lists.newArrayList();
@@ -153,7 +153,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
     if (method == null) {
       String sqlCmd = fillNAWithValueSQL(value, function, columnsToValues, columns);
       mLog.info("FillNA sql command: " + sqlCmd);
-      newddf = this.getManager().sql2ddf(String.format(sqlCmd, this.getDDF().getTableName()));
+      newddf = this.getManager().sql2ddf(String.format(sqlCmd, this.getDDF().getTableName()), this.getEngine());
 
     } else { // interpolation methods 'ffill' or 'bfill'
       // TODO:
