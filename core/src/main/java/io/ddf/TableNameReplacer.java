@@ -122,6 +122,14 @@ public class TableNameReplacer extends TableVisitor {
             ((DescribeTable)statement).accept(this);
             // TODO: Handler for other statments.
         }
+        if (this.uri2TableObj.isEmpty()) {
+            return statement;
+        } else {
+            if (!this.getDDFManager().getEngine().equals("spark")) {
+                throw new DDFException("For this engine, only local table " +
+                        "can be referred");
+            }
+        }
         if (containsLocalTable) {
             // contains local table, can only use local spark.
             for (String uri : this.uri2TableObj.keySet()) {

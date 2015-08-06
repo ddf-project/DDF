@@ -18,6 +18,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Arrays;
 
 
@@ -30,7 +32,8 @@ public class TableNameReplacerTests {
     public static DDFManager manager;
     public static CCJSqlParserManager parser;
 
-    @Test void testUnion() {
+    @Test
+    public void testUnion() {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         String sqlcmd = "select * from ddf://adatao/a union select * from " +
                 "ddf://adatao/b";
@@ -423,6 +426,9 @@ public class TableNameReplacerTests {
     @BeforeClass
     public static void startServer() throws Exception {
         Thread.sleep(1000);
+        Connection connection = DriverManager.getConnection("jdbc:salesforce:User=bhan@adatao.com;Password=adataoisc00l;SecurityToken=K0nvp6LTr63PcyuEZtIiXk90;");
+        java.sql.Statement sqlstat = connection.createStatement();
+        sqlstat.execute("select * from account");
         // LOG = LoggerFactory.getLogger(BaseTest.class);
         // manager = DDFManager.get("spark");
         /*
@@ -437,6 +443,7 @@ public class TableNameReplacerTests {
         }
         DDF ret = manager.sql2ddf("select * from testtable", "jdbc");*/
         // Add 2 test ddfs.
+
         DDFManager manager2 = DDFManager.get("spark");
         Schema schema = new Schema("tablename1", "d  d,d  d");
         DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class

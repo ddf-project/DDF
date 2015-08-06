@@ -50,6 +50,9 @@ public class SparkDDFManager extends DDFManager {
   @Override
   public DDF transferByTable(String fromEngine, String tableName) throws
           DDFException {
+
+    mLog.info("Get the engine " + fromEngine + " to transfer table : " +
+            tableName);
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
     DataSourceDescriptor dataSourceDescriptor = fromManager
             .getDataSourceDescriptor();

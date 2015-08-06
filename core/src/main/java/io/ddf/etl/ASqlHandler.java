@@ -251,6 +251,10 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                            DataSourceDescriptor dataSource,
                            DataFormat dataFormat,
                            TableNameReplacer tableNameReplacer) throws DDFException {
+      if (!this.getManager().getEngine().equals("spark")) {
+          throw new DDFException("Currently the sql2ddf operation is only " +
+                  "supported in spark");
+      }
     if (dataSource != null) {
         if (dataSource instanceof JDBCDataSourceDescriptor) {
             return this.sql2ddf(command, schema, dataSource, dataFormat);
@@ -279,8 +283,20 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       } else {
           this.mLog.info("replace: " + command);
         statement = tableNameReplacer.run(statement);
-          this.mLog.info("New stat is " + statement.toString());
-        return this.sql2ddf(statement.toString(), schema, dataSource, dataFormat);
+          if (tableNameReplacer.containsLocalTable) {
+              this.mLog.info("New stat is " + statement.toString());
+              return this.sql2ddf(statement.toString(), schema, dataSource,
+                      dataFormat);
+          } else {
+              String selectString = statement.toString();
+              DDF ddf = this.getManager().transfer(tableNameReplacer
+                      .fromEngineName, "select * from (" + selectString + ") " +
+                      "newtable" );
+              return ddf;
+              // return this.sql2ddf("select * from " + ddf.getTableName(),
+              //        schema,
+              //        dataSource, dataFormat);
+          }
       }
     } catch (Exception e) {
         OutputStream os = new OutputStream()
