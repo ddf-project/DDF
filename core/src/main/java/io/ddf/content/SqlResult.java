@@ -29,5 +29,20 @@ public class SqlResult {
   }
 
   private Schema schema;
+
   private List<String> rows;
+
+  public String toString(){
+    String outString = "";
+
+    for (String s : schema.getColumnNames()) {
+      outString += s + "\t";
+    }
+    outString += "\n";
+
+    for (String s : rows) {
+      outString += s + "\n";
+    }
+    return outString;
+  }
 }

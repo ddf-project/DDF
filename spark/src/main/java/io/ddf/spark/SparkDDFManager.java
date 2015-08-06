@@ -7,6 +7,7 @@ import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.etl.udf.DateParse;
+import io.ddf.spark.etl.udf.DateTimeExtract;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -17,10 +18,7 @@ import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //import shark.SharkEnv;
 //import shark.api.JavaSharkContext;
@@ -74,6 +72,7 @@ public class SparkDDFManager extends DDFManager {
   // TODO: Dynamically load UDFs
   private void registerUDFs() {
     DateParse.register(this.mHiveContext);
+    DateTimeExtract.register(this.mHiveContext);
   }
 
 
@@ -258,10 +257,20 @@ public class SparkDDFManager extends DDFManager {
     String tableName = "tbl" + String.valueOf(Math.abs(rand.nextLong()));
     String cmd = "CREATE TABLE " + tableName + "(" + StringUtils.join(metaInfos, ", ")
         + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY '" + fieldSeparator + "'";
-    sql(cmd);
+    sql(cmd, "SparkSQL");
     sql("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
-        "INTO TABLE " + tableName);
-    return sql2ddf("SELECT * FROM " + tableName);
+        "INTO TABLE " + tableName, "SparkSQL");
+    return sql2ddf("SELECT * FROM " + tableName, "SparkSQL");
+  }
+
+  @Override
+  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
+    return null;
+  }
+
+  @Override
+  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
+    return null;
   }
 
   /**

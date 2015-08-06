@@ -10,7 +10,7 @@ class MLSupporterSuite extends ATestSuite {
   createTableAirlineSmall()
 
   test("Test KMeans Prediction") {
-    val ddf: DDF = manager.sql2ddf("select year, month, dayofmonth from airline")
+    val ddf: DDF = manager.sql2ddf("select year, month, dayofmonth from airline", "SparkSQL")
     val k: Int = 5
     val numIterations: Int = 5
     val kmeansModel: IModel = ddf.ML.KMeans(5, 5, 2, "random")
@@ -23,7 +23,7 @@ class MLSupporterSuite extends ATestSuite {
 
   test("Test KMeans Prediction new Types") {
     createTableAirline_ColTypes()
-    val ddf: DDF = manager.sql2ddf("select year, month, dayofmonth, flightnum from airline_type")
+    val ddf: DDF = manager.sql2ddf("select year, month, dayofmonth, flightnum from airline_type", "SparkSQL")
     val k: Int = 5
     val numIterations: Int = 5
     val kmeansModel: IModel = ddf.ML.KMeans(5, 5, 2, "random")
