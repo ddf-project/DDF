@@ -107,6 +107,7 @@ public class SqlHandler extends ASqlHandler {
   @Override public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource) throws DDFException {
     Connection conn = this.getConn();
     Statement statement;
+    this.getManager().log("JDBC execute command : " + command);
     try {
       statement = conn.createStatement();
       Boolean ret = statement.execute(command);
@@ -170,7 +171,7 @@ public class SqlHandler extends ASqlHandler {
         }
       };
       e.printStackTrace(new PrintStream(os));
-      throw new DDFException("Encouter error when running sql query using jdbc");
+      throw new DDFException(e);
     }
   }
 

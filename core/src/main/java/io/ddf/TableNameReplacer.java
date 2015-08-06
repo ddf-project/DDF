@@ -5,6 +5,7 @@ import io.ddf.exception.DDFException;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
+import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.WithItem;
@@ -117,6 +118,8 @@ public class TableNameReplacer extends TableVisitor {
         } else if (statement instanceof DescribeTable){
             ((DescribeTable)statement).accept(this);
             // TODO: Handler for other statments.
+        } else if (statement instanceof Insert) {
+            ((Insert)statement).accept(this);
         }
         return statement;
     }
