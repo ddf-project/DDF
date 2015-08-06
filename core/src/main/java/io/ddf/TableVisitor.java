@@ -60,6 +60,8 @@ public class TableVisitor
             }
         } else if (statement instanceof DescribeTable) {
             ((DescribeTable)statement).accept(this);
+        } else if (statement instanceof Insert) {
+            ((Insert)statement).accept(this);
         }
         // TODO: Add more type support here.
     }
@@ -157,12 +159,16 @@ public class TableVisitor
     }
 
     public void visit(SetOperationList setOperationList) throws Exception {
-        for (SelectBody selectBody : setOperationList.getSelects()) {
-            selectBody.accept(this);
+        if (setOperationList.getSelects() != null) {
+            for (SelectBody selectBody : setOperationList.getSelects()) {
+                selectBody.accept(this);
+            }
         }
 
-        for (OrderByElement orderByElement : setOperationList.getOrderByElements()) {
-            orderByElement.accept(this);
+        if (setOperationList.getOrderByElements() != null) {
+            for (OrderByElement orderByElement : setOperationList.getOrderByElements()) {
+                orderByElement.accept(this);
+            }
         }
     }
 
@@ -509,7 +515,10 @@ public class TableVisitor
 
     @Override
     public void visit(Insert insert) throws Exception {
-
+        insert.getTable().accept(this);
+        if (insert.getSelect()!= null) {
+            insert.getSelect().accept(this);
+        }
     }
 
     @Override

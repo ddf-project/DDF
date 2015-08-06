@@ -19,6 +19,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.drop.Drop;
+import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.show.ShowTables;
 
@@ -160,6 +161,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       } else if (statement instanceof Drop) {
           // TODO: +rename
           return null;
+      } else if (statement instanceof Insert) {
+          statement = tableNameReplacer.run(statement);
+          return this.sql(statement.toString(), maxRows, dataSource);
       } else {
           throw  new DDFException("ERROR: Only show tables, describe tables, " +
                   "select, drop, and rename operations are allowed on ddf");

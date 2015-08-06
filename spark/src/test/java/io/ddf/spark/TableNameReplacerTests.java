@@ -419,7 +419,7 @@ public class TableNameReplacerTests {
         // DDFCoordinator ddfCoordinator = new DDFCoordinator();
         // LOG = LoggerFactory.getLogger(BaseTest.class);
         // manager = DDFManager.get("spark");
-        /**
+
         manager = DDFManager.get("jdbc", new JDBCDataSourceDescriptor(new
                 DataSourceURI("jdbc:mysql://localhost/testdb"), new
                 JDBCDataSourceDescriptor.JDBCDataSourceCredentials("pauser",

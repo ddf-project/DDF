@@ -13,6 +13,9 @@ import io.ddf.jdbc.JDBCDDF;
 import io.ddf.jdbc.JDBCDDFManager;
 import io.ddf.jdbc.JDBCUtils;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,9 +73,10 @@ public class SqlHandler extends ASqlHandler {
       this.getManager().log("create table DDFTable_" + randomTbName);
       // statement.execute("create table "+ randomTbName + " as (" + command +
       //        ")");
-      statement.execute("create view " + randomTbName + " as " + command);
+      statement.execute("create view DDFTable_" + randomTbName + " as " +
+              command);
       DDF ddf = new JDBCDDF((JDBCDDFManager)this.getManager(), null, null, null,
-             randomTbName);
+            "DDFTable_" + randomTbName);
       this.getManager().addDDF(ddf);
       this.getManager().log("add ddf");
       return ddf;
@@ -105,7 +109,16 @@ public class SqlHandler extends ASqlHandler {
     Statement statement;
     try {
       statement = conn.createStatement();
-      ResultSet rs = statement.executeQuery(command);
+      Boolean ret = statement.execute(command);
+      if (ret == false) {
+        // update
+        List<String> rows = new ArrayList<String>();
+        rows.add("ok");
+        SqlResult sqlResult = new SqlResult(null, rows);
+        return sqlResult;
+      }
+      // ResultSet rs = statement.executeQuery(command);
+      ResultSet rs = statement.getResultSet();
       ResultSetMetaData rsmd = rs.getMetaData();
       int colSize = rsmd.getColumnCount();
       if (colSize == 0) {
@@ -143,8 +156,20 @@ public class SqlHandler extends ASqlHandler {
 
       return new SqlResult(schema, result);
     } catch (SQLException e) {
-      mLog.debug(e.getMessage());
-      e.printStackTrace();
+      OutputStream os = new OutputStream()
+      {
+        private StringBuilder string = new StringBuilder();
+        @Override
+        public void write(int b) throws IOException {
+          this.string.append((char) b );
+        }
+
+        //Netbeans IDE automatically overrides this toString()
+        public String toString(){
+          return this.string.toString();
+        }
+      };
+      e.printStackTrace(new PrintStream(os));
       throw new DDFException("Encouter error when running sql query using jdbc");
     }
   }
