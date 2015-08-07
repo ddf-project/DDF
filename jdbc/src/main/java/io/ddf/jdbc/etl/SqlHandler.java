@@ -9,45 +9,81 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.etl.ASqlHandler;
 import io.ddf.exception.DDFException;
+import io.ddf.jdbc.JDBCDDF;
 import io.ddf.jdbc.JDBCDDFManager;
 import io.ddf.jdbc.JDBCUtils;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by freeman on 7/15/15.
  */
 public class SqlHandler extends ASqlHandler {
+
+  static final String AB = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  static Random rnd = new Random();
+
+  String randomString( int len )
+  {
+    StringBuilder sb = new StringBuilder( len );
+    for( int i = 0; i < len; i++ )
+      sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+    return sb.toString();
+  }
+
   public SqlHandler(DDF theDDF) {
     super(theDDF);
   }
 
   @Override public DDF sql2ddf(String command) throws DDFException {
-    return null;
+    return this.sql2ddf(command, null, null, null);
   }
 
   @Override public DDF sql2ddf(String command, Schema schema) throws DDFException {
-    return null;
+    return this.sql2ddf(command, schema, null, null);
   }
 
   @Override public DDF sql2ddf(String command, DataFormat dataFormat) throws DDFException {
-    return null;
+    return this.sql2ddf(command, null, null, dataFormat);
   }
 
   @Override public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource) throws DDFException {
-    return null;
+    return this.sql2ddf(command, schema, dataSource, null);
   }
 
   @Override public DDF sql2ddf(String command, Schema schema, DataFormat dataFormat) throws DDFException {
-    return null;
+    return this.sql2ddf(command, schema, null, dataFormat);
   }
 
   @Override public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource, DataFormat dataFormat)
       throws DDFException {
     // TODO: We can easily run sql, but we should generate ddf from the SqlResult.
-    return null;
+    this.getManager().log("sql2ddf in jdbc");
+    Connection conn = this.getConn();
+    try {
+      Statement statement = conn.createStatement();
+      String randomTbName = this.randomString(24);
+      this.getManager().log("create table DDFTable_" + randomTbName);
+      // statement.execute("create table "+ randomTbName + " as (" + command +
+      //        ")");
+      statement.execute("create view DDFTable_" + randomTbName + " as " +
+              command);
+      DDF ddf = new JDBCDDF((JDBCDDFManager)this.getManager(), null, null, null,
+            "DDFTable_" + randomTbName);
+      this.getManager().addDDF(ddf);
+      this.getManager().log("add ddf");
+      return ddf;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      throw new DDFException("Unable to generate jdbc ddf " + e.getMessage());
+    }
   }
 
   /**
@@ -71,9 +107,19 @@ public class SqlHandler extends ASqlHandler {
   @Override public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource) throws DDFException {
     Connection conn = this.getConn();
     Statement statement;
+    this.getManager().log("JDBC execute command : " + command);
     try {
       statement = conn.createStatement();
-      ResultSet rs = statement.executeQuery(command);
+      Boolean ret = statement.execute(command);
+      if (ret == false) {
+        // update
+        List<String> rows = new ArrayList<String>();
+        rows.add("ok");
+        SqlResult sqlResult = new SqlResult(null, rows);
+        return sqlResult;
+      }
+      // ResultSet rs = statement.executeQuery(command);
+      ResultSet rs = statement.getResultSet();
       ResultSetMetaData rsmd = rs.getMetaData();
       int colSize = rsmd.getColumnCount();
       if (colSize == 0) {
@@ -111,9 +157,21 @@ public class SqlHandler extends ASqlHandler {
 
       return new SqlResult(schema, result);
     } catch (SQLException e) {
-      mLog.debug(e.getMessage());
-      e.printStackTrace();
-      throw new DDFException("Encouter error when running sql query using jdbc");
+      OutputStream os = new OutputStream()
+      {
+        private StringBuilder string = new StringBuilder();
+        @Override
+        public void write(int b) throws IOException {
+          this.string.append((char) b );
+        }
+
+        //Netbeans IDE automatically overrides this toString()
+        public String toString(){
+          return this.string.toString();
+        }
+      };
+      e.printStackTrace(new PrintStream(os));
+      throw new DDFException(e);
     }
   }
 

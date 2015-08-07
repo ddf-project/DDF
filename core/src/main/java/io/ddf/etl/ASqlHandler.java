@@ -20,11 +20,12 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.drop.Drop;
+import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.show.ShowTables;
 
 import java.awt.*;
-import java.io.StringReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -139,7 +140,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                 case "SparkSQL":case "spark":case "Spark":
                     return this.sql(sqlcmd, maxRows, dataSource);
                 default:
-                    throw new DDFException("ERROR: Unrecognized datasource");
+                    //throw new DDFException("ERROR: Unrecognized datasource");
+                    return this.sql(sqlcmd, maxRows, dataSource);
             }
         }
     }
@@ -153,26 +155,48 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         return this.describeTable(((DescribeTable)statement).getName().getName());
       } else if (statement instanceof  Select) {
         // Standard SQL.
-        statement = tableNameReplacer.run(statement);
+          this.mLog.info("replace: " + sqlcmd);
+          statement = tableNameReplacer.run(statement);
+          this.mLog.info("New stat is " + statement.toString());
         return this.sql(statement.toString(), maxRows, dataSource);
       } else if (statement instanceof Drop) {
           // TODO: +rename
           return null;
+      } else if (statement instanceof Insert) {
+          statement = tableNameReplacer.run(statement);
+          return this.sql(statement.toString(), maxRows, dataSource);
       } else {
           throw  new DDFException("ERROR: Only show tables, describe tables, " +
                   "select, drop, and rename operations are allowed on ddf");
       }
     } catch (JSQLParserException e) {
       // It's neither standard SQL nor allowed DDL.
-      // e.printStackTrace();
-      // Just pass it to lower level SE.
-      // return this.sql(sqlcmd, maxRows, dataSource);
-      // System.out.println(sqlcmd);
       throw  new DDFException("Please check the syntax. If the query should " +
               "be directly run on engine table, " +
               "please specify dataSource");
     } catch (Exception e) {
-      throw new DDFException(e.getMessage());
+
+        OutputStream os = new OutputStream()
+        {
+            private StringBuilder string = new StringBuilder();
+            @Override
+            public void write(int b) throws IOException {
+                this.string.append((char) b );
+            }
+
+            //Netbeans IDE automatically overrides this toString()
+            public String toString(){
+                return this.string.toString();
+            }
+        };
+        e.printStackTrace(new PrintStream(os));
+        this.mLog.info(os.toString());
+
+        // Just pass it to lower level SE.
+        // return this.sql(sqlcmd, maxRows, dataSource);
+        // System.out.println(sqlcmd);
+        this.mLog.info("error: " + sqlcmd);
+      throw  new DDFException(e);
     }
   }
 
@@ -241,7 +265,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                 case "SparkSQL":case "spark":case "Spark":
                     return this.sql2ddf(command, schema, dataSource, dataFormat);
                 default:
-                    throw new DDFException("ERROR: Unrecognized datasource: " + dataSource);
+                    // throw new DDFException("ERROR: Unrecognized datasource:
+                    // " + dataSource);
+                    return this.sql2ddf(command, schema, dataSource, dataFormat);
             }
         }
     }
@@ -252,20 +278,32 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       if (!(statement instanceof Select)) {
         throw  new DDFException("ERROR: Only select is allowed in this sql2ddf");
       } else {
+          this.mLog.info("replace: " + command);
         statement = tableNameReplacer.run(statement);
+          this.mLog.info("New stat is " + statement.toString());
         return this.sql2ddf(statement.toString(), schema, dataSource, dataFormat);
       }
     } catch (JSQLParserException e) {
-      // It's neither standard SQL nor allowed DDL.
-      // e.printStackTrace();
-      // Just pass it to lower level SE.
-      // System.out.println(command);
-      throw new DDFException("Please check the syntax. If the query should " +
-              "be directly run on engine table, " +
-              "please specify dataSource");
+        throw new DDFException("Please check the syntax. If the query should " +
+                "be directly run on engine table, " +
+                "please specify dataSource");
     } catch (Exception e) {
-        throw new DDFException(e.getMessage());
+        OutputStream os = new OutputStream()
+        {
+            private StringBuilder string = new StringBuilder();
+            @Override
+            public void write(int b) throws IOException {
+                this.string.append((char) b );
+            }
+
+            //Netbeans IDE automatically overrides this toString()
+            public String toString(){
+                return this.string.toString();
+            }
+        };
+        e.printStackTrace(new PrintStream(os));
+        this.mLog.info(os.toString());
+        throw new DDFException(e);
     }
   }
-
 }

@@ -1,20 +1,26 @@
 package io.ddf.spark;
 
 import io.ddf.DDF;
+import io.ddf.DDFCoordinator;
 import io.ddf.DDFManager;
 import io.ddf.TableNameReplacer;
 import io.ddf.content.Schema;
-import io.ddf.datasource.SQLDataSourceDescriptor;
+import io.ddf.content.SqlResult;
+import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
+import io.ddf.spark.content.SchemaHandler;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
+import org.apache.spark.sql.DataFrame;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -423,14 +429,30 @@ public class TableNameReplacerTests {
     @BeforeClass
     public static void startServer() throws Exception {
         Thread.sleep(1000);
+        // DDFCoordinator ddfCoordinator = new DDFCoordinator();
         // LOG = LoggerFactory.getLogger(BaseTest.class);
-        manager = DDFManager.get("spark");
-        // Add 2 test ddfs.
+        // manager = DDFManager.get("spark");
+
+
+        System.setProperty("spark.driver.port", Integer.toString(20002));
+        System.setProperty("spark.ui.port", Integer.toString(30001));
+
+        DDFManager manager = DDFManager.get("spark");
+
+
+        // TODO: Pay attention here. Some maybe username?
+        // options.put("user", jdbcCredential.getUserName());
+        // options.put("password", jdbcCredential.getPassword());
+        // TODO: What if sfdc.
+       
+        // Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
         Schema schema = new Schema("tablename1", "d  d,d  d");
-        DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "a",
+        DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class
+                }, "spark", "adatao", "a",
                 schema);
         Schema schema2 = new Schema("tablename2", "d  d,d  d");
-        DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "b",
+        DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class
+                }, "spark", "adatao", "b",
                 schema2);
 
         parser = new CCJSqlParserManager();

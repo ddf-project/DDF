@@ -17,16 +17,13 @@ import io.ddf.exception.DDFException;
 import io.ddf.spark.SparkDDFManager;
 import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.util.SparkUtils;
-import org.apache.avro.generic.GenericData;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 import scala.collection.Seq;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 //import org.apache.hadoop.hive.ql.metadata.HiveException;
 
 /**
@@ -76,7 +73,30 @@ public class SqlHandler extends ASqlHandler {
   @Override
   public DDF sql2ddf(String command, Schema schema, DataSourceDescriptor dataSource, DataFormat dataFormat) throws DDFException {
     //    TableRDD tableRdd = null;
-    //    RDD<Row> rddRow = null;
+    //    RDD<Row> rddRow = null;m
+    String stringArray[] = command.split(",| |\\.");
+    Map<String, String> ddf2tb = new HashMap<String, String>();
+    for (String str : stringArray) {
+      String tbNameCandidate = str.trim();
+      try {
+        DDF ddf = this.getManager().getDDFByName(tbNameCandidate);
+        ddf2tb.put(tbNameCandidate, ddf.getTableName());
+      } catch (DDFException e) {
+        e.printStackTrace();
+      }
+    }
+
+    List<String> sortedNames = new ArrayList<String>(ddf2tb.keySet());
+    Collections.sort(sortedNames, new Comparator<String>() {
+      @Override
+      public int compare(String o1, String o2) {
+        return (o1.length() < o2.length()) ? 1 : -1;
+      }
+    });
+
+    for (String str : sortedNames) {
+      command = command.replace(str, ddf2tb.get(str));
+    }
 
     DataFrame rdd = null;
     // TODO: handle other dataSources and dataFormats
@@ -98,7 +118,8 @@ public class SqlHandler extends ASqlHandler {
 
     rdd = this.getHiveContext().sql(command);
     if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
-    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
+    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[]
+                    {DataFrame.class}, null, null,
         null, schema);
     ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
     return ddf;
@@ -126,6 +147,7 @@ public class SqlHandler extends ASqlHandler {
   @Override
   public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource) throws DDFException {
     // TODO: handle other dataSources and dataFormats
+    this.getManager().log("Execute command: " + command);
     DataFrame rdd = null;
     if (dataSource != null) {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;

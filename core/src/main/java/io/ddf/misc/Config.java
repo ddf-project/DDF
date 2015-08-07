@@ -169,7 +169,13 @@ public class Config {
     
     SECTION_GLOBAL("global"), 
     
-    FIELD_RUNTIME_DIR("RuntimeDir"), FIELD_NAMESPACE("Namespace"), FIELD_DDF("DDF"), FIELD_DDF_MANAGER("DDFManager"),
+    FIELD_RUNTIME_DIR("RuntimeDir"), FIELD_NAMESPACE("Namespace"),
+      FIELD_ENGINE("Engine"), FIELD_ENGINE_TYPE("EngineType"), FIELD_URL("URL"),
+      FIELD_USER("User"), FIELD_PASSWORD("Password"),
+      FIELD_DDF
+              ("DDF"),
+      FIELD_DDF_MANAGER
+              ("DDFManager"),
     FIELD_BASIC_PERSISTENCE_DIRECTORY("BasicPersistenceDir"),
 
     JDBC_DRIVER("Driver"), DEFAULT_JDBC_DRIVER("com.mysql.jdbc"),

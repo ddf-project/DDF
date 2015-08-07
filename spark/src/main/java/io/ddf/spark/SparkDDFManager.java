@@ -5,15 +5,22 @@ import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
+import io.ddf.datasource.DataSourceDescriptor;
+import io.ddf.datasource.JDBCDataSourceCredentials;
+import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.etl.udf.DateParse;
 import io.ddf.spark.etl.udf.DateTimeExtract;
+import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
@@ -41,6 +48,61 @@ public class SparkDDFManager extends DDFManager {
 
   public SparkDDFManager(SparkContext sparkContext) throws DDFException {
     this.initialize(sparkContext, null);
+  }
+
+  @Override
+  public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
+    DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
+    mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
+    DDF fromDDF = fromManager.getDDFByURI(ddfuri);
+    if (fromDDF == null) {
+      throw new DDFException("There is no ddf with uri : " + ddfuri + " in " +
+              "another engine");
+    }
+    String fromTableName = fromDDF.getTableName();
+
+    DataSourceDescriptor dataSourceDescriptor = fromManager
+            .getDataSourceDescriptor();
+    if (dataSourceDescriptor instanceof JDBCDataSourceDescriptor) {
+      // JDBCConnection.
+      JDBCDataSourceDescriptor jdbcDataSourceDescriptor = (JDBCDataSourceDescriptor)
+              dataSourceDescriptor;
+      Map<String, String> options = new HashMap<String, String>();
+      options.put("dbtable", fromTableName);
+      JDBCDataSourceCredentials jdbcCredential =
+              jdbcDataSourceDescriptor.getCredentials();
+
+      // TODO
+      if (fromManager.getEngine().equals("sfdc")) {
+        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri
+                ().toString());
+        mLog.info("sfdc uri: " + jdbcDataSourceDescriptor.getDataSourceUri()
+                .getUri().toString());
+      } else {
+        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri()
+                .toString() + "?user=" + jdbcCredential.getUsername() +
+                "&password="+jdbcCredential.getPassword());
+
+      }
+
+
+      // TODO: Pay attention here. Some maybe username?
+      // options.put("user", jdbcCredential.getUserName());
+      // options.put("password", jdbcCredential.getPassword());
+      // TODO: What if sfdc.
+      DataFrame rdd = mHiveContext.load("jdbc", options);
+      if (rdd == null) {
+        throw new DDFException("fail use spark datasource api");
+      }
+      Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
+      DDF ddf = this.newDDF(this, rdd, new Class<?>[]
+                      {DataFrame.class}, null, null, null, schema);
+      ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+      return ddf;
+    } else {
+      throw new DDFException("Currently no other DataSourceDescriptor is " +
+              "supported");
+    }
   }
 
   /**
@@ -231,9 +293,12 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
+  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
+                    String engineName, String namespace, String name, Schema
+                              schema)
           throws DDFException {
-    DDF ddf = super.newDDF(manager, data, typeSpecs, namespace, name, schema);
+    DDF ddf = super.newDDF(manager, data, typeSpecs, engineName, namespace,
+            name, schema);
     if(ddf instanceof SparkDDF) {
       ((SparkDDF) ddf).saveAsTable();
     }
@@ -241,9 +306,11 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF newDDF(Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
+  public DDF newDDF(Object data, Class<?>[] typeSpecs, String engineName,
+                    String namespace, String name, Schema schema)
           throws DDFException {
-    DDF ddf = super.newDDF(data, typeSpecs, namespace, name, schema);
+    DDF ddf = super.newDDF(data, typeSpecs, engineName, namespace, name,
+            schema);
     if(ddf instanceof SparkDDF) {
       ((SparkDDF) ddf).saveAsTable();
     }
