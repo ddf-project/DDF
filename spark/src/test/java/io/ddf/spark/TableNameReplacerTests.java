@@ -437,7 +437,7 @@ public class TableNameReplacerTests {
         System.setProperty("spark.driver.port", Integer.toString(20002));
         System.setProperty("spark.ui.port", Integer.toString(30001));
 
-        DDFManager manager = DDFManager.get("spark");
+        manager = DDFManager.get("spark");
 
 
         // TODO: Pay attention here. Some maybe username?
