@@ -33,7 +33,7 @@ public class TableNameReplacer extends TableVisitor {
     private DDFManager ddfManager = null;
     // DDF uri to table name mapping.
     private Map<String, String> uri2tbl = new HashMap<String, String>();
-    private Map<String, List<Table>> uri2TableObj
+    public Map<String, List<Table>> uri2TableObj
             = new HashMap<String, List<Table>>();
     public Boolean containsLocalTable = false;
     public String fromEngineName = null;
@@ -130,7 +130,7 @@ public class TableNameReplacer extends TableVisitor {
                         "can be referred");
             }
         }
-        if (containsLocalTable) {
+        if (containsLocalTable || uri2TableObj.keySet().size() == 1) {
             // contains local table, can only use local spark.
             for (String uri : this.uri2TableObj.keySet()) {
                 DDF ddf = this.ddfManager.transfer(this.getDDFManager()

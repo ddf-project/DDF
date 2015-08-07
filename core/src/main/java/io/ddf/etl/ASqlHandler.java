@@ -155,14 +155,14 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         // Standard SQL.
           this.mLog.info("replace: " + sqlcmd);
           statement = tableNameReplacer.run(statement);
-          if (tableNameReplacer.containsLocalTable) {
+          if (tableNameReplacer.containsLocalTable || tableNameReplacer
+                  .uri2TableObj.keySet().size() == 1) {
               this.mLog.info("New stat is " + statement.toString());
               return this.sql(statement.toString(), maxRows, dataSource);
           } else {
             String selectString = statement.toString();
-            DDF ddf = this.getManager().transfer(tableNameReplacer
-                    .fromEngineName, "select * from (" + selectString + ") " +
-                    "newtable" );
+            DDF ddf = this.getManager().transferByTable(tableNameReplacer
+                    .fromEngineName, " (" + selectString + ") ");
             return this.sql("select * from " + ddf.getTableName(), maxRows,
                     dataSource);
           }
