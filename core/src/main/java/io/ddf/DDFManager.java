@@ -140,6 +140,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     //   throw new DDFException("Can't get engine from the uri");
     // }
     // return stringArrays[2];
+    if (this.getDDFCoordinator() == null) {
+      this.setDDFCoordinator(new DDFCoordinator(true));
+      this.getDDFCoordinator().getDDFManagerList().add(this);
+      this.getDDFCoordinator().getName2DDFManager().put(engineName, this);
+    }
+
     DDFManager manager = this.getDDFCoordinator().getDDFManagerByURI(ddfURI);
     if (manager == null) {
       manager.log("Can't get manager for " + ddfURI);
@@ -194,6 +200,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
     mDDFCache.setDDFName(ddf, name);
     mLog.info("set ddfname : " + "ddf://" + this.getNamespace() + "/" + name);
+    if (this.getDDFCoordinator() == null) {
+      this.setDDFCoordinator(new DDFCoordinator(true));
+      this.getDDFCoordinator().getDDFManagerList().add(this);
+      this.getDDFCoordinator().getName2DDFManager().put(engineName, this);
+    }
     mDDFCoordinator.setURI2DDFManager("ddf://" + this.getNamespace() + "/" +
             name, this);
     mDDFCoordinator.setUuid2DDFManager(ddf.getUUID(), this);

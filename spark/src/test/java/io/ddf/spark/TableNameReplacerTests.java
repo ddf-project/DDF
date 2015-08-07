@@ -435,26 +435,14 @@ public class TableNameReplacerTests {
         System.setProperty("spark.driver.port", Integer.toString(20002));
         System.setProperty("spark.ui.port", Integer.toString(30001));
 
-        DDFManager manager2 = DDFManager.get("spark");
-        SparkDDFManager s2 = (SparkDDFManager)manager2;
-
-        Map<String, String> options = new HashMap<String, String>();
-        options.put("dbtable", "(select * from testtable, testtable2 where " +
-                "testtable.value = testtable2.value2) tmptable");
-
-
-        options.put("url", "jdbc:mysql://localhost/testdb" +
-                        "?user=pauser&password=papwd");
+        DDFManager manager = DDFManager.get("spark");
 
 
         // TODO: Pay attention here. Some maybe username?
         // options.put("user", jdbcCredential.getUserName());
         // options.put("password", jdbcCredential.getPassword());
         // TODO: What if sfdc.
-        DataFrame rdd = s2.getHiveContext().load("jdbc", options);
-        if (rdd == null) {
-            throw new DDFException("fail use spark datasource api");
-        }
+       
         // Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
         Schema schema = new Schema("tablename1", "d  d,d  d");
         DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class

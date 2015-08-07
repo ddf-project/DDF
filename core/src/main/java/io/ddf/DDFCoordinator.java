@@ -31,6 +31,10 @@ public class DDFCoordinator {
     private String mComputeEngine;
 
 
+    public DDFCoordinator(Boolean test) {
+
+    }
+
     public DDFCoordinator() throws DDFException, URISyntaxException {
         if (mDDFManagerList.isEmpty()) {
             String engineType = Config.getGlobalValue(Config.ConfigConstant
