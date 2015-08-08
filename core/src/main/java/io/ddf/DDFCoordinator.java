@@ -129,6 +129,7 @@ public class DDFCoordinator {
     public DDFManager initEngine(String engineName, String engineType,
                                  DataSourceDescriptor dataSourceDescriptor)
             throws DDFException {
+        this.getEngine("spark").log("log4");
         if (engineName == null) {
             throw new DDFException("Please input engine name");
         }
@@ -136,12 +137,17 @@ public class DDFCoordinator {
             throw new DDFException("This engine name is already used : " +
                     engineName);
         }
+
+        this.getEngine("spark").log("log5");
         DDFManager manager = DDFManager.get(engineType, dataSourceDescriptor);
         if (manager == null) {
             throw new DDFException("Error int get the DDFManager for engine :" +
                     engineName);
         }
+
+        this.getEngine("spark").log("log6");
         manager.setEngineName(engineName);
+        manager.setEngineType(engineType);
         manager.setDDFCoordinator(this);
         mDDFManagerList.add(manager);
         mName2DDFManager.put(engineName, manager);

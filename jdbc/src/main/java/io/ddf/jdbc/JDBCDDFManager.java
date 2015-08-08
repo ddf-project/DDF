@@ -62,13 +62,16 @@ public class JDBCDDFManager extends DDFManager {
     mLog.info("Initializing jdbddfmanager with no arguments");
   }
 
-  public JDBCDDFManager(DataSourceDescriptor dataSourceDescriptor) throws Exception {
+  public JDBCDDFManager(DataSourceDescriptor dataSourceDescriptor, String
+          engineType) throws
+          Exception {
     /*
      * Register driver for the JDBC connector
      */
     // TODO: check the correctness here.
     super(dataSourceDescriptor);
 
+    this.setEngineType(engineType);
     mLog.info("Initializing jdbddfmanager");
 
     String driver = sConfigHandler.getValue(this.getEngine(), ConfigConstant.JDBC_DRIVER.toString());
@@ -291,7 +294,8 @@ public class JDBCDDFManager extends DDFManager {
   }
 
   @Override public String getEngine() {
-    return ConfigConstant.ENGINE_NAME_JDBC.toString();
+    // return ConfigConstant.ENGINE_NAME_JDBC.toString();
+    return this.getEngineType();
   }
 
   /**

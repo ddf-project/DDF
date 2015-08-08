@@ -18,7 +18,7 @@ object RootBuild extends Build {
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
 
-  val SPARK_VERSION = "1.3.1"
+  val SPARK_VERSION = "1.3.1-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -69,9 +69,9 @@ object RootBuild extends Build {
 
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, jdbc)
   lazy val core = Project("core", file("core"), settings = coreSettings)
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core)
-  lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
   lazy val jdbc = Project("jdbc", file("jdbc"), settings = jdbcSettings) dependsOn (core)
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) dependsOn(jdbc)
+  lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
 
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend(Compile)

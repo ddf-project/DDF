@@ -10,6 +10,7 @@ import io.ddf.datasource.DataSourceURI;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
+import io.ddf.jdbc.JDBCDDFManager;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
@@ -426,9 +427,6 @@ public class TableNameReplacerTests {
     @BeforeClass
     public static void startServer() throws Exception {
         Thread.sleep(1000);
-        Connection connection = DriverManager.getConnection("jdbc:salesforce:User=bhan@adatao.com;Password=adataoisc00l;SecurityToken=K0nvp6LTr63PcyuEZtIiXk90;");
-        java.sql.Statement sqlstat = connection.createStatement();
-        sqlstat.execute("select * from account");
         // LOG = LoggerFactory.getLogger(BaseTest.class);
         // manager = DDFManager.get("spark");
         /*
@@ -443,7 +441,15 @@ public class TableNameReplacerTests {
         }
         DDF ret = manager.sql2ddf("select * from testtable", "jdbc");*/
         // Add 2 test ddfs.
+        JDBCDataSourceDescriptor ds = new JDBCDataSourceDescriptor(
+                new DataSourceURI(""),
+                new JDBCDataSourceDescriptor.JDBCDataSourceCredentials
+                        ("",
+                                ""), null
+        );
 
+        JDBCDDFManager jdbc = new JDBCDDFManager((DataSourceDescriptor)ds,
+                "sfdc");
         DDFManager manager2 = DDFManager.get("spark");
         Schema schema = new Schema("tablename1", "d  d,d  d");
         DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class

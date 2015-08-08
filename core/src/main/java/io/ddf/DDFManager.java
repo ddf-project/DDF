@@ -76,7 +76,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public enum  EngineType {
     ENGINE_SPARK("spark"),
-    ENGINE_JDBC("jdbc");
+    ENGINE_JDBC("jdbc"),
+    ENGINE_SFDC("sfdc");
 
     private final String typeName;
     EngineType(String typeName) {
@@ -90,7 +91,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   // The engine name, should be unique.
   private String engineName;
-
+  private String engineType;
   // DataSourceDescriptor.
   private DataSourceDescriptor mDataSourceDescriptor;
   // DDFCoordinator.
@@ -105,6 +106,14 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   // using engine name.
   public void setEngineName(String engineName) {
     this.engineName = engineName;
+  }
+
+  public String getEngineType() {
+    return engineType;
+  }
+
+  public void setEngineType(String engineType) {
+    this.engineType = engineType;
   }
 
   public DDFCoordinator getDDFCoordinator() {
@@ -263,11 +272,13 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     }
 
     try {
-      Class[] classType = new Class[1];
+      Class[] classType = new Class[2];
       classType[0] = DataSourceDescriptor.class;
+      classType[1] = String.class;
 
       DDFManager manager = (DDFManager) Class.forName(className)
-              .getDeclaredConstructor(classType).newInstance(dataSourceDescriptor);
+              .getDeclaredConstructor(classType).newInstance
+                      (dataSourceDescriptor, engineType);
       return manager;
     } catch (Exception e) {
       throw new DDFException("Cannot get DDFManager for engine " +

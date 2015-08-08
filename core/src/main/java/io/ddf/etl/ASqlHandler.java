@@ -283,15 +283,15 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       } else {
           this.mLog.info("replace: " + command);
         statement = tableNameReplacer.run(statement);
-          if (tableNameReplacer.containsLocalTable) {
+          if (tableNameReplacer.containsLocalTable || tableNameReplacer
+                  .uri2TableObj.size() == 1) {
               this.mLog.info("New stat is " + statement.toString());
               return this.sql2ddf(statement.toString(), schema, dataSource,
                       dataFormat);
           } else {
               String selectString = statement.toString();
-              DDF ddf = this.getManager().transfer(tableNameReplacer
-                      .fromEngineName, "select * from (" + selectString + ") " +
-                      "newtable" );
+              DDF ddf = this.getManager().transferByTable(tableNameReplacer
+                      .fromEngineName, selectString);
               return ddf;
               // return this.sql2ddf("select * from " + ddf.getTableName(),
               //        schema,
