@@ -32,6 +32,22 @@ public class DDFCoordinator {
         return mDefaultEngine;
     }
 
+    public void rmEngine(String engineName) throws DDFException {
+        if (!mName2DDFManager.containsKey(engineName)) {
+            throw new DDFException("There is no engine with engine name : " +
+                    engineName);
+        }
+        DDFManager manager = mName2DDFManager.get(engineName);
+        mName2DDFManager.remove(engineName);
+        mDDFManagerList.remove(manager);
+        for (DDF ddf: manager.listDDFs()) {
+            UUID uuid = ddf.getUUID();
+            String uri = ddf.getUri();
+            mUuid2DDFManager.remove(uuid);
+            mURI2DDFManager.remove(uri);
+        }
+    }
+
     public void setURI2DDFManager(String uri, DDFManager ddfManager) {
         ddfManager.log("Set uri2ddfManager with uri: " + uri);
         mURI2DDFManager.put(uri, ddfManager);

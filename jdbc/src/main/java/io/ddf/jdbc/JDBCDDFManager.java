@@ -51,6 +51,8 @@ public class JDBCDDFManager extends DDFManager {
     sConfigHandler = new ConfigHandler(ConfigConstant.DDF_CONFIG_DIR.toString(), configFileName);
   }
 
+
+
   @Override
   public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
     throw new DDFException("Currently jdbc engine doesn't support transfer");
@@ -59,6 +61,7 @@ public class JDBCDDFManager extends DDFManager {
   public JDBCDDFManager()  {
     mLog.info("Initializing jdbddfmanager with no arguments");
   }
+
   public JDBCDDFManager(DataSourceDescriptor dataSourceDescriptor) throws Exception {
     /*
      * Register driver for the JDBC connector
@@ -66,7 +69,8 @@ public class JDBCDDFManager extends DDFManager {
     // TODO: check the correctness here.
     super(dataSourceDescriptor);
 
-    System.out.println("initialize in jdbc");
+    mLog.info("Initializing jdbddfmanager");
+
     String driver = sConfigHandler.getValue(this.getEngine(), ConfigConstant.JDBC_DRIVER.toString());
 
     Class.forName(driver);
@@ -86,6 +90,9 @@ public class JDBCDDFManager extends DDFManager {
     boolean isDDFAutoCreate = Boolean.parseBoolean(sConfigHandler.getValue(ConfigConstant.ENGINE_NAME_JDBC.toString(),
         ConfigConstant.JDBC_DDF_AUTOCREATE.toString()));
 
+    mLog.info("Running show tables ");
+    this.showTables();
+    mLog.info("Show tables successfully, connection is correct");
     if (isDDFAutoCreate){
 
     } else {
