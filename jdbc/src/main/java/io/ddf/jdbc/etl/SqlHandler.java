@@ -146,9 +146,7 @@ public class SqlHandler extends ASqlHandler {
 
       return new SqlResult(schema, result);
     } catch (SQLException e) {
-      mLog.debug(e.getMessage());
-      e.printStackTrace();
-      throw new DDFException("Encouter error when running sql query using jdbc");
+      throw new DDFException(e);
     }
   }
 
