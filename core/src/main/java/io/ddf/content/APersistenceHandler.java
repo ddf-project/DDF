@@ -19,8 +19,21 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
   public APersistenceHandler(DDF theDDF) {
     super(theDDF);
+    this.mPersitable = true;
   }
 
+  private boolean mPersitable = true;
+
+  public boolean isPersistable() {
+    if(this.getDDF().getUUID() == null) {
+      return false;
+    }
+    return this.mPersitable;
+  }
+
+  public void setPersistable(boolean persistable) {
+    this.mPersitable = persistable;
+  }
 
   /**
    * The URI format should be:

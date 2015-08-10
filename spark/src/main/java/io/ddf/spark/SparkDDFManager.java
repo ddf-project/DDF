@@ -6,9 +6,12 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.datasource.DataSourceDescriptor;
+import io.ddf.datasource.JDBCDataSourceCredentials;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.content.SchemaHandler;
+import io.ddf.spark.etl.udf.DateParse;
+import io.ddf.spark.etl.udf.DateTimeExtract;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -62,7 +65,7 @@ public class SparkDDFManager extends DDFManager {
               dataSourceDescriptor;
       Map<String, String> options = new HashMap<String, String>();
       options.put("dbtable", tableName);
-      JDBCDataSourceDescriptor.JDBCDataSourceCredentials jdbcCredential =
+      JDBCDataSourceCredentials jdbcCredential =
               jdbcDataSourceDescriptor.getCredentials();
 
       // TODO
@@ -73,7 +76,7 @@ public class SparkDDFManager extends DDFManager {
                 .getUri().toString());
       } else {
         options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri()
-                .toString() + "?user=" + jdbcCredential.getUserName() +
+                .toString() + "?user=" + jdbcCredential.getUsername() +
                 "&password="+jdbcCredential.getPassword());
 
       }
@@ -133,6 +136,14 @@ public class SparkDDFManager extends DDFManager {
     mLog.info(">>>> spark.sql.inMemoryColumnarStorage.batchSize= " + batchSize);
     this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", compression);
     this.mHiveContext.setConf("spark.sql.inMemoryColumnarStorage.batchSize", batchSize);
+
+    // register SparkSQL UDFs
+    this.registerUDFs();
+  }
+  // TODO: Dynamically load UDFs
+  private void registerUDFs() {
+    DateParse.register(this.mHiveContext);
+    DateTimeExtract.register(this.mHiveContext);
   }
 
 

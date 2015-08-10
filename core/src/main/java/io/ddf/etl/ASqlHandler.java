@@ -15,6 +15,7 @@ import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
@@ -24,6 +25,7 @@ import net.sf.jsqlparser.statement.show.ShowTables;
 
 import java.awt.*;
 import java.io.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -314,12 +316,10 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         };
         e.printStackTrace(new PrintStream(os));
         this.mLog.info(os.toString());
-      // It's neither standard SQL nor allowed DDL.
-      // e.printStackTrace();
-      // Just pass it to lower level SE.
-      // System.out.println(command);
-        this.mLog.info("sqlcmd : " + command);
-      throw new DDFException(e);
+
+      throw new DDFException("Please check the syntax. If the query should " +
+              "be directly run on engine table, " +
+              "please specify dataSource " + e.getMessage());
     }
   }
 

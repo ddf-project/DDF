@@ -2,6 +2,7 @@ package io.ddf.spark.content
 
 import io.ddf.content.Schema.{ColumnClass, ColumnType}
 import io.ddf.spark.ATestSuite
+import scala.collection.JavaConversions._
 
 /**
   */
@@ -39,6 +40,18 @@ class FactorSuite extends ATestSuite {
     assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("4") == 11)
     assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("6") == 7)
     assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("8") == 14)
+  }
+
+  test("test set factor for string columns") {
+    val ddf = manager.sql2ddf("select * from airlineWithNA")
+    assert(ddf.getSchemaHandler.getColumn("Origin").getType == ColumnType.STRING)
+    assert(ddf.getSchemaHandler.getColumn("Origin").getColumnClass == ColumnClass.CHARACTER)
+    ddf.getSchemaHandler.setFactorLevelsForStringColumns(ddf.getSchemaHandler.getColumns.map{col => col.getName}.toArray)
+    ddf.getSchemaHandler.computeFactorLevelsAndLevelCounts()
+    assert(ddf.getSchemaHandler.getColumn("Origin").getType == ColumnType.STRING)
+    assert(ddf.getSchemaHandler.getColumn("Origin").getColumnClass == ColumnClass.FACTOR)
+    assert(ddf.getSchemaHandler.getColumn("Origin").getOptionalFactor.getLevelCounts.size() == 3)
+
   }
 
   test("test get factors for DDF with RDD[Array[Object]]") {

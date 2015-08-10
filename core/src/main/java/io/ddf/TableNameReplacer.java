@@ -193,6 +193,12 @@ public class TableNameReplacer extends TableVisitor {
                 return;
             }
         }
+        for (String tablename : this.aliasTableNameList) {
+            if (tablename.equals(name)) {
+                return;
+            }
+        }
+        
         Matcher matcher = this.uriPattern.matcher(name);
         if (matcher.matches()) {
             // The first situation.
@@ -221,13 +227,12 @@ public class TableNameReplacer extends TableVisitor {
                     if (index > uuidList.size()) {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
-                        if (null == this.ddfManager.getDDF(uuidList.get(index - 1))) {
                             try {
                                 this.ddfManager.getOrRestoreDDF(uuidList.get(index - 1));
                             } catch (DDFException e) {
                                 throw new Exception("ERROR: There is no ddf with uri:" + uuidList.get(index - 1).toString());
                             }
-                        }
+
                         table.setName(this.ddfManager.getDDF(uuidList.get(index - 1)).getTableName());
                     }
                 } else {

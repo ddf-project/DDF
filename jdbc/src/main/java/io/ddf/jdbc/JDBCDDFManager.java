@@ -85,7 +85,7 @@ public class JDBCDDFManager extends DDFManager {
               "JDBCDDFManager");
     }
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
-        mJdbcDataSource.getCredentials().getUserName(),
+        mJdbcDataSource.getCredentials().getUsername(),
         mJdbcDataSource.getCredentials().getPassword());
 
     mLog.info("Set up connection with jdbc : " + mJdbcDataSource

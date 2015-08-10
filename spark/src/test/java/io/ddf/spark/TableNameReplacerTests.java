@@ -5,10 +5,7 @@ import io.ddf.DDFManager;
 import io.ddf.TableNameReplacer;
 import io.ddf.content.Schema;
 import io.ddf.content.SqlResult;
-import io.ddf.datasource.DataSourceDescriptor;
-import io.ddf.datasource.DataSourceURI;
-import io.ddf.datasource.JDBCDataSourceDescriptor;
-import io.ddf.datasource.SQLDataSourceDescriptor;
+import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
 import io.ddf.jdbc.JDBCDDFManager;
 import net.sf.jsqlparser.JSQLParserException;
@@ -47,6 +44,22 @@ public class TableNameReplacerTests {
         }
     }
 
+    public void testAlias() {
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        String sqlcmd = "select T0.id from (select tmp.id from ddf://adatao/a" +
+                " " +
+                "tmp) T0";
+        try {
+            Statement statement = parser.parse(new StringReader(sqlcmd));
+            statement = tableNameReplacer.run(statement);
+            System.out.println(statement.toString());
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     @Test
     public void testRealQuery() {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
@@ -349,7 +362,8 @@ public class TableNameReplacerTests {
                 + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
                + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", sqlDataSourceDescriptor);
 
-        manager.sql("load data local inpath '/Users/Jing/Github/DDF/resources/test/airline.csv' into table airline",
+        manager.sql("load data local inpath '../resources/test/airline.csv' " +
+                        "into table airline",
                 sqlDataSourceDescriptor);
 
         DDF ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, distance, arrdelay, "
@@ -443,7 +457,7 @@ public class TableNameReplacerTests {
         // Add 2 test ddfs.
         JDBCDataSourceDescriptor ds = new JDBCDataSourceDescriptor(
                 new DataSourceURI(""),
-                new JDBCDataSourceDescriptor.JDBCDataSourceCredentials
+                new JDBCDataSourceCredentials
                         ("",
                                 ""), null
         );

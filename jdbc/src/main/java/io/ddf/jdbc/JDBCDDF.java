@@ -48,7 +48,11 @@ public class JDBCDDF extends DDF {
   public JDBCDDF(DDFManager manager) throws DDFException {
     super(manager);
   }
-
+  
+  @Override
+  public DDF copy() throws DDFException {
+    return null;
+  }
   private Schema buildDDFSchema(TableSchema tableSchema) throws DDFException {
     List<Schema.Column> cols = new ArrayList<>();
     Iterator<ColumnSchema> schemaIter = tableSchema.iterator();
