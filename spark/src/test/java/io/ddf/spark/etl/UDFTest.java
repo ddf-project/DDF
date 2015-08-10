@@ -136,6 +136,11 @@ public class UDFTest extends BaseTest {
     System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0))== 4);
 
+    ddf3 = ddf.sql2ddf("select extract('2015-01-22 20:23 +0000', 'dayofyear') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 22);
+
     ddf3 = ddf.sql2ddf("select extract('2015-01-22 20:23 +0000', 'minute') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
@@ -160,6 +165,31 @@ public class UDFTest extends BaseTest {
     System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0)) == 2015);
 
+    ddf3 = ddf.sql2ddf("select month('2015-01-22 20:23 +0000', 'number') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("1"));
+
+    ddf3 = ddf.sql2ddf("select month('2015-01-22 20:23 +0000', 'text') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("January"));
+
+    ddf3 = ddf.sql2ddf("select month('2015-01-22 20:23 +0000', 'shorttext') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("Jan"));
+
+    ddf3 = ddf.sql2ddf("select weekyear('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 2015);
+
+    ddf3 = ddf.sql2ddf("select weekofweekyear('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 4);
+
     ddf3 = ddf.sql2ddf("select dayofweek('2015-01-22 20:23 +0000', 'number') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
@@ -175,10 +205,30 @@ public class UDFTest extends BaseTest {
     System.out.println(rows.get(0));
     Assert.assertTrue(rows.get(0).equalsIgnoreCase("Thu"));
 
+    ddf3 = ddf.sql2ddf("select dayofyear('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 22);
+
     ddf3 = ddf.sql2ddf("select hour('2015-01-22 20:23 +0000') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0)) == 20);
+
+    ddf3 = ddf.sql2ddf("select minute('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 23);
+
+    ddf3 = ddf.sql2ddf("select second('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 0);
+
+    ddf3 = ddf.sql2ddf("select millisecond('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 0);
   }
 
 }
