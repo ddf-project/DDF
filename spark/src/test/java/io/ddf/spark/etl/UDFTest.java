@@ -190,6 +190,11 @@ public class UDFTest extends BaseTest {
     System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0)) == 4);
 
+    ddf3 = ddf.sql2ddf("select day('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 22);
+
     ddf3 = ddf.sql2ddf("select dayofweek('2015-01-22 20:23 +0000', 'number') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
