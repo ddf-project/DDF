@@ -8,6 +8,10 @@ import org.apache.spark.sql.types.DataTypes;
 import org.joda.time.DateTime;
 
 /**
+ * A SparkSQL UDF to extract year information from a unixtimestamp
+ * or an ISO8601 datetime string.
+ * In case of an ISO datetime string with timezone, the output will be a
+ * local value at UTC timezone.
  * Created by nhanitvn on 30/07/2015.
  */
 public class Year {

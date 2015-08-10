@@ -11,6 +11,10 @@ import org.joda.time.DateTime;
 import java.util.regex.Pattern;
 
 /**
+ * A SparkSQL UDF to extract hour information from a unixtimestamp
+ * or an ISO8601 datetime string.
+ * In case of an ISO datetime string with timezone, the output will be a
+ * local value at UTC timezone.
  * Created by nhanitvn on 30/07/2015.
  */
 public class Hour {

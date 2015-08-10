@@ -11,6 +11,13 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
+ * A SparkSQL UDF to extract day of week information from a unixtimestamp
+ * or an ISO8601 datetime string.
+ * In case of an ISO datetime string with timezone, the output will be a
+ * local value at UTC timezone.
+ * @param format: either "number" or "text" or "shorttext" to return a number (1-7)
+ *              or a text (Monday - Sunday)
+ *              or a short text (Mon - Sun)
  * Created by nhanitvn on 08/08/2015.
  */
 public class DayOfWeek {

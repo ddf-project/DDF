@@ -12,8 +12,8 @@ import org.joda.time.DateTimeZone;
 /**
  * A SparkSQL UDF that extract date/time field from a unixtimestamp or an ISO8601 datetime string.
  * In case of an ISO datetime string with timezone, the output will be a
- * localized value wrt the corresponding timezone.
- * Support fields: year, month, day, dayofweek, dayofyear, hour, minute, second, millisecond
+ * local datetime at UTC timezone.
+ * Support fields: year, month, weekyear, weekofyear, day, dayofweek, dayofyear, hour, minute, second, millisecond
  * Created by nhanitvn on 30/07/2015.
  */
 public class DateTimeExtract {
