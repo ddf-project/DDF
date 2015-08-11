@@ -5,7 +5,7 @@ package io.ddf.spark.content
 
 import io.ddf._
 import io.ddf.content.{Representation, RepresentationHandler => RH}
-import io.ddf.spark.SparkDDF
+import io.ddf.spark.{SparkDDFManager, SparkDDF}
 import io.ddf.spark.content.RepresentationHandler._
 import io.ddf.types.TupleMatrixVector
 import org.apache.spark.mllib.linalg.Vector
@@ -78,7 +78,9 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
     val ddf = this.getDDF.asInstanceOf[SparkDDF]
     ddf.saveAsTable()
     val dataFrame = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-    dataFrame.persist()
+    if(!this.getManager.asInstanceOf[SparkDDFManager].getHiveContext.isCached(ddf.getTableName)) {
+      dataFrame.persist()
+    }
     if (!isLazy) {
       dataFrame.count()
     }
