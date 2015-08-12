@@ -6,8 +6,7 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
-import io.ddf.spark.etl.udf.DateParse;
-import io.ddf.spark.etl.udf.DateTimeExtract;
+import io.ddf.spark.etl.udf.*;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -73,6 +72,17 @@ public class SparkDDFManager extends DDFManager {
   private void registerUDFs() {
     DateParse.register(this.mHiveContext);
     DateTimeExtract.register(this.mHiveContext);
+    Year.register(this.mHiveContext);
+    Month.register(this.mHiveContext);
+    WeekYear.register(this.mHiveContext);
+    WeekOfWeekYear.register(this.mHiveContext);
+    DayOfWeek.register(this.mHiveContext);
+    Day.register(this.mHiveContext);
+    DayOfYear.register(this.mHiveContext);
+    Hour.register(this.mHiveContext);
+    Minute.register(this.mHiveContext);
+    Second.register(this.mHiveContext);
+    Millisecond.register(this.mHiveContext);
   }
 
 
