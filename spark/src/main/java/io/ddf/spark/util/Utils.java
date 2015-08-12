@@ -54,6 +54,8 @@ public class Utils {
     if (object instanceof Integer) {
       // Unix timestamp
       return new DateTime((Integer) object * 1000L).withZone(DateTimeZone.UTC);
+    } else if (object instanceof Long) {
+      return new DateTime((Long)object * 1000L).withZone(DateTimeZone.UTC);
     } else if (object instanceof String) {
 
       Matcher matcher = isoPattern.matcher((String)object);

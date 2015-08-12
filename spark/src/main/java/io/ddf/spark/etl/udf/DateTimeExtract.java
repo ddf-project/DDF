@@ -20,7 +20,7 @@ public class DateTimeExtract {
 
   static UDF2 udf = new UDF2<Object, String, Integer>() {
     @Override public Integer call(Object object, String field) throws Exception {
-      DateTime dt = Utils.toDateTimeObject((String) object);
+      DateTime dt = Utils.toDateTimeObject(object);
       
       if (dt != null) {
         if (field.equalsIgnoreCase("year")) {

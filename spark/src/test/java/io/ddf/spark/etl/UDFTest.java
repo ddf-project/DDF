@@ -155,6 +155,118 @@ public class UDFTest extends BaseTest {
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0))== 0);
+
+    // Support unixtimestamp in int values
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'year') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 2015);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'weekyear') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 2015);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'weekofweekyear') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 23);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'month') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 6);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'day') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 4);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'dayofweek') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 4);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'dayofyear') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 155);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'hour') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 3);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'minute') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 0);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'second') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 0);
+
+    ddf3 = ddf.sql2ddf("select extract(1433386800, 'millisecond') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 0);
+
+    //Support unixtimestamp in long values
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'year') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 2101);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'weekyear') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 2101);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'weekofweekyear') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 23);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'month') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 6);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'day') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 6);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'dayofweek') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 1);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'dayofyear') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 157);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'hour') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 6);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'minute') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 47);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'second') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 27);
+
+    ddf3 = ddf.sql2ddf("select extract(4147483647, 'millisecond') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0))== 0);
   }
 
   @Test
