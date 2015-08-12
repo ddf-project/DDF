@@ -18,7 +18,7 @@ public class Year {
 
   static UDF1 udf = new UDF1<Object, Integer>() {
     @Override public Integer call(Object object) throws Exception {
-      DateTime dt = Utils.toDateTimeObject((String) object);
+      DateTime dt = Utils.toDateTimeObject(object);
 
       if (dt != null) {
         return Integer.parseInt(dt.year().getAsString());

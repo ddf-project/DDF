@@ -17,7 +17,7 @@ import org.joda.time.DateTime;
 public class DayOfYear {
   static UDF1 udf = new UDF1<Object, Integer>() {
     @Override public Integer call(Object object) throws Exception {
-      DateTime dt = Utils.toDateTimeObject((String) object);
+      DateTime dt = Utils.toDateTimeObject(object);
 
       if (dt != null) {
         return Integer.parseInt(dt.dayOfYear().getAsString());

@@ -21,7 +21,7 @@ public class Month {
   static UDF2 udf = new UDF2<Object, String, String>() {
     @Override public String call(Object object, String format) throws Exception {
 
-      DateTime dt = Utils.toDateTimeObject((String) object);
+      DateTime dt = Utils.toDateTimeObject(object);
 
       if (dt != null) {
         if (format.equalsIgnoreCase("number")) {
