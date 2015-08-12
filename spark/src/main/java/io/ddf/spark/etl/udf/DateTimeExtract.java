@@ -12,43 +12,46 @@ import org.joda.time.DateTimeZone;
 /**
  * A SparkSQL UDF that extract date/time field from a unixtimestamp or an ISO8601 datetime string.
  * In case of an ISO datetime string with timezone, the output will be a
- * local datetime at UTC timezone.
- * Support fields: year, month, weekyear, weekofyear, day, dayofweek, dayofyear, hour, minute, second, millisecond
+ * localized value wrt the corresponding timezone.
+ * Support fields: year, month, day, dayofweek, dayofyear, hour, minute, second, millisecond
  * Created by nhanitvn on 30/07/2015.
  */
 public class DateTimeExtract {
 
   static UDF2 udf = new UDF2<Object, String, Integer>() {
     @Override public Integer call(Object object, String field) throws Exception {
-      DateTime dt = Utils.toDateTimeObject(object);
-      
+      DateTime dt = null;
+      if (object instanceof Integer) {
+        // Unix timestamp
+        dt = new DateTime((Integer) object * 1000L).withZone(DateTimeZone.UTC);
+      } else {
+        dt = Utils.toDateTimeObject((String) object);
+      }
+
+      Integer value = null;
       if (dt != null) {
         if (field.equalsIgnoreCase("year")) {
-          return new Integer(dt.getYear());
+          value = new Integer(dt.getYear());
         } else if (field.equalsIgnoreCase("month")) {
-          return new Integer(dt.getMonthOfYear());
-        } else if (field.equalsIgnoreCase("weekyear")) {
-          return new Integer(dt.getWeekyear());
-        } else if (field.equalsIgnoreCase("weekofweekyear")) {
-          return new Integer(dt.getWeekOfWeekyear());
+          value = new Integer(dt.getMonthOfYear());
         } else if (field.equalsIgnoreCase("day")) {
-          return new Integer(dt.getDayOfMonth());
+          value = new Integer(dt.getDayOfMonth());
         } else if (field.equalsIgnoreCase("dayofweek")) {
-          return new Integer(dt.getDayOfWeek());
+          value = new Integer(dt.getDayOfWeek());
         } else if (field.equalsIgnoreCase("dayofyear")) {
-          return new Integer(dt.getDayOfYear());
+          value = new Integer(dt.getDayOfYear());
         } else if (field.equalsIgnoreCase("hour")) {
-          return new Integer(dt.getHourOfDay());
+          value = new Integer(dt.getHourOfDay());
         } else if (field.equalsIgnoreCase("minute")) {
-          return new Integer(dt.getMinuteOfHour());
+          value = new Integer(dt.getMinuteOfHour());
         } else if (field.equalsIgnoreCase("second")) {
-          return new Integer(dt.getSecondOfMinute());
+          value = new Integer(dt.getSecondOfMinute());
         } else if (field.equalsIgnoreCase("millisecond")) {
-          return new Integer(dt.getMillisOfSecond());
+          value = new Integer(dt.getMillisOfSecond());
         }
 
       }
-      return null;
+      return value;
     }
   };
 
