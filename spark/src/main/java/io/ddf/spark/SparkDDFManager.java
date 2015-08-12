@@ -47,6 +47,7 @@ public class SparkDDFManager extends DDFManager {
 
 
   public SparkDDFManager(SparkContext sparkContext) throws DDFException {
+    this.setEngineName("spark");
     this.initialize(sparkContext, null);
   }
 
@@ -120,10 +121,12 @@ public class SparkDDFManager extends DDFManager {
    * @throws DDFException
    */
   public SparkDDFManager() throws DDFException {
+    this.setEngineName("spark");
     this.initialize(null, new HashMap<String, String>());
   }
 
   public SparkDDFManager(Map<String, String> params) throws DDFException {
+    this.setEngineName("spark");
     this.initialize(null, params);
   }
 
