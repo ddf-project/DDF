@@ -209,9 +209,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
     mDDFCache.setDDFName(ddf, name);
-    mLog.info("set ddfname : " + "ddf://" + this.getNamespace() + "/" + name);
+    mLog.info("set ddfname : " + "ddf://" + ddf.getNamespace() + "/" + name);
     if (mDDFCoordinator != null) {
-      mDDFCoordinator.setURI2DDFManager("ddf://" + this.getNamespace() + "/" +
+      mDDFCoordinator.setURI2DDFManager("ddf://" + ddf.getNamespace() + "/" +
               name, this);
       mDDFCoordinator.setUuid2DDFManager(ddf.getUUID(), this);
     }
