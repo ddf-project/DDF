@@ -295,9 +295,6 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
               DDF ddf = this.getManager().transferByTable(tableNameReplacer
                       .fromEngineName, selectString);
               return ddf;
-              // return this.sql2ddf("select * from " + ddf.getTableName(),
-              //        schema,
-              //        dataSource, dataFormat);
           }
       }
     } catch (Exception e) {

@@ -455,16 +455,8 @@ public class TableNameReplacerTests {
         }
         DDF ret = manager.sql2ddf("select * from testtable", "jdbc");*/
         // Add 2 test ddfs.
-        JDBCDataSourceDescriptor ds = new JDBCDataSourceDescriptor(
-                new DataSourceURI(""),
-                new JDBCDataSourceCredentials
-                        ("",
-                                ""), null
-        );
-
-        JDBCDDFManager jdbc = new JDBCDDFManager((DataSourceDescriptor)ds,
-                "sfdc");
-        DDFManager manager2 = DDFManager.get("spark");
+        manager = DDFManager.get("spark");
+        manager.setEngineName("spark");
         Schema schema = new Schema("tablename1", "d  d,d  d");
         DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class
                 }, "spark", "adatao", "a",

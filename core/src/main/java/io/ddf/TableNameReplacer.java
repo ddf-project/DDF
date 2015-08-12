@@ -227,13 +227,16 @@ public class TableNameReplacer extends TableVisitor {
                     if (index > uuidList.size()) {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
-                            try {
-                                this.ddfManager.getOrRestoreDDF(uuidList.get(index - 1));
-                            } catch (DDFException e) {
-                                throw new Exception("ERROR: There is no ddf with uri:" + uuidList.get(index - 1).toString());
-                            }
+                            // try {
+                            //    this.ddfManager.getOrRestoreDDF(uuidList.get
+                            //    (index - 1));
+                            //} catch (DDFException e) {
+                            //    throw new Exception("ERROR: There is no ddf
+                            // with uri:" + uuidList.get(index - 1).toString());
+                            // }
 
                         table.setName(this.ddfManager.getDDF(uuidList.get(index - 1)).getTableName());
+                        containsLocalTable = true;
                     }
                 } else {
                     if (index > uriList.size()) {

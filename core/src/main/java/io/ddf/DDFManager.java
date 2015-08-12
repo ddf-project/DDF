@@ -149,7 +149,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     //   throw new DDFException("Can't get engine from the uri");
     // }
     // return stringArrays[2];
-    DDFManager manager = this.getDDFCoordinator().getDDFManagerByURI(ddfURI);
+    DDFManager manager = null;
+    if (this.mDDFCoordinator == null) {
+      manager = this;
+    } else {
+      manager = this.mDDFCoordinator.getDDFManagerByURI(ddfURI);
+    }
     if (manager == null) {
       manager.log("Can't get manager for " + ddfURI);
     }
