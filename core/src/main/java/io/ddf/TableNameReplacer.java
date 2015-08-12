@@ -362,7 +362,11 @@ public class TableNameReplacer extends TableVisitor {
                 try {
                    // TODO: fix setDDFName.scala first.
                    // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
-                  ddf = this.ddfManager.getDDFByURI(ddfuri);
+                    if (this.getDDFManager().getEngine().equals("spark")) {
+                        ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
+                    } else {
+                        ddf = this.ddfManager.getDDFByURI(ddfuri);
+                    }
                 }
                 catch (Exception e) {
                     this.ddfManager.log("restore error");
