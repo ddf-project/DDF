@@ -6,6 +6,9 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
+import io.ddf.spark.etl.DateParseUDF;
+import io.ddf.spark.etl.DateTimeExtractUDF;
+import io.ddf.spark.etl.DateUDF;
 import io.ddf.spark.etl.udf.*;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
@@ -70,19 +73,19 @@ public class SparkDDFManager extends DDFManager {
   }
   // TODO: Dynamically load UDFs
   private void registerUDFs() {
-    DateParse.register(this.mHiveContext);
-    DateTimeExtract.register(this.mHiveContext);
-    Year.register(this.mHiveContext);
-    Month.register(this.mHiveContext);
-    WeekYear.register(this.mHiveContext);
-    WeekOfWeekYear.register(this.mHiveContext);
-    DayOfWeek.register(this.mHiveContext);
-    Day.register(this.mHiveContext);
-    DayOfYear.register(this.mHiveContext);
-    Hour.register(this.mHiveContext);
-    Minute.register(this.mHiveContext);
-    Second.register(this.mHiveContext);
-    Millisecond.register(this.mHiveContext);
+    DateParseUDF.register(this.mHiveContext);
+    DateTimeExtractUDF.register(this.mHiveContext);
+    DateUDF.registerYearUDF(this.mHiveContext);
+    DateUDF.registerMonthUDF(this.mHiveContext);
+    DateUDF.registerWeekOfYearUDF(this.mHiveContext);
+    DateUDF.registerWeekOfWeekYear(this.mHiveContext);
+    DateUDF.registerDayOfWeekUDf(this.mHiveContext);
+    DateUDF.registerDay(this.mHiveContext);
+    DateUDF.registerDayOfYear(this.mHiveContext);
+    DateUDF.registerHourUDF(this.mHiveContext);
+    DateUDF.registerMinute(this.mHiveContext);
+    DateUDF.registerSecond(this.mHiveContext);
+    DateUDF.registerMillisecond(this.mHiveContext);
   }
 
 

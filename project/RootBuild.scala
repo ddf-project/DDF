@@ -211,7 +211,8 @@ object RootBuild extends Build {
 
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
       "mysql" % "mysql-connector-java" % "5.1.25",
-      "joda-time" % "joda-time" % "2.8.1"
+      "joda-time" % "joda-time" % "2.8.1",
+      "org.joda" % "joda-convert" % "1.7"
     ),
 
 

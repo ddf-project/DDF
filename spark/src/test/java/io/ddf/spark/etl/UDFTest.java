@@ -347,5 +347,4 @@ public class UDFTest extends BaseTest {
     System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0)) == 0);
   }
-
 }
