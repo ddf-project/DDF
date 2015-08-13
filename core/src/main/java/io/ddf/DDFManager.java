@@ -288,10 +288,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
                       (dataSourceDescriptor, engineType);
       return manager;
     } catch (Exception e) {
-      throw new DDFException("Cannot get DDFManager for engine " +
-              engineType + " classname "
-              + className + " " + e.getMessage());
-
+      //throw new DDFException("Cannot get DDFManager for engine " +
+      //        engineType + " classname "
+      //        + className + " " + e.getMessage());
+      throw new DDFException(e);
     }
   }
 

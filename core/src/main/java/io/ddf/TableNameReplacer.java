@@ -353,7 +353,14 @@ public class TableNameReplacer extends TableVisitor {
     String handleDDFURI(String ddfuri) throws Exception {
 
         this.ddfManager.log("debug2 " + ddfuri);
-        String engineName = this.ddfManager.getEngineNameOfDDF(ddfuri);
+        String engineName = null;
+        try {
+            engineName = this.ddfManager.getEngineNameOfDDF(ddfuri);
+        } catch (DDFException e) {
+            this.ddfManager.log("Can't find ddfmanger for " + ddfuri + " , " +
+                    "trying spark");
+            engineName = "spark";
+        }
         if (engineName.equals(this.ddfManager.getEngineName())) {
             // It's in the same engine.
             DDF ddf = null;

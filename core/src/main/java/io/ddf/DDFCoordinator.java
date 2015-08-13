@@ -56,7 +56,14 @@ public class DDFCoordinator {
     public DDFManager getDDFManagerByURI(String uri) throws DDFException {
         DDFManager dm =  mURI2DDFManager.get(uri);
         if (dm == null) {
-            throw new DDFException("Can't find ddfmanager for ddf: " + uri);
+            // throw new DDFException("Can't find ddfmanager for ddf: " + uri);
+            try {
+                // this.getEngine("spark").getOrRestoreDDFUri(uri);
+                dm = this.getEngine("spark");
+            } catch (Exception e) {
+                throw new DDFException("Can't find ddfmanager for ddf: " +
+                        uri + " after trying spark ");
+            }
         }
         return dm;
     }

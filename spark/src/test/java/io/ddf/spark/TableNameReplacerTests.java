@@ -51,7 +51,7 @@ public class TableNameReplacerTests {
                 "tmp) T0";
         try {
             Statement statement = parser.parse(new StringReader(sqlcmd));
-            statement = tableNameReplacer.run(statement);
+            // statement = tableNameReplacer.run(statement);
             System.out.println(statement.toString());
         } catch (JSQLParserException e) {
             e.printStackTrace();
@@ -139,7 +139,7 @@ public class TableNameReplacerTests {
             assert(false);
         }
         try {
-            statement = tableNameReplacer.run(statement);
+            // statement = tableNameReplacer.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -166,7 +166,7 @@ public class TableNameReplacerTests {
         }
 
         try {
-            statement = tableNameReplacer.run(statement);
+            // statement = tableNameReplacer.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -177,7 +177,8 @@ public class TableNameReplacerTests {
     public Statement testFullURISingle(String sqlcmd) throws Exception {
         Statement statement = parser.parse(new StringReader(sqlcmd));
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
-        return tableNameReplacer.run(statement);
+        return null;
+        // return tableNameReplacer.run(statement);
     }
 
     @Test
@@ -255,7 +256,7 @@ public class TableNameReplacerTests {
             assert(false);
         }
         try {
-            tableNameReplacer.run(statement);
+            // tableNameReplacer.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -284,7 +285,7 @@ public class TableNameReplacerTests {
         }
 
         try {
-            tableNameReplacer.run(statement);
+            // tableNameReplacer.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -314,7 +315,7 @@ public class TableNameReplacerTests {
             String newSqlCmd = String.format(sqlcmd, udfname);
             try {
                 Statement statement = parser.parse(new StringReader(newSqlCmd));
-                statement = tableNameReplacer.run(statement);
+                // statement = tableNameReplacer.run(statement);
                 assert (statement.toString().toLowerCase().equals(
                         String.format("select %s(tablename1.year) from tablename1", udfname)
                 ));
@@ -331,7 +332,7 @@ public class TableNameReplacerTests {
             String newSqlCmd = String.format(doubleSqlCmd, udfname);
             try {
                 Statement statement = parser.parse(new StringReader(newSqlCmd));
-                statement = tableNameReplacer.run(statement);
+                // statement = tableNameReplacer.run(statement);
                 assert (statement.toString().toLowerCase().equals(
                         String.format("select %s(tablename1.year, tablename1.rev) from tablename1",
                                 udfname)));
@@ -370,7 +371,8 @@ public class TableNameReplacerTests {
                 + "depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline",
                 sqlDataSourceDescriptor);
         this.manager.setDDFName(ddf, "airlineDDF");
-        DDF sql2ddfRet = manager.sql2ddf("select * from ddf://adatao/airlineDDF");
+        // DDF sql2ddfRet = manager.sql2ddf("select * from " +
+        //        "ddf://adatao/airlineDDF");
     }
 
     @Test
@@ -429,7 +431,7 @@ public class TableNameReplacerTests {
         try {
 
             Statement newStat = parser.parse(new StringReader(testSqlCmd));
-            newStat = tableNameReplacer.run(newStat);
+            // newStat = tableNameReplacer.run(newStat);
 
         } catch (Exception e) {
             e.printStackTrace();
