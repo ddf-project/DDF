@@ -277,17 +277,22 @@ public class UDFTest extends BaseTest {
     System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0)) == 2015);
 
-    ddf3 = ddf.sql2ddf("select month('2015-01-22 20:23 +0000', 'number') from @this");
+    ddf3 = ddf.sql2ddf("select month('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 1);
+
+    ddf3 = ddf.sql2ddf("select month_as_text('2015-01-22 20:23 +0000', 'number') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
     Assert.assertTrue(rows.get(0).equalsIgnoreCase("1"));
 
-    ddf3 = ddf.sql2ddf("select month('2015-01-22 20:23 +0000', 'text') from @this");
+    ddf3 = ddf.sql2ddf("select month_as_text('2015-01-22 20:23 +0000', 'text') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
     Assert.assertTrue(rows.get(0).equalsIgnoreCase("January"));
 
-    ddf3 = ddf.sql2ddf("select month('2015-01-22 20:23 +0000', 'shorttext') from @this");
+    ddf3 = ddf.sql2ddf("select month_as_text('2015-01-22 20:23 +0000', 'shorttext') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
     Assert.assertTrue(rows.get(0).equalsIgnoreCase("Jan"));
@@ -307,17 +312,22 @@ public class UDFTest extends BaseTest {
     System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0)) == 22);
 
-    ddf3 = ddf.sql2ddf("select dayofweek('2015-01-22 20:23 +0000', 'number') from @this");
+    ddf3 = ddf.sql2ddf("select dayofweek('2015-01-22 20:23 +0000') from @this");
+    rows = ddf3.VIEWS.head(1);
+    System.out.println(rows.get(0));
+    Assert.assertTrue(Integer.parseInt(rows.get(0)) == 4);
+
+    ddf3 = ddf.sql2ddf("select dayofweek_as_text('2015-01-22 20:23 +0000', 'number') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
     Assert.assertTrue(rows.get(0).equalsIgnoreCase("4"));
 
-    ddf3 = ddf.sql2ddf("select dayofweek('2015-01-22 20:23 +0000', 'text') from @this");
+    ddf3 = ddf.sql2ddf("select dayofweek_as_text('2015-01-22 20:23 +0000', 'text') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
     Assert.assertTrue(rows.get(0).equalsIgnoreCase("Thursday"));
 
-    ddf3 = ddf.sql2ddf("select dayofweek('2015-01-22 20:23 +0000', 'shorttext') from @this");
+    ddf3 = ddf.sql2ddf("select dayofweek_as_text('2015-01-22 20:23 +0000', 'shorttext') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
     Assert.assertTrue(rows.get(0).equalsIgnoreCase("Thu"));

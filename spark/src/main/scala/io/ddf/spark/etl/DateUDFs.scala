@@ -28,7 +28,18 @@ object DateUDF {
     }
   }
 
-  val parseDayOfWeek: (Object, String) => String = {
+  val parseDayOfWeek: Object => Integer = {
+    (obj: Object) => {
+      val dateTime = Utils.toDateTimeObject(obj)
+      if(dateTime != null) {
+        dateTime.getDayOfWeek
+      } else {
+        null
+      }
+    }
+  }
+
+  val parseDayOfWeekAsText: (Object, String) => String = {
     (obj: Object, format: String) => {
       val dateTime = Utils.toDateTimeObject(obj)
       if(dateTime != null) {
@@ -43,7 +54,18 @@ object DateUDF {
     }
   }
 
-  val parseMonth: (Object, String) => String = {
+  val parseMonth: Object => Integer = {
+    (obj: Object) => {
+      val dateTime = Utils.toDateTimeObject(obj)
+      if(dateTime != null) {
+        dateTime.getMonthOfYear
+      } else {
+        null
+      }
+    }
+  }
+
+  val parseMonthAsText: (Object, String) => String = {
     (obj: Object, format: String) => {
       val dateTime = Utils.toDateTimeObject(obj)
       if(dateTime != null) {
@@ -135,47 +157,20 @@ object DateUDF {
     }
   }
 
-  def registerYearUDF(sQLContext: SQLContext) = {
+  def registerUDFs(sQLContext: SQLContext) = {
     sQLContext.udf.register("year", parseYear)
-  }
-
-  def registerHourUDF(sqlContext: SQLContext) = {
-    sqlContext.udf.register("hour", parseHour)
-  }
-
-  def registerDayOfWeekUDf(sqlContext: SQLContext) = {
-    sqlContext.udf.register("dayofweek", parseDayOfWeek)
-  }
-
-  def registerMonthUDF(sqlContext: SQLContext) = {
-    sqlContext.udf.register("month", parseMonth)
-  }
-
-  def registerWeekOfYearUDF(sQLContext: SQLContext) = {
+    sQLContext.udf.register("month", parseMonth)
+    sQLContext.udf.register("month_as_text", parseMonthAsText)
     sQLContext.udf.register("weekyear", parseWeekOfYear)
-  }
-
-  def registerWeekOfWeekYear(sQLContext: SQLContext) = {
     sQLContext.udf.register("weekofweekyear", parseWeekOfWeekYear)
-  }
-
-  def registerDay(sQLContext: SQLContext) = {
     sQLContext.udf.register("day", parseDay)
-  }
-
-  def registerDayOfYear(sQLContext: SQLContext) = {
+    sQLContext.udf.register("dayofweek", parseDayOfWeek)
+    sQLContext.udf.register("dayofweek_as_text", parseDayOfWeekAsText)
     sQLContext.udf.register("dayofyear", parseDayOfYear)
-  }
-
-  def registerMinute(sQLContext: SQLContext) = {
+    sQLContext.udf.register("hour", parseHour)
     sQLContext.udf.register("minute", parseMinute)
-  }
-
-  def registerSecond(sQLContext: SQLContext) = {
     sQLContext.udf.register("second", parseSecond)
-  }
-
-  def registerMillisecond(sQLContext: SQLContext) = {
     sQLContext.udf.register("millisecond", parseMillisecond)
+
   }
 }
