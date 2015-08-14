@@ -98,7 +98,8 @@ public class SqlHandler extends ASqlHandler {
 
     rdd = this.getHiveContext().sql(command);
     if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
-    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[] {DataFrame.class}, null,
+    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[]
+                    {DataFrame.class}, null, null,
         null, schema);
     ddf.getRepresentationHandler().cache(false);
     ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
@@ -132,6 +133,7 @@ public class SqlHandler extends ASqlHandler {
       SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
       if (sqlDataSourceDescriptor != null) {
         if (sqlDataSourceDescriptor.getDataSource() != null
+                && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
             && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
                 && !sqlDataSourceDescriptor.getDataSource().equals("Spark")
                 && !sqlDataSourceDescriptor.getDataSource().equals("spark")) {

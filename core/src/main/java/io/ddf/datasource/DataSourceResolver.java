@@ -21,7 +21,7 @@ public class DataSourceResolver {
       case "hdfs": {
         return resolveHDFS(options);
       }
-      case "jdbc": {
+      case "jdbc":case "sfdc": {
         return resolveJDBC(options);
       }
       case "sql" : {
@@ -77,8 +77,8 @@ public class DataSourceResolver {
     String uri = options.get("uri");
     String username = options.get("username");
     String password = options.get("password");
-    String dbTable = options.get("dbTable");
-
+    // String dbTable = options.get("dbTable");
+    String dbTable = getOrDefault(options, "dbTable", null);
     try {
       return new JDBCDataSourceDescriptor(uri, username, password, dbTable);
     } catch (URISyntaxException e) {

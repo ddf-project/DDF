@@ -29,12 +29,15 @@ public class JDBCDDF extends DDF {
    * @param name: DDF name
    * @param tableName: JDBC table name
    */
-  public JDBCDDF(JDBCDDFManager manager, String namespace, String name, String tableName)
+  public JDBCDDF(JDBCDDFManager manager, String engineName, String namespace,
+                 String name, String tableName)
       throws DDFException, SQLException {
     //build DDF schema from table schema
     TableSchema tableSchema = manager.getTableSchema(tableName);
     Schema ddfSchema = buildDDFSchema(tableSchema);
-    this.initialize(manager, null, null, namespace, name, ddfSchema, tableName);
+    this.initialize(manager, null, null, engineName, namespace, name,
+            ddfSchema,
+            tableName);
   }
 
   /**

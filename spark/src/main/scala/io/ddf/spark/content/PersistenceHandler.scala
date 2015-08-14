@@ -65,7 +65,8 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
     val schemaRDD = ctx.parquetFile(dataPath)
     val schema = JsonSerDes.loadFromFile(schemaPath).asInstanceOf[Schema]
 
-    val ddf = manager.newDDF(manager, schemaRDD, Array(classOf[SchemaRDD]), manager.getNamespace, null, schema)
+    val ddf = manager.newDDF(manager, schemaRDD, Array(classOf[SchemaRDD]),
+      manager.getEngineName,manager.getNamespace, null, schema)
     ddf
   }
 

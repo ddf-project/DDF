@@ -2,6 +2,7 @@ package io.ddf.jdbc;
 
 import com.google.common.base.Strings;
 import io.ddf.content.Schema;
+import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
@@ -43,35 +44,72 @@ public class JDBCDDFManager extends DDFManager {
   private Connection conn;
   private static IHandleConfig sConfigHandler;
 
+
   static {
     String configFileName = System.getenv(ConfigConstant.DDF_INI_ENV_VAR.toString());
     if (Strings.isNullOrEmpty(configFileName)) configFileName = ConfigConstant.DDF_INI_FILE_NAME.toString();
     sConfigHandler = new ConfigHandler(ConfigConstant.DDF_CONFIG_DIR.toString(), configFileName);
   }
 
-  public JDBCDDFManager()  {}
-  public JDBCDDFManager(JDBCDataSourceDescriptor jdbcDataSource) throws SQLException, ClassNotFoundException {
+
+
+  @Override
+  public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
+    throw new DDFException("Currently jdbc engine doesn't support transfer");
+  }
+
+  public JDBCDDFManager()  {
+    mLog.info("Initializing jdbddfmanager with no arguments");
+  }
+
+  public JDBCDDFManager(DataSourceDescriptor dataSourceDescriptor, String
+          engineType) throws
+          Exception {
     /*
      * Register driver for the JDBC connector
      */
+    // TODO: check the correctness here.
+    super(dataSourceDescriptor);
+
+    this.setEngineType(engineType);
+    mLog.info("Initializing jdbddfmanager");
+
     String driver = sConfigHandler.getValue(this.getEngine(), ConfigConstant.JDBC_DRIVER.toString());
 
     Class.forName(driver);
 
-    mJdbcDataSource = jdbcDataSource;
+    mJdbcDataSource = (JDBCDataSourceDescriptor) dataSourceDescriptor;
+    this.setDataSourceDescriptor(dataSourceDescriptor);
+    if (mJdbcDataSource == null) {
+      throw new Exception("JDBCDatasource is null when initializing " +
+              "JDBCDDFManager");
+    }
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
         mJdbcDataSource.getCredentials().getUsername(),
         mJdbcDataSource.getCredentials().getPassword());
 
+    mLog.info("Set up connection with jdbc : " + mJdbcDataSource
+            .getDataSourceUri().toString());
     boolean isDDFAutoCreate = Boolean.parseBoolean(sConfigHandler.getValue(ConfigConstant.ENGINE_NAME_JDBC.toString(),
         ConfigConstant.JDBC_DDF_AUTOCREATE.toString()));
 
+    mLog.info("Running show tables ");
+    this.showTables();
+    mLog.info("Show tables successfully, connection is correct");
     if (isDDFAutoCreate){
 
     } else {
 
     }
 
+  }
+
+  /**
+   * @brief Close the jdbc connection.
+   * @throws Throwable
+   */
+  protected void finalize() throws Throwable {
+    this.conn.close();
   }
 
   public JDBCDataSourceDescriptor getJdbcDataSource() {
@@ -256,7 +294,8 @@ public class JDBCDDFManager extends DDFManager {
   }
 
   @Override public String getEngine() {
-    return ConfigConstant.ENGINE_NAME_JDBC.toString();
+    // return ConfigConstant.ENGINE_NAME_JDBC.toString();
+    return this.getEngineType();
   }
 
   /**

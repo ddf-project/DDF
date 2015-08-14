@@ -4,8 +4,10 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.TableNameReplacer;
 import io.ddf.content.Schema;
-import io.ddf.datasource.SQLDataSourceDescriptor;
+import io.ddf.content.SqlResult;
+import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
+import io.ddf.jdbc.JDBCDDFManager;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
@@ -14,6 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Arrays;
 
 
@@ -27,6 +31,19 @@ public class TableNameReplacerTests {
     public static CCJSqlParserManager parser;
 
     @Test
+    public void testUnion() {
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        String sqlcmd = "select * from ddf://adatao/a union select * from " +
+                "ddf://adatao/b";
+        try {
+            Statement statement = parser.parse(new StringReader(sqlcmd));
+            // System.out.println(statement.toString());
+            int a = 2;
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void testAlias() {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         String sqlcmd = "select T0.id from (select tmp.id from ddf://adatao/a" +
@@ -34,7 +51,7 @@ public class TableNameReplacerTests {
                 "tmp) T0";
         try {
             Statement statement = parser.parse(new StringReader(sqlcmd));
-            statement = tableNameReplacer.run(statement);
+            // statement = tableNameReplacer.run(statement);
             System.out.println(statement.toString());
         } catch (JSQLParserException e) {
             e.printStackTrace();
@@ -42,6 +59,7 @@ public class TableNameReplacerTests {
             e.printStackTrace();
         }
     }
+    
     @Test
     public void testRealQuery() {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
@@ -121,7 +139,7 @@ public class TableNameReplacerTests {
             assert(false);
         }
         try {
-            statement = tableNameReplacer.run(statement);
+            // statement = tableNameReplacer.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -148,7 +166,7 @@ public class TableNameReplacerTests {
         }
 
         try {
-            statement = tableNameReplacer.run(statement);
+            // statement = tableNameReplacer.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -159,7 +177,8 @@ public class TableNameReplacerTests {
     public Statement testFullURISingle(String sqlcmd) throws Exception {
         Statement statement = parser.parse(new StringReader(sqlcmd));
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
-        return tableNameReplacer.run(statement);
+        return null;
+        // return tableNameReplacer.run(statement);
     }
 
     @Test
@@ -237,7 +256,7 @@ public class TableNameReplacerTests {
             assert(false);
         }
         try {
-            tableNameReplacer.run(statement);
+            // tableNameReplacer.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -266,7 +285,7 @@ public class TableNameReplacerTests {
         }
 
         try {
-            tableNameReplacer.run(statement);
+            // tableNameReplacer.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -296,7 +315,7 @@ public class TableNameReplacerTests {
             String newSqlCmd = String.format(sqlcmd, udfname);
             try {
                 Statement statement = parser.parse(new StringReader(newSqlCmd));
-                statement = tableNameReplacer.run(statement);
+                // statement = tableNameReplacer.run(statement);
                 assert (statement.toString().toLowerCase().equals(
                         String.format("select %s(tablename1.year) from tablename1", udfname)
                 ));
@@ -313,7 +332,7 @@ public class TableNameReplacerTests {
             String newSqlCmd = String.format(doubleSqlCmd, udfname);
             try {
                 Statement statement = parser.parse(new StringReader(newSqlCmd));
-                statement = tableNameReplacer.run(statement);
+                // statement = tableNameReplacer.run(statement);
                 assert (statement.toString().toLowerCase().equals(
                         String.format("select %s(tablename1.year, tablename1.rev) from tablename1",
                                 udfname)));
@@ -352,7 +371,8 @@ public class TableNameReplacerTests {
                 + "depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline",
                 sqlDataSourceDescriptor);
         this.manager.setDDFName(ddf, "airlineDDF");
-        DDF sql2ddfRet = manager.sql2ddf("select * from ddf://adatao/airlineDDF");
+        // DDF sql2ddfRet = manager.sql2ddf("select * from " +
+        //        "ddf://adatao/airlineDDF");
     }
 
     @Test
@@ -411,7 +431,7 @@ public class TableNameReplacerTests {
         try {
 
             Statement newStat = parser.parse(new StringReader(testSqlCmd));
-            newStat = tableNameReplacer.run(newStat);
+            // newStat = tableNameReplacer.run(newStat);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -424,13 +444,28 @@ public class TableNameReplacerTests {
     public static void startServer() throws Exception {
         Thread.sleep(1000);
         // LOG = LoggerFactory.getLogger(BaseTest.class);
-        manager = DDFManager.get("spark");
+        // manager = DDFManager.get("spark");
+        /*
+        manager = DDFManager.get("jdbc", new JDBCDataSourceDescriptor(new
+                DataSourceURI("jdbc:mysql://localhost/testdb"), new
+                JDBCDataSourceDescriptor.JDBCDataSourceCredentials("pauser",
+                "papwd"), null));
+        DataSourceDescriptor ds = manager.getDataSourceDescriptor();
+        if (ds instanceof
+                JDBCDataSourceDescriptor) {
+            System.out.println("hello");
+        }
+        DDF ret = manager.sql2ddf("select * from testtable", "jdbc");*/
         // Add 2 test ddfs.
+        manager = DDFManager.get("spark");
+        manager.setEngineName("spark");
         Schema schema = new Schema("tablename1", "d  d,d  d");
-        DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "a",
+        DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class
+                }, "spark", "adatao", "a",
                 schema);
         Schema schema2 = new Schema("tablename2", "d  d,d  d");
-        DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class }, "adatao", "b",
+        DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class
+                }, "spark", "adatao", "b",
                 schema2);
 
         parser = new CCJSqlParserManager();
