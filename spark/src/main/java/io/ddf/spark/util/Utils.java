@@ -2,6 +2,7 @@ package io.ddf.spark.util;
 
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -49,46 +50,55 @@ public class Utils {
           + "(?<timezone>Z|\\s?[+-](?:2[0-3]|[01][0-9])(:?[0-5][0-9])?)?)?)?)?$"
   );
 
-  public static DateTime toDateTimeObject(String string) {
-    Matcher matcher= isoPattern.matcher(string);
-    if (matcher.matches()) {
-      String year = matcher.group("year");
-      String month = matcher.group("month");
-      String day = matcher.group("day");
-      String sep = matcher.group("sep");
-      String hour = matcher.group("hour");
-      String minute = matcher.group("minute");
-      String second = matcher.group("second");
-      String ms = matcher.group("ms");
-      String timezone = matcher.group("timezone");
+  public static DateTime toDateTimeObject(Object object) {
+    if (object instanceof Integer) {
+      // Unix timestamp
+      return new DateTime((Integer) object * 1000L).withZone(DateTimeZone.UTC);
+    } else if (object instanceof Long) {
+      return new DateTime((Long)object * 1000L).withZone(DateTimeZone.UTC);
+    } else if (object instanceof String) {
 
-      StringBuilder sb = new StringBuilder();
-      sb.append(year);
-      sb.append(month != null ? ("-" + month) : "");
-      sb.append(day != null ? ("-" + day) : "");
-      sb.append(sep != null ? sep : "");
-      sb.append(hour != null ? hour : "");
-      sb.append(minute != null ? (minute) : "");
-      sb.append(second != null ? (second) : "");
-      sb.append(ms != null ? (ms) : "");
-      sb.append(timezone != null ? timezone : "");
+      Matcher matcher = isoPattern.matcher((String)object);
+      if (matcher.matches()) {
+        String year = matcher.group("year");
+        String month = matcher.group("month");
+        String day = matcher.group("day");
+        String sep = matcher.group("sep");
+        String hour = matcher.group("hour");
+        String minute = matcher.group("minute");
+        String second = matcher.group("second");
+        String ms = matcher.group("ms");
+        String timezone = matcher.group("timezone");
 
-      StringBuilder sb2 = new StringBuilder();
-      sb2.append("yyyy");
-      sb2.append(month != null ? ("-" + "MM") : "");
-      sb2.append(day != null ? ("-" + "dd") : "");
-      sb2.append(sep != null ? sep.equalsIgnoreCase("T") ? "'T'" : sep : "");
-      sb2.append(hour != null ? "HH" : "");
-      sb2.append(minute != null ? (":" + "mm") : "");
-      sb2.append(second != null ? (":" + "ss") : "");
-      sb2.append(ms != null ? ("." + "SSS") : "");
-      sb2.append(timezone != null ? timezone.startsWith(" ") ? " Z" : "Z" : "");
+        StringBuilder sb = new StringBuilder();
+        sb.append(year);
+        sb.append(month != null ? ("-" + month) : "");
+        sb.append(day != null ? ("-" + day) : "");
+        sb.append(sep != null ? sep : "");
+        sb.append(hour != null ? hour : "");
+        sb.append(minute != null ? (minute) : "");
+        sb.append(second != null ? (second) : "");
+        sb.append(ms != null ? (ms) : "");
+        sb.append(timezone != null ? timezone : "");
 
-      DateTimeFormatter formatter = DateTimeFormat.forPattern(sb2.toString()).withZoneUTC();
-      return formatter.parseDateTime(sb.toString());
-    } else {
-      return null;
+        StringBuilder sb2 = new StringBuilder();
+        sb2.append("yyyy");
+        sb2.append(month != null ? ("-" + "MM") : "");
+        sb2.append(day != null ? ("-" + "dd") : "");
+        sb2.append(sep != null ? sep.equalsIgnoreCase("T") ? "'T'" : sep : "");
+        sb2.append(hour != null ? "HH" : "");
+        sb2.append(minute != null ? (":" + "mm") : "");
+        sb2.append(second != null ? (":" + "ss") : "");
+        sb2.append(ms != null ? ("." + "SSS") : "");
+        sb2.append(timezone != null ? timezone.startsWith(" ") ? " Z" : "Z" : "");
+
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(sb2.toString()).withZoneUTC();
+        return formatter.parseDateTime(sb.toString());
+      } else {
+        return null;
+      }
     }
+    return null;
   }
 }
 

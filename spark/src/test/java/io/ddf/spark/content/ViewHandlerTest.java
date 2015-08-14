@@ -26,13 +26,12 @@ public class ViewHandlerTest extends BaseTest{
     columns.add("month");
     columns.add("deptime");
 
-    DDF newddf1 = ddf.VIEWS.removeColumn("year");
-    DDF newddf2 = ddf.VIEWS.removeColumns("year", "deptime", "SparkSQL");
-    DDF newddf3 = ddf.VIEWS.removeColumns(columns);
-
-    Assert.assertEquals(28, newddf1.getNumColumns());
-    Assert.assertEquals(27, newddf2.getNumColumns());
-    Assert.assertEquals(26, newddf3.getNumColumns());
+    ddf.VIEWS.removeColumn("year");
+    Assert.assertEquals(28, ddf.getNumColumns());
+    ddf.VIEWS.removeColumns("year", "deptime", "SparkSQL");
+    Assert.assertEquals(27, ddf.getNumColumns());
+    ddf.VIEWS.removeColumns(columns);
+    Assert.assertEquals(26, ddf.getNumColumns());
   }
 
   @Test

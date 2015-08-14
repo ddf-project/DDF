@@ -10,8 +10,9 @@ import io.ddf.datasource.JDBCDataSourceCredentials;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.content.SchemaHandler;
-import io.ddf.spark.etl.udf.DateParse;
-import io.ddf.spark.etl.udf.DateTimeExtract;
+import io.ddf.spark.etl.DateParseUDF;
+import io.ddf.spark.etl.DateTimeExtractUDF;
+import io.ddf.spark.etl.DateUDF;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -145,8 +146,9 @@ public class SparkDDFManager extends DDFManager {
   }
   // TODO: Dynamically load UDFs
   private void registerUDFs() {
-    DateParse.register(this.mHiveContext);
-    DateTimeExtract.register(this.mHiveContext);
+    DateParseUDF.register(this.mHiveContext);
+    DateTimeExtractUDF.register(this.mHiveContext);
+    DateUDF.registerUDFs(this.mHiveContext);
   }
 
 
