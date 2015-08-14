@@ -349,7 +349,7 @@ object RootBuild extends Build {
             <plugin>
               <groupId>net.alchim31.maven</groupId>
               <artifactId>scala-maven-plugin</artifactId>
-              <version>3.1.5</version>
+              <version>3.2.0</version>
               <configuration>
                 <recompileMode>incremental</recompileMode>
               </configuration>
