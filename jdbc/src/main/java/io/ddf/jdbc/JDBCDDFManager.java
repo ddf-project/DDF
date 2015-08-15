@@ -265,6 +265,16 @@ public class JDBCDDFManager extends DDFManager {
     return tableList;
   }
 
+  public List<String> listColumns(String tablename) throws SQLException {
+    DatabaseMetaData dbmd = conn.getMetaData();
+    ResultSet columns = dbmd.getColumns(null, null, tablename, null);
+    List<String> columnNames = new ArrayList<String>();
+    while (columns.next()) {
+      columnNames.add(columns.getString("COLUMN_NAME"));
+    }
+    return columnNames;
+  }
+
   /**
    * @param
    * @param tableName
