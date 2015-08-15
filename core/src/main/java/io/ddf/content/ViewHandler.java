@@ -103,7 +103,12 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   @Override
   public DDF removeColumns(List<String> columnNames) throws DDFException {
     if (columnNames == null || columnNames.isEmpty()) throw new DDFException("columnNames must be specified");
-
+    List<String> currentColumnNames = this.getDDF().getColumnNames();
+    for(String columnName: columnNames) {
+      if(!currentColumnNames.contains(columnName)) {
+        throw new DDFException(String.format("Column %s does not exists", columnName));
+      }
+    }
     List<String> columns = this.getDDF().getColumnNames();
 
     for (String columnName : columnNames) {
