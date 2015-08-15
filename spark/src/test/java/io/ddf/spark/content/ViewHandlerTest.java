@@ -20,7 +20,7 @@ public class ViewHandlerTest extends BaseTest{
     createTableAirline();
 
     DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
-
+    DDF ddf0 = manager.sql2ddf("select * from airline", "SparkSQL");
     List<String> columns = Lists.newArrayList();
     columns.add("year");
     columns.add("month");
@@ -28,10 +28,10 @@ public class ViewHandlerTest extends BaseTest{
 
     ddf.VIEWS.removeColumn("year");
     Assert.assertEquals(28, ddf.getNumColumns());
-    ddf.VIEWS.removeColumns("year", "deptime", "SparkSQL");
+    ddf.VIEWS.removeColumns("deptime");
     Assert.assertEquals(27, ddf.getNumColumns());
-    ddf.VIEWS.removeColumns(columns);
-    Assert.assertEquals(26, ddf.getNumColumns());
+    ddf0.VIEWS.removeColumns(columns);
+    Assert.assertEquals(26, ddf0.getNumColumns());
   }
 
   @Test
