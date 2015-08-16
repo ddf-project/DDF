@@ -31,22 +31,29 @@ public class BasicDDF extends DDF {
   @Expose private List<?> mData; // only needed during serialization
   @Expose private String mUnitTypeName; // only needed during serialization
 
-  public BasicDDF(List<?> rows, Class<?> unitType, String namespace, String name, Schema schema) throws DDFException {
-    this((DDFManager) null, (List<?>) rows, unitType, namespace, name, schema);
+  public BasicDDF(List<?> rows, Class<?> unitType, String engineName, String
+          namespace, String name, Schema schema) throws DDFException {
+    this((DDFManager) null, (List<?>) rows, unitType, engineName, namespace,
+            name,
+            schema);
     if (rows != null) mUnitType = unitType;
   }
 
-  public BasicDDF(DDFManager manager, List<?> rows, Class<?> unitType, String namespace, String name, Schema schema)
+  public BasicDDF(DDFManager manager, List<?> rows, Class<?> unitType,
+                  String engineName, String namespace, String name, Schema
+                          schema)
       throws DDFException {
 
     super(manager, sDummyBasicDDFManager);
     if (rows == null) throw new DDFException("Non-null rows List is required to instantiate a new BasicDDF");
     mUnitType = unitType;
-    this.initialize(manager, rows, new Class[] { List.class, unitType }, namespace, name, schema);
+    this.initialize(manager, rows, new Class[] { List.class, unitType },
+            engineName, namespace, name, schema);
   }
 
   /**
-   * This signature is needed to support {@link DDFManager#newDDF(DDFManager, Object, Class[], String, String, Schema)}
+   * This signature is needed to support {@link DDFManager#newDDF(DDFManager,
+   * Object, Class[], String, String, String, Schema)}
    *
    * @param manager
    * @param rows
@@ -56,13 +63,16 @@ public class BasicDDF extends DDF {
    * @param schema
    * @throws DDFException
    */
-  public BasicDDF(DDFManager manager, Object rows, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
+  public BasicDDF(DDFManager manager, Object rows, Class<?>[] typeSpecs,
+                  String engineName, String namespace, String name, Schema
+                          schema)
       throws DDFException {
 
     super(manager, sDummyBasicDDFManager);
     if (rows == null) throw new DDFException("Non-null rows Object is required to instantiate a new BasicDDF");
     mUnitType = (typeSpecs != null && typeSpecs.length > 0) ? typeSpecs[1] : null;
-    this.initialize(manager, rows, typeSpecs, namespace, name, schema);
+    this.initialize(manager, rows, typeSpecs, engineName, namespace, name,
+            schema);
   }
 
   /**

@@ -77,7 +77,7 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
     }
 
     try {
-      DDF resultDDF = this.getManager().sql2ddf(joinSqlCommand);
+      DDF resultDDF = this.getManager().sql2ddf(joinSqlCommand, "SparkSQL");
       return resultDDF;
     } catch (Exception e) {
       e.printStackTrace();
@@ -91,6 +91,7 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
     DataFrame rdd2 = ((DataFrame) anotherDDF.getRepresentationHandler().get(DataFrame.class));
     DataFrame newRDD = rdd1.unionAll(rdd2);
     Schema schema = SparkUtils.schemaFromDataFrame(newRDD);
-    return this.getManager().newDDF(newRDD, new Class<?>[]{DataFrame.class}, null, null, schema);
+    return this.getManager().newDDF(newRDD, new Class<?>[]{DataFrame.class},
+            null, null, null, schema);
   }
 }

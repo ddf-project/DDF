@@ -24,7 +24,7 @@ public class MetaDataHandler extends AMetaDataHandler {
     String tableName = this.getDDF().getSchemaHandler().getTableName();
     logger.debug("get NumRows Impl called");
     try {
-      List<String> rs = this.getManager().sql("SELECT COUNT(*) FROM " + tableName).getRows();
+      List<String> rs = this.getManager().sql("SELECT COUNT(*) FROM " + tableName, "SparkSQL").getRows();
       return Long.parseLong(rs.get(0));
     } catch (Exception e) {
       throw new DDFException("Error getting NRow", e);

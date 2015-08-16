@@ -19,27 +19,26 @@ public class ViewHandlerTest extends BaseTest{
   public void testRemoveColumns() throws DDFException {
     createTableAirline();
 
-    DDF ddf = manager.sql2ddf("select * from airline");
-
+    DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+    DDF ddf0 = manager.sql2ddf("select * from airline", "SparkSQL");
     List<String> columns = Lists.newArrayList();
     columns.add("year");
     columns.add("month");
     columns.add("deptime");
 
-    DDF newddf1 = ddf.VIEWS.removeColumn("year");
-    DDF newddf2 = ddf.VIEWS.removeColumns("year", "deptime");
-    DDF newddf3 = ddf.VIEWS.removeColumns(columns);
-
-    Assert.assertEquals(28, newddf1.getNumColumns());
-    Assert.assertEquals(27, newddf2.getNumColumns());
-    Assert.assertEquals(26, newddf3.getNumColumns());
+    ddf.VIEWS.removeColumn("year");
+    Assert.assertEquals(28, ddf.getNumColumns());
+    ddf.VIEWS.removeColumns("deptime");
+    Assert.assertEquals(27, ddf.getNumColumns());
+    ddf0.VIEWS.removeColumns(columns);
+    Assert.assertEquals(26, ddf0.getNumColumns());
   }
 
   @Test
   public void testSubsettingWithGrep() throws DDFException {
     createTableAirline();
 
-    DDF ddf = manager.sql2ddf("select * from airline");
+    DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
 
     List<Column> columns = Lists.newArrayList();
     Column col = new Column();
@@ -64,7 +63,7 @@ public class ViewHandlerTest extends BaseTest{
   public void testSubsettingWithGrepIgnoreCase() throws DDFException {
     createTableAirline();
 
-    DDF ddf = manager.sql2ddf("select * from airline");
+    DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
 
     List<Column> columns = Lists.newArrayList();
     Column col = new Column();

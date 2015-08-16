@@ -39,9 +39,9 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val selectColumns: Array[String] = new Array[String](flattenedColumns.length)
     // update hive-invalid column names
 
-    for (i <- 0 until flattenedColumns.length) {
-      selectColumns(i) = flattenedColumns(i).replaceAll("[.]", "_")
-      if (selectColumns(i).charAt(0) == '_') {
+    for(i <- flattenedColumns.indices) {
+      selectColumns(i) = flattenedColumns(i).replaceAll("->", "_")
+      if(selectColumns(i).charAt(0) == '_') {
         selectColumns(i) = selectColumns(i).substring(1)
       }
       selectColumns(i) = s"${flattenedColumns(i)} as ${selectColumns(i)}"
@@ -49,7 +49,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val selectClause = selectColumns.mkString(",")
     //val q = String.format("select %s from %s", selectClause, mDDF.getTableName)
-    val q = s"select $selectClause from ${mDDF.getTableName}"
+    val q = s"select $selectClause from @this"
 
     //println("Query: \n" + q)
 
@@ -121,7 +121,9 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList);
 
     val manager = this.getManager
-    val ddf = manager.newDDF(manager, rReduced, Array(classOf[RDD[_]], classOf[REXP]), manager.getNamespace, null, newSchema)
+    val ddf = manager.newDDF(manager, rReduced, Array(classOf[RDD[_]],
+      classOf[REXP]), manager.getEngineName, manager.getNamespace, null,
+      newSchema)
     ddf
   }
 
@@ -171,7 +173,9 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList);
 
     val manager = this.getManager
-    val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]], classOf[REXP]), manager.getNamespace, null, newSchema)
+    val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]],
+      classOf[REXP]), manager.getEngineName,  manager.getNamespace, null,
+      newSchema)
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
     ddf.getMetaDataHandler.copyFactor(this.getDDF)
     ddf
@@ -254,7 +258,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val manager = this.getManager
     val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]], classOf[PyObject]),
-      manager.getNamespace, null, newSchema)
+      manager.getEngineName, manager.getNamespace, null, newSchema)
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
     ddf.getMetaDataHandler.copyFactor(this.getDDF)
     ddf

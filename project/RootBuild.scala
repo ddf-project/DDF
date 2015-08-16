@@ -18,7 +18,7 @@ object RootBuild extends Build {
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
 
-  val SPARK_VERSION = "1.3.1"
+  val SPARK_VERSION = "1.3.1-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -34,7 +34,7 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-  val rootVersion = "1.3.0-SNAPSHOT"
+  val rootVersion = "1.4.0-SNAPSHOT"
   //val rootVersion = if(YARN_ENABLED) {
   //  "1.2-adatao"
   //} else {
@@ -65,10 +65,12 @@ object RootBuild extends Build {
   val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
   val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
-  
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
+  val jdbcProjectName = projectName + "_jdbc"
+
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, jdbc)
   lazy val core = Project("core", file("core"), settings = coreSettings)
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core)
+  lazy val jdbc = Project("jdbc", file("jdbc"), settings = jdbcSettings) dependsOn (core)
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) dependsOn(jdbc)
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
 
   // A configuration to set an alternative publishLocalConfiguration
@@ -124,6 +126,7 @@ object RootBuild extends Build {
     //"org.scalatest" %% "scalatest" % "1.9.1" % "test",
     //"org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
     "com.novocode" % "junit-interface" % "0.10" % "test",
+    "net.sf" % "jsqlparser" % "0.9.8.2",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
     //"org.antlr" % "antlr" % "3.4", // needed by shark.SharkDriver.compile
     // needed by Hive
@@ -202,13 +205,15 @@ object RootBuild extends Build {
       "com.novocode" % "junit-interface" % "0.10" % "test",	
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
       "com.googlecode.matrix-toolkits-java" % "mtj" % "0.9.14",
-      "commons-io" % "commons-io" % "1.3.2",
+      "net.sf" % "jsqlparser" % "0.9.8.2", 
+	"commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
 
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
       "mysql" % "mysql-connector-java" % "5.1.25",
-
-      "org.python" % "jython-standalone" % "2.7.0"
+      "org.python" % "jython-standalone" % "2.7.0",
+      "joda-time" % "joda-time" % "2.8.1",
+      "org.joda" % "joda-convert" % "1.7"
     ),
 
 
@@ -346,7 +351,7 @@ object RootBuild extends Build {
             <plugin>
               <groupId>net.alchim31.maven</groupId>
               <artifactId>scala-maven-plugin</artifactId>
-              <version>3.1.5</version>
+              <version>3.2.0</version>
               <configuration>
                 <recompileMode>incremental</recompileMode>
               </configuration>
@@ -560,10 +565,6 @@ object RootBuild extends Build {
     }
   ) ++ assemblySettings ++ extraAssemblySettings
 
-
-
-
-
   def examplesSettings = commonSettings ++ Seq(
     name := examplesProjectName,
     //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
@@ -571,7 +572,12 @@ object RootBuild extends Build {
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch examples/" + targetDir + "/*timestamp") }
   ) ++ assemblySettings ++ extraAssemblySettings
 
-
+  def jdbcSettings = commonSettings ++ Seq(
+    name := jdbcProjectName,
+    // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
+    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch jdbc/" + targetDir + "/*timestamp") },
+    testOptions in Test += Tests.Argument("-oI")
+  ) ++ assemblySettings ++ extraAssemblySettings
 
 
 

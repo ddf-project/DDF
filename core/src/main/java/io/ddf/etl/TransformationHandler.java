@@ -41,7 +41,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
     sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
 
-    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString());
+    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
     return newddf;
   }
@@ -68,7 +68,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
     sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
 
-    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString());
+    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
     return newddf;
 
@@ -115,7 +115,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
         RToSqlUdf(RExps, columns, this.getDDF().getSchema().getColumns()),
         this.getDDF().getTableName());
 
-    DDF newddf = this.getManager().sql2ddf(sqlCmd);
+    DDF newddf = this.getManager().sql2ddf(sqlCmd, this.getEngine());
 
     if (this.getDDF().isMutable()) {
       return this.getDDF().updateInplace(newddf);

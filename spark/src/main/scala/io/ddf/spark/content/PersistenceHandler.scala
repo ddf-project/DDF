@@ -1,5 +1,6 @@
 package io.ddf.spark.content
 
+import com.google.common.base.Strings
 import io.basic.ddf.content.{PersistenceHandler => BPersistenceHandler}
 import io.ddf.DDF
 import io.ddf.content.Schema
@@ -50,7 +51,7 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
 
   def getFolderPath(namespace: String, name: String, subfolder: String) = {
     val directory = this.locateOrCreatePersistenceSubdirectory(namespace)
-    if(subfolder != null || !subfolder.isEmpty) {
+    if(!Strings.isNullOrEmpty(subfolder)) {
       s"$directory/$name/$subfolder"
     } else {
       s"$directory/$name"
@@ -64,7 +65,8 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
     val schemaRDD = ctx.parquetFile(dataPath)
     val schema = JsonSerDes.loadFromFile(schemaPath).asInstanceOf[Schema]
 
-    val ddf = manager.newDDF(manager, schemaRDD, Array(classOf[SchemaRDD]), manager.getNamespace, null, schema)
+    val ddf = manager.newDDF(manager, schemaRDD, Array(classOf[SchemaRDD]),
+      manager.getEngineName,manager.getNamespace, null, schema)
     ddf
   }
 

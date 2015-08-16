@@ -19,8 +19,21 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
   public APersistenceHandler(DDF theDDF) {
     super(theDDF);
+    this.mPersitable = true;
   }
 
+  private boolean mPersitable = true;
+
+  public boolean isPersistable() {
+    if(this.getDDF().getUUID() == null) {
+      return false;
+    }
+    return this.mPersitable;
+  }
+
+  public void setPersistable(boolean persistable) {
+    this.mPersitable = persistable;
+  }
 
   /**
    * The URI format should be:
@@ -168,10 +181,19 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
 
     // //// IGloballyAddressable //////
-
+    @Expose private String mEngineName;
     @Expose private String mNamespace;
     @Expose private String mName;
 
+    @Override
+    public String getEngineName() {
+      return mEngineName;
+    }
+
+    @Override
+    public void setEngineName(String mEngineName) {
+      this.mEngineName = mEngineName;
+    }
 
     @Override
     public String getNamespace() {

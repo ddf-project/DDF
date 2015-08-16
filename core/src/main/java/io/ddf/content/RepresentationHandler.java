@@ -325,6 +325,7 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
    * A special class representing a Table that's native to the engine, e.g., Shark Table for the Spark engine.
    */
   public static class NativeTable extends AGloballyAddressable implements IGloballyAddressable {
+    private String mEngineName;
     private String mNamespace;
     private String mName;
 
@@ -332,6 +333,16 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
     public NativeTable(String namespace, String name) {
       mNamespace = namespace;
       mName = name;
+    }
+
+    @Override
+    public String getEngineName() {
+      return mEngineName;
+    }
+
+    @Override
+    public void setEngineName(String mEngineName) {
+      this.mEngineName = mEngineName;
     }
 
     @Override

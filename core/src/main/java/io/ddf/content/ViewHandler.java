@@ -103,7 +103,12 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   @Override
   public DDF removeColumns(List<String> columnNames) throws DDFException {
     if (columnNames == null || columnNames.isEmpty()) throw new DDFException("columnNames must be specified");
-
+    List<String> currentColumnNames = this.getDDF().getColumnNames();
+    for(String columnName: columnNames) {
+      if(!currentColumnNames.contains(columnName)) {
+        throw new DDFException(String.format("Column %s does not exists", columnName));
+      }
+    }
     List<String> columns = this.getDDF().getColumnNames();
 
     for (String columnName : columnNames) {
@@ -115,16 +120,20 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
 
     DDF newddf = this.project(columns);
-
-    newddf.getMetaDataHandler().copyFactor(this.getDDF());
-    return newddf;
+    if(this.getDDF().isMutable()) {
+      this.getDDF().updateInplace(newddf);
+      return this.getDDF();
+    } else {
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
+      return newddf;
+    }
   }
 
   // ///// Execute SQL command on the DDF ///////
 
   private DDF sql2ddf(String sqlCommand, String errorMessage) throws DDFException {
     try {
-      return this.getManager().sql2ddf(String.format(sqlCommand, this.getDDF().getTableName()));
+      return this.getManager().sql2ddf(String.format(sqlCommand, this.getDDF().getTableName()), this.getEngine());
 
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getDDF().getTableName()), e);
@@ -149,7 +158,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
     mLog.info("sql = {}", sqlCmd);
 
-    DDF subset = this.getManager().sql2ddf(sqlCmd);
+    DDF subset = this.getManager().sql2ddf(sqlCmd, this.getEngine());
 
     subset.getMetaDataHandler().copyFactor(this.getDDF());
     return subset;
