@@ -243,7 +243,13 @@ public class TableNameReplacer extends TableVisitor {
                         throw new Exception(new ArrayIndexOutOfBoundsException());
                     } else {
                         String uri = uriList.get(index - 1);
-                        String tablename = this.handleDDFURI(uri);
+                        String tablename = null;
+                        if (this.uriPattern.matcher(uri).matches()) {
+                            tablename = this.handleDDFURI(uri);
+                        } else {
+                            tablename = this.handleDDFUUID(uri);
+                        }
+
                         if (tablename == null) {
                             // It's not from this engine.
                             if (!this.uri2TableObj.containsKey(uri)) {
@@ -265,13 +271,6 @@ public class TableNameReplacer extends TableVisitor {
             }
         } else if (namespace != null) {
             // The second situation.
-            // TODO: leave structure here.
-            // String uri = "ddf://".concat(this.getDDFManager().getEngineName()
-            //                .concat("/")
-            //).concat
-            //        (namespace.concat("/")
-            //        .concat
-            //        (name));
             String uri  = "ddf://" + namespace + "/" + name;
             this.ddfManager.log("debug1");
             String tablename = this.handleDDFURI(uri);
@@ -398,5 +397,13 @@ public class TableNameReplacer extends TableVisitor {
             // return uri2tbl.get(ddfuri);
             return null;
         }
+    }
+
+    // Currently for uuid, we only support DDF from local engine.
+    // TODO: Support ddf from other engine
+    String handleDDFUUID(String uuid) throws Exception {
+        containsLocalTable = true;
+        return this.getDDFManager().getDDF(UUID.fromString(uuid))
+                .getTableName();
     }
 }
