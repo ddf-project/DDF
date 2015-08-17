@@ -25,6 +25,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -63,14 +64,25 @@ public class SparkDDFManager extends DDFManager {
             .getDataSourceDescriptor();
     if (dataSourceDescriptor instanceof JDBCDataSourceDescriptor) {
       // JDBCConnection.
-      JDBCDataSourceDescriptor jdbcDataSourceDescriptor = (JDBCDataSourceDescriptor)
+      JDBCDataSourceDescriptor jdbcDS = (JDBCDataSourceDescriptor)
               dataSourceDescriptor;
-      Map<String, String> options = new HashMap<String, String>();
-      options.put("dbtable", tableName);
-      JDBCDataSourceCredentials jdbcCredential =
-              jdbcDataSourceDescriptor.getCredentials();
 
+      if (fromManager.getEngine().equals("sfdc")) {
+        try {
+          JDBCDataSourceDescriptor sfdcDS = new JDBCDataSourceDescriptor
+                  (jdbcDS.getDataSourceUri().getUri().toString(),
+                   "",
+                   "",
+                   tableName);
+          return this.load(sfdcDS);
+        } catch (URISyntaxException e) {
+          throw new DDFException(e);
+        }
+      } else {
+        return this.load(dataSourceDescriptor);
+      }
       // TODO
+      /*
       if (fromManager.getEngine().equals("sfdc")) {
         options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri
                 ().toString());
@@ -96,7 +108,7 @@ public class SparkDDFManager extends DDFManager {
       DDF ddf = this.newDDF(this, rdd, new Class<?>[]
               {DataFrame.class}, null, null, null, schema);
       ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
-      return ddf;
+      */
     } else {
       throw new DDFException("Currently no other DataSourceDescriptor is " +
               "supported");
