@@ -157,7 +157,7 @@ object SparkUtils {
         if(v == null)
           gen.writeNull()
         else if(field.dataType.isPrimitive)
-          gen.writeRaw(v.toString)
+          gen.writeRaw(v.toString.replaceAll("\t", "\\\\t"))
         else
           data2json(field.dataType, v, gen)
     }
@@ -200,7 +200,7 @@ object SparkUtils {
     
     (dataType,data) match {
       case (_, null) | (NullType, _) => gen.writeNull()
-      case (StringType, v: String) => gen.writeString(v)
+      case (StringType, v: String) => gen.writeString(v.toString.replaceAll("\t", "\\\\t"))
       case (TimestampType, v: java.sql.Timestamp) => gen.writeString(v.toString)
       case (IntegerType, v: Int) => gen.writeNumber(v)
       case (ShortType, v: Short) => gen.writeNumber(v)
