@@ -113,10 +113,7 @@ public  class DataSourceManager {
   }
 
   public DDF loadFromSQL(SQLDataSourceDescriptor dataSource, DDFManager manager) throws DDFException {
-    if (dataSource.getNamespace() != null) {
-      // manager.sql2ddf(dataSource.sqlCmd, null , null, null, dataSource.namespace)
-      return manager.sql2ddf(dataSource.getSqlCommand(), dataSource, dataSource.getNamespace());
-    } else if (dataSource.getUriList() != null) {
+    if (dataSource.getUriList() != null) {
       return manager.sql2ddf(dataSource.getSqlCommand(), dataSource, dataSource.getUriList());
     } else if (dataSource.getUuidList() != null) {
       List<UUID> uuidListUUID = new ArrayList<UUID>();
@@ -124,6 +121,9 @@ public  class DataSourceManager {
         uuidListUUID.add(UUID.fromString(uuidStr));
       }
       return manager.sql2ddf(dataSource.getSqlCommand(), dataSource, (UUID[])uuidListUUID.toArray());
+    } else if (dataSource.getNamespace() != null) {
+        // manager.sql2ddf(dataSource.sqlCmd, null , null, null, dataSource.namespace)
+        return manager.sql2ddf(dataSource.getSqlCommand(), dataSource, dataSource.getNamespace());
     } else {
       return manager.sql2ddf(dataSource.getSqlCommand(), dataSource);
     }
