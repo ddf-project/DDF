@@ -44,6 +44,7 @@ public class TableNameReplacerTests {
         }
     }
 
+    @Test
     public void testAlias() {
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         String sqlcmd = "select T0.id from (select tmp.id from ddf://adatao/a" +
@@ -226,7 +227,7 @@ public class TableNameReplacerTests {
                             // System.out.println(sqlcmd);
                             try {
                                 Statement statement = testFullURISingle(sqlcmd);
-                                // System.out.println(statement.toString());
+                                System.out.println(statement.toString());
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 assert false;

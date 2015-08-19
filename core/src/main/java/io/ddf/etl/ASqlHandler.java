@@ -175,6 +175,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
           throw  new DDFException("ERROR: Only show tables, describe tables, " +
                   "select, drop, and rename operations are allowed on ddf");
       }
+    } catch (DDFException e) {
+        throw e;
     } catch (Exception e) {
       // It's neither standard SQL nor allowed DDL.
         OutputStream os = new OutputStream()
@@ -314,9 +316,11 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         e.printStackTrace(new PrintStream(os));
         this.mLog.info(os.toString());
 
-      throw new DDFException("Please check the syntax. If the query should " +
-              "be directly run on engine table, " +
-              "please specify dataSource " + e.getMessage());
+      // throw new DDFException("Please check the syntax. If the query should
+      // " +
+      //        "be directly run on engine table, " +
+      //        "please specify dataSource " + e.getMessage());
+        throw new DDFException(e);
     }
   }
 
