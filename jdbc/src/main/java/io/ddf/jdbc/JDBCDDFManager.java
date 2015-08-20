@@ -59,7 +59,6 @@ public class JDBCDDFManager extends DDFManager {
   }
 
   public JDBCDDFManager()  {
-    mLog.info("Initializing jdbddfmanager with no arguments");
   }
 
   public JDBCDDFManager(DataSourceDescriptor dataSourceDescriptor, String
@@ -72,7 +71,7 @@ public class JDBCDDFManager extends DDFManager {
     super(dataSourceDescriptor);
 
     this.setEngineType(engineType);
-    mLog.info("Initializing jdbddfmanager");
+    mLog.info(">>> Initializing JDBCDDFManager");
 
     String driver = sConfigHandler.getValue(this.getEngine(), ConfigConstant.JDBC_DRIVER.toString());
 
@@ -81,21 +80,20 @@ public class JDBCDDFManager extends DDFManager {
     mJdbcDataSource = (JDBCDataSourceDescriptor) dataSourceDescriptor;
     this.setDataSourceDescriptor(dataSourceDescriptor);
     if (mJdbcDataSource == null) {
-      throw new Exception("JDBCDatasource is null when initializing " +
-              "JDBCDDFManager");
+      throw new Exception("JDBCDataSourceDescriptor is null when initializing "
+              + "JDBCDDFManager");
     }
     conn = DriverManager.getConnection(mJdbcDataSource.getDataSourceUri().toString(),
         mJdbcDataSource.getCredentials().getUsername(),
         mJdbcDataSource.getCredentials().getPassword());
 
-    mLog.info("Set up connection with jdbc : " + mJdbcDataSource
+    mLog.info(">>> Set up connection with jdbc : " + mJdbcDataSource
             .getDataSourceUri().toString());
     boolean isDDFAutoCreate = Boolean.parseBoolean(sConfigHandler.getValue(ConfigConstant.ENGINE_NAME_JDBC.toString(),
         ConfigConstant.JDBC_DDF_AUTOCREATE.toString()));
 
-    mLog.info("Running show tables ");
     this.showTables();
-    mLog.info("Show tables successfully, connection is correct");
+    mLog.info(">>> Connection is set up");
     if (isDDFAutoCreate){
 
     } else {
@@ -170,49 +168,6 @@ public class JDBCDDFManager extends DDFManager {
      * @Getter and Setter.
      * @return
      */
-
-    Schema.ColumnType getDDFType() throws DDFException {
-      //TODO: review data type support
-      switch (colType) {
-        case Types.ARRAY:
-          return Schema.ColumnType.ARRAY;
-        case Types.BIGINT:
-          return Schema.ColumnType.BIGINT;
-        case Types.BINARY:
-          return Schema.ColumnType.BINARY;
-        case Types.BOOLEAN:
-          return Schema.ColumnType.BOOLEAN;
-        case Types.CHAR:
-          return Schema.ColumnType.STRING;
-        case Types.DATE:
-          return Schema.ColumnType.DATE;
-        case Types.DECIMAL:
-          return Schema.ColumnType.DECIMAL;
-        case Types.DOUBLE:
-          return Schema.ColumnType.DOUBLE;
-        case Types.FLOAT:
-          return Schema.ColumnType.FLOAT;
-        case Types.INTEGER:
-          return Schema.ColumnType.INT;
-        case Types.LONGVARCHAR:
-          return Schema.ColumnType.STRING; //TODO: verify
-        case Types.NUMERIC:
-          return Schema.ColumnType.DECIMAL;
-        case Types.NVARCHAR:
-          return Schema.ColumnType.STRING; //TODO: verify
-        case Types.SMALLINT:
-          return Schema.ColumnType.INT;
-        case Types.TIMESTAMP:
-          return Schema.ColumnType.TIMESTAMP;
-        case Types.TINYINT:
-          return Schema.ColumnType.INT;
-        case Types.VARCHAR:
-          return Schema.ColumnType.STRING; //TODO: verify
-        default:
-          throw new DDFException(String.format("Type not support %s", JDBCUtils.getSqlTypeName(colType)));
-          //TODO: complete for other types
-      }
-    }
 
     public Integer getColType() {
       return colType;

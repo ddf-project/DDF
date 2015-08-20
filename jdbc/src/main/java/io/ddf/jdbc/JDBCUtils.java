@@ -113,6 +113,7 @@ public class JDBCUtils {
       case Types.TIMESTAMP: return Schema.ColumnType.TIMESTAMP;
       case Types.TINYINT: return Schema.ColumnType.INT;
       case Types.VARCHAR: return Schema.ColumnType.STRING; //TODO: verify
+      case Types.VARBINARY: return Schema.ColumnType.BINARY;
       default: throw new DDFException(String.format("Type not support %s", JDBCUtils.getSqlTypeName(colType)));
         //TODO: complete for other types
     }
