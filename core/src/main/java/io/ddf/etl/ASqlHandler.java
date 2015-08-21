@@ -176,7 +176,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                   "select, drop, and rename operations are allowed on ddf");
       }
     } catch (JSQLParserException e) {
-        throw  new DDFException(e.getCause().getMessage().split("\n")[0]);
+        throw  new DDFException(" SQL Syntax ERROR: " + e.getCause().getMessage
+                ().split("\n")[0]);
     } catch (DDFException e) {
         throw e;
     } catch (Exception e) {
@@ -200,11 +201,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                            DataSourceDescriptor dataSource,
                            DataFormat dataFormat,
                            String namespace) throws DDFException {
-    return sql2ddfHandle(command,
-                         schema,
-                         dataSource,
-                         dataFormat,
-                         new TableNameReplacer(getManager(), namespace));
+      return sql2ddfHandle(command, schema, dataSource, dataFormat, new
+              TableNameReplacer(getManager(), namespace));
   }
 
   public DDF sql2ddfHandle(String command,
@@ -281,7 +279,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
           }
       }
     } catch (JSQLParserException e) {
-        throw  new DDFException(e.getCause().getMessage().split("\n")[0]);
+        throw  new DDFException(" SQL Syntax ERROR: " + e.getCause().getMessage().split("\n")[0]);
     } catch (DDFException e) {
         throw e;
     } catch (Exception e) {
