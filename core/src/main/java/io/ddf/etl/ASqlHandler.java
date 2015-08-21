@@ -88,36 +88,6 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                           new TableNameReplacer(this.getManager()));
   }
 
-  public SqlResult sqlHandle(String command,
-                             Integer maxRows,
-                             DataSourceDescriptor dataSource,
-                             String namespace) throws DDFException {
-    return this.sqlHandle(command,
-                          maxRows,
-                          dataSource,
-                          new TableNameReplacer(this.getManager(), namespace));
-  }
-
-  public SqlResult sqlHandle(String command,
-                             Integer maxRows,
-                             DataSourceDescriptor dataSource,
-                             List<String> uriList) throws DDFException {
-    return this.sqlHandle(command,
-                          maxRows,
-                          dataSource,
-                          new TableNameReplacer(this.getManager(), uriList));
-  }
-
-
-  public SqlResult sqlHandle(String command,
-                             Integer maxRows,
-                             DataSourceDescriptor dataSource,
-                             UUID[] uuidList) throws DDFException {
-    return this.sqlHandle(command,
-                          maxRows,
-                          dataSource,
-                          new TableNameReplacer(this.getManager(), uuidList));
-  }
 
   public SqlResult sqlHandle(String sqlcmd,
                              Integer maxRows,
@@ -158,7 +128,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
           this.mLog.info("replace: " + sqlcmd);
           statement = tableNameReplacer.run(statement);
           if (tableNameReplacer.containsLocalTable || tableNameReplacer
-                  .uri2TableObj.keySet().size() == 1) {
+                  .mUri2TblObj.keySet().size() == 1) {
               this.mLog.info("New stat is " + statement.toString());
               return this.sql(statement.toString(), maxRows, dataSource);
           } else {
@@ -194,41 +164,6 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                          dataSource,
                          dataFormat,
                          new TableNameReplacer(this.getManager()));
-  }
-  public DDF sql2ddfHandle(String command,
-                           Schema schema,
-                           DataSourceDescriptor dataSource,
-                           DataFormat dataFormat,
-                           String namespace) throws DDFException {
-    return sql2ddfHandle(command,
-                         schema,
-                         dataSource,
-                         dataFormat,
-                         new TableNameReplacer(getManager(), namespace));
-  }
-
-  public DDF sql2ddfHandle(String command,
-                           Schema schema,
-                           DataSourceDescriptor dataSource,
-                           DataFormat dataFormat,
-                           List<String> uriList) throws DDFException {
-    return sql2ddfHandle(command,
-                         schema,
-                         dataSource,
-                         dataFormat,
-                         new TableNameReplacer(getManager(), uriList));
-  }
-
-  public DDF sql2ddfHandle(String command,
-                           Schema schema,
-                           DataSourceDescriptor dataSource,
-                           DataFormat dataFormat,
-                           UUID[] uuidList) throws DDFException {
-      return sql2ddfHandle(command,
-                           schema,
-                           dataSource,
-                           dataFormat,
-                           new TableNameReplacer(getManager(), uuidList));
   }
 
   public DDF sql2ddfHandle(String command,
@@ -269,7 +204,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
           this.mLog.info("replace: " + command);
         statement = tableNameReplacer.run(statement);
           if (tableNameReplacer.containsLocalTable || tableNameReplacer
-                  .uri2TableObj.size() == 1) {
+                  .mUri2TblObj.size() == 1) {
               this.mLog.info("New stat is " + statement.toString());
               return this.sql2ddf(statement.toString(), schema, dataSource,
                       dataFormat);

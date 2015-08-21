@@ -65,6 +65,9 @@ public class TableVisitor
         // TODO: Add more type support here.
     }
 
+
+
+
     /**
      * @brief This function should be overridden according to user case.
      * @param table The table that is visiting.
@@ -180,7 +183,9 @@ public class TableVisitor
     public void visit(WithItem withItem) throws Exception {
         // TODO: Redo this later. What's withItem list.
         // Add with name here.
-        withItem.accept(this);
+        if (withItem.getName() != null) {
+            this.withTableNameList.add(withItem.getName());
+        }
         withItem.getSelectBody().accept(this);
         if (withItem.getWithItemList() != null) {
             for (SelectItem selectItem : withItem.getWithItemList()) {

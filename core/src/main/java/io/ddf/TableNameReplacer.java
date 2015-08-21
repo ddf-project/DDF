@@ -1,6 +1,8 @@
 package io.ddf;
 
 
+import io.ddf.datasource.DataSourceDescriptor;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
@@ -22,18 +24,16 @@ import java.util.regex.Pattern;
  */
 public class TableNameReplacer extends TableVisitor {
     // The URI regex representation.
-    private Pattern uriPattern = Pattern.compile("ddf:\\/\\/.*");
-    // The namespace.
-    private String namespace = null;
-    // The URI List.
-    private List<String> uriList = null;
-    // The UUID List.
-    private List<UUID> uuidList = null;
+    private Pattern mUriPattern = Pattern.compile("ddf:\\/\\/.*");
+    // The index regex representation.
+    private Pattern mIndexPattern = Pattern.compile("\\{\\d+\\}");
+    // The datasource.
+    private SQLDataSourceDescriptor mDS = null;
     // The DDFManager.
-    private DDFManager ddfManager = null;
+    private DDFManager mDDFManager = null;
     // DDF uri to table name mapping.
-    private Map<String, String> uri2tbl = new HashMap<String, String>();
-    public Map<String, List<Table>> uri2TableObj
+    private Map<String, String> mUri2Tbl = new HashMap<String, String>();
+    public Map<String, List<Table>> mUri2TblObj
             = new HashMap<String, List<Table>>();
     public Boolean containsLocalTable = false;
     public String fromEngineName = null;
@@ -45,7 +45,7 @@ public class TableNameReplacer extends TableVisitor {
      * have default one the match.
      */
     public TableNameReplacer(DDFManager ddfManager) {
-        this.ddfManager = ddfManager;
+        this.mDDFManager = ddfManager;
     }
 
     /**
@@ -55,57 +55,21 @@ public class TableNameReplacer extends TableVisitor {
      *                  and {number} match fail, and namespace is specified, the tablename will be
      *                  converted to ddf://namespace/tablename automatically.
      */
-    public TableNameReplacer(DDFManager ddfManager, String namespace) {
-        this.ddfManager = ddfManager;
-        this.namespace = namespace;
-    }
-
-
-    public TableNameReplacer(DDFManager ddfManager, String namespace, String uriRegex) {
-        this.ddfManager = ddfManager;
-        this.namespace = namespace;
-        this.uriPattern = Pattern.compile(uriRegex);
+    public TableNameReplacer(DDFManager ddfManager, DataSourceDescriptor ds) {
+        this.mDDFManager = ddfManager;
+        this.mDS = (SQLDataSourceDescriptor)ds;
     }
 
     /**
-     * @brief Constructor.
+     * @brief Constructor
      * @param ddfManager
-     * @param uriList The list of uri.
      */
-    public TableNameReplacer(DDFManager ddfManager, List<String> uriList) {
-        this.ddfManager = ddfManager;
-        this.uriList = uriList;
-    }
-
-    public TableNameReplacer(DDFManager ddfManager, String namespace, List<String> uriList) {
-        this.ddfManager = ddfManager;
-        this.namespace = namespace;
-        this.uriList = uriList;
-    }
-
-    /**
-     * @brief Constructor. Combination replacer, it will check dd://, {number}, tablename format
-     * respectively.
-     * @param ddfManager
-     * @param namespace
-     * @param uriRegex
-     * @param uriList
-     */
-    public TableNameReplacer(DDFManager ddfManager, String namespace, String uriRegex, List<String> uriList) {
-        this.ddfManager = ddfManager;
-        this.namespace = namespace;
-        this.uriPattern = Pattern.compile(uriRegex);
-        this.uriList = uriList;
-    }
-
-    /**
-     * @brief Constructor.
-     * @param ddfManager
-     * @param uuidList The list of uuids.
-     */
-    public TableNameReplacer(DDFManager ddfManager, UUID[] uuidList) {
-        this.ddfManager = ddfManager;
-        this.uuidList = Arrays.asList(uuidList);
+    public TableNameReplacer(DDFManager ddfManager,
+                             DataSourceDescriptor ds,
+                             String uriRegex) {
+        this.mDDFManager = ddfManager;
+        this.mDS = (SQLDataSourceDescriptor)ds;
+        this.mUriPattern = Pattern.compile(uriRegex);
     }
 
     /**
@@ -120,35 +84,34 @@ public class TableNameReplacer extends TableVisitor {
             visit(statement);
         } else if (statement instanceof DescribeTable){
             ((DescribeTable)statement).accept(this);
-            // TODO: Handler for other statments.
         }
-        if (this.uri2TableObj.isEmpty()) {
+        if (this.mUri2TblObj.isEmpty()) {
             return statement;
         } else {
-            if (!this.getDDFManager().getEngine().equals("spark")) {
+            if (!this.mDDFManager.getEngine().equals("spark")) {
                 throw new DDFException("For this engine, only local table " +
                         "can be referred");
             }
         }
-        if (containsLocalTable || uri2TableObj.keySet().size() == 1) {
+        if (containsLocalTable || mUri2TblObj.keySet().size() == 1) {
             // contains local table, can only use local spark.
-            for (String uri : this.uri2TableObj.keySet()) {
-                DDF ddf = this.ddfManager.transfer(this.getDDFManager()
+            for (String uri : this.mUri2TblObj.keySet()) {
+                DDF ddf = this.mDDFManager.transfer(this.mDDFManager
                                 .getEngineNameOfDDF(uri),
                         uri);
-                for (Table table : this.uri2TableObj.get(uri)) {
+                for (Table table : this.mUri2TblObj.get(uri)) {
                     table.setName(ddf.getTableName());
                 }
             }
         } else {
-            for (String uri : this.uri2TableObj.keySet()) {
-                String fromEngineName2 = this.ddfManager.getEngineNameOfDDF
+            for (String uri : this.mUri2TblObj.keySet()) {
+                String fromEngineName2 = this.mDDFManager.getEngineNameOfDDF
                         (uri);
                 this.fromEngineName = fromEngineName2;
-                DDFManager fromManager = this.ddfManager.getDDFCoordinator()
+                DDFManager fromManager = this.mDDFManager.getDDFCoordinator()
                         .getEngine(fromEngineName);
                 DDF ddf = fromManager.getDDFByURI(uri);
-                for (Table table : this.uri2TableObj.get(uri)) {
+                for (Table table : this.mUri2TblObj.get(uri)) {
                     table.setName(ddf.getTableName());
                 }
             }
@@ -156,20 +119,6 @@ public class TableNameReplacer extends TableVisitor {
         return statement;
     }
 
-    @Override
-    public void visit(WithItem withItem) throws Exception {
-        // TODO: Redo this later. What's withItem list.
-        // Add with name here.
-        if (withItem.getName() != null) {
-            this.withTableNameList.add(withItem.getName());
-        }
-        withItem.getSelectBody().accept(this);
-        if (withItem.getWithItemList() != null) {
-            for (SelectItem selectItem : withItem.getWithItemList()) {
-                selectItem.accept(this);
-            }
-        }
-    }
 
 
     /**
@@ -187,6 +136,7 @@ public class TableNameReplacer extends TableVisitor {
     public void visit(Table table) throws Exception {
         if (null == table || null == table.getName()) return;
         String name = table.getName();
+        // Special handling for the with statement and table alias.
         for (String tablename : this.withTableNameList) {
             // It a table name appeared in with clause.
             if (tablename.equals(name)) {
@@ -199,90 +149,19 @@ public class TableNameReplacer extends TableVisitor {
             }
         }
         
-        Matcher matcher = this.uriPattern.matcher(name);
+        Matcher matcher = this.mUriPattern.matcher(name);
         if (matcher.matches()) {
             // The first situation.
-            String tablename = this.handleDDFURI(name);
-            if (tablename == null) {
-                // It's not from this engine.
-                if (!this.uri2TableObj.containsKey(name)) {
-                    uri2TableObj.put(name, new ArrayList<Table>());
-                }
-                uri2TableObj.get(name).add(table);
-            } else {
-                table.setName(tablename);
-            }
-        } else if (uriList != null || uuidList != null) {
+            this.handleDDFURI(name, table);
+
+        } else if (this.mDS.getUriList() != null || this.mDS.getUuidList() != null) {
             // The third situation.
-            Pattern indexPattern = Pattern.compile("\\{\\d+\\}");
-            Matcher indexMatcher = indexPattern.matcher(name);
-            if (indexMatcher.matches()) {
-                String number = name.substring(name.indexOf('{') + 1, name.indexOf('}')).trim();
-                int index = Integer.parseInt(number);
-                if (index < 1) {
-                    throw new Exception("In the SQL command, " +
-                            "if you use {number} as index, the number should begin from 1");
-                }
-                if (null == uriList) {
-                    if (index > uuidList.size()) {
-                        throw new Exception(new ArrayIndexOutOfBoundsException());
-                    } else {
-                            // try {
-                            //    this.ddfManager.getOrRestoreDDF(uuidList.get
-                            //    (index - 1));
-                            //} catch (DDFException e) {
-                            //    throw new Exception("ERROR: There is no ddf
-                            // with uri:" + uuidList.get(index - 1).toString());
-                            // }
-
-                        table.setName(this.ddfManager.getDDF(uuidList.get(index - 1)).getTableName());
-                        containsLocalTable = true;
-                    }
-                } else {
-                    if (index > uriList.size()) {
-                        throw new Exception(new ArrayIndexOutOfBoundsException());
-                    } else {
-                        String uri = uriList.get(index - 1);
-                        String tablename = null;
-                        if (this.uriPattern.matcher(uri).matches()) {
-                            tablename = this.handleDDFURI(uri);
-                        } else {
-                            tablename = this.handleDDFUUID(uri);
-                        }
-
-                        if (tablename == null) {
-                            // It's not from this engine.
-                            if (!this.uri2TableObj.containsKey(uri)) {
-                                uri2TableObj.put(uri, new ArrayList<Table>());
-                            }
-                            uri2TableObj.get(uri).add(table);
-                        } else {
-                            table.setName(tablename);
-
-                            this.ddfManager.log("replace ddf uri " + uriList
-                                    .get(index - 1) + " with " + tablename);
-                        }
-                    }
-                }
-            } else {
-                // Not full uri, no namespace, the index can't match.
-                System.out.println("ddf name is:" + table.getName());
-                throw new Exception("ERROR: Can't find the required ddf");
-            }
-        } else if (namespace != null) {
+            this.handleIndex(name, this.mDS.getUriList() == null ? this.mDS
+                    .getUuidList() : this.mDS.getUriList(), table);
+        } else if (this.mDS.getNamespace() != null) {
             // The second situation.
-            String uri  = "ddf://" + namespace + "/" + name;
-            this.ddfManager.log("debug1");
-            String tablename = this.handleDDFURI(uri);
-            if (tablename == null) {
-                // It's not from this engine.
-                if (!this.uri2TableObj.containsKey(uri)) {
-                    uri2TableObj.put(uri, new ArrayList<Table>());
-                }
-                uri2TableObj.get(uri).add(table);
-            } else {
-                table.setName(tablename);
-            }
+            String uri  = "ddf://" + this.mDS.getNamespace() + "/" + name;
+            this.handleDDFURI(uri, table);
         } else {
             // No modification.
             throw new Exception("ERROR: The ddf reference should either full uri, ddfname with namespace or list index");
@@ -298,46 +177,6 @@ public class TableNameReplacer extends TableVisitor {
     }
 
     /**
-     * @brief Getters and Setters.
-     */
-    public Pattern getUriPattern() {
-        return uriPattern;
-    }
-
-    public void setUriRegex(String uriRegex) {
-        this.uriPattern = Pattern.compile(uriRegex);
-    }
-
-    public DDFManager getDDFManager() {
-        return ddfManager;
-    }
-
-    public void setDDFManager(DDFManager ddfManager) {
-        this.ddfManager = ddfManager;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public List<String> getUriList() {
-        return uriList;
-    }
-
-    public void setUriList(List<String> uriList) {
-        this.uriList = uriList;
-    }
-
-    public List<UUID> getUuidLsit() { return uuidList;}
-
-    public void setUuidList(List<UUID> uuidList) {this.uuidList = uuidList;}
-
-
-    /**
      * @brief This is the main function of ddf-on-x. When the user is
      * requesting the ddf uri, several situations exist: (1) The user wants
      * to access the ddf in this engine and the ddf exists, then just return
@@ -349,42 +188,38 @@ public class TableNameReplacer extends TableVisitor {
      * @param ddfuri The ddf uri.
      * @return The local tablename.
      */
-    String handleDDFURI(String ddfuri) throws Exception {
+    void handleDDFURI(String ddfuri, Table table) throws Exception {
+        DDF ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(ddfuri);
+        this.handleDDFUUID(ddf.getUUID().toString(), table);
+    }
 
-        this.ddfManager.log("debug2 " + ddfuri);
+    // Currently for uuid, we only support DDF from local engine.
+    // TODO: Support ddf from other engine
+    String handleDDFUUID(String uuid, Table table) throws Exception {
         String engineName = null;
         try {
-            engineName = this.ddfManager.getEngineNameOfDDF(ddfuri);
+            DDFManager manager = this.mDDFManager.getDDFCoordinator()
+                    .getDDFManagerByUUID(UUID.fromString(uuid));
+            engineName = manager.getEngineName();
         } catch (DDFException e) {
-            this.ddfManager.log("Can't find ddfmanger for " + ddfuri + " , " +
+            this.mDDFManager.log("Can't find ddfmanger for " + uuid + " , " +
                     "trying spark");
             engineName = "spark";
         }
-        if (engineName.equals(this.ddfManager.getEngineName())) {
+        if (engineName.equals(this.mDDFManager.getEngineName())) {
             // It's in the same engine.
             DDF ddf = null;
-            try {
-                // Restore the ddf first.
-                try {
-                   // TODO: fix setDDFName.scala first.
-                   // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
-                    if (this.getDDFManager().getEngine().equals("spark")) {
-                        ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
-                    } else {
-                        ddf = this.ddfManager.getDDFByURI(ddfuri);
-                    }
-                }
-                catch (Exception e) {
-                    this.ddfManager.log("restore error");
-                    throw new DDFException("hah ");
-                }
-                this.ddfManager.log("debug3");
-
-            } catch (DDFException e) {
-                throw new Exception("ERROR: There is no ddf with uri:" + ddfuri);
+            // Restore the ddf first.
+            // TODO: fix setDDFName.scala first.
+            // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
+            if (this.mDDFManager.getEngine().equals("spark")) {
+                ddf = this.mDDFManager.getOrRestoreDDF(UUID.fromString(uuid));
+            } else {
+                ddf = this.mDDFManager.getDDF(UUID.fromString(uuid));
             }
             containsLocalTable = true;
-            return ddf.getTableName();
+            table.setName(ddf.getTableName());
+
         } else {
             // Transfer from the other engine.
             // if (!uri2tbl.containsKey(ddfuri)) {
@@ -393,17 +228,43 @@ public class TableNameReplacer extends TableVisitor {
             //
             // }
 
-            this.ddfManager.log("debug4");
             // return uri2tbl.get(ddfuri);
-            return null;
+            // It's not from this engine.
+            if (!this.mUri2TblObj.containsKey(uuid)) {
+                mUri2TblObj.put(uuid, new ArrayList<Table>());
+            }
+            mUri2TblObj.get(uuid).add(table);
         }
+        return this.mDDFManager.getDDFCoordinator().getDDF(UUID.fromString
+                (uuid)).getTableName();
     }
 
-    // Currently for uuid, we only support DDF from local engine.
-    // TODO: Support ddf from other engine
-    String handleDDFUUID(String uuid) throws Exception {
-        containsLocalTable = true;
-        return this.getDDFManager().getDDF(UUID.fromString(uuid))
-                .getTableName();
+    void handleIndex(String index, List<String> identifierList, Table table)
+            throws Exception {
+        if (!mIndexPattern.matcher(index).matches()) {
+            // Not full uri, no namespace, the index can't match.
+            throw new Exception(">>> ERROR: Can't find the required ddf "
+                    + index);
+        }
+        String number = index.substring(index.indexOf('{') + 1,
+                                        index.indexOf('}')).trim();
+        int idx = Integer.parseInt(number);
+        if (idx < 1) {
+            throw new Exception("In the SQL command, " +
+                    "if you use {number} as index, the number should begin from 1");
+        }
+        if (idx > identifierList.size()) {
+            throw new Exception(new ArrayIndexOutOfBoundsException());
+        } else {
+            String identifier = identifierList.get(idx - 1);
+
+            String tablename = null;
+            if (this.mUriPattern.matcher(identifier).matches()) {
+                this.handleDDFURI(identifier, table);
+            } else {
+                this.handleDDFUUID(identifier, table);
+            }
+
+        }
     }
 }

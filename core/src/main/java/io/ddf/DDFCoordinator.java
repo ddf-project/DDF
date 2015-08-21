@@ -72,8 +72,13 @@ public class DDFCoordinator {
         mUuid2DDFManager.put(uuid, ddfManager);
     }
 
-    public DDFManager getDDFManagerByUUID(UUID uuid) {
-        return mUuid2DDFManager.get(uuid);
+    public DDFManager getDDFManagerByUUID(UUID uuid) throws DDFException {
+        DDFManager manager = mUuid2DDFManager.get(uuid);
+        if (manager == null) {
+            throw new DDFException("Can't get DDFManager for uuid: " + uuid
+                    .toString());
+        }
+        return manager;
     }
 
     public void setDefaultEngine(String defaultEngine) {
@@ -112,17 +117,27 @@ public class DDFCoordinator {
         return ret;
     }
 
-    public DDF getDDF(UUID uuid) {
+    public DDF getDDF(UUID uuid) throws DDFException {
         for (DDFManager ddfManager : mDDFManagerList) {
             try {
-                if (ddfManager.getDDF(uuid) != null) {
-                    return ddfManager.getDDF(uuid);
-                }
+                DDF ddf = ddfManager.getDDF(uuid);
+                return ddf;
             } catch (DDFException e) {
                 // e.printStackTrace();
             }
         }
-        return null;
+        throw new DDFException("Can't find ddf with uuid: " + uuid.toString());
+    }
+
+    public DDF getDDFByURI(String uri) throws DDFException {
+        for (DDFManager ddfManager : mDDFManagerList) {
+            try {
+                DDF ddf = ddfManager.getDDFByURI(uri);
+                return ddf;
+            } catch (Exception e) {
+            }
+        }
+        throw new DDFException("Can't find ddf with uri: " + uri);
     }
 
     /**

@@ -541,41 +541,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat);
   }
 
-  public DDF sql2ddf(String command, DataSourceDescriptor dataSouce, String namespace) throws DDFException {
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.sql2ddf(command, null, dataSouce, null, namespace);
-  }
-
-  public DDF sql2ddf(String command, Schema schema,
-                     DataSourceDescriptor dataSource, DataFormat dataFormat, String namespace) throws DDFException {
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, namespace);
-  }
-
-  public DDF sql2ddf(String command, DataSourceDescriptor dataSource, List<String> uriList) throws DDFException {
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.sql2ddf(command, null, dataSource, null, uriList);
-  }
-
-  public DDF sql2ddf(String command, Schema schema,
-                     DataSourceDescriptor dataSource, DataFormat dataFormat, List<String> uriList) throws DDFException {
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, uriList);
-  }
-
-  public DDF sql2ddf(String command, DataSourceDescriptor dataSource, UUID[] uuidList) throws  DDFException {
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-      return this.sql2ddf(command, null, dataSource, null, uuidList);
-  }
-
-  public DDF sql2ddf(String command,
-                     Schema schema,
-                     DataSourceDescriptor dataSource,
-                     DataFormat dataFormat,
-                     UUID[] uuidList) throws DDFException {
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.getDummyDDF().getSqlHandler().sql2ddfHandle(command, schema, dataSource, dataFormat, uuidList);
-  }
 
   @Override
   public SqlResult sql(String command) throws DDFException {
@@ -610,41 +575,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.getDummyDDF().getSqlHandler().sqlHandle(command, null, dataSource);
   }
 
-  public SqlResult sql(String command, DataSourceDescriptor dataSource, String namespace) throws DDFException {
 
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.sql(command, null, dataSource, namespace);
-  }
-
-  public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource, String namespace) throws DDFException {
-
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, namespace);
-  }
-
-  public SqlResult sql(String command, DataSourceDescriptor dataSource, List<String> uriList) throws DDFException {
-
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.sql(command, null, dataSource, uriList);
-  }
-
-  public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource, List<String> uriList) throws DDFException {
-
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, uriList);
-  }
-
-  public SqlResult sql(String command, DataSourceDescriptor dataSource, UUID[] uuidList) throws DDFException {
-
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.sql(command, null, dataSource, uuidList);
-  }
-
-  public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource, UUID[] uuidList) throws DDFException {
-
-    mLog.info("Running command: " + command + " in Engine: " + this.getEngineName());
-    return this.getDummyDDF().getSqlHandler().sqlHandle(command, maxRows, dataSource, uuidList);
-  }
 
   @Override
   public SqlTypedResult sqlTyped(String command) throws DDFException {

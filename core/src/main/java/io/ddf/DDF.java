@@ -30,6 +30,7 @@ import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.*;
 import io.ddf.content.IHandlePersistence.IPersistible;
 import io.ddf.content.Schema.Column;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.etl.*;
 import io.ddf.etl.IHandleMissingData.Axis;
 import io.ddf.etl.IHandleMissingData.NAChecking;
@@ -393,9 +394,9 @@ public abstract class DDF extends ALoggable //
       // return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
       sqlCommand = sqlCommand.replace("@this", "{1}");
       sqlCommand = String.format(sqlCommand, "{1}");
-      UUID[] uuidList = new UUID[1];
-      uuidList[0] = this.getUUID();
-      return this.getManager().sql(sqlCommand, null, uuidList);
+      SQLDataSourceDescriptor sqlDS = new SQLDataSourceDescriptor(sqlCommand,
+              null, null,null, this.getUUID().toString());
+      return this.getManager().sql(sqlCommand, null, sqlDS);
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }
@@ -415,9 +416,9 @@ public abstract class DDF extends ALoggable //
       // sqlCommand = sqlCommand.replace("@this", this.getTableName());
       sqlCommand = sqlCommand.replace("@this", "{1}");
       sqlCommand = String.format(sqlCommand, "{1}");
-      UUID[] uuidList = new UUID[1];
-      uuidList[0] = this.getUUID();
-      return  this.getManager().sql2ddf(sqlCommand, null, uuidList);
+      SQLDataSourceDescriptor sqlDS = new SQLDataSourceDescriptor(sqlCommand,
+              null, null,null, this.getUUID().toString());
+      return  this.getManager().sql2ddf(sqlCommand, null, sqlDS);
       // return this.getManager().sql2ddf(sqlCommand);
     } catch (Exception e) {
       throw new DDFException(String.format("Error executing queries for ddf %s", this.getTableName()), e);
