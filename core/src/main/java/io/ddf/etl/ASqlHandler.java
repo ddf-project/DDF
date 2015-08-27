@@ -23,9 +23,7 @@ import net.sf.jsqlparser.statement.drop.Drop;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.show.ShowTables;
 
-import java.awt.*;
 import java.io.*;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,20 +55,33 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
 
   /**
    * @brief Get the column information of this table.
-   * @param uri The URI of the ddf.
+   * @param name The URI or the name of the ddf.
+   * @param namespace The namespace.
    * @return The column information.
    * @throws DDFException
    */
-  private SqlResult describeTable(String uri) throws DDFException {
-    DDF ddf = this.getManager().getDDFByURI(uri);
-    if (null == ddf) {
-      throw new DDFException("ERROR: there is no ddf with uri " + uri);
+  private SqlResult describeTable(String name, String namespace)
+          throws DDFException {
+    DDF ddf = null;
+    try {
+        ddf = this.getManager().getOrRestoreDDFUri(name);
+    } catch (DDFException e) {
+        if (null == namespace) {
+            throw new DDFException("ERROR: there is no ddf " + name);
+        }
+        try {
+            ddf = this.getManager().getOrRestoreDDFUri("ddf://" + namespace + "/" + name);
+        } catch (Exception e2) {
+            throw new DDFException("ERROR: there is no ddf " + name);
+        }
     }
+
     int colSize = ddf.getNumColumns();
     List<String> ret = new ArrayList<String>();
     for (int colIdx = 0; colIdx < colSize; ++colIdx) {
       Schema.Column col = ddf.getColumn(ddf.getColumnName(colIdx));
-      ret.add(col.getName().concat("\t").concat(col.getType().toString()));
+      ret.add(col.getName().concat("\t").concat(col.getType().toString()
+              .toLowerCase()));
     }
     List<Column> columnList = new ArrayList<Column>();
     columnList.add(new Column("column_name", Schema.ColumnType.STRING));
@@ -152,7 +163,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       if (statement instanceof ShowTables) {
         return this.showTables();
       } else if (statement instanceof  DescribeTable){
-        return this.describeTable(((DescribeTable)statement).getName().getName());
+        return this.describeTable(((DescribeTable)statement).getName()
+                .getName(), tableNameReplacer.getNamespace());
       } else if (statement instanceof  Select) {
         // Standard SQL.
           this.mLog.info("replace: " + sqlcmd);
