@@ -29,48 +29,57 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
     String leftTableName = getDDF().getTableName();
     String rightTableName = anotherDDF.getTableName();
     List<Column> rightColumns = anotherDDF.getSchema().getColumns();
-    HashSet<String> rightColumNameSet = new HashSet<String>();
+    List<Column> leftColumns = getDDF().getSchema().getColumns();
+    
+    HashSet<String> rightColumnNameSet = new HashSet<String>();
     for (Column m : rightColumns) {
-      rightColumNameSet.add(m.getName());
+      rightColumnNameSet.add(m.getName());
     }
 
     String joinSqlCommand = "SELECT lt.*,%s FROM %s lt %s JOIN %s rt ON (%s)";
     String joinLeftSemiCommand = "SELECT lt.* FROM %s lt %s JOIN %s rt ON (%s)";
-    String columnString = "";
+    String joinConditionString = "";
 
     if (byColumns != null && !byColumns.isEmpty()) {
       for (int i = 0; i < byColumns.size(); i++) {
-        columnString += String.format("lt.%s = rt.%s AND ", byColumns.get(i), byColumns.get(i));
-        rightColumNameSet.remove(byColumns.get(i));
+        joinConditionString += String.format("lt.%s = rt.%s AND ", byColumns.get(i), byColumns.get(i));
+        rightColumnNameSet.remove(byColumns.get(i));
       }
     } else {
       if (byLeftColumns != null && byRightColumns != null && byLeftColumns.size() == byRightColumns.size()
           && !byLeftColumns.isEmpty()) {
         for (int i = 0; i < byLeftColumns.size(); i++) {
-          columnString += String.format("lt.%s = rt.%s AND ", byLeftColumns.get(i), byRightColumns.get(i));
-          rightColumNameSet.remove(byRightColumns.get(i));
+          joinConditionString += String.format("lt.%s = rt.%s AND ", byLeftColumns.get(i), byRightColumns.get(i));
+          rightColumnNameSet.remove(byRightColumns.get(i));
         }
       } else {
         throw new DDFException(String.format("Left and right column specifications are missing or not compatible"),
             null);
       }
     }
-    columnString = columnString.substring(0, columnString.length() - 5);
+    joinConditionString = joinConditionString.substring(0, joinConditionString.length() - 5); //remove " AND " at the end
 
     // we will not select column that is already in left table
     String rightSelectColumns = "";
-    for (String name : rightColumNameSet) {
-      rightSelectColumns += String.format("rt.%s AS r_%s,", name, name);
+    
+    for (Column m : leftColumns) {
+      if (rightColumnNameSet.contains(m.getName())) {
+        rightColumnNameSet.remove(m.getName());
+        rightColumnNameSet.add(String.format("r_%s", m.getName()));
+      }
     }
-    rightSelectColumns = rightSelectColumns.substring(0, rightSelectColumns.length() - 1);
+    for (String name : rightColumnNameSet) {
+      rightSelectColumns += String.format("rt.%s,", name);
+    }
+    rightSelectColumns = rightSelectColumns.substring(0, rightSelectColumns.length() - 1); // remove "," at the end
 
     try {
       if (joinType == JoinType.LEFTSEMI) {
         joinSqlCommand = String.format(joinLeftSemiCommand, leftTableName, joinType.getStringRepr(), rightTableName,
-            columnString);
+            joinConditionString);
       } else {
         joinSqlCommand = String.format(joinSqlCommand, rightSelectColumns, leftTableName, joinType.getStringRepr(),
-            rightTableName, columnString);
+            rightTableName, joinConditionString);
       }
     } catch (Exception ex) {
       throw new DDFException(String.format("Error while joinType.getStringRepr()"), null);
