@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 public class BaseTest {
     public static DDFManager manager;
 
-    static Logger LOG;
+    public static Logger LOG;
 
 
     @BeforeClass
@@ -100,5 +100,15 @@ public class BaseTest {
 
         manager.sql("load data local inpath '../resources/test/mtcars' into table mtcars", "SparkSQL");
     }
+    
+    public void createTableCarOwner() throws DDFException {
+      manager.sql("drop table if exists carowner", "SparkSQL");
+
+      manager.sql("CREATE TABLE carowner ("
+          + "name string, cyl int, disp double"
+          + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '", "SparkSQL");
+
+      manager.sql("load data local inpath '../resources/test/carowner' into table carowner", "SparkSQL");
+  }
 
 }

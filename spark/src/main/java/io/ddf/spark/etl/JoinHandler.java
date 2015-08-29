@@ -28,12 +28,12 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
 
     String leftTableName = getDDF().getTableName();
     String rightTableName = anotherDDF.getTableName();
-    List<Column> rightColumns = anotherDDF.getSchema().getColumns();
-    List<Column> leftColumns = getDDF().getSchema().getColumns();
+    List<String> rightColumns = anotherDDF.getColumnNames();
+    List<String> leftColumns = getDDF().getColumnNames();
     
     HashSet<String> rightColumnNameSet = new HashSet<String>();
-    for (Column m : rightColumns) {
-      rightColumnNameSet.add(m.getName());
+    for (String colname : rightColumns) {
+      rightColumnNameSet.add(colname);
     }
 
     String joinSqlCommand = "SELECT lt.*,%s FROM %s lt %s JOIN %s rt ON (%s)";
@@ -62,10 +62,10 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
     // we will not select column that is already in left table
     String rightSelectColumns = "";
     
-    for (Column m : leftColumns) {
-      if (rightColumnNameSet.contains(m.getName())) {
-        rightColumnNameSet.remove(m.getName());
-        rightColumnNameSet.add(String.format("r_%s", m.getName()));
+    for (String colname : leftColumns) {
+      if (rightColumnNameSet.contains(colname)) {
+        rightColumnNameSet.remove(colname);
+        rightColumnNameSet.add(String.format("%s AS r_%s", colname,colname));
       }
     }
     for (String name : rightColumnNameSet) {
@@ -85,6 +85,7 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
       throw new DDFException(String.format("Error while joinType.getStringRepr()"), null);
     }
 
+    mLog.info("Join SQL command: " +joinSqlCommand);
     try {
       DDF resultDDF = this.getManager().sql2ddf(joinSqlCommand, "SparkSQL");
       return resultDDF;
