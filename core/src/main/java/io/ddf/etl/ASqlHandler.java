@@ -65,11 +65,12 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
     DDF ddf = null;
     try {
         ddf = this.getManager().getOrRestoreDDFUri(name);
-    } catch (DDFException e) {
+    } catch (Exception e) {
         if (null == namespace) {
             throw new DDFException("ERROR: there is no ddf " + name);
         }
         try {
+            mLog.info("trying to restore " + "ddf://" + namespace + "/" + name);
             ddf = this.getManager().getOrRestoreDDFUri("ddf://" + namespace + "/" + name);
         } catch (Exception e2) {
             throw new DDFException("ERROR: there is no ddf " + name);

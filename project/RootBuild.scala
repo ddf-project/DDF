@@ -572,10 +572,15 @@ object RootBuild extends Build {
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch examples/" + targetDir + "/*timestamp") }
   ) ++ assemblySettings ++ extraAssemblySettings
 
+val jdbc_dependencies = Seq(
+    "cdata.jdbc.salesforce" % "SalesforceDriver" % "1.0.0"
+)
+
   def jdbcSettings = commonSettings ++ Seq(
     name := jdbcProjectName,
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
-    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch jdbc/" + targetDir + "/*timestamp") },
+    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch jdbc/" + targetDir + "/*timestamp") }, 
+    libraryDependencies ++= jdbc_dependencies,
     testOptions in Test += Tests.Argument("-oI")
   ) ++ assemblySettings ++ extraAssemblySettings
 
