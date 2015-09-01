@@ -53,7 +53,7 @@ public class TableNameReplacerTests {
         try {
             Statement statement = parser.parse(new StringReader(sqlcmd));
             // statement = tableNameReplacer.run(statement);
-            System.out.println(statement.toString());
+            // System.out.println(statement.toString());
         } catch (JSQLParserException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -227,7 +227,7 @@ public class TableNameReplacerTests {
                             // System.out.println(sqlcmd);
                             try {
                                 Statement statement = testFullURISingle(sqlcmd);
-                                System.out.println(statement.toString());
+                                // System.out.println(statement.toString());
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 assert false;
