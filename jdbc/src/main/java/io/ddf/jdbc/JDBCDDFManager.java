@@ -82,10 +82,12 @@ public class JDBCDDFManager extends DDFManager {
 
     if (engineType.equals("sfdc")) {
       // Special handler for sfdc connection string, add RTK (for cdata driver)
-      URI uriWithRTK = new URI(mJdbcDataSource
-              .getDataSourceUri().getUri().toString()
-              + "RTK='" + cdata.jdbc.salesforce.SalesforceDriver.getRTK()+"';");
-      mJdbcDataSource.getDataSourceUri().setUri(uriWithRTK);
+      String rtkString = System.getenv("SFDC_RTK");
+      String uriString = mJdbcDataSource.getDataSourceUri().getUri().toString();
+      if (!Strings.isNullOrEmpty(rtkString)) {
+        uriString += "RTK='" + rtkString + "';";
+      }
+      mJdbcDataSource.getDataSourceUri().setUri(new URI(uriString));
     }
 
     this.setDataSourceDescriptor(dataSourceDescriptor);
