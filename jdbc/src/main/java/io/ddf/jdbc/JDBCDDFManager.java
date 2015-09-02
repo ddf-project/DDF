@@ -11,6 +11,7 @@ import io.ddf.misc.Config.ConfigConstant;
 import io.ddf.util.ConfigHandler;
 import io.ddf.util.IHandleConfig;
 
+import java.net.URI;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +79,15 @@ public class JDBCDDFManager extends DDFManager {
     Class.forName(driver);
 
     mJdbcDataSource = (JDBCDataSourceDescriptor) dataSourceDescriptor;
+
+    if (engineType.equals("sfdc")) {
+      // Special handler for sfdc connection string, add RTK (for cdata driver)
+      URI uriWithRTK = new URI(mJdbcDataSource
+              .getDataSourceUri().getUri().toString()
+              + "RTK='" + cdata.jdbc.salesforce.SalesforceDriver.getRTK()+"';");
+      mJdbcDataSource.getDataSourceUri().setUri(uriWithRTK);
+    }
+
     this.setDataSourceDescriptor(dataSourceDescriptor);
     if (mJdbcDataSource == null) {
       throw new Exception("JDBCDataSourceDescriptor is null when initializing "

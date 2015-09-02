@@ -48,6 +48,11 @@ public class TableNameReplacer extends TableVisitor {
         this.mDDFManager = ddfManager;
     }
 
+
+    public String getNamespace() {
+        return this.mDS.getNamespace();
+    }
+
     /**
      * @brief Constructor
      * @param ddfManager
