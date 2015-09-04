@@ -89,7 +89,7 @@ public class PersistenceHandler extends APersistenceHandler {
    * @see io.ddf.content.IHandlePersistence#save(boolean)
    */
   @Override
-  public PersistenceUri persist(boolean doOverwrite) throws DDFException {
+  public APersistenceHandler.PersistenceUri persist(boolean doOverwrite) throws DDFException {
     if (this.getDDF() == null) throw new DDFException("DDF cannot be null");
 
     String dataFile = this.getDataFileName();
@@ -180,7 +180,7 @@ public class PersistenceHandler extends APersistenceHandler {
   }
 
   @Override
-  public IPersistible load(PersistenceUri uri) throws DDFException {
+  public IPersistible load(APersistenceHandler.PersistenceUri uri) throws DDFException {
     PersistenceUri2 uri2 = new PersistenceUri2(uri);
     return this.load(uri2.getNamespace(), uri2.getName());
   }
