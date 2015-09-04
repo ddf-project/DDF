@@ -11,7 +11,7 @@
 	<artifactId>ddf</artifactId>
 	<packaging>pom</packaging>
 	<description>Distributed DataFrame</description>
-	<version>1.5.0-SNAPSHOT</version>
+	<version>1.4.0-SNAPSHOT</version>
 	<name>ddf</name>
 	<organization>
 		<name>io.ddf</name>
@@ -61,7 +61,6 @@
 	  	<module>core</module>
 	  	<module>spark</module>
 	  	<module>examples</module>
-		<module>jdbc</module>
 	</modules>
 
 	<dependencies>

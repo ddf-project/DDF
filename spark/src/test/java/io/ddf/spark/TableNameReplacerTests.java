@@ -1,13 +1,13 @@
 package io.ddf.spark;
 
 import io.ddf.DDF;
+import io.ddf.DDFCoordinator;
 import io.ddf.DDFManager;
 import io.ddf.TableNameReplacer;
 import io.ddf.content.Schema;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
-import io.ddf.jdbc.JDBCDDFManager;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
@@ -451,6 +451,7 @@ public class TableNameReplacerTests {
     @BeforeClass
     public static void startServer() throws Exception {
         Thread.sleep(1000);
+
         // LOG = LoggerFactory.getLogger(BaseTest.class);
         // manager = DDFManager.get("spark");
         /*
@@ -486,3 +487,4 @@ public class TableNameReplacerTests {
     }
 
 }
+

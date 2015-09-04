@@ -34,7 +34,7 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-  val rootVersion = "1.5.0-SNAPSHOT"
+  val rootVersion = "1.4.0-SNAPSHOT"
   //val rootVersion = if(YARN_ENABLED) {
   //  "1.2-adatao"
   //} else {
@@ -65,12 +65,12 @@ object RootBuild extends Build {
   val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
   val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
-  val jdbcProjectName = projectName + "_jdbc"
+  // val jdbcProjectName = projectName + "_jdbc"
 
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, jdbc)
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val core = Project("core", file("core"), settings = coreSettings)
-  lazy val jdbc = Project("jdbc", file("jdbc"), settings = jdbcSettings) dependsOn (core)
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) dependsOn(jdbc)
+  // lazy val jdbc = Project("jdbc", file("jdbc"), settings = jdbcSettings) dependsOn (core)
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
 
   // A configuration to set an alternative publishLocalConfiguration
@@ -193,6 +193,8 @@ object RootBuild extends Build {
 
     publishMavenStyle := true, // generate pom.xml with "sbt make-pom"
 
+publishArtifact in (Compile, packageDoc) := false,
+
     libraryDependencies ++= Seq(
       "org.slf4j" % "slf4j-api" % slf4jVersion,
       "org.slf4j" % "slf4j-log4j12" % slf4jVersion,
@@ -212,7 +214,7 @@ object RootBuild extends Build {
       //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
       "mysql" % "mysql-connector-java" % "5.1.25",
       "org.python" % "jython-standalone" % "2.7.0",
-      "joda-time" % "joda-time" % "2.8.1",
+      "joda-time" % "joda-time" % "2.8",
       "org.joda" % "joda-convert" % "1.7"
     ),
 
@@ -508,9 +510,14 @@ object RootBuild extends Build {
     libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.2.0" exclude("org.mortbay.jetty", "servlet-api")
       exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
+    libraryDependencies += "com.zaxxer" % "HikariCP-java6" % "2.3.9",
+    libraryDependencies += "org.scalikejdbc" %% "scalikejdbc" % "2.2.7",
+    libraryDependencies += "com.univocity" % "univocity-parsers" % "1.5.5",
+    libraryDependencies += "com.clearspring.analytics" % "stream" % "2.7.0" exclude("asm", "asm"),
     libraryDependencies ++= scalaDependencies,
     testOptions in Test += Tests.Argument("-oI")
-  ) ++ assemblySettings ++ extraAssemblySettings
+   
+) ++ assemblySettings ++ extraAssemblySettings
 
   val java_opts = if(System.getenv("JAVA_OPTS") != null) {
     System.getenv("JAVA_OPTS").split(" ").filter(x => x.startsWith("-D")).map {
@@ -537,6 +544,12 @@ object RootBuild extends Build {
     ),
     testOptions in Test += Tests.Argument("-oI"),
     libraryDependencies ++= com_adatao_unmanaged,
+    libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
+    libraryDependencies += "com.zaxxer" % "HikariCP-java6" % "2.3.9",
+    libraryDependencies += "org.scalikejdbc" %% "scalikejdbc" % "2.2.7",
+    libraryDependencies += "com.univocity" % "univocity-parsers" % "1.5.5",
+    libraryDependencies += "com.clearspring.analytics" % "stream" % "2.7.0" exclude("asm", "asm"),
+  
     libraryDependencies ++= spark_dependencies,
     if(isLocal) {
       initialCommands in console :=
@@ -576,13 +589,13 @@ val jdbc_dependencies = Seq(
     "cdata.jdbc.salesforce" % "SalesforceDriver" % "1.0.0"
 )
 
-  def jdbcSettings = commonSettings ++ Seq(
-    name := jdbcProjectName,
+ // def jdbcSettings = commonSettings ++ Seq(
+ //   name := jdbcProjectName,
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
-    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch jdbc/" + targetDir + "/*timestamp") }, 
-    libraryDependencies ++= jdbc_dependencies,
-    testOptions in Test += Tests.Argument("-oI")
-  ) ++ assemblySettings ++ extraAssemblySettings
+ //   compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch jdbc/" + targetDir + "/*timestamp") }, 
+ //   libraryDependencies ++= jdbc_dependencies,
+ //   testOptions in Test += Tests.Argument("-oI")
+ // ) ++ assemblySettings ++ extraAssemblySettings
 
 
 
