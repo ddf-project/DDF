@@ -8,24 +8,20 @@ import org.apache.spark.sql.SQLContext
 object DateTimeExtractUDF {
   val extractDateTime: (Object, String) => Integer =  {
     (obj: Object, field: String) => {
-      val dateTime = Utils.toDateTimeObject(obj)
-      if(dateTime != null) {
-        val intValue = field.toLowerCase match {
-          case "year" => dateTime.getYear
-          case "month" => dateTime.getMonthOfYear
-          case "weekyear" => dateTime.getWeekyear
-          case "weekofweekyear" => dateTime.getWeekOfWeekyear
-          case "day" => dateTime.getDayOfMonth
-          case "dayofweek" => dateTime.getDayOfWeek
-          case "dayofyear" => dateTime.getDayOfYear
-          case "hour" => dateTime.getHourOfDay
-          case "minute" => dateTime.getMinuteOfHour
-          case "second" => dateTime.getSecondOfMinute
-          case "millisecond" => dateTime.getMillisOfSecond
-        }
-        new Integer(intValue)
-      } else {
-        null
+      field.toLowerCase match {
+          case "year" => DateUDF.parseYear(obj)
+          case "month" => DateUDF.parseMonth(obj)
+          case "quarter" => DateUDF.parseQuarter(obj)
+          case "weekyear" => DateUDF.parseWeekYear(obj)
+          case "weekofyear" => DateUDF.parseWeekOfYear(obj)
+          case "day" => DateUDF.parseDay(obj)
+          case "dayofweek" => DateUDF.parseDayOfWeek(obj)
+          case "dayofyear" => DateUDF.parseDayOfYear(obj)
+          case "hour" => DateUDF.parseHour(obj)
+          case "minute" => DateUDF.parseMinute(obj)
+          case "second" => DateUDF.parseSecond(obj)
+          case "millisecond" => DateUDF.parseMillisecond(obj)
+          case _ => null
       }
     }
   }
