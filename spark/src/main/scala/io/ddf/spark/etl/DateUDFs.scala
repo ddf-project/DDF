@@ -8,13 +8,16 @@ import org.apache.spark.sql.types.DataTypes
  */
 object DateUDF {
 
-  val parseYear: (String => Integer) = (year: String) =>  {
-    val datetime = Utils.toDateTimeObject(year)
-    if(datetime != null) {
-      datetime.getYear
-    } else {
-      null
+  val parseYear: (Object => Integer) =  {
+    (obj: Object) => {
+      val datetime = Utils.toDateTimeObject(obj)
+      if(datetime != null) {
+        datetime.getYear
+      } else {
+        null
+      }
     }
+
   }
 
   val parseHour: Object => Integer = {
@@ -33,6 +36,29 @@ object DateUDF {
       val dateTime = Utils.toDateTimeObject(obj)
       if(dateTime != null) {
         dateTime.getDayOfWeek
+      } else {
+        null
+      }
+    }
+  }
+
+  val parseQuarter: Object => Integer = {
+    (obj: Object) => {
+      val dateTime = Utils.toDateTimeObject(obj)
+      if(dateTime != null) {
+        val month = dateTime.getMonthOfYear
+        if (month >= 1 && month <= 3) {
+          1
+        } else if (month >= 4 && month <= 6) {
+          2
+        } else if (month >= 7 && month <= 9) {
+          3
+        } else if (month >= 10 && month <= 12) {
+          4
+        } else {
+          null
+        }
+
       } else {
         null
       }
@@ -80,7 +106,7 @@ object DateUDF {
     }
   }
 
-  val parseWeekOfYear: (Object) => Integer = {
+  val parseWeekYear: (Object) => Integer = {
     (obj: Object) => {
       val dateTime = Utils.toDateTimeObject(obj)
       if(dateTime !=null) {
@@ -91,7 +117,7 @@ object DateUDF {
     }
   }
 
-  val parseWeekOfWeekYear: Object => Integer = {
+  val parseWeekOfYear: Object => Integer = {
     (obj: Object) => {
       val dateTime = Utils.toDateTimeObject(obj)
       if(dateTime != null) {
@@ -159,10 +185,12 @@ object DateUDF {
 
   def registerUDFs(sQLContext: SQLContext) = {
     sQLContext.udf.register("year", parseYear)
+    sQLContext.udf.register("quarter", parseQuarter)
     sQLContext.udf.register("month", parseMonth)
     sQLContext.udf.register("month_as_text", parseMonthAsText)
-    sQLContext.udf.register("weekyear", parseWeekOfYear)
-    sQLContext.udf.register("weekofweekyear", parseWeekOfWeekYear)
+    sQLContext.udf.register("weekyear", parseWeekYear)
+    sQLContext.udf.register("weekofyear", parseWeekOfYear)
+    sQLContext.udf.register("weekofweekyear", parseWeekOfYear)
     sQLContext.udf.register("day", parseDay)
     sQLContext.udf.register("dayofweek", parseDayOfWeek)
     sQLContext.udf.register("dayofweek_as_text", parseDayOfWeekAsText)
