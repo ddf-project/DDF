@@ -13,10 +13,8 @@ import scala.collection.JavaConversions._
 object RootBuild extends Build {
 
   //////// Project definitions/configs ///////
-  //////// Project definitions/configs ///////
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
-
 
   val SPARK_VERSION = "1.3.1-adatao"
 
@@ -28,8 +26,6 @@ object RootBuild extends Build {
   val theScalaVersion = "2.10.3"
         val majorScalaVersion = theScalaVersion.split(".[0-9]+$")(0)
   val targetDir = "target/scala-" + majorScalaVersion // to help mvn and sbt share the same target dir
-  //val theScalaVersion = "2.9.3"
-  //val targetDir = "target/scala-" + theScalaVersion // to help mvn and sbt share the same target dir
 
   val rootOrganization = "io"
   val projectName = "ddf"
@@ -115,22 +111,9 @@ object RootBuild extends Build {
   val spark_dependencies = Seq(
     "commons-configuration" % "commons-configuration" % "1.6",
     "com.google.code.gson"% "gson" % "2.2.2",
-    //"javax.jdo" % "jdo2-api" % "2.3-ec",
-//    "org.eclipse.jetty" % "jetty-server" % "8.1.14.v20131031",
-//    "org.eclipse.jetty" % "jetty-security" % "8.1.14.v20131031",
-//    "org.eclipse.jetty" % "jetty-util" % "8.1.14.v20131031",
-//    "org.eclipse.jetty" % "jetty-plus" % "8.1.14.v20131031",
-//    "org.eclipse.jetty" % "jetty-servlet" % "8.1.14.v20131031",
-//    "org.eclipse.jetty" % "jetty-webapp" % "8.1.14.v20131031",
-//    "org.eclipse.jetty" % "jetty-jsp" % "8.1.14.v20131031",
-    //"org.scalatest" %% "scalatest" % "1.9.1" % "test",
-    //"org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
     "com.novocode" % "junit-interface" % "0.10" % "test",
     "net.sf" % "jsqlparser" % "0.9.8.2",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
-    //"org.antlr" % "antlr" % "3.4", // needed by shark.SharkDriver.compile
-    // needed by Hive
-    //"commons-dbcp" % "commons-dbcp" % "1.4",
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java")
@@ -142,9 +125,6 @@ object RootBuild extends Build {
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
-    //  exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
-    //"edu.berkeley.cs.amplab" % "shark_2.9.3" % SHARK_VERSION excludeAll(excludeSpark)
-    //"edu.berkeley.cs.shark" %% "shark" % SHARK_VERSION exclude("org.apache.avro", "avro-ipc") exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all"),
     "com.google.protobuf" % "protobuf-java" % "2.5.0"
   )
 
@@ -156,7 +136,6 @@ object RootBuild extends Build {
     version := rootVersion,
     scalaVersion := theScalaVersion,
     scalacOptions := Seq("-unchecked", "-optimize", "-deprecation"),
-    //retrieveManaged := false, // Do not create a lib_managed, leave dependencies in ~/.ivy2
     retrieveManaged := true, // Do create a lib_managed, so we have one place for all the dependency jars to copy to slaves, if needed
     retrievePattern := "[type]s/[artifact](-[revision])(-[classifier]).[ext]",
     transitiveClassifiers in Scope.GlobalScope := Seq("sources"),
@@ -174,10 +153,8 @@ object RootBuild extends Build {
     // This goes first for fastest resolution. We need this for com_adatao_unmanaged.
     // Now, sometimes missing .jars in ~/.m2 can lead to sbt compile errors.
     // In that case, clean up the ~/.m2 local repository using bin/clean-m2-repository.sh
-    // @aht: needs this to get Rserve jars, I don't know how to publish to adatao/mvnrepos
     
     resolvers ++= Seq(
-      //"BetaDriven Repository" at "http://nexus.bedatadriven.com/content/groups/public/",
       "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository",
       //"Local ivy Repository" at "file://"+Path.userHome.absolutePath+"/.ivy2/local",
       "Adatao Mvnrepos Snapshots" at "https://raw.github.com/adatao/mvnrepos/master/snapshots",
@@ -185,9 +162,6 @@ object RootBuild extends Build {
       "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
       "Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/",
       "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
-      //"Sonatype Testing" at "https://oss.sonatype.org/content/repositories/eduberkeleycs-1016"
-
-      //"Sonatype Staging" at "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     ),
 
 
@@ -199,17 +173,14 @@ object RootBuild extends Build {
       "commons-configuration" % "commons-configuration" % "1.6",
       "com.google.guava" % "guava" % "14.0.1",
       "com.google.code.gson"% "gson" % "2.2.2",
-      //"org.scalatest" % "scalatest_2.10" % "2.1.0" % "test",
       "org.scalatest" % "scalatest_2.10" % "2.1.5" % "test",
       "org.scalacheck"   %% "scalacheck" % "1.11.3" % "test",
       "com.novocode" % "junit-interface" % "0.10" % "test",	
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
       "com.googlecode.matrix-toolkits-java" % "mtj" % "0.9.14",
       "net.sf" % "jsqlparser" % "0.9.8.2", 
-	"commons-io" % "commons-io" % "1.3.2",
+      "commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
-
-      //"edu.berkeley.cs.shark" % "hive-contrib" % "0.11.0-shark" exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
       "mysql" % "mysql-connector-java" % "5.1.25",
       "org.python" % "jython-standalone" % "2.7.0",
       "joda-time" % "joda-time" % "2.8.1",
@@ -219,7 +190,6 @@ object RootBuild extends Build {
 
     otherResolvers := Seq(Resolver.file("dotM2", file(Path.userHome + "/.m2/repository"))),
 
-
     publishLocalConfiguration in MavenCompile <<= (packagedArtifacts, deliverLocal, ivyLoggingLevel) map {
       (arts, _, level) => new PublishConfiguration(None, "dotM2", arts, Seq(), level)
     },
@@ -228,10 +198,6 @@ object RootBuild extends Build {
     publishLocalBoth <<= Seq(publishLocal in MavenCompile, publishLocal).dependOn,
 
 
-    //dependencyOverrides += "org.scala-lang" % "scala-library" % theScalaVersion,
-    //dependencyOverrides += "org.scala-lang" % "scala-compiler" % theScalaVersion,
-    // dependencyOverrides += "commons-configuration" % "commons-configuration" % "1.6",
-    // dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.1",
     dependencyOverrides += "commons-lang" % "commons-lang" % "2.6",
     dependencyOverrides += "it.unimi.dsi" % "fastutil" % "6.4.4",
     dependencyOverrides += "log4j" % "log4j" % "1.2.17",
@@ -239,7 +205,6 @@ object RootBuild extends Build {
     dependencyOverrides += "org.slf4j" % "slf4j-log4j12" % slf4jVersion,
     dependencyOverrides += "commons-io" % "commons-io" % "2.4", //tachyon 0.2.1
     dependencyOverrides += "org.apache.httpcomponents" % "httpclient" % "4.1.3", //libthrift
-    //dependencyOverrides += "org.apache.commons" % "commons-math" % "2.1", //hadoop-core, renjin newer use a newer version but we prioritize hadoop
     dependencyOverrides += "com.google.guava" % "guava" % "14.0.1", //spark-core
     dependencyOverrides += "org.codehaus.jackson" % "jackson-core-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
@@ -254,14 +219,6 @@ object RootBuild extends Build {
     dependencyOverrides += "org.apache.avro" % "avro-ipc" % "1.7.4",
     dependencyOverrides += "org.apache.avro" % "avro" % "1.7.4",
     dependencyOverrides += "org.apache.zookeeper" % "zookeeper" % "3.4.5",
-//    dependencyOverrides += "org.eclipse.jetty" % "jetty-server" % "8.1.14.v20131031",
-//    dependencyOverrides += "org.eclipse.jetty" % "jetty-jndi" % "8.1.14.v20131031",
-//     dependencyOverrides += "org.eclipse.jetty" % "jetty-security" % "8.1.14.v20131031",
-//     dependencyOverrides += "org.eclipse.jetty" % "jetty-util" % "8.1.14.v20131031",
-//     dependencyOverrides += "org.eclipse.jetty" % "jetty-plus" % "8.1.14.v20131031",
-//     dependencyOverrides += "org.eclipse.jetty" % "jetty-servlet" % "8.1.14.v20131031",
-//     dependencyOverrides += "org.eclipse.jetty" % "jetty-webapp" % "8.1.14.v20131031",
-//     dependencyOverrides += "org.eclipse.jetty" % "jetty-jsp" % "8.1.14.v20131031",
     dependencyOverrides += "org.scala-lang" % "scala-compiler" % "2.10.3",
     dependencyOverrides += "io.netty" % "netty" % "3.6.6.Final",
     dependencyOverrides += "org.ow2.asm" % "asm" % "4.0", //org.datanucleus#datanucleus-enhancer's
@@ -367,31 +324,6 @@ object RootBuild extends Build {
               </configuration>
             </plugin>
             
-            <!--
-            <plugin>
-                <groupId>org.scalastyle</groupId>
-                <artifactId>scalastyle-maven-plugin</artifactId>
-                <version>0.4.0</version>
-                <configuration>
-                  <verbose>false</verbose>
-                  <failOnViolation>true</failOnViolation>
-                  <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                  <failOnWarning>false</failOnWarning>
-                  <sourceDirectory>${{basedir}}/src/main/scala</sourceDirectory>
-                  <testSourceDirectory>${{basedir}}/src/test/scala</testSourceDirectory>
-                  <configLocation>${{basedir}}/../src/main/resources/scalastyle-config.xml</configLocation>
-                  <outputFile>${{basedir}}/{targetDir}/scalastyle-output.xml</outputFile>
-                  <outputEncoding>UTF-8</outputEncoding>
-                </configuration>
-                <executions>
-                  <execution>
-                    <goals>
-                      <goal>check</goal>
-                    </goals>
-                  </execution>
-                </executions>
-              </plugin>
-              -->
           </plugins>
         </build>
         <profiles>
@@ -502,9 +434,6 @@ object RootBuild extends Build {
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch core/" + targetDir + "/*timestamp") },
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.7.2",
-//    libraryDependencies += "org.apache.hadoop" % "hadoop-core" % "1.0.4" exclude("commons-httpclient", "commons-httpclient")
-//      exclude("tomcat", "jasper-compiler") exclude("tomcat", "jasper-runtime") exclude("org.mortbay.jetty", "servlet-api-2.5")
-//      exclude("org.mortbay.jetty", "jetty"),
     libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.2.0" exclude("org.mortbay.jetty", "servlet-api")
       exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
@@ -553,14 +482,14 @@ object RootBuild extends Build {
         |"NASDelay int, SecurityDelay int, LateAircraftDelay int ) " +
         |"ROW FORMAT DELIMITED FIELDS TERMINATED BY ','")
         |manager.sql2txt("load data local inpath 'resources/test/airlineBig.csv' into table airline")
-        |println("SparkDDFManager available as manager")""".stripMargin
+        |println("SparkDDFManager is available as the DDF manager")""".stripMargin
     } else {
       initialCommands in console :=
         s"""
            |$getEnvCommand
            |import io.ddf.DDFManager
            |val manager = DDFManager.get("spark")
-           |println("SparkDDFManager available as manager")
+           |println("SparkDDFManager is available as the DDF manager")
          """.stripMargin
     }
   ) ++ assemblySettings ++ extraAssemblySettings
