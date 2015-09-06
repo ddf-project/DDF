@@ -7,7 +7,6 @@ import io.ddf.content.Schema;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
-import io.ddf.jdbc.JDBCDDFManager;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
