@@ -97,7 +97,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
     return this.sqlHandle(command,
                           maxRows,
                           dataSource,
-                          new TableNameReplacer(this.getManager()));
+                          new TableNameReplacer(this.getManager(), dataSource));
   }
 
 
@@ -177,7 +177,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                          schema,
                          dataSource,
                          dataFormat,
-                         new TableNameReplacer(this.getManager()));
+                         new TableNameReplacer(this.getManager(), dataSource));
   }
   public DDF sql2ddfHandle(String command,
                            Schema schema,

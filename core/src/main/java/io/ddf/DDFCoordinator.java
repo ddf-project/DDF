@@ -135,6 +135,12 @@ public class DDFCoordinator {
                 DDF ddf = ddfManager.getDDFByURI(uri);
                 return ddf;
             } catch (Exception e) {
+                try {
+                    DDF ddf = ddfManager.getOrRestoreDDFUri(uri);
+                    return ddf;
+                } catch (Exception e2) {
+
+                }
             }
         }
         throw new DDFException("Can't find ddf with uri: " + uri);

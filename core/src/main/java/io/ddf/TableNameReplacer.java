@@ -46,6 +46,8 @@ public class TableNameReplacer extends TableVisitor {
      */
     public TableNameReplacer(DDFManager ddfManager) {
         this.mDDFManager = ddfManager;
+
+        this.mDDFManager.log("Initalizing, no ds");
     }
 
 
@@ -63,6 +65,7 @@ public class TableNameReplacer extends TableVisitor {
     public TableNameReplacer(DDFManager ddfManager, DataSourceDescriptor ds) {
         this.mDDFManager = ddfManager;
         this.mDS = (SQLDataSourceDescriptor)ds;
+        this.mDDFManager.log("Initalizing, ds is : " + mDS.toString());
     }
 
     /**
