@@ -22,8 +22,8 @@ class CrossValidationSuite extends ATestSuite {
       .getEngineName, manager.getNamespace, "data", schema)
     for (seed <- 1 to 5) {
       for (split <- ddf.ML.CVRandom(5, 0.85, seed)) {
-        val train = split(0).asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]]).collect()
-        val test = split(1).asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]]).collect().toSet
+        val train = split.getTrainSet.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]]).collect()
+        val test = split.getTestSet.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]]).collect().toSet
         assertEquals(0.85, train.size / 1000.0, 0.025)
         assert(train.forall(x => !test.contains(x)), "train element found in test set!")
       }
@@ -43,8 +43,8 @@ class CrossValidationSuite extends ATestSuite {
     for (seed <- 1 to 3) {
       val betweenFolds = scala.collection.mutable.ArrayBuffer.empty[Set[Array[Object]]]
       for (split <- ddf.ML.CVKFold(5, seed)) {
-        val train = split(0).asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]]).collect()
-        val test = split(1).asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]]).collect().toSet
+        val train = split.getTrainSet.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]]).collect()
+        val test = split.getTestSet.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]]).collect().toSet
         assertEquals(0.8, train.size / 5000.0, 0.02)
         assert(train.forall(x => !test.contains(x)), "train element found in test set!")
         betweenFolds += test
@@ -61,8 +61,8 @@ class CrossValidationSuite extends ATestSuite {
     val tableName = ddf.getTableName
     for (split <- ddf.ML.CVKFold(5, 10)) {
 
-      val trainddf = split(0).asInstanceOf[SparkDDF]
-      val testddf = split(1).asInstanceOf[SparkDDF]
+      val trainddf = split.getTrainSet.asInstanceOf[SparkDDF]
+      val testddf = split.getTestSet.asInstanceOf[SparkDDF]
 
       val train = trainddf.getRDD(classOf[Array[Object]]).collect()
       val test = testddf.getRDD(classOf[Array[Object]]).collect().toSet

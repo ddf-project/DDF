@@ -211,12 +211,12 @@ public class MLSupporter extends ADDFFunctionalGroupHandler implements ISupportM
     return null;
   }
 
-  public List<List<DDF>> CVKFold(int k, Long seed) throws DDFException {
-    return new ArrayList<List<DDF>>();
+  public List<CrossValidationSet> CVKFold(int k, Long seed) throws DDFException {
+    return new ArrayList<CrossValidationSet>();
   }
 
   @Override
-  public List<List<DDF>> CVRandom(int k, double trainingSize, Long seed) throws DDFException {
-    return new ArrayList<List<DDF>>();
+  public List<CrossValidationSet> CVRandom(int k, double trainingSize, Long seed) throws DDFException {
+    return new ArrayList<CrossValidationSet>();
   }
 }

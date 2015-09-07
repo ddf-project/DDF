@@ -56,7 +56,7 @@ public interface ISupportML extends IHandleDDFFunctionalGroup {
   */
   long[][] getConfusionMatrix(IModel model, double threshold) throws DDFException;
 
-  List<List<DDF>> CVKFold(int k, Long seed) throws DDFException;
+  List<CrossValidationSet> CVKFold(int k, Long seed) throws DDFException;
 
-  List<List<DDF>> CVRandom(int k, double trainingSize, Long seed) throws DDFException;
+  List<CrossValidationSet> CVRandom(int k, double trainingSize, Long seed) throws DDFException;
 }
