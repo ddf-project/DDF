@@ -52,10 +52,11 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
    * @return
    */
 
-  public static class PersistenceUri {
+  public static class PersistenceUri extends AGloballyAddressable {
     private String mEngine;
+    private String mNamespace;
     private String mPath;
-
+    private String mName;
 
     public PersistenceUri(String uri) throws DDFException {
       if (Strings.isNullOrEmpty(uri)) throw new DDFException("uri may not be null or empty");
@@ -74,6 +75,37 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
       mPath = path;
     }
 
+    /**
+     * Parse the path part of the uri into namespace and name
+     */
+    private void parsePath() {
+      if (Strings.isNullOrEmpty(this.getPath())) return;
+
+      String[] parts = this.getPath().split("/");
+      if (parts == null || parts.length == 0) return;
+
+      String name = parts[parts.length - 1];
+      if (!Strings.isNullOrEmpty(name) && name.toLowerCase().endsWith(".dat") || name.toLowerCase().endsWith(".sch")) {
+        name = name.substring(0, name.lastIndexOf('.'));
+        // Also trim our current path
+        this.setPath(this.getPath().substring(0, this.getPath().lastIndexOf('.')));
+      }
+      this.setName(name);
+
+      if (parts.length > 1) {
+        this.setNamespace(parts[parts.length - 2]);
+      }
+
+      if (parts.length > 2) {
+        this.setEngineName(parts[parts.length-3]);
+      }
+    }
+
+    @Override
+    public String getGlobalObjectType() {
+      return "persistence_uri";
+    }
+
     public String getEngine() {
       return mEngine;
     }
@@ -88,6 +120,52 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
     protected void setPath(String path) {
       mPath = path;
+    }
+
+    /**
+     * @return the namespace
+     */
+    @Override
+    public String getNamespace() {
+      return mNamespace;
+    }
+
+    /**
+     * @param namespace the namespace to set
+     */
+    @Override
+    public void setNamespace(String namespace) {
+      this.mNamespace = namespace;
+    }
+
+    /**
+     * @return the name
+     */
+    @Override
+    public String getName() {
+      return mName;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+      this.mName = name;
+    }
+
+    @Override
+    public String getUri() {
+      return AGloballyAddressable.getUri(this);
+    }
+
+    @Override
+    public String getEngineName() {
+      return mEngine;
+    }
+
+    @Override
+    public void setEngineName(String engineName) {
+      this.mEngine = engineName;
     }
 
     @Override
