@@ -124,7 +124,7 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
+    public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
     mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
     DDF fromDDF = fromManager.getDDFByURI(ddfuri);
