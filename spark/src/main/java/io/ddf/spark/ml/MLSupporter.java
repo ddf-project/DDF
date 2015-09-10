@@ -6,6 +6,7 @@ import io.ddf.content.IHandleRepresentations.IGetResult;
 import io.ddf.content.IHandleSchema;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
+import io.ddf.ml.CrossValidationSet;
 import io.ddf.ml.IModel;
 import io.ddf.types.TupleMatrixVector;
 import io.ddf.util.Utils.MethodInfo.ParamInfo;
@@ -338,11 +339,11 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
     else return 0;
   }
 
-  public List<List<DDF>> CVKFold(int k, Long seed) throws DDFException {
+  public List<CrossValidationSet> CVKFold(int k, Long seed) throws DDFException {
     return CrossValidation.DDFKFoldSplit(this.getDDF(), k, seed);
   }
 
-  public List<List<DDF>> CVRandom(int k, double trainingSize, Long seed) throws DDFException {
+  public List<CrossValidationSet> CVRandom(int k, double trainingSize, Long seed) throws DDFException {
     return CrossValidation.DDFRandomSplit(this.getDDF(), k, trainingSize, seed);
   }
 }

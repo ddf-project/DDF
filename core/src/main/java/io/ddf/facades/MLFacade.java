@@ -6,6 +6,7 @@ package io.ddf.facades;
 
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
+import io.ddf.ml.CrossValidationSet;
 import io.ddf.ml.IModel;
 import io.ddf.ml.ISupportML;
 
@@ -79,11 +80,11 @@ public class MLFacade implements ISupportML {
     return this.getMLSupporter().getConfusionMatrix(model, threshold);
   }
 
-  public List<List<DDF>> CVKFold(int k, Long seed) throws DDFException {
+  public List<CrossValidationSet> CVKFold(int k, Long seed) throws DDFException {
     return this.getMLSupporter().CVKFold(k, seed);
   }
 
-  public List<List<DDF>> CVRandom(int k, double trainingSize, Long seed) throws DDFException {
+  public List<CrossValidationSet> CVRandom(int k, double trainingSize, Long seed) throws DDFException {
     return this.getMLSupporter().CVRandom(k, trainingSize, seed);
   }
 
