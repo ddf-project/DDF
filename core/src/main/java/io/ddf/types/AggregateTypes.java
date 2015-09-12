@@ -57,7 +57,7 @@ public class AggregateTypes {
       for (String res : sqlResult) {
 
         int pos = StringUtils.ordinalIndexOf(res, "\t", numUnaggregatedFields);
-        String groupByColNames = res.substring(0, pos).replaceAll("\t", ",");
+        String groupByColNames = res.substring(0, pos);
         String[] stats = res.substring(pos + 1).split("\t");
 
         double[] statsDouble = new double[stats.length];
