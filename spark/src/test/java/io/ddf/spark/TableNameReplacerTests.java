@@ -279,7 +279,7 @@ public class TableNameReplacerTests {
         // TableNameReplacer tableNameReplacer = new TableNameReplacer(manager,
         //        Arrays.asList(uris));
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager,
-                null);
+                    null);
 
         String sqlcmd = "select {1}.a,{2}.b from {1}";
         Statement statement = null;

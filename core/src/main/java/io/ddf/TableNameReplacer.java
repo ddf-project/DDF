@@ -46,8 +46,6 @@ public class TableNameReplacer extends TableVisitor {
      */
     public TableNameReplacer(DDFManager ddfManager) {
         this.mDDFManager = ddfManager;
-
-        this.mDDFManager.log("Initalizing, no ds");
     }
 
 
@@ -65,7 +63,6 @@ public class TableNameReplacer extends TableVisitor {
     public TableNameReplacer(DDFManager ddfManager, DataSourceDescriptor ds) {
         this.mDDFManager = ddfManager;
         this.mDS = (SQLDataSourceDescriptor)ds;
-        this.mDDFManager.log("Initalizing, ds is : " + mDS.toString());
     }
 
     /**
@@ -206,15 +203,20 @@ public class TableNameReplacer extends TableVisitor {
     String handleDDFUUID(String uuid, Table table) throws Exception {
         String engineName = null;
         try {
-            DDFManager manager = this.mDDFManager.getDDFCoordinator()
-                    .getDDFManagerByUUID(UUID.fromString(uuid));
-            engineName = manager.getEngineName();
+            if (this.mDDFManager.getDDFCoordinator() != null) {
+                DDFManager manager = this.mDDFManager.getDDFCoordinator()
+                        .getDDFManagerByUUID(UUID.fromString(uuid));
+                engineName = manager.getEngineName();
+            } else {
+                engineName = this.mDDFManager.getEngineName();
+            }
         } catch (DDFException e) {
             this.mDDFManager.log("Can't find ddfmanger for " + uuid + " , " +
                     "trying spark");
             engineName = "spark";
         }
-        if (engineName.equals(this.mDDFManager.getEngineName())) {
+        if (engineName == null
+           || engineName.equals(this.mDDFManager.getEngineName())) {
             // It's in the same engine.
             DDF ddf = null;
             // Restore the ddf first.
@@ -229,22 +231,19 @@ public class TableNameReplacer extends TableVisitor {
             table.setName(ddf.getTableName());
 
         } else {
-            // Transfer from the other engine.
-            // if (!uri2tbl.containsKey(ddfuri)) {
-            //    DDF ddf = this.ddfManager.transfer(engineName, ddfuri);
-            //    uri2tbl.put(ddfuri, ddf.getTableName());
-            //
-            // }
-
-            // return uri2tbl.get(ddfuri);
-            // It's not from this engine.
+            // The ddf is from another engine.
             if (!this.mUri2TblObj.containsKey(uuid)) {
                 mUri2TblObj.put(uuid, new ArrayList<Table>());
             }
             mUri2TblObj.get(uuid).add(table);
         }
-        return this.mDDFManager.getDDFCoordinator().getDDF(UUID.fromString
-                (uuid)).getTableName();
+        if (this.mDDFManager.getDDFCoordinator() == null) {
+            return this.mDDFManager.getOrRestoreDDF(UUID.fromString(uuid))
+                    .getTableName();
+        } else {
+            return this.mDDFManager.getDDFCoordinator().getDDF(UUID.fromString
+                    (uuid)).getTableName();
+        }
     }
 
     void handleIndex(String index, List<String> identifierList, Table table)

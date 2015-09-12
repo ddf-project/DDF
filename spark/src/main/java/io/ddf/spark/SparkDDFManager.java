@@ -366,12 +366,12 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-    return null;
+    return this.mDDFCache.getDDFByUri(ddfURI);
   }
 
   @Override
   public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-    return null;
+    return this.mDDFCache.getDDF(uuid);
   }
 
   /**
