@@ -109,8 +109,8 @@ class RepresentationHandlerSuite extends ATestSuite {
   test("Can do sql queries after CrossValidation ") {
     val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
     for (split <- ddf.ML.CVKFold(5, 10)) {
-      val train = split(0).asInstanceOf[SparkDDF]
-      val test = split(1).asInstanceOf[SparkDDF]
+      val train = split.getTrainSet.asInstanceOf[SparkDDF]
+      val test = split.getTestSet.asInstanceOf[SparkDDF]
       val ddf1 = train.sql2ddf("select month, year, dayofmonth from @this")
       val ddf2 = test.sql2ddf("select * from @this")
 
