@@ -38,6 +38,40 @@ public class TableNameReplacer extends TableVisitor {
     public Boolean containsLocalTable = false;
     public String fromEngineName = null;
 
+    String possibleLetter = "abcdefghijklmnopqrstuvwxyz0123456789";
+    String possibleStart = "abcdefghijklmnopqrstuvwxyz";
+
+    /**
+     * @brief Get a random character from the string.
+     * @param possible
+     * @return
+     */
+    private char random(String possible) {
+        return possible.charAt((int)Math.floor(Math.random() * possible.length
+                ()));
+    }
+
+    /**
+     * @brief Generate a temporary table name for the ddf view.
+     * @param length
+     * @return
+     */
+    private String genTableName(int length) {
+        StringBuffer text = new StringBuffer();
+        int i = 0;
+        while (i < length) {
+            if (i == 0) {
+                text.append(random(possibleStart));
+            }
+            else {
+                text.append(random(possibleLetter));
+            }
+            ++i;
+        }
+        return "TEMP_DDF_" + text.toString();
+    }
+
+
     /**
      * @brief Constructor.
      * @param ddfManager The DDFManager.
