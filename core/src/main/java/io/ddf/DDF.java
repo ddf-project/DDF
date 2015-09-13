@@ -74,6 +74,17 @@ public abstract class DDF extends ALoggable //
 
   private Date mCreatedTime;
 
+  //  Whether the ddf acts as a view for the database table.
+  private boolean mIsDDFView = false;
+
+  public boolean getIsDDFView() {
+    return mIsDDFView;
+  }
+
+  public void setIsDDFView(boolean isDDFView) {
+    this.mIsDDFView = isDDFView;
+  }
+
   /**
    *
    * @param data
