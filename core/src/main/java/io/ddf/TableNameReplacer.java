@@ -262,7 +262,13 @@ public class TableNameReplacer extends TableVisitor {
                 ddf = this.mDDFManager.getDDF(UUID.fromString(uuid));
             }
             containsLocalTable = true;
-            table.setName(ddf.getTableName());
+            // TODO(fanj) : Temporary fix for ddf.
+            if (ddf.getIsDDFView()) {
+                table.setName("(" + ddf.getTableName() + ") AS " + this
+                        .genTableName(8));
+            } else {
+                table.setName(ddf.getTableName());
+            }
 
         } else {
             // The ddf is from another engine.
