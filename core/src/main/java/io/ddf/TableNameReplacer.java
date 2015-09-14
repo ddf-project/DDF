@@ -228,7 +228,12 @@ public class TableNameReplacer extends TableVisitor {
      * @return The local tablename.
      */
     void handleDDFURI(String ddfuri, Table table) throws Exception {
-        DDF ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(ddfuri);
+        DDF ddf = null;
+        if (this.mDDFManager.getDDFCoordinator() == null) {
+            ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(ddfuri);
+        } else {
+            ddf = this.mDDFManager.getDDFByURI(ddfuri);
+        }
         this.handleDDFUUID(ddf.getUUID().toString(), table);
     }
 
