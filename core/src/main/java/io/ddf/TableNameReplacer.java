@@ -254,6 +254,11 @@ public class TableNameReplacer extends TableVisitor {
                     "trying spark");
             engineName = "spark";
         }
+
+        this.mDDFManager.log("In handleDDFUUid, enginename is : " + engineName);
+        this.mDDFManager.log("In handleDDFUUid, this manager name is : " +
+                this.mDDFManager.getEngineName());
+
         if (engineName == null
            || engineName.equals(this.mDDFManager.getEngineName())) {
             // It's in the same engine.
