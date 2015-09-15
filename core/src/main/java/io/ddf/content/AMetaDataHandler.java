@@ -6,10 +6,12 @@ package io.ddf.content;
 
 import com.google.common.base.Strings;
 import io.ddf.DDF;
+import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +39,14 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
   private long mNumRows = 0L;
   private boolean bNumRowsIsValid = false;
   private int useCount = 0;
+  private DataSourceDescriptor mDataSourceDescriptor;
+  private Date mLastRefreshTime;
+  private String mLastRefreshUser;
+  private Date mLastModifiedTime;
+  private String mLastModifiedUser;
+  private Date mLastPersistedTime;
+  private DataSourceDescriptor mSnapshotDescriptor;
+
   /**
    * Each implementation needs to come up with its own way to compute the row
    * count.
@@ -104,7 +114,13 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
   }
 
   public void copy(IHandleMetaData fromMetaData) throws DDFException {
-
+    if(fromMetaData instanceof AMetaDataHandler) {
+      AMetaDataHandler metaDataHandler = (AMetaDataHandler) fromMetaData;
+      this.mLastRefreshTime = metaDataHandler.getLastRefreshTime();
+      this.mLastRefreshUser = metaDataHandler.getLastRefreshUser();
+      this.mLastModifiedTime = metaDataHandler.getLastModifiedTime();
+      this.mLastModifiedUser = metaDataHandler.getLastModifiedUser();
+    }
     this.copyFactor(fromMetaData.getDDF());
   }
 
@@ -131,4 +147,59 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
     public int getColumnIndex();
   }
 
+  public void setDataSourceDescriptor(DataSourceDescriptor dataSource) {
+    this.mDataSourceDescriptor = dataSource;
+  }
+
+  public DataSourceDescriptor getDataSourceDescriptor() {
+    return this.mDataSourceDescriptor;
+  }
+
+  public void setLastRefreshTime(Date time) {
+    this.mLastRefreshTime = time;
+  }
+
+  public Date getLastRefreshTime() {
+    return this.mLastRefreshTime;
+  }
+
+  public void setLastRefreshUser(String user) {
+    this.mLastRefreshUser = user;
+  }
+
+  public String getLastRefreshUser() {
+    return this.mLastRefreshUser;
+  }
+
+  public void setLastModifiedTime(Date time) {
+    this.mLastModifiedTime = time;
+  }
+
+  public Date getLastModifiedTime() {
+    return this.mLastModifiedTime;
+  }
+
+  public void setLastModifiedUser(String user) {
+    this.mLastModifiedUser = user;
+  }
+
+  public String getLastModifiedUser() {
+    return this.mLastModifiedUser;
+  }
+
+  public void setLastPersistedTime(Date time) {
+    this.mLastPersistedTime = time;
+  }
+
+  public Date getLastPersistedTime() {
+    return this.mLastPersistedTime;
+  }
+
+  public void setSnapshotDescriptor(DataSourceDescriptor snapshot) {
+    this.mSnapshotDescriptor = snapshot;
+  }
+
+  public DataSourceDescriptor getSnapshotDescriptor() {
+    return this.mSnapshotDescriptor;
+  }
 }
