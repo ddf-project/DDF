@@ -33,10 +33,21 @@ public class TableNameReplacer extends TableVisitor {
     private DDFManager mDDFManager = null;
     // DDF uri to table name mapping.
     private Map<String, String> mUri2Tbl = new HashMap<String, String>();
+    // The mapping from ddf view to new table name.It contains the following
+    // situation: (1) If only the view is referred, select ddfview. a from
+    // ddfview, it should be converted into select tmp.a from (query) tmp. So
+    // that we should remeber the view from ddfview->tmp. (2) If it self
+    // contains the alias, select alias.a from ddfview alias, then it should
+    // be converted to select alias.a from (query) alias, then as we already
+    // remember the alias, we only replace ddfview -> (ddfview).
+    private Map<String, String> mViewMapping = new HashMap<String, String>();
+
     public Map<String, List<Table>> mUri2TblObj
             = new HashMap<String, List<Table>>();
     public Boolean containsLocalTable = false;
     public String fromEngineName = null;
+
+
 
     String possibleLetter = "abcdefghijklmnopqrstuvwxyz0123456789";
     String possibleStart = "abcdefghijklmnopqrstuvwxyz";
@@ -228,7 +239,12 @@ public class TableNameReplacer extends TableVisitor {
      * @return The local tablename.
      */
     void handleDDFURI(String ddfuri, Table table) throws Exception {
-        DDF ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(ddfuri);
+        DDF ddf = null;
+        if (this.mDDFManager.getDDFCoordinator() != null) {
+            ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(ddfuri);
+        } else {
+            ddf = this.mDDFManager.getDDFByURI(ddfuri);
+        }
         this.handleDDFUUID(ddf.getUUID().toString(), table);
     }
 
@@ -249,6 +265,11 @@ public class TableNameReplacer extends TableVisitor {
                     "trying spark");
             engineName = "spark";
         }
+
+        this.mDDFManager.log("In handleDDFUUid, enginename is : " + engineName);
+        this.mDDFManager.log("In handleDDFUUid, this manager name is : " +
+                this.mDDFManager.getEngineName());
+
         if (engineName == null
            || engineName.equals(this.mDDFManager.getEngineName())) {
             // It's in the same engine.
@@ -264,8 +285,12 @@ public class TableNameReplacer extends TableVisitor {
             containsLocalTable = true;
             // TODO(fanj) : Temporary fix for ddf.
             if (ddf.getIsDDFView()) {
-                table.setName("(" + ddf.getTableName() + ") AS " + this
-                        .genTableName(8));
+                if (table.getAlias() != null) {
+                    table.setName("(" + ddf.getTableName() + ")");
+                } else {
+                    table.setName("(" + ddf.getTableName() + ") "
+                            + this.genTableName(8));
+                }
             } else {
                 table.setName(ddf.getTableName());
             }

@@ -183,6 +183,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public void addDDF(DDF ddf) throws DDFException {
     mDDFCache.addDDF(ddf);
+    if (this.mDDFCoordinator != null) {
+      mDDFCoordinator.setUuid2DDFManager(ddf.getUUID(), this);
+    }
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
@@ -213,7 +216,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     if (mDDFCoordinator != null) {
       mDDFCoordinator.setURI2DDFManager("ddf://" + ddf.getNamespace() + "/" +
               name, this);
-      mDDFCoordinator.setUuid2DDFManager(ddf.getUUID(), this);
     }
   }
 

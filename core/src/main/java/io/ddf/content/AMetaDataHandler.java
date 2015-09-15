@@ -6,10 +6,12 @@ package io.ddf.content;
 
 import com.google.common.base.Strings;
 import io.ddf.DDF;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
@@ -41,7 +43,7 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
    *
    * @return row count of a DDF
    */
-  protected abstract long getNumRowsImpl() throws DDFException;
+  // protected abstract long getNumRowsImpl() throws DDFException;
 
   /**
    * Called to assert that the row count needs to be recomputed at next access
@@ -58,6 +60,19 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
       //      bNumRowsIsValid = true;
     }
     return mNumRows;
+  }
+
+  protected long getNumRowsImpl() throws DDFException {
+    this.mLog.debug("get NumRows Impl called");
+    try {
+      String sqlcmd = "SELECT COUNT(*) FROM {1}";
+      List<String> rs = this.getManager().sql(sqlcmd,
+              new SQLDataSourceDescriptor(sqlcmd, null, null, null, this
+                      .getDDF().getUUID().toString())).getRows();
+      return Long.parseLong(rs.get(0));
+    } catch (Exception e) {
+      throw new DDFException("Error getting NRow", e);
+    }
   }
 
   @Override

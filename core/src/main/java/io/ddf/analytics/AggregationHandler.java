@@ -4,6 +4,7 @@ package io.ddf.analytics;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import io.ddf.DDF;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.types.AggregateTypes.AggregateField;
@@ -125,7 +126,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
   public DDF agg(List<String> aggregateFunctions) throws DDFException {
 
     if (mGroupedColumns.size() > 0) {
-      String tableName = this.getDDF().getTableName();
+      // String tableName = this.getDDF().getTableName();
 
       String groupedColSql = Joiner.on(",").join(mGroupedColumns);
 
@@ -134,17 +135,23 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
         selectFuncSql += "," + convertAggregateFunctionsToSql(aggregateFunctions.get(i));
       }
 
-      String sqlCmd = String.format("SELECT %s , %s FROM %s GROUP BY %s", selectFuncSql, groupedColSql, tableName,
-          groupedColSql);
+      String sqlCmd = String.format("SELECT %s , %s FROM %s GROUP BY %s",
+                                    selectFuncSql,
+                                    groupedColSql,
+                                    "{1}",
+                                    groupedColSql);
       mLog.info("SQL Command: " + sqlCmd);
 
       try {
-        DDF resultDDF = this.getManager().sql2ddf(sqlCmd, this.getEngine());
+        DDF resultDDF = this.getManager().sql2ddf(sqlCmd,
+                        new SQLDataSourceDescriptor(sqlCmd,
+                        null, null,null, this.getDDF().getUUID().toString()));
         return resultDDF;
 
       } catch (Exception e) {
         e.printStackTrace();
-        throw new DDFException("Unable to query from " + tableName, e);
+        throw new DDFException("Unable to query from " + this.getDDF().getTableName(),
+                e);
       }
 
     } else {
