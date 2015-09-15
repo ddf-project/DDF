@@ -285,16 +285,20 @@ public class TableNameReplacer extends TableVisitor {
             containsLocalTable = true;
             // TODO(fanj) : Temporary fix for ddf.
             if (ddf.getIsDDFView()) {
-                if (table.getAlias() != null) {
-                    table.setName("(" + ddf.getTableName() + ")");
+                String tableName = null;
+                if (mViewMapping.containsKey(uuid)) {
+                    tableName = mViewMapping.get(uuid);
+                } else if (table.getAlias() != null) {
+                    tableName = "(" + ddf.getTableName() + ")";
                 } else {
-                    table.setName("(" + ddf.getTableName() + ") "
-                            + this.genTableName(8));
+                    tableName = "(" + ddf.getTableName() + ") "
+                            + this.genTableName(8);
+                    mViewMapping.put(uuid, tableName);
                 }
+                table.setName(tableName);
             } else {
                 table.setName(ddf.getTableName());
             }
-
         } else {
             // The ddf is from another engine.
             if (!this.mUri2TblObj.containsKey(uuid)) {
