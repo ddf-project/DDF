@@ -5,6 +5,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.types.IGloballyAddressable;
 
 import java.util.Collection;
+import java.util.UUID;
 
 
 /**
@@ -30,13 +31,19 @@ public interface IDDFManager {
   public interface IGloballyAddressableObjectRegistry {
     boolean contains(String namespace, String name);
 
+    boolean contains(UUID uuid);
+
     IGloballyAddressable retrieve(String namespace, String name);
+
+    IGloballyAddressable retrieve(UUID uuid);
 
     void register(IGloballyAddressable obj);
 
     void register(IGloballyAddressable obj, String namespace, String name);
 
     void unregister(String namespace, String name);
+
+    void unregister(UUID uuid);
 
     void unregister(IGloballyAddressable obj);
 

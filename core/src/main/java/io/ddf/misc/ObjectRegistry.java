@@ -7,7 +7,9 @@ import io.ddf.types.IGloballyAddressable;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Convenience class to hold a global registry of all registered objects in our system. TODO: Provide some kind of
@@ -16,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ObjectRegistry implements IGloballyAddressableObjectRegistry {
   private final Map<String, IGloballyAddressable> mRegistryMap = new ConcurrentHashMap<String, IGloballyAddressable>();
 
+  private final Map<UUID, IGloballyAddressable> uuidRegistryMap = new ConcurrentHashMap<UUID, IGloballyAddressable>() ;
 
   private String getKeyFor(IGloballyAddressable obj) {
     if (obj == null) return "null";
@@ -47,26 +50,46 @@ public class ObjectRegistry implements IGloballyAddressableObjectRegistry {
   @Override
   public void unregister(IGloballyAddressable obj) {
     mRegistryMap.remove(this.getKeyFor(obj));
+    uuidRegistryMap.remove(obj.getUUID());
   }
 
   @Override
   public void unregister(String namespace, String name) {
-    mRegistryMap.remove(this.getKeyFor(namespace, name));
+    IGloballyAddressable obj = this.retrieve(namespace, name);
+    this.unregister(obj);
+  }
+
+  @Override
+  public void unregister(UUID uuid) {
+    IGloballyAddressable obj = this.retrieve(uuid);
+    this.unregister(obj);
+  }
+
+  @Override
+  public IGloballyAddressable retrieve(UUID uuid) {
+    return uuidRegistryMap.get(uuid);
   }
 
   @Override
   public void register(IGloballyAddressable obj) {
     mRegistryMap.put(this.getKeyFor(obj), obj);
+    uuidRegistryMap.put(obj.getUUID(), obj);
   }
 
   @Override
   public void register(IGloballyAddressable obj, String namespace, String name) {
     mRegistryMap.put(this.getKeyFor(obj, namespace, name), obj);
+    uuidRegistryMap.put(obj.getUUID(), obj);
   }
 
   @Override
   public boolean contains(String namespace, String name) {
     return mRegistryMap.containsKey(this.getKeyFor(namespace, name));
+  }
+
+  @Override
+  public boolean contains(UUID uuid) {
+    return uuidRegistryMap.containsKey(uuid);
   }
 
   @Override
