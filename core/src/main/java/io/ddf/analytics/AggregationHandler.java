@@ -136,8 +136,10 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
       }
 
       String sqlCmd = String.format("SELECT %s , %s FROM %s GROUP BY %s",
-              selectFuncSql, groupedColSql, "{1}",
-          groupedColSql);
+                                    selectFuncSql,
+                                    groupedColSql,
+                                    "{1}",
+                                    groupedColSql);
       mLog.info("SQL Command: " + sqlCmd);
 
       try {

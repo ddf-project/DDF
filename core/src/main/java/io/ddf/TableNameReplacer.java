@@ -229,7 +229,7 @@ public class TableNameReplacer extends TableVisitor {
      */
     void handleDDFURI(String ddfuri, Table table) throws Exception {
         DDF ddf = null;
-        if (this.mDDFManager.getDDFCoordinator() == null) {
+        if (this.mDDFManager.getDDFCoordinator() != null) {
             ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(ddfuri);
         } else {
             ddf = this.mDDFManager.getDDFByURI(ddfuri);
