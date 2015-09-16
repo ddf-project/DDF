@@ -3,7 +3,7 @@ package io.ddf;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
-
+import io.ddf.DDFManager.EngineType;
 import java.util.*;
 
 /**
@@ -172,7 +172,7 @@ public class DDFCoordinator {
         }
 
         manager.setEngineName(engineName);
-        manager.setEngineType(engineType);
+        manager.setEngineType(EngineType.fromString(engineType));
         manager.setDDFCoordinator(this);
         mDDFManagerList.add(manager);
         mName2DDFManager.put(engineName, manager);
