@@ -87,11 +87,23 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     public String getTypeName() {
       return this.typeName;
     }
+
+    public static EngineType fromString(String str) throws DDFException {
+      if(str.equals("spark")) {
+        return ENGINE_SPARK;
+      } else if (str.equals("jdbc")) {
+        return ENGINE_JDBC;
+      } else if(str.equals("sfdc")) {
+        return ENGINE_SFDC;
+      } else {
+        throw new DDFException("Engine type should be either spark, jdbc or sfdc");
+      }
+    }
   }
 
   // The engine name, should be unique.
   private String engineName;
-  private String engineType;
+  private EngineType engineType;
   // DataSourceDescriptor.
   private DataSourceDescriptor mDataSourceDescriptor;
   // DDFCoordinator.
@@ -108,11 +120,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     this.engineName = engineName;
   }
 
-  public String getEngineType() {
+  public EngineType getEngineType() {
     return engineType;
   }
 
-  public void setEngineType(String engineType) {
+  public void setEngineType(EngineType engineType) {
     this.engineType = engineType;
   }
 
