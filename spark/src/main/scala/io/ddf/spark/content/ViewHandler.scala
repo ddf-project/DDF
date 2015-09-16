@@ -53,6 +53,12 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
 
   val MAX_SAMPLE_SIZE = 1000000;
 
+  override  def getRandomSampleByNum(numSamples: Int, withReplacement: Boolean,
+    seed:
+  Int): DDF = {
+    null.asInstanceOf[DDF]
+  }
+
   override def getRandomSample(numSamples: Int, withReplacement: Boolean, seed: Int): java.util.List[Array[Object]] = {
     if (numSamples > MAX_SAMPLE_SIZE) {
       throw new IllegalArgumentException("Number of samples is currently limited to %d".format(MAX_SAMPLE_SIZE))
