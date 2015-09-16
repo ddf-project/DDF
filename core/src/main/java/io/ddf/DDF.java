@@ -360,6 +360,10 @@ public abstract class DDF extends ALoggable //
     return this.getManager().getEngine();
   }
 
+  public DDFManager.EngineType getEngineType() {
+    return this.getManager().getEngineType();
+  }
+
   // ////// MetaData that deserves to be right here at the top level ////////
 
   public Schema getSchema() {
