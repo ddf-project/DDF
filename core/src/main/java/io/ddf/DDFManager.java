@@ -77,7 +77,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public enum  EngineType {
     ENGINE_SPARK("spark"),
     ENGINE_JDBC("jdbc"),
-    ENGINE_SFDC("sfdc");
+    ENGINE_SFDC("sfdc"),
+    ENGINE_POSTGRES("postgres");
 
     private final String typeName;
     EngineType(String typeName) {
@@ -95,6 +96,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
         return ENGINE_JDBC;
       } else if(str.equals("sfdc")) {
         return ENGINE_SFDC;
+      } else if(str.equals("postgres")) {
+        return ENGINE_POSTGRES;
       } else {
         throw new DDFException("Engine type should be either spark, jdbc or sfdc");
       }
