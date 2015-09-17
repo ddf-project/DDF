@@ -646,6 +646,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    */
   public abstract DDF loadTable(String fileURL, String fieldSeparator) throws DDFException;
 
+  public DDF restoreDDF(UUID uuid) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
   /**
    * @brief Restore the ddf given uri.
    * @param ddfURI The URI of ddf.
