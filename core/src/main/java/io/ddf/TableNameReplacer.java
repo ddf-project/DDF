@@ -245,6 +245,10 @@ public class TableNameReplacer extends TableVisitor {
         } else {
             ddf = this.mDDFManager.getDDFByURI(ddfuri);
         }
+        if (ddf == null) {
+            this.mDDFManager.log("ddf is null when ddfuri is: " + ddfuri);
+            this.mDDFManager.log("enginename is : " + this.mDDFManager.getEngineName());
+        }
         this.handleDDFUUID(ddf.getUUID().toString(), table);
     }
 
