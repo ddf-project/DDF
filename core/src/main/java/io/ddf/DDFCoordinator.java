@@ -32,6 +32,12 @@ public class DDFCoordinator {
         return mDefaultEngine;
     }
 
+    public void restoreEngines() {}
+
+    public DDFCoordinator() {
+        this.restoreEngines();
+    }
+
     public void rmEngine(String engineName) throws DDFException {
         if (!mName2DDFManager.containsKey(engineName)) {
             throw new DDFException("There is no engine with engine name : " +
