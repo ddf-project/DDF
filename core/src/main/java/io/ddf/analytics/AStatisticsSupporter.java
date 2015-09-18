@@ -4,6 +4,7 @@ package io.ddf.analytics;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
+import io.ddf.DDFManager;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
@@ -58,10 +59,23 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       // each value can be a NULL
       // a fivenumsummary of an Double/Float column is in the format "min \t max \t[1st_quantile, median, 3rd_quantile]"
       // or "min \t max \t null"s
-      String[] rs = this.getDDF()
-          .sql(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).getRows().get(0)
-          .replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t| ");
+      String [] rs = new String[5];
+      if (this.getDDF().getEngineType().equals(DDFManager.EngineType
+              .ENGINE_SPARK)) {
+        rs = this.getDDF().sql(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).getRows().get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t| ");
+      } else {
+        String[] percentiles = {"0.0", "1.0", "0.25", "0.5", "0.75"};
+        String sql = "select percentile_DISC(%s) within group (order by " +
+                columnNames.get(0) + ") over() from (" + this.getDDF()
+                .getTableName() + ") TMP_FIVENUM";
+        for (int i = 0; i < percentiles.length; ++i) {
+          String query = String.format(sql, percentiles[i]);
 
+          rs[i] = this.getDDF().getManager().sql(query, this.getDDF()
+                  .getEngineType().toString()).getRows().get(0);
+
+        }
+      }
 
       int k = 0;
       for (int i = 0; i < columnNames.size(); i++) {
