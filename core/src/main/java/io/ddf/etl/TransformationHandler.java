@@ -101,7 +101,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return flattenDDF(null);
   }
 
-  public DDF transformUDFtransformUDF(String RExprs, List<String> columns)
+  public DDF transformUDF(String RExprs, List<String> columns)
           throws DDFException {
     List<String> expressions = Arrays.asList(RExprs);
     return this.transformUDF(expressions, columns);
