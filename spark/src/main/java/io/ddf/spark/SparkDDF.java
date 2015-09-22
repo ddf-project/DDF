@@ -25,45 +25,32 @@ public class SparkDDF extends DDF {
 
   private static final long serialVersionUID = 7466377156065874568L;
 
-  public SparkDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-                  UUID engineUUID, String namespace, String name, Schema
-                          schema)
-          throws DDFException {
-    super(manager);
-    this.initialize(manager, data, typeSpecs, engineUUID,
-            namespace, name,
-            schema);
-  }
-
-
   //  TODO: For backup compatiblity.
   public SparkDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String namespace, String name, Schema schema)
       throws DDFException {
     super(manager);
-    this.initialize(manager, data, typeSpecs, manager.getUUID(),
+    this.initialize(manager, data, typeSpecs,
             namespace, name,
             schema);
   }
 
 
   public <T> SparkDDF(DDFManager manager, RDD<?> rdd, Class<T> unitType,
-                      UUID engineUUID, String namespace, String name, Schema
+                       String namespace, String name, Schema
                               schema)
       throws DDFException {
 
     super(manager);
     if (rdd == null) throw new DDFException("Non-null RDD is required to instantiate a new SparkDDF");
-    this.initialize(manager, rdd, new Class<?>[] { RDD.class, unitType },
-        engineUUID, namespace, name, schema);
+    this.initialize(manager, rdd, new Class<?>[] { RDD.class, unitType }, namespace, name, schema);
   }
 
-  public SparkDDF(DDFManager manager, DataFrame rdd, UUID engineUUID, String
+  public SparkDDF(DDFManager manager, DataFrame rdd, String
                   namespace, String name) throws DDFException {
     super(manager);
     if (rdd == null) throw new DDFException("Non-null RDD is required to instantiate a new SparkDDF");
     Schema schema = SparkUtils.schemaFromDataFrame(rdd);
     this.initialize(manager, rdd, new Class<?>[] { DataFrame.class },
-        engineUUID,
             namespace, name, schema);
   }
   /**

@@ -102,6 +102,6 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
     DataFrame newRDD = rdd1.unionAll(rdd2);
     Schema schema = SparkUtils.schemaFromDataFrame(newRDD);
     return this.getManager().newDDF(newRDD, new Class<?>[]{DataFrame.class},
-            null, null, null, schema);
+             null, null, schema);
   }
 }

@@ -30,7 +30,7 @@ public class BasicDDFTests {
     String name = this.getClass().getSimpleName();
     Schema schema = new Schema(name, "name string, value string");
     DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[]
-            .class, this.getDDFManager().getUUID(), namespace, name, schema);
+            .class, namespace, name, schema);
     return ddf;
   }
 

@@ -327,26 +327,22 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-                    UUID engineUUID, String namespace, String name, Schema
+      String namespace, String name, Schema
                               schema)
           throws DDFException {
-    DDF ddf = super.newDDF(manager, data, typeSpecs, engineUUID, namespace,
+    DDF ddf = super.newDDF(manager, data, typeSpecs, namespace,
             name, schema);
-    if(ddf instanceof SparkDDF) {
-      ((SparkDDF) ddf).saveAsTable();
-    }
+    ((SparkDDF) ddf).saveAsTable();
     return ddf;
   }
 
   @Override
-  public DDF newDDF(Object data, Class<?>[] typeSpecs, UUID engineUUID,
+  public DDF newDDF(Object data, Class<?>[] typeSpecs,
                     String namespace, String name, Schema schema)
           throws DDFException {
-    DDF ddf = super.newDDF(data, typeSpecs, engineUUID, namespace, name,
+    DDF ddf = super.newDDF(data, typeSpecs, namespace, name,
             schema);
-    if(ddf instanceof SparkDDF) {
-      ((SparkDDF) ddf).saveAsTable();
-    }
+    ((SparkDDF) ddf).saveAsTable();
     return ddf;
   }
 

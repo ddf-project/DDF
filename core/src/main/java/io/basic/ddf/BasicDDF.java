@@ -32,16 +32,16 @@ public class BasicDDF extends DDF {
   @Expose private List<?> mData; // only needed during serialization
   @Expose private String mUnitTypeName; // only needed during serialization
 
-  public BasicDDF(List<?> rows, Class<?> unitType, UUID engineUUID, String
+  public BasicDDF(List<?> rows, Class<?> unitType, String
           namespace, String name, Schema schema) throws DDFException {
-    this((DDFManager) null, (List<?>) rows, unitType, engineUUID, namespace,
+    this((DDFManager) null, (List<?>) rows, unitType, namespace,
             name,
             schema);
     if (rows != null) mUnitType = unitType;
   }
 
   public BasicDDF(DDFManager manager, List<?> rows, Class<?> unitType,
-                  UUID engineUUID, String namespace, String name, Schema
+      String namespace, String name, Schema
                           schema)
       throws DDFException {
 
@@ -49,7 +49,7 @@ public class BasicDDF extends DDF {
     if (rows == null) throw new DDFException("Non-null rows List is required to instantiate a new BasicDDF");
     mUnitType = unitType;
     this.initialize(manager, rows, new Class[] { List.class, unitType },
-        engineUUID, namespace, name, schema);
+         namespace, name, schema);
   }
 
   /**
@@ -65,14 +65,14 @@ public class BasicDDF extends DDF {
    * @throws DDFException
    */
   public BasicDDF(DDFManager manager, Object rows, Class<?>[] typeSpecs,
-                  UUID engineUUID, String namespace, String name, Schema
+                  String namespace, String name, Schema
                           schema)
       throws DDFException {
 
     super(manager, sDummyBasicDDFManager);
     if (rows == null) throw new DDFException("Non-null rows Object is required to instantiate a new BasicDDF");
     mUnitType = (typeSpecs != null && typeSpecs.length > 0) ? typeSpecs[1] : null;
-    this.initialize(manager, rows, typeSpecs, engineUUID, namespace, name,
+    this.initialize(manager, rows, typeSpecs, namespace, name,
             schema);
   }
 

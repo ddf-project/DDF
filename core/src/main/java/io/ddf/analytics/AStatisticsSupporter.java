@@ -20,7 +20,6 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     super(theDDF);
   }
 
-
   private Summary[] basicStats;
 
   private SimpleSummary[] simpleSummary;

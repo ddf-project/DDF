@@ -32,8 +32,7 @@ public class BasicDDFManager extends DDFManager {
   }
 
 
-  public <T> DDF newDDF(List<T> rows, Class<T> unitType, UUID
-          engineUUID, String namespace, String name, Schema schema)
+  public <T> DDF newDDF(List<T> rows, Class<T> unitType, String namespace, String name, Schema schema)
       throws DDFException {
 
     if (rows == null || rows.isEmpty()) {
@@ -41,7 +40,7 @@ public class BasicDDFManager extends DDFManager {
     }
 
     return this.newDDF(this, rows, new Class[] { List.class, unitType },
-        engineUUID, namespace, name, schema);
+         namespace, name, schema);
   }
 
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
