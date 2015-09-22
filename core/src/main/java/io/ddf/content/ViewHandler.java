@@ -251,7 +251,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
         case le:
           return String.format("(%s <= %s)", operands[0].toSql(), operands[1].toSql());
         case eq:
-          return String.format("(%s == %s)", operands[0].toSql(), operands[1].toSql());
+          return String.format("(%s = %s)", operands[0].toSql(), operands[1].toSql());
         case ne:
           return String.format("(%s != %s)", operands[0].toSql(), operands[1].toSql());
         case and:
