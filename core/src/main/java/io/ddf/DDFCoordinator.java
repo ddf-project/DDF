@@ -1,5 +1,6 @@
 package io.ddf;
 
+import com.google.common.base.Strings;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
@@ -34,9 +35,7 @@ public class DDFCoordinator {
 
     public void restoreEngines() {}
 
-    public DDFCoordinator() {
-        this.restoreEngines();
-    }
+    public DDFCoordinator() {}
 
     public void rmEngine(String engineName) throws DDFException {
         if (!mName2DDFManager.containsKey(engineName)) {
@@ -152,6 +151,10 @@ public class DDFCoordinator {
         throw new DDFException("Can't find ddf with uri: " + uri);
     }
 
+    public DDFManager initEngine(String engineName, String engineType) throws DDFException {
+        return this.initEngine(engineName, engineType, null);
+    }
+
     /**
      * @brief Init an engine.
      * @param engineName The unique name of the engine.
@@ -163,7 +166,7 @@ public class DDFCoordinator {
     public DDFManager initEngine(String engineName, String engineType,
                                  DataSourceDescriptor dataSourceDescriptor)
             throws DDFException {
-        if (engineName == null) {
+        if (Strings.isNullOrEmpty(engineName)) {
             throw new DDFException("Please input engine name");
         }
         if (mName2DDFManager.get(engineName) != null) {
@@ -171,7 +174,10 @@ public class DDFCoordinator {
                     engineName);
         }
 
-        DDFManager manager = DDFManager.get(engineType, dataSourceDescriptor);
+        DDFManager manager = (null != dataSourceDescriptor)
+                             ? DDFManager.get(engineType, dataSourceDescriptor)
+                             : DDFManager.get(engineType);
+
         if (manager == null) {
             throw new DDFException("Error int get the DDFManager for engine :" +
                     engineName);
