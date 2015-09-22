@@ -88,7 +88,7 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       schema.setTableName(mDDF.getSchemaHandler.newTableName())
       val manager = this.getManager
       val sampleDDF = manager.newDDF(manager, sample_df, Array
-        (classOf[DataFrame]), manager.getEngineName, manager.getNamespace,
+        (classOf[DataFrame]), manager.getUUID, manager.getNamespace,
         null, schema)
       mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
       sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)

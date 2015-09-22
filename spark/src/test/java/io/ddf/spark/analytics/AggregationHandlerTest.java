@@ -38,23 +38,23 @@ public class AggregationHandlerTest extends BaseTest {
     Assert.assertEquals(5, ddf.VIEWS.head(5).size());
   }
 
-  @Test
-  public void testGroupBy() throws DDFException {
-    List<String> l1 = Arrays.asList("year", "month");
-    List<String> l2 = Arrays.asList("m=avg(depdelay)");
-    List<String> l3 = Arrays.asList("m= stddev(arrdelay)");
-
-    Assert.assertEquals(13, ddf.groupBy(l1, l2).getNumRows());
-    Assert.assertTrue(ddf.groupBy(Arrays.asList("dayofweek"), l3).getNumRows() > 0);
-
-    Assert.assertEquals(13, ddf.groupBy(l1).agg(l2).getNumRows());
-    Assert.assertTrue(ddf.groupBy(Arrays.asList("dayofweek")).agg(l3).getNumRows() > 0);
-
-    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics = count(*)")).getNumRows() > 0);
-    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics = count(1)")).getNumRows() > 0);
-    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=count(dayofweek )")).getNumRows() > 0);
-    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=avg(arrdelay )")).getNumRows() > 0);
-  }
+//  @Ignore
+//  public void testGroupBy() throws DDFException {
+//    List<String> l1 = Arrays.asList("year", "month");
+//    List<String> l2 = Arrays.asList("m=avg(depdelay)");
+//    List<String> l3 = Arrays.asList("m= stddev(arrdelay)");
+//
+//    Assert.assertEquals(13, ddf.groupBy(l1, l2).getNumRows());
+//    Assert.assertTrue(ddf.groupBy(Arrays.asList("dayofweek"), l3).getNumRows() > 0);
+//
+//    Assert.assertEquals(13, ddf.groupBy(l1).agg(l2).getNumRows());
+//    Assert.assertTrue(ddf.groupBy(Arrays.asList("dayofweek")).agg(l3).getNumRows() > 0);
+//
+//    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics = count(*)")).getNumRows() > 0);
+//    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics = count(1)")).getNumRows() > 0);
+//    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=count(dayofweek )")).getNumRows() > 0);
+//    Assert.assertTrue(ddf.groupBy(Arrays.asList("origin")).agg(Arrays.asList("metrics=avg(arrdelay )")).getNumRows() > 0);
+//  }
 
 
 }

@@ -3,6 +3,8 @@ package io.ddf.types;
 
 import io.ddf.exception.DDFException;
 
+import java.util.UUID;
+
 /**
  * Interface for objects that are globally addressable by namespace and name
  */
@@ -16,8 +18,4 @@ public interface IGloballyAddressable {
   String getUri();
 
   String getGlobalObjectType();
-
-  String getEngineName();
-
-  void setEngineName(String engineName);
 }

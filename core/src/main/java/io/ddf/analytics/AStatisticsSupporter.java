@@ -61,7 +61,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
       // or "min \t max \t null"s
       String [] rs = new String[5];
       if (this.getDDF().getEngineType().equals(DDFManager.EngineType
-              .ENGINE_SPARK)) {
+              .SPARK)) {
         rs = this.getDDF().sql(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).getRows().get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t| ");
       } else {
         String[] percentiles = {"0.0", "1.0", "0.25", "0.5", "0.75"};
