@@ -6,6 +6,7 @@ import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.DDFManager.EngineType;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
 
 /**
@@ -15,15 +16,15 @@ public class DDFCoordinator {
   // The ddfmangers.
   private List<DDFManager> mDDFManagerList = new ArrayList<DDFManager>();
   // The mapping from engine name to ddfmanager.
-  private Map<UUID, DDFManager> mDDFUuid2DDFManager = new HashMap<UUID, DDFManager>();
-  private Map<String, DDFManager> mURI2DDFManager = new HashMap<String, DDFManager>();
-  private Map<UUID, DDFManager> mUUID2DDFManager = new HashMap<UUID, DDFManager>();
+  private Map<UUID, DDFManager> mDDFUuid2DDFManager = new ConcurrentHashMap<UUID, DDFManager>();
+  private Map<String, DDFManager> mURI2DDFManager = new ConcurrentHashMap<String, DDFManager>();
+  private Map<UUID, DDFManager> mUUID2DDFManager = new ConcurrentHashMap<UUID, DDFManager>();
   // The default engine.
-  private UUID mDefaultEngine;
+  private DDFManager mDefaultEngine;
   private String mComputeEngine;
 
 
-  public UUID getDefaultEngine() {
+  public DDFManager getDefaultEngine() {
     return mDefaultEngine;
   }
 
@@ -70,24 +71,17 @@ public class DDFCoordinator {
     return manager;
   }
 
-  public void setDefaultEngine(UUID defaultEngine) {
+  public void setDefaultEngine(DDFManager defaultEngine) {
     this.mDefaultEngine = defaultEngine;
   }
 
-  public String getComputeEngine() {
-    return mComputeEngine;
-  }
-
-  public void setComputeEngine(String computeEngine) {
-    mComputeEngine = computeEngine;
+  public void addComputeEngine(DDFManager manager) {
+    this.mDDFManagerList.add(manager);
+    this.mUUID2DDFManager.put(manager.getUUID(), manager);
   }
 
   public List<DDFManager> getDDFManagerList() {
     return mDDFManagerList;
-  }
-
-  public void setDDFManagerList(List<DDFManager> mDDFManagerList) {
-    this.mDDFManagerList = mDDFManagerList;
   }
 
   public List<UUID> showEngines() {
@@ -135,8 +129,6 @@ public class DDFCoordinator {
    * @brief Init an engine.
    */
   public DDFManager initEngine(EngineType engineType, DataSourceDescriptor dataSourceDescriptor) throws DDFException {
-
-
     DDFManager manager = DDFManager.get(engineType, dataSourceDescriptor);
     if (manager == null) {
       throw new DDFException("Error int get the DDFManager for engine :" + engineType);
@@ -208,7 +200,7 @@ public class DDFCoordinator {
       throw new DDFException(
           "No default engine specified, please " + "specify the default engine or pass the engine name");
     }
-    return this.sqlX(sqlcmd, this.getDefaultEngine());
+    return this.sqlX(sqlcmd, this.getDefaultEngine().getUUID());
   }
 
   /**
@@ -227,7 +219,7 @@ public class DDFCoordinator {
       throw new DDFException(
           "No default engine specified, please " + "specify the default engine or pass the engine name");
     }
-    return this.sql2ddf(sqlcmd, this.getDefaultEngine());
+    return this.sql2ddf(sqlcmd, this.getDefaultEngine().getUUID());
   }
 
   public DDF sql2ddfX(String sqlcmd, UUID engineUUID) throws DDFException {

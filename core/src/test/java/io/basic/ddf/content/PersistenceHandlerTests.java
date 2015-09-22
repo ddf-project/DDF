@@ -25,7 +25,7 @@ public class PersistenceHandlerTests {
 
   @Test
   public void testPersistenceDir() throws IOException, DDFException {
-    DDFManager manager = DDFManager.get("basic");
+    DDFManager manager = DDFManager.get(DDFManager.EngineType.BASIC);
     DDF ddf = manager.newDDF();
 
     List<String> namespaces = ddf.getPersistenceHandler().listNamespaces();
@@ -39,7 +39,7 @@ public class PersistenceHandlerTests {
 
   @Ignore
   public void testPersistDDF() throws Exception {
-    DDFManager manager = DDFManager.get("basic");
+    DDFManager manager = DDFManager.get(DDFManager.EngineType.BASIC);
     DDF ddf = manager.newDDF();
 
     PersistenceUri uri = ddf.persist();

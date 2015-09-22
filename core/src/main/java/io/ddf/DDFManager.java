@@ -83,17 +83,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     SFDC,
     POSTGRES,
     AWS,
-    REDSHIFT
+    REDSHIFT,
+    BASIC
     ;
-
-    //    private final String typeName;
-    //    EngineType(String typeName) {
-    //      this.typeName = typeName;
-    //    }
-    //
-    //    public String getTypeName() {
-    //      return this.typeName;
-    //    }
 
     public static EngineType fromString(String str) throws DDFException {
       if (str.equals("spark")) {
@@ -108,8 +100,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
         return AWS;
       } else if(str.equalsIgnoreCase("redshift")) {
         return REDSHIFT;
+      } else if(str.equalsIgnoreCase("basic")) {
+        return BASIC;
       } else {
-        throw new DDFException("Engine type should be either spark, jdbc or sfdc");
+        throw new DDFException("Engine type should be either spark, jdbc, postgres, aws, redshift, basic");
       }
     }
   }
@@ -302,16 +296,16 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @return
    * @throws Exception
    */
-  public static DDFManager get(String engineName) throws DDFException {
-    if (Strings.isNullOrEmpty(engineName)) {
-      engineName = ConfigConstant.ENGINE_NAME_DEFAULT.toString();
+  public static DDFManager get(EngineType engineType) throws DDFException {
+    if (engineType == null) {
+      engineType = EngineType.fromString(ConfigConstant.ENGINE_NAME_DEFAULT.toString());
     }
 
-    String className = Config.getValue(engineName, ConfigConstant.FIELD_DDF_MANAGER);
+    String className = Config.getValue(engineType.name(), ConfigConstant.FIELD_DDF_MANAGER);
     // if (Strings.isNullOrEmpty(className)) return null;
     if (Strings.isNullOrEmpty(className)) {
       throw new DDFException("ERROR: in jdbc ddfmanger, class name is " + className +
-          " when enginename is : " + engineName);
+          " when engineType is : " + engineType.name());
     }
 
     try {
@@ -330,7 +324,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       // throw new DDFException("Cannot get DDFManager for engine " + engineName, e);
       e.printStackTrace();
       throw new DDFException(
-          "Cannot get DDFManager for engine " + engineName + " classname " + className + " " + e.getMessage());
+          "Cannot get DDFManager for engine " + engineType.name() + " classname " + className + " " + e.getMessage());
 
     }
   }
@@ -611,7 +605,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public static IPersistible doLoad(PersistenceUri uri) throws DDFException {
     if (uri == null) throw new DDFException("URI cannot be null");
     if (Strings.isNullOrEmpty(uri.getEngine())) throw new DDFException("Engine/Protocol in URI cannot be missing");
-    return DDFManager.get(uri.getEngine()).load(uri);
+    return DDFManager.get(EngineType.fromString(uri.getEngine())).load(uri);
   }
 
   public IPersistible load(String namespace, String name) throws DDFException {

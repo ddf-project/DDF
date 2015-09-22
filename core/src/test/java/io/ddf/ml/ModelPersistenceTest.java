@@ -60,7 +60,7 @@ public class ModelPersistenceTest {
   public void testModelSerialize2DDF() throws DDFException {
     DummyModel dummyModel = new DummyModel(20, "dummymodel2");
     Model model = new Model(dummyModel);
-    DDFManager manager = DDFManager.get("basic");
+    DDFManager manager = DDFManager.get(DDFManager.EngineType.BASIC);
 
     DDF ddf = model.serialize2DDF(manager);
 

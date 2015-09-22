@@ -18,7 +18,7 @@ public class BasicDDFTests {
 
 
   private DDFManager getDDFManager() throws DDFException {
-    if (mManager == null) mManager = DDFManager.get("basic");
+    if (mManager == null) mManager = DDFManager.get(DDFManager.EngineType.BASIC);
     return mManager;
   }
 

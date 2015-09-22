@@ -73,7 +73,7 @@ public class Vector<T> implements Serializable {
   private void initialize(String name, T[] data, String engineName) throws DDFException {
     if (data == null || data.length == 0) throw new DDFException("Cannot initialize a null or zero-length Vector");
 
-    DDF newDDF = DDFManager.get(engineName) //
+    DDF newDDF = DDFManager.get(DDFManager.EngineType.fromString(engineName)) //
         .newDDF(null, (Object) data, new Class[] { Array.class, this.getParameterizedType() }, null /* namespace */, name, //
             new Schema(name, String.format("%s %s", name, this.getParameterizedType().getSimpleName())));
 
