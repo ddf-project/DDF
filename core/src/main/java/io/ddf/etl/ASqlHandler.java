@@ -147,7 +147,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
           } else {
             String selectString = statement.toString();
             DDF ddf = this.getManager().transferByTable(tableNameReplacer
-                    .fromEngineName, " (" + selectString + ") ");
+                    .fromEngine, " (" + selectString + ") ");
             return this.sql("select * from " + ddf.getTableName(), maxRows,
                     dataSource);
           }
@@ -221,7 +221,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
           } else {
               String selectString = statement.toString();
               DDF ddf = this.getManager().transferByTable(tableNameReplacer
-                      .fromEngineName, selectString);
+                      .fromEngine, selectString);
               return ddf;
           }
       }
