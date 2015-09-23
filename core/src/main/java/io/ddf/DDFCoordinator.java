@@ -150,6 +150,27 @@ public class DDFCoordinator extends ALoggable {
     return this.initEngine(engineType, null);
   }
 
+  public DDFManager initEngine(UUID engineUUID,
+                               EngineType engineType,
+                               DataSourceDescriptor dataSourceDescriptor)
+          throws DDFException {
+    DDFManager manager = (null != dataSourceDescriptor)
+                         ? DDFManager.get(engineType, dataSourceDescriptor)
+                         : DDFManager.get(engineType);
+    if (manager == null) {
+      throw new DDFException("Error int get the DDFManager for engine :" + engineType);
+    }
+    if (engineUUID != null) {
+      manager.setUUID(engineUUID);
+    }
+    manager.setEngineType(engineType);
+    manager.setDDFCoordinator(this);
+    mDDFManagerList.add(manager);
+    mUUID2DDFManager.put(manager.getUUID(), manager);
+    return manager;
+  }
+
+
   /**
    * @param engineType           The type of the engine.
    * @param dataSourceDescriptor DataSource.
@@ -158,18 +179,7 @@ public class DDFCoordinator extends ALoggable {
    * @brief Init an engine.
    */
   public DDFManager initEngine(EngineType engineType, DataSourceDescriptor dataSourceDescriptor) throws DDFException {
-    //DDFManager manager = DDFManager.get(engineType, dataSourceDescriptor);
-    DDFManager manager = (null != dataSourceDescriptor)
-                         ? DDFManager.get(engineType, dataSourceDescriptor)
-                         : DDFManager.get(engineType);
-    if (manager == null) {
-      throw new DDFException("Error int get the DDFManager for engine :" + engineType);
-    }
-    manager.setEngineType(engineType);
-    manager.setDDFCoordinator(this);
-    mDDFManagerList.add(manager);
-    mUUID2DDFManager.put(manager.getUUID(), manager);
-    return manager;
+    return this.initEngine(null, engineType, dataSourceDescriptor);
   }
 
   public int stopEngine(String engineName) {
