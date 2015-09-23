@@ -88,7 +88,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     ;
 
     public static EngineType fromString(String str) throws DDFException {
-      if (str.equals("spark")) {
+      if (str.equalsIgnoreCase("spark")) {
         return SPARK;
       } else if (str.equalsIgnoreCase("jdbc")) {
         return JDBC;
