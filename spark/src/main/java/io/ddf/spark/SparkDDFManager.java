@@ -79,7 +79,15 @@ public class SparkDDFManager extends DDFManager {
           throw new DDFException(e);
         }
       } else {
-        return this.load(dataSourceDescriptor);
+        JDBCDataSourceDescriptor loadDS
+                = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(),
+                                               jdbcDS.getCredentials(),
+                                               tableName);
+        mLog.info("load from JDBCDatasource, " + loadDS.getDataSourceUri()
+                .getUri().toString() + ", " + loadDS.getCredentials()
+                .getUsername() + ", " + loadDS.getCredentials().getPassword()
+                + ", " + loadDS.getDbTable());
+        return this.load(loadDS);
       }
       // TODO
       /*
@@ -116,7 +124,7 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
+    public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
     mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
     DDF fromDDF = fromManager.getDDFByURI(ddfuri);
@@ -358,12 +366,12 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-    return null;
+    return this.mDDFCache.getDDFByUri(ddfURI);
   }
 
   @Override
   public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-    return null;
+    return this.mDDFCache.getDDF(uuid);
   }
 
   /**

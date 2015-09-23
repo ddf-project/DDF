@@ -1,9 +1,11 @@
 package io.ddf.analytics;
 
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
+import io.ddf.DDFManager;
 import io.ddf.content.Schema.ColumnType;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
@@ -37,48 +39,80 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     return simpleSummary;
   }
 
-  @Override
-  public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException {
+  // This function does many things and thus violates the Do One Thing principle
+  // TODO: refactor the code to move the engine-specific computation to the corresponding ddf-on-x
+  @Override public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException {
     FiveNumSummary[] fivenums = new FiveNumSummary[columnNames.size()];
 
-    List<String> specs = Lists.newArrayList();
-    Set<String> stringColumns = new HashSet<String>();
+    List<String> numericColumns = new ArrayList<String>();
+
+    // Filter non-numeric columns
     for (String columnName : columnNames) {
-      String query = fiveNumFunction(columnName);
-      if (query != null && query.length() > 0) {
-        specs.add(query);
-      } else stringColumns.add(columnName);
+      if (ColumnType.isNumeric(this.getDDF().getColumn(columnName).getType())) {
+        numericColumns.add(columnName);
+      }
     }
 
-    String command = String.format("SELECT %s FROM %%s", StringUtils.join(specs.toArray(new String[0]), ','));
+    String[] rs = null;
 
-    if (!Strings.isNullOrEmpty(command)) {
-    mLog.info(">>>> command = " + command);
-      // a fivenumsummary of an Int/Long column is in the format "[min, max, 1st_quantile, median, 3rd_quantile]"
-      // each value can be a NULL
-      // a fivenumsummary of an Double/Float column is in the format "min \t max \t[1st_quantile, median, 3rd_quantile]"
-      // or "min \t max \t null"s
-      String[] rs = this.getDDF()
-          .sql(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).getRows().get(0)
-          .replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t| ");
+    if (numericColumns.size() > 0) {
 
-
-      int k = 0;
-      for (int i = 0; i < columnNames.size(); i++) {
-        if (stringColumns.contains(columnNames.get(i))) {
-          fivenums[i] = new FiveNumSummary(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
-        } else {
-          fivenums[i] = new FiveNumSummary(parseDouble(rs[5 * k]), parseDouble(rs[5 * k + 1]),
-              parseDouble(rs[5 * k + 2]),
-              parseDouble(rs[5 * k + 3]), parseDouble(rs[5 * k + 4]));
-          k++;
+      if (this.getDDF().getEngineType().equals(DDFManager.EngineType.ENGINE_SPARK)) {
+        List<String> specs = Lists.newArrayList();
+        for (String columnName : columnNames) {
+          String query = fiveNumHiveFunction(columnName);
+          if (query != null && query.length() > 0) {
+            specs.add(query);
+          }
         }
+
+        String command = String.format("SELECT %s FROM %%s", StringUtils.join(specs.toArray(new String[0]), ','));
+
+        mLog.info(">>>> command = " + command);
+        // a fivenumsummary of an Int/Long column is in the format "[min, max, 1st_quantile, median, 3rd_quantile]"
+        // each value can be a NULL
+        // a fivenumsummary of an Double/Float column is in the format "min \t max \t[1st_quantile, median, 3rd_quantile]"
+        // or "min \t max \t null"s
+
+        rs = this.getDDF()
+            .sql(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).getRows()
+            .get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t| ");
+      } else if (this.getDDF().getEngineType().equals(DDFManager.EngineType.ENGINE_POSTGRES)) {
+
+        rs = new String[numericColumns.size()*5];
+
+        int k = 0;
+        // Need to separately compute each column's five-num values
+        // Otherwise, combining all into a query will produce incorrect result in Redshift case
+        // May be due to the nature of its window functions
+        for(String column: numericColumns) {
+          String sql = buildPostgresFiveNumSql(column, this.getDDF().getTableName());
+
+          String[] ret = this.getDDF().getManager().sql(sql, this.getDDF().getEngineType().toString()).getRows().get(0).split("\t");
+          System.arraycopy(ret, 0, rs, k, 5);
+          k += 5;
+        }
+
+      } else {
+        throw new DDFException("Unsupported engine");
       }
 
-      return fivenums;
     }
 
-    return null;
+
+    int k = 0;
+    for (int i = 0; i < columnNames.size(); i++) {
+      if (!numericColumns.contains(columnNames.get(i))) {
+        fivenums[i] = new FiveNumSummary(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+      } else {
+        fivenums[i] = new FiveNumSummary(parseDouble(rs[5 * k]), parseDouble(rs[5 * k + 1]),
+            parseDouble(rs[5 * k + 2]),
+            parseDouble(rs[5 * k + 3]), parseDouble(rs[5 * k + 4]));
+        k++;
+      }
+    }
+
+    return fivenums;
   }
 
   @Override
@@ -183,7 +217,28 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     return ("NULL".equalsIgnoreCase(s.trim())) ? Double.NaN : Double.parseDouble(s);
   }
 
-  private String fiveNumFunction(String columnName) {
+  private String buildPostgresFiveNumSql(String columnName, String tableName) {
+    List<String> minPart = new ArrayList<String>();
+    List<String> percentilePart = new ArrayList<String>();
+
+    String[] quantiles = {"0","1","0.25","0.5","0.75"};
+
+    for(int i = 0; i < 5; i++) {
+      String column = columnName+"_q"+i;
+      minPart.add(String.format("min(%s) as %s", column, column));
+      percentilePart.add(String.format("percentile_disc(%s) within group (order by %s) over() as %s", quantiles[i], columnName,column));
+    }
+
+    String sql =
+        "select %s from \n"
+            + "(select %s from (%s) TMP_FIVENUM)";
+    String query = String
+        .format(sql, Joiner.on(",").join(minPart), Joiner.on(",").join(percentilePart), this.getDDF().getTableName());
+
+    return query;
+  }
+
+  private String fiveNumHiveFunction(String columnName) {
     ColumnType colType = this.getDDF().getColumn(columnName).getType();
 
     if(ColumnType.isIntegral(colType))

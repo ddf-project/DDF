@@ -24,6 +24,10 @@ public interface IHandleViews extends IHandleDDFFunctionalGroup {
    */
   public List<Object[]> getRandomSample(int numSamples, boolean withReplacement, int seed);
 
+  public DDF getRandomSampleByNum(int numSamples,
+                                  boolean withReplacement,
+                                  int seed);
+
   public DDF getRandomSample(double percent, boolean withReplacement, int seed);
 
   public List<String> head(int numRows) throws DDFException;

@@ -1,9 +1,10 @@
 package io.ddf;
 
+import com.google.common.base.Strings;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
-
+import io.ddf.DDFManager.EngineType;
 import java.util.*;
 
 /**
@@ -31,6 +32,10 @@ public class DDFCoordinator {
         }
         return mDefaultEngine;
     }
+
+    public void restoreEngines() {}
+
+    public DDFCoordinator() {}
 
     public void rmEngine(String engineName) throws DDFException {
         if (!mName2DDFManager.containsKey(engineName)) {
@@ -72,8 +77,13 @@ public class DDFCoordinator {
         mUuid2DDFManager.put(uuid, ddfManager);
     }
 
-    public DDFManager getDDFManagerByUUID(UUID uuid) {
-        return mUuid2DDFManager.get(uuid);
+    public DDFManager getDDFManagerByUUID(UUID uuid) throws DDFException {
+        DDFManager manager = mUuid2DDFManager.get(uuid);
+        if (manager == null) {
+            throw new DDFException("Can't get DDFManager for uuid: " + uuid
+                    .toString());
+        }
+        return manager;
     }
 
     public void setDefaultEngine(String defaultEngine) {
@@ -112,17 +122,37 @@ public class DDFCoordinator {
         return ret;
     }
 
-    public DDF getDDF(UUID uuid) {
+    public DDF getDDF(UUID uuid) throws DDFException {
         for (DDFManager ddfManager : mDDFManagerList) {
             try {
-                if (ddfManager.getDDF(uuid) != null) {
-                    return ddfManager.getDDF(uuid);
-                }
+                DDF ddf = ddfManager.getDDF(uuid);
+                return ddf;
             } catch (DDFException e) {
                 // e.printStackTrace();
             }
         }
-        return null;
+        throw new DDFException("Can't find ddf with uuid: " + uuid.toString());
+    }
+
+    public DDF getDDFByURI(String uri) throws DDFException {
+        for (DDFManager ddfManager : mDDFManagerList) {
+            try {
+                DDF ddf = ddfManager.getDDFByURI(uri);
+                return ddf;
+            } catch (Exception e) {
+                try {
+                    DDF ddf = ddfManager.getOrRestoreDDFUri(uri);
+                    return ddf;
+                } catch (Exception e2) {
+
+                }
+            }
+        }
+        throw new DDFException("Can't find ddf with uri: " + uri);
+    }
+
+    public DDFManager initEngine(String engineName, String engineType) throws DDFException {
+        return this.initEngine(engineName, engineType, null);
     }
 
     /**
@@ -136,8 +166,7 @@ public class DDFCoordinator {
     public DDFManager initEngine(String engineName, String engineType,
                                  DataSourceDescriptor dataSourceDescriptor)
             throws DDFException {
-        this.getEngine("spark").log("log4");
-        if (engineName == null) {
+        if (Strings.isNullOrEmpty(engineName)) {
             throw new DDFException("Please input engine name");
         }
         if (mName2DDFManager.get(engineName) != null) {
@@ -145,16 +174,17 @@ public class DDFCoordinator {
                     engineName);
         }
 
-        this.getEngine("spark").log("log5");
-        DDFManager manager = DDFManager.get(engineType, dataSourceDescriptor);
+        DDFManager manager = (null != dataSourceDescriptor)
+                             ? DDFManager.get(engineType, dataSourceDescriptor)
+                             : DDFManager.get(engineType);
+
         if (manager == null) {
             throw new DDFException("Error int get the DDFManager for engine :" +
                     engineName);
         }
 
-        this.getEngine("spark").log("log6");
         manager.setEngineName(engineName);
-        manager.setEngineType(engineType);
+        manager.setEngineType(EngineType.fromString(engineType));
         manager.setDDFCoordinator(this);
         mDDFManagerList.add(manager);
         mName2DDFManager.put(engineName, manager);

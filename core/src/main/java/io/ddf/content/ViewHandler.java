@@ -7,6 +7,7 @@ package io.ddf.content;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import scala.Int;
@@ -38,6 +39,12 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   @Override
   public List<Object[]> getRandomSample(int numSamples, boolean withReplacement, int seed) {
     // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public DDF getRandomSampleByNum(int numSamples, boolean withReplacement,
+                                  int seed) {
     return null;
   }
 
@@ -152,13 +159,16 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
     mLog.info("Updated columns: " + Arrays.toString(columnExpr.toArray()));
 
-    String sqlCmd = String.format("SELECT %s FROM %s", Joiner.on(", ").join(colNames), this.getDDF().getTableName());
+    String sqlCmd = String.format("SELECT %s FROM %s", Joiner.on(", ").join
+            (colNames), "{1}");
     if (filter != null) {
       sqlCmd = String.format("%s WHERE %s", sqlCmd, filter.toSql());
     }
     mLog.info("sql = {}", sqlCmd);
 
-    DDF subset = this.getManager().sql2ddf(sqlCmd, this.getEngine());
+    DDF subset = this.getManager().sql2ddf(sqlCmd, new
+            SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF()
+            .getUUID().toString()));
 
     subset.getMetaDataHandler().copyFactor(this.getDDF());
     return subset;
@@ -241,7 +251,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
         case le:
           return String.format("(%s <= %s)", operands[0].toSql(), operands[1].toSql());
         case eq:
-          return String.format("(%s == %s)", operands[0].toSql(), operands[1].toSql());
+          return String.format("(%s = %s)", operands[0].toSql(), operands[1].toSql());
         case ne:
           return String.format("(%s != %s)", operands[0].toSql(), operands[1].toSql());
         case and:

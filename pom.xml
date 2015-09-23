@@ -61,7 +61,6 @@
 	  	<module>core</module>
 	  	<module>spark</module>
 	  	<module>examples</module>
-		<module>jdbc</module>
 	</modules>
 
 	<dependencies>
