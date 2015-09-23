@@ -1,23 +1,26 @@
 package io.ddf;
 
 
+import com.google.common.base.Strings;
 import io.ddf.DDFManager.EngineType;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.DDFManager.EngineType;
+import io.ddf.misc.ALoggable;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
 
 /**
  * Created by jing on 7/23/15.
  */
-public class DDFCoordinator {
+public class DDFCoordinator extends ALoggable {
   // The ddfmangers.
   private List<DDFManager> mDDFManagerList = new ArrayList<DDFManager>();
   // The mapping from engine name to ddfmanager.
   private Map<UUID, DDFManager> mDDFUuid2DDFManager = new ConcurrentHashMap<UUID, DDFManager>();
-  private Map<String, DDFManager> mURI2DDFManager = new ConcurrentHashMap<String, DDFManager>();
+  private Map<String, DDFManager> mDDFURI2DDFManager = new ConcurrentHashMap<String, DDFManager>();
   private Map<UUID, DDFManager> mUUID2DDFManager = new ConcurrentHashMap<UUID, DDFManager>();
   // The default engine.
   private DDFManager mDefaultEngine;
@@ -39,17 +42,17 @@ public class DDFCoordinator {
       UUID uuid = ddf.getUUID();
       String uri = ddf.getUri();
       mDDFUuid2DDFManager.remove(uuid);
-      mURI2DDFManager.remove(uri);
+      mDDFURI2DDFManager.remove(uri);
     }
   }
 
   public void setURI2DDFManager(String uri, DDFManager ddfManager) {
     ddfManager.log("Set uri2ddfManager with uri: " + uri);
-    mURI2DDFManager.put(uri, ddfManager);
+    mDDFURI2DDFManager.put(uri, ddfManager);
   }
 
   public DDFManager getDDFManagerByURI(String uri) throws DDFException {
-    DDFManager dm = mURI2DDFManager.get(uri);
+    DDFManager dm = mDDFURI2DDFManager.get(uri);
     if (dm == null) {
 
       throw new DDFException("Can't find ddfmanager for ddf: " +
@@ -66,6 +69,7 @@ public class DDFCoordinator {
   public DDFManager getDDFManagerByUUID(UUID uuid) throws DDFException {
     DDFManager manager = mDDFUuid2DDFManager.get(uuid);
     if (manager == null) {
+      mLog.info(">>> ddfManager is null for uuid " + uuid.toString());
       throw new DDFException("Can't get DDFManager for uuid: " + uuid.toString());
     }
     return manager;
@@ -75,9 +79,26 @@ public class DDFCoordinator {
     this.mDefaultEngine = defaultEngine;
   }
 
-  public void addComputeEngine(DDFManager manager) {
+  public synchronized void addComputeEngine(DDFManager manager) {
     this.mDDFManagerList.add(manager);
     this.mUUID2DDFManager.put(manager.getUUID(), manager);
+    DDF[] ddfs = manager.listDDFs();
+    for(DDF ddf: ddfs) {
+      mDDFUuid2DDFManager.put(ddf.getUUID(), manager);
+      if(!Strings.isNullOrEmpty(ddf.getUri())) {
+        mDDFURI2DDFManager.put(ddf.getUri(), manager);
+      }
+    }
+  }
+
+  public synchronized void addDDF(DDF ddf) {
+    if(this.mUUID2DDFManager.get(ddf.getManager().getUUID()) == null) {
+      this.addComputeEngine(ddf.getManager());
+    }
+    this.mDDFUuid2DDFManager.put(ddf.getUUID(), ddf.getManager());
+    if(!Strings.isNullOrEmpty(ddf.getUri())) {
+      this.mDDFURI2DDFManager.put(ddf.getUri(), ddf.getManager());
+    }
   }
 
   public List<DDFManager> getDDFManagerList() {

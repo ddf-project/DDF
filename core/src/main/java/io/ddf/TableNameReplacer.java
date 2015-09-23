@@ -259,7 +259,7 @@ public class TableNameReplacer extends TableVisitor {
                 engineUUID = this.mDDFManager.getUUID();
             }
         } catch (DDFException e) {
-           throw new DDFException("Can't find ddfmanger for " + uuid);
+           throw new DDFException("Can't find ddfmanger for " + uuid, e);
         }
 
         this.mDDFManager.log("In handleDDFUUid, engine UUID is : " + engineUUID.toString());
