@@ -46,6 +46,10 @@ public class DDFCoordinator extends ALoggable {
     }
   }
 
+  public void restoreEngines() {}
+
+  public DDFCoordinator() {}
+  
   public void setURI2DDFManager(String uri, DDFManager ddfManager) {
     ddfManager.log("Set uri2ddfManager with uri: " + uri);
     mDDFURI2DDFManager.put(uri, ddfManager);
@@ -135,11 +139,15 @@ public class DDFCoordinator extends ALoggable {
           DDF ddf = ddfManager.getOrRestoreDDFUri(uri);
           return ddf;
         } catch (Exception e2) {
-
+          throw new DDFException("Can't find ddf with uri: " + uri, e2);
         }
       }
     }
     throw new DDFException("Can't find ddf with uri: " + uri);
+  }
+
+  public DDFManager initEngine(EngineType engineType) throws DDFException {
+    return this.initEngine(engineType, null);
   }
 
   /**
@@ -150,7 +158,10 @@ public class DDFCoordinator extends ALoggable {
    * @brief Init an engine.
    */
   public DDFManager initEngine(EngineType engineType, DataSourceDescriptor dataSourceDescriptor) throws DDFException {
-    DDFManager manager = DDFManager.get(engineType, dataSourceDescriptor);
+    //DDFManager manager = DDFManager.get(engineType, dataSourceDescriptor);
+    DDFManager manager = (null != dataSourceDescriptor)
+                         ? DDFManager.get(engineType, dataSourceDescriptor)
+                         : DDFManager.get(engineType);
     if (manager == null) {
       throw new DDFException("Error int get the DDFManager for engine :" + engineType);
     }
