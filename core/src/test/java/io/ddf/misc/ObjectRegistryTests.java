@@ -15,7 +15,7 @@ public class ObjectRegistryTests {
 
   @Test
   public void testRegister() throws DDFException {
-    DDFManager manager = DDFManager.get("basic");
+    DDFManager manager = DDFManager.get(DDFManager.EngineType.BASIC);
     DDF ddf1 = manager.newDDF();
 
     Collection<IGloballyAddressable> objs = manager.REGISTRY.getObjects();

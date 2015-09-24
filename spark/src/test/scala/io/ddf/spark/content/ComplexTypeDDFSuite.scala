@@ -141,7 +141,7 @@ class ComplexTypeDDFSuite extends ATestSuite {
     val sqlCtx = manager.getHiveContext
     val jdf: DataFrame = sqlCtx.jsonFile(path)
     val df = SparkUtils.getDataFrameWithValidColnames(jdf)
-    manager.newDDF(manager, df, Array(classOf[DataFrame]), null, null, null,
+    manager.newDDF(manager, df, Array(classOf[DataFrame]), null, null,
       SparkUtils.schemaFromDataFrame(df))
   }
 

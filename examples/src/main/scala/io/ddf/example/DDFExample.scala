@@ -6,7 +6,7 @@ import io.ddf.DDFManager
 object DDFExample {
 
 	def run() = {
-		val manager = DDFManager.get("spark")
+		val manager = DDFManager.get(DDFManager.EngineType.SPARK)
 		manager.sql("drop TABLE if exists mtcars", "SparkSQL")
 		manager.sql("CREATE TABLE mtcars ("
 			+ "mpg double,cyl int, disp double, hp int, drat double, wt double, qsec double, vs int, am int, gear int, carb int"

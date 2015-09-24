@@ -45,8 +45,7 @@ public class TableNameReplacer extends TableVisitor {
     public Map<String, List<Table>> mUri2TblObj
             = new HashMap<String, List<Table>>();
     public Boolean containsLocalTable = false;
-    public String fromEngineName = null;
-
+    public UUID fromEngine = null;
 
 
     String possibleLetter = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -146,8 +145,8 @@ public class TableNameReplacer extends TableVisitor {
         if (containsLocalTable || mUri2TblObj.keySet().size() == 1) {
             // contains local table, can only use local spark.
             for (String uri : this.mUri2TblObj.keySet()) {
-                DDF ddf = this.mDDFManager.transfer(this.mDDFManager
-                                .getEngineNameOfDDF(uri),
+                DDFManager engine = this.mDDFManager.getDDFCoordinator().getDDFManagerByURI(uri);
+                DDF ddf = this.mDDFManager.transfer(engine.getUUID(),
                         uri);
                 for (Table table : this.mUri2TblObj.get(uri)) {
                     table.setName(ddf.getTableName());
@@ -155,12 +154,7 @@ public class TableNameReplacer extends TableVisitor {
             }
         } else {
             for (String uri : this.mUri2TblObj.keySet()) {
-                String fromEngineName2 = this.mDDFManager.getEngineNameOfDDF
-                        (uri);
-                this.fromEngineName = fromEngineName2;
-                DDFManager fromManager = this.mDDFManager.getDDFCoordinator()
-                        .getEngine(fromEngineName);
-                DDF ddf = fromManager.getDDFByURI(uri);
+                DDF ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(uri);
                 for (Table table : this.mUri2TblObj.get(uri)) {
                     table.setName(ddf.getTableName());
                 }
@@ -247,7 +241,7 @@ public class TableNameReplacer extends TableVisitor {
         }
         if (ddf == null) {
             this.mDDFManager.log("ddf is null when ddfuri is: " + ddfuri);
-            this.mDDFManager.log("enginename is : " + this.mDDFManager.getEngineName());
+            this.mDDFManager.log("enginename is : " + this.mDDFManager.getUUID());
         }
         this.handleDDFUUID(ddf.getUUID().toString(), table);
     }
@@ -255,27 +249,23 @@ public class TableNameReplacer extends TableVisitor {
     // Currently for uuid, we only support DDF from local engine.
     // TODO: Support ddf from other engine
     String handleDDFUUID(String uuid, Table table) throws Exception {
-        String engineName = null;
+        UUID engineUUID = null;
         try {
             if (this.mDDFManager.getDDFCoordinator() != null) {
                 DDFManager manager = this.mDDFManager.getDDFCoordinator()
                         .getDDFManagerByUUID(UUID.fromString(uuid));
-                engineName = manager.getEngineName();
+                engineUUID = manager.getUUID();
             } else {
-                engineName = this.mDDFManager.getEngineName();
+                engineUUID = this.mDDFManager.getUUID();
             }
         } catch (DDFException e) {
-            this.mDDFManager.log("Can't find ddfmanger for " + uuid + " , " +
-                    "trying spark");
-            engineName = "spark";
+           throw new DDFException("Can't find ddfmanger for " + uuid, e);
         }
 
-        this.mDDFManager.log("In handleDDFUUid, enginename is : " + engineName);
-        this.mDDFManager.log("In handleDDFUUid, this manager name is : " +
-                this.mDDFManager.getEngineName());
+        this.mDDFManager.log("In handleDDFUUid, engine UUID is : " + engineUUID.toString());
 
-        if (engineName == null
-           || engineName.equals(this.mDDFManager.getEngineName())) {
+        if (engineUUID == null
+           || engineUUID.equals(this.mDDFManager.getUUID())) {
             // It's in the same engine.
             DDF ddf = null;
             // Restore the ddf first.

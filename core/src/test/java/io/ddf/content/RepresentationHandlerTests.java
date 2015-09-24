@@ -104,7 +104,7 @@ public class RepresentationHandlerTests {
 
   @Test
   public void testRepresentDDF() throws DDFException {
-    DDFManager manager = DDFManager.get("basic");
+    DDFManager manager = DDFManager.get(DDFManager.EngineType.BASIC);
     DDF ddf = manager.newDDF();
 
     IHandleRepresentations handler = ddf.getRepresentationHandler();
@@ -127,7 +127,7 @@ public class RepresentationHandlerTests {
 
   @Test
   public void testNewRepHandler() throws DDFException {
-    DDFManager manager = DDFManager.get("basic");
+    DDFManager manager = DDFManager.get(DDFManager.EngineType.BASIC);
     DDF ddf = manager.newDDF();
 
     IHandleRepresentations handler = new DummyRepresentationHandler(ddf);
