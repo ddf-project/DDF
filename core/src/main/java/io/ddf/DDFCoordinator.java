@@ -42,7 +42,7 @@ public class DDFCoordinator extends ALoggable {
       UUID uuid = ddf.getUUID();
       String uri = ddf.getUri();
       mDDFUuid2DDFManager.remove(uuid);
-      mDDFURI2DDFManager.remove(uri);
+      if (!Strings.isNullOrEmpty(uri)) mDDFURI2DDFManager.remove(uri);
     }
   }
 
