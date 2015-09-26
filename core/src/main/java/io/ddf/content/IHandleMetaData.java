@@ -7,6 +7,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public interface IHandleMetaData extends IHandleDDFFunctionalGroup {
@@ -18,6 +19,8 @@ public interface IHandleMetaData extends IHandleDDFFunctionalGroup {
   public long getNumRows() throws DDFException;
 
   public void copyFactor(DDF ddf)  throws DDFException;
+
+  public void copyFactor(DDF ddf, List<String> colums)  throws DDFException;
 
   public void copy(IHandleMetaData otherMetaData) throws DDFException;
 
