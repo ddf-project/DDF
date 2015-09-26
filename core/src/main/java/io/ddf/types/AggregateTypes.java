@@ -152,7 +152,7 @@ public class AggregateTypes {
         throw new DDFException("Table name cannot be null or empty");
       }
 
-      return String.format("SELECT %s FROM (%s) tmp GROUP BY %s", toSqlFieldSpecs(fields), tableName,
+      return String.format("SELECT %s FROM %s GROUP BY %s", toSqlFieldSpecs(fields), tableName,
           toSqlGroupBySpecs(fields));
     }
 
