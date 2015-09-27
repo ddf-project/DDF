@@ -149,6 +149,13 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   @Override
   public DDF subset(List<Column> columnExpr, Expression filter) throws DDFException {
+    DDF subset = _subset(columnExpr, filter);
+    subset.getMetaDataHandler().copyFactor(this.getDDF(), this.getDDF().getColumnNames());
+    return subset;
+
+  }
+
+  protected DDF _subset(List<Column> columnExpr, Expression filter) throws DDFException {
     updateVectorName(filter, this.getDDF());
     mLog.info("Updated filter: " + filter);
 
@@ -160,19 +167,16 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     mLog.info("Updated columns: " + Arrays.toString(columnExpr.toArray()));
 
     String sqlCmd = String.format("SELECT %s FROM %s", Joiner.on(", ").join
-            (colNames), "{1}");
+        (colNames), "{1}");
     if (filter != null) {
       sqlCmd = String.format("%s WHERE %s", sqlCmd, filter.toSql());
     }
     mLog.info("sql = {}", sqlCmd);
 
     DDF subset = this.getManager().sql2ddf(sqlCmd, new
-            SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF()
-            .getUUID().toString()));
-
-    subset.getMetaDataHandler().copyFactor(this.getDDF());
+        SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF()
+        .getUUID().toString()));
     return subset;
-
   }
 
 
