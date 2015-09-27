@@ -10,11 +10,9 @@ import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+import org.apache.avro.generic.GenericData;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
     implements IHandleMetaData {
@@ -105,6 +103,22 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
    * @throws DDFException
    */
   public void copyFactor(DDF ddf)  throws DDFException {
+    this.copyFactor(ddf, null);
+  }
+
+  /**
+   * Transfer factor information from ddf to this DDF
+   * @param ddf
+   * @param columns Columns to re-compute factors
+   * @throws DDFException
+   */
+  public void copyFactor(DDF ddf, List<String> columns)  throws DDFException {
+
+    // if there is no columns to recompute factor info
+    if (columns == null) {
+      columns = new ArrayList<String>();
+    }
+
     for (Schema.Column col : ddf.getSchema().getColumns()) {
       this.getManager().log("colname is : " + col.getName());
       this.getManager().log("checking columns");
@@ -112,10 +126,19 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
       this.getManager().log("ddf uuid: " + this.getDDF().getUUID().toString());
       for (Schema.Column col2 : this.getDDF().getSchema().getColumns()) {
         this.getManager().log("col2: " + col2.getName() + " " + col2.getType
-                ().toString());
+            ().toString());
       }
       if (this.getDDF().getColumn(col.getName()) != null && col.getColumnClass() == Schema.ColumnClass.FACTOR) {
+        // Set corresponding column as factor
         this.getDDF().getSchemaHandler().setAsFactor(col.getName());
+
+        // if not in list of columns to re-compute factors
+        // then we just copy existing factor info to the new ones
+        if (!columns.contains(col.getName())) {
+          // copy existing factor column info
+          this.getDDF().getSchemaHandler().setFactorLevels(col.getName(), col.getOptionalFactor());
+        }
+
       }
     }
     this.getDDF().getSchemaHandler().computeFactorLevelsAndLevelCounts();

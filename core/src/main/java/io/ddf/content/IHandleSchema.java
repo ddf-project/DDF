@@ -54,5 +54,7 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
 
   void unsetAsFactor(int columnIndex);
 
+  void setFactorLevels(String columnName, Factor<?> factor) throws DDFException;
+
   public void generateDummyCoding() throws NumberFormatException, DDFException;
 }
