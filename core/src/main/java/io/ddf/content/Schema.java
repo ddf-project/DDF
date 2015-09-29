@@ -12,6 +12,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
 
+
 /**
  * Table schema of a DDF including table name and column metadata
  */

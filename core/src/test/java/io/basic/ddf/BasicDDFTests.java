@@ -18,7 +18,7 @@ public class BasicDDFTests {
 
 
   private DDFManager getDDFManager() throws DDFException {
-    if (mManager == null) mManager = DDFManager.get("basic");
+    if (mManager == null) mManager = DDFManager.get(DDFManager.EngineType.BASIC);
     return mManager;
   }
 
@@ -26,11 +26,11 @@ public class BasicDDFTests {
     List<Object[]> list = new ArrayList<Object[]>();
     list.add(new Object[] { "Last", "Nguyen" });
     list.add(new Object[] { "First", "Christopher" });
-    String namespace = null; // use default
+    String namespace = "random"; // use default
     String name = this.getClass().getSimpleName();
     Schema schema = new Schema(name, "name string, value string");
     DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[]
-            .class, null, namespace, name, schema);
+            .class, namespace, name, schema);
     return ddf;
   }
 

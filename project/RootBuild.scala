@@ -63,10 +63,12 @@ object RootBuild extends Build {
 
   val jdbcProjectName = projectName + "_jdbc"
 
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, jdbc)
+  // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, jdbc)
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val core = Project("core", file("core"), settings = coreSettings)
   lazy val jdbc = Project("jdbc", file("jdbc"), settings = jdbcSettings) dependsOn (core)
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) dependsOn(jdbc)
+  // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) dependsOn(jdbc)
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
 
   // A configuration to set an alternative publishLocalConfiguration

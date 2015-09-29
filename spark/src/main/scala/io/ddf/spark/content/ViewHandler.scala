@@ -53,6 +53,12 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
 
   val MAX_SAMPLE_SIZE = 1000000;
 
+  override  def getRandomSampleByNum(numSamples: Int, withReplacement: Boolean,
+    seed:
+  Int): DDF = {
+    null.asInstanceOf[DDF]
+  }
+
   override def getRandomSample(numSamples: Int, withReplacement: Boolean, seed: Int): java.util.List[Array[Object]] = {
     if (numSamples > MAX_SAMPLE_SIZE) {
       throw new IllegalArgumentException("Number of samples is currently limited to %d".format(MAX_SAMPLE_SIZE))
@@ -82,7 +88,7 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       schema.setTableName(mDDF.getSchemaHandler.newTableName())
       val manager = this.getManager
       val sampleDDF = manager.newDDF(manager, sample_df, Array
-        (classOf[DataFrame]), manager.getEngineName, manager.getNamespace,
+        (classOf[DataFrame]), manager.getNamespace,
         null, schema)
       mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
       sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)

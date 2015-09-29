@@ -7,7 +7,6 @@ import io.ddf.content.Schema;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
-import io.ddf.jdbc.JDBCDDFManager;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
@@ -247,7 +246,10 @@ public class TableNameReplacerTests {
      */
     @Test
     public void testNamespace() throws  DDFException {
-        TableNameReplacer tableNameReplacer  = new TableNameReplacer(manager, "adatao");
+        TableNameReplacer tableNameReplacer  = new TableNameReplacer(manager);
+        // TableNameReplacer tableNameReplacer  = new TableNameReplacer
+        //        (manager, "adatao");
+
         String sqlcmd = "select a.b from a";
         Statement statement = null;
         try {
@@ -274,7 +276,11 @@ public class TableNameReplacerTests {
     @Test
     public void testList() throws  DDFException {
         String[] uris={"ddf://adatao/a", "ddf://adatao/b"};
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager, Arrays.asList(uris));
+        // TableNameReplacer tableNameReplacer = new TableNameReplacer(manager,
+        //        Arrays.asList(uris));
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager,
+                    null);
+
         String sqlcmd = "select {1}.a,{2}.b from {1}";
         Statement statement = null;
 
@@ -458,15 +464,14 @@ public class TableNameReplacerTests {
         }
         DDF ret = manager.sql2ddf("select * from testtable", "jdbc");*/
         // Add 2 test ddfs.
-        manager = DDFManager.get("spark");
-        manager.setEngineName("spark");
+        manager = DDFManager.get(DDFManager.EngineType.BASIC);
         Schema schema = new Schema("tablename1", "d  d,d  d");
         DDF ddf = manager.newDDF(manager, new Class<?>[] { DDFManager.class
-                }, "spark", "adatao", "a",
+                }, "adatao", "a",
                 schema);
         Schema schema2 = new Schema("tablename2", "d  d,d  d");
         DDF ddf2 = manager.newDDF(manager, new Class<?>[] { DDFManager.class
-                }, "spark", "adatao", "b",
+                }, "adatao", "b",
                 schema2);
 
         parser = new CCJSqlParserManager();

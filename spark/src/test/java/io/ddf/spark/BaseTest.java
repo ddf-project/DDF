@@ -18,7 +18,7 @@ public class BaseTest {
     public static void startServer() throws Exception {
         Thread.sleep(1000);
         LOG = LoggerFactory.getLogger(BaseTest.class);
-        manager = DDFManager.get("spark");
+        manager = DDFManager.get(DDFManager.EngineType.SPARK);
     }
 
     @AfterClass

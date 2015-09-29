@@ -7,6 +7,7 @@ import io.ddf.DDF;
 import io.ddf.analytics.Summary;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 
@@ -100,7 +101,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return flattenDDF(null);
   }
 
-  public DDF transformUDF(String RExprs, List<String> columns) throws DDFException {
+  public DDF transformUDF(String RExprs, List<String> columns)
+          throws DDFException {
     List<String> expressions = Arrays.asList(RExprs);
     return this.transformUDF(expressions, columns);
   }
@@ -113,9 +115,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   public DDF transformUDF(List<String> RExps, List<String> columns) throws DDFException {
     String sqlCmd = String.format("SELECT %s FROM %s",
         RToSqlUdf(RExps, columns, this.getDDF().getSchema().getColumns()),
-        this.getDDF().getTableName());
+        "{1}");
 
-    DDF newddf = this.getManager().sql2ddf(sqlCmd, this.getEngine());
+    DDF newddf = this.getManager().sql2ddf(sqlCmd, new
+            SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF()
+            .getUUID().toString()));
 
     if (this.getDDF().isMutable()) {
       return this.getDDF().updateInplace(newddf);
@@ -181,8 +185,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     String selectStr = "";
     for (String udf : udfs) {
       String exp = newColToDef.containsKey(udf) ?
-        String.format("(%s) as %s", newColToDef.get(udf), udf) :
-        String.format("(%s)", udf);
+        String.format("%s as %s", newColToDef.get(udf), udf) :
+        String.format("%s", udf);
       selectStr += (exp + ",");
     }
 

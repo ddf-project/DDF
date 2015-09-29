@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
+import io.ddf.DDFManager.EngineType;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceCredentials;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
@@ -46,15 +47,13 @@ public class SparkDDFManager extends DDFManager {
   private static final String DEFAULT_SPARK_APPNAME = "DDFClient";
   private static final String DEFAULT_SPARK_MASTER = "local[4]";
 
-
-
   public SparkDDFManager(SparkContext sparkContext) throws DDFException {
-    this.setEngineName("spark");
+    this.setEngineType(EngineType.SPARK);
     this.initialize(sparkContext, null);
   }
 
   @Override
-  public DDF transferByTable(String fromEngine, String tableName) throws
+  public DDF transferByTable(UUID fromEngine, String tableName) throws
           DDFException {
 
     mLog.info("Get the engine " + fromEngine + " to transfer table : " +
@@ -79,7 +78,15 @@ public class SparkDDFManager extends DDFManager {
           throw new DDFException(e);
         }
       } else {
-        return this.load(dataSourceDescriptor);
+        JDBCDataSourceDescriptor loadDS
+                = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(),
+                                               jdbcDS.getCredentials(),
+                                               tableName);
+        mLog.info("load from JDBCDatasource, " + loadDS.getDataSourceUri()
+                .getUri().toString() + ", " + loadDS.getCredentials()
+                .getUsername() + ", " + loadDS.getCredentials().getPassword()
+                + ", " + loadDS.getDbTable());
+        return this.load(loadDS);
       }
       // TODO
       /*
@@ -116,7 +123,7 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF transfer(String fromEngine, String ddfuri) throws DDFException {
+    public DDF transfer(UUID fromEngine, String ddfuri) throws DDFException {
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
     mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
     DDF fromDDF = fromManager.getDDFByURI(ddfuri);
@@ -134,12 +141,12 @@ public class SparkDDFManager extends DDFManager {
    * @throws DDFException
    */
   public SparkDDFManager() throws DDFException {
-    this.setEngineName("spark");
+    this.setEngineType(EngineType.SPARK);
     this.initialize(null, new HashMap<String, String>());
   }
 
   public SparkDDFManager(Map<String, String> params) throws DDFException {
-    this.setEngineName("spark");
+    this.setEngineType(EngineType.SPARK);
     this.initialize(null, params);
   }
 
@@ -320,26 +327,22 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-                    String engineName, String namespace, String name, Schema
+      String namespace, String name, Schema
                               schema)
           throws DDFException {
-    DDF ddf = super.newDDF(manager, data, typeSpecs, engineName, namespace,
+    DDF ddf = super.newDDF(manager, data, typeSpecs, namespace,
             name, schema);
-    if(ddf instanceof SparkDDF) {
-      ((SparkDDF) ddf).saveAsTable();
-    }
+    ((SparkDDF) ddf).saveAsTable();
     return ddf;
   }
 
   @Override
-  public DDF newDDF(Object data, Class<?>[] typeSpecs, String engineName,
+  public DDF newDDF(Object data, Class<?>[] typeSpecs,
                     String namespace, String name, Schema schema)
           throws DDFException {
-    DDF ddf = super.newDDF(data, typeSpecs, engineName, namespace, name,
+    DDF ddf = super.newDDF(data, typeSpecs, namespace, name,
             schema);
-    if(ddf instanceof SparkDDF) {
-      ((SparkDDF) ddf).saveAsTable();
-    }
+    ((SparkDDF) ddf).saveAsTable();
     return ddf;
   }
 
@@ -358,12 +361,12 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-    return null;
+    return this.mDDFCache.getDDFByUri(ddfURI);
   }
 
   @Override
   public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-    return null;
+    return this.mDDFCache.getDDF(uuid);
   }
 
   /**
