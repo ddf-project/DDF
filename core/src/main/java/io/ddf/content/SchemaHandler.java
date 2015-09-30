@@ -102,8 +102,12 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   public void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
     Column c = this.getColumn(columnName);
     Factor<?> f = c.getOptionalFactor();
-    f.setLevelCounts(factor.getLevelCounts());
-    f.setLevels(factor.getLevels(), false);
+    if(factor.getLevelCounts() != null) {
+      f.setLevelCounts(factor.getLevelCounts());
+    }
+    if(factor.getLevels() != null) {
+      f.setLevels(factor.getLevels(), false);
+    }
   }
 
   @Override

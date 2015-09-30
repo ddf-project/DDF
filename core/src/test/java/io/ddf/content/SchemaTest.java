@@ -38,4 +38,13 @@ public class SchemaTest {
     System.out.println(m.get(2).toString());
   }
 
+  @Test
+  public void testParseSchema() {
+    String columns = "row Int, \n\tprice double, \n\t lotsize int, \n\t bedrooms int,\n\tbathrms int";
+    Schema schema = new Schema(null, columns);
+    for(Schema.Column column: schema.getColumns()) {
+      assert(column.getName() != null);
+      assert(column.getType().toString() != null);
+    }
+  }
 }
