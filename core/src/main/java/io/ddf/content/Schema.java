@@ -76,14 +76,14 @@ public class Schema implements Serializable {
   private List<Column> parseColumnList(String columnList) {
     if (Strings.isNullOrEmpty(columnList))
       return null;
-    String[] segments = columnList.split(" *, *");
+    String[] segments = columnList.split("\\s*,\\s*");
 
     mColumns.clear();
     for (String segment : segments) {
       if (Strings.isNullOrEmpty(segment))
         continue;
 
-      String[] parts = segment.split("  *");
+      String[] parts = segment.split("\\s+");
       if (Strings.isNullOrEmpty(parts[0])
           || Strings.isNullOrEmpty(parts[1]))
         continue;

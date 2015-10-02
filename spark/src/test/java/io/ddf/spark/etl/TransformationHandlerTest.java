@@ -155,25 +155,26 @@ public class TransformationHandlerTest extends BaseTest {
     s1.add("distance/(arrtime-deptime)");
     String s2 = "arr_delayed=if(arrdelay=\"yes\",1,0)";
     String s3 = "origin_sfo = case origin when \'SFO\' then 1 else 0 end ";
-    Assert.assertEquals("(if(arrdelay=15,1,0)) as new_col,((arrtime-deptime)) as v,(distance/(arrtime-deptime))",
+    System.out.println(">>> TransformationHandler.RToSqlUdf(s1) = " + TransformationHandler.RToSqlUdf(s1));
+    //>>> TransformationHandler.RToSqlUdf(s1) = if(arrdelay=15,1,0) as new_col,(arrtime-deptime) as v,distance/(arrtime-deptime)");
+    Assert.assertEquals("if(arrdelay=15,1,0) as new_col,(arrtime-deptime) as v,distance/(arrtime-deptime)",
         TransformationHandler.RToSqlUdf(s1));
-    Assert.assertEquals("(if(arrdelay=\"yes\",1,0)) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
-    Assert.assertEquals("(case origin when \'SFO\' then 1 else 0 end) as origin_sfo", TransformationHandler.RToSqlUdf(s3));
+    Assert.assertEquals("if(arrdelay=\"yes\",1,0) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
+    System.out.println(">>> TransformationHandler.RToSqlUdf(s3): " + TransformationHandler.RToSqlUdf(s3));
+        Assert.assertEquals("case origin when \'SFO\' then 1 else 0 end as origin_sfo",
+            TransformationHandler.RToSqlUdf(s3));
     DDF ddf2 = ddf.Transform.transformUDF(s1, lcols);
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(6, ddf2.getNumColumns());
 
-    Assert.assertEquals("(regexp_extract('yyyy/mm/dd', '.*/([^/])+', 1)) as dt",
+    Assert.assertEquals("regexp_extract('yyyy/mm/dd', '.*/([^/])+', 1) as dt",
         TransformationHandler.RToSqlUdf("dt=regexp_extract('yyyy/mm/dd', '.*/([^/])+', 1)"));
 
-    Assert.assertEquals("(regexp_extract('hh:mm:ss', '([^:])+:.*', 1)) as dt",
+    Assert.assertEquals("regexp_extract('hh:mm:ss', '([^:])+:.*', 1) as dt",
         TransformationHandler.RToSqlUdf("dt=regexp_extract('hh:mm:ss', '([^:])+:.*', 1)"));
 
-    Assert.assertEquals("(regexp_extract('hh:mm:ss', '.*\\\\+([^+])+', 1)) as dt",
+    Assert.assertEquals("regexp_extract('hh:mm:ss', '.*\\\\+([^+])+', 1) as dt",
         TransformationHandler.RToSqlUdf("dt=regexp_extract('hh:mm:ss', '.*\\\\+([^+])+', 1)"));
-
-
-
   }
 
   @Test(expected=RuntimeException.class)
