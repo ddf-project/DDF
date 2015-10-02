@@ -159,16 +159,6 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
     }
 
     @Override
-    public String getEngineName() {
-      return mEngine;
-    }
-
-    @Override
-    public void setEngineName(String engineName) {
-      this.mEngine = engineName;
-    }
-
-    @Override
     public String toString() {
       return String.format("%s://%s", mEngine, mPath);
     }
@@ -259,19 +249,8 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
 
 
     // //// IGloballyAddressable //////
-    @Expose private String mEngineName;
     @Expose private String mNamespace;
     @Expose private String mName;
-
-    @Override
-    public String getEngineName() {
-      return mEngineName;
-    }
-
-    @Override
-    public void setEngineName(String mEngineName) {
-      this.mEngineName = mEngineName;
-    }
 
     @Override
     public String getNamespace() {

@@ -12,7 +12,7 @@ public class MetricsTests {
 
   @Test
   public void testConfusionMatrix() throws DDFException {
-    DDFManager manager = DDFManager.get("spark");
+    DDFManager manager = DDFManager.get(DDFManager.EngineType.SPARK);
     try {
       manager.sql("drop table if exists airline", "SparkSQL");
     } catch (Exception e) {

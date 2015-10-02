@@ -97,39 +97,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
     return this.sqlHandle(command,
                           maxRows,
                           dataSource,
-                          new TableNameReplacer(this.getManager()));
+                          new TableNameReplacer(this.getManager(), dataSource));
   }
 
-  public SqlResult sqlHandle(String command,
-                             Integer maxRows,
-                             DataSourceDescriptor dataSource,
-                             String namespace) throws DDFException {
-    return this.sqlHandle(command,
-                          maxRows,
-                          dataSource,
-                          new TableNameReplacer(this.getManager(), namespace));
-  }
-
-  public SqlResult sqlHandle(String command,
-                             Integer maxRows,
-                             DataSourceDescriptor dataSource,
-                             List<String> uriList) throws DDFException {
-    return this.sqlHandle(command,
-                          maxRows,
-                          dataSource,
-                          new TableNameReplacer(this.getManager(), uriList));
-  }
-
-
-  public SqlResult sqlHandle(String command,
-                             Integer maxRows,
-                             DataSourceDescriptor dataSource,
-                             UUID[] uuidList) throws DDFException {
-    return this.sqlHandle(command,
-                          maxRows,
-                          dataSource,
-                          new TableNameReplacer(this.getManager(), uuidList));
-  }
 
   public SqlResult sqlHandle(String sqlcmd,
                              Integer maxRows,
@@ -168,16 +138,16 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                 .getName(), tableNameReplacer.getNamespace());
       } else if (statement instanceof  Select) {
         // Standard SQL.
-          this.mLog.info("replace: " + sqlcmd);
+          this.mLog.info("Replace: " + sqlcmd);
           statement = tableNameReplacer.run(statement);
           if (tableNameReplacer.containsLocalTable || tableNameReplacer
-                  .uri2TableObj.keySet().size() == 1) {
+                  .mUri2TblObj.keySet().size() == 1) {
               this.mLog.info("New stat is " + statement.toString());
               return this.sql(statement.toString(), maxRows, dataSource);
           } else {
             String selectString = statement.toString();
             DDF ddf = this.getManager().transferByTable(tableNameReplacer
-                    .fromEngineName, " (" + selectString + ") ");
+                    .fromEngine, " (" + selectString + ") ");
             return this.sql("select * from " + ddf.getTableName(), maxRows,
                     dataSource);
           }
@@ -207,50 +177,14 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                          schema,
                          dataSource,
                          dataFormat,
-                         new TableNameReplacer(this.getManager()));
+                         new TableNameReplacer(this.getManager(), dataSource));
   }
-  public DDF sql2ddfHandle(String command,
-                           Schema schema,
-                           DataSourceDescriptor dataSource,
-                           DataFormat dataFormat,
-                           String namespace) throws DDFException {
-      return sql2ddfHandle(command, schema, dataSource, dataFormat, new
-              TableNameReplacer(getManager(), namespace));
-  }
-
-  public DDF sql2ddfHandle(String command,
-                           Schema schema,
-                           DataSourceDescriptor dataSource,
-                           DataFormat dataFormat,
-                           List<String> uriList) throws DDFException {
-    return sql2ddfHandle(command,
-                         schema,
-                         dataSource,
-                         dataFormat,
-                         new TableNameReplacer(getManager(), uriList));
-  }
-
-  public DDF sql2ddfHandle(String command,
-                           Schema schema,
-                           DataSourceDescriptor dataSource,
-                           DataFormat dataFormat,
-                           UUID[] uuidList) throws DDFException {
-      return sql2ddfHandle(command,
-                           schema,
-                           dataSource,
-                           dataFormat,
-                           new TableNameReplacer(getManager(), uuidList));
-  }
-
   public DDF sql2ddfHandle(String command,
                            Schema schema,
                            DataSourceDescriptor dataSource,
                            DataFormat dataFormat,
                            TableNameReplacer tableNameReplacer) throws DDFException {
-      if (!this.getManager().getEngine().equals("spark")) {
-          throw new DDFException("Currently the sql2ddf operation is only " +
-                  "supported in spark");
-      }
+
     if (dataSource != null) {
         if (dataSource instanceof JDBCDataSourceDescriptor) {
             return this.sql2ddf(command, schema, dataSource, dataFormat);
@@ -280,14 +214,14 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
           this.mLog.info("replace: " + command);
         statement = tableNameReplacer.run(statement);
           if (tableNameReplacer.containsLocalTable || tableNameReplacer
-                  .uri2TableObj.size() == 1) {
+                  .mUri2TblObj.size() == 1) {
               this.mLog.info("New stat is " + statement.toString());
               return this.sql2ddf(statement.toString(), schema, dataSource,
                       dataFormat);
           } else {
               String selectString = statement.toString();
               DDF ddf = this.getManager().transferByTable(tableNameReplacer
-                      .fromEngineName, selectString);
+                      .fromEngine, selectString);
               return ddf;
           }
       }

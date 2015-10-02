@@ -26,7 +26,7 @@ public class RowCount {
 
   public static void main(String[] args) throws DDFException {
 
-    DDFManager manager = DDFManager.get("spark");
+    DDFManager manager = DDFManager.get(DDFManager.EngineType.SPARK);
     manager.sql("drop table if exists airline", "SparkSQL");
 
     manager.sql("create table airline (Year int,Month int,DayofMonth int,"

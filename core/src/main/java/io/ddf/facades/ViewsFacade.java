@@ -43,6 +43,12 @@ public class ViewsFacade implements IHandleViews {
   }
 
   @Override
+  public DDF getRandomSampleByNum(int numSamples, boolean withReplacement,
+                                  int seed) {
+    return mViewHandler.getRandomSampleByNum(numSamples, withReplacement, seed);
+  }
+
+  @Override
   public DDF getRandomSample(double percent, boolean withReplacement, int seed) {
     return mViewHandler.getRandomSample(percent, withReplacement, seed);
   }

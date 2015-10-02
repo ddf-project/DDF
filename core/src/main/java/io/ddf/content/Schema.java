@@ -12,6 +12,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
 
+
 /**
  * Table schema of a DDF including table name and column metadata
  */
@@ -75,14 +76,14 @@ public class Schema implements Serializable {
   private List<Column> parseColumnList(String columnList) {
     if (Strings.isNullOrEmpty(columnList))
       return null;
-    String[] segments = columnList.split(" *, *");
+    String[] segments = columnList.split("\\s*,\\s*");
 
     mColumns.clear();
     for (String segment : segments) {
       if (Strings.isNullOrEmpty(segment))
         continue;
 
-      String[] parts = segment.split("  *");
+      String[] parts = segment.split("\\s+");
       if (Strings.isNullOrEmpty(parts[0])
           || Strings.isNullOrEmpty(parts[1]))
         continue;

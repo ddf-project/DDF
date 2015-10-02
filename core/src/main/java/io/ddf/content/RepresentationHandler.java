@@ -336,16 +336,6 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
     }
 
     @Override
-    public String getEngineName() {
-      return mEngineName;
-    }
-
-    @Override
-    public void setEngineName(String mEngineName) {
-      this.mEngineName = mEngineName;
-    }
-
-    @Override
     public String getNamespace() {
       return mNamespace;
     }

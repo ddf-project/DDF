@@ -30,6 +30,7 @@ import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.*;
 import io.ddf.content.IHandlePersistence.IPersistible;
 import io.ddf.content.Schema.Column;
+import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.etl.*;
 import io.ddf.etl.IHandleMissingData.Axis;
 import io.ddf.etl.IHandleMissingData.NAChecking;
@@ -73,6 +74,17 @@ public abstract class DDF extends ALoggable //
 
   private Date mCreatedTime;
 
+  //  Whether the ddf acts as a view for the database table.
+  private boolean mIsDDFView = false;
+
+  public boolean getIsDDFView() {
+    return mIsDDFView;
+  }
+
+  public void setIsDDFView(boolean isDDFView) {
+    this.mIsDDFView = isDDFView;
+  }
+
   /**
    *
    * @param data
@@ -87,17 +99,17 @@ public abstract class DDF extends ALoggable //
    * @throws DDFException
    */
   public DDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-             String engineName, String namespace, String name, Schema schema)
+      String namespace, String name, Schema schema)
       throws DDFException {
 
-    this.initialize(manager, data, typeSpecs, engineName, namespace, name,
+    this.initialize(manager, data, typeSpecs, namespace, name,
             schema);
   }
 
   abstract public DDF copy() throws DDFException;
 
   protected DDF(DDFManager manager, DDFManager defaultManagerIfNull) throws DDFException {
-    this(manager != null ? manager : defaultManagerIfNull, null, null, null,
+    this(manager != null ? manager : defaultManagerIfNull, null, null,
             null, null, null);
   }
 
@@ -157,7 +169,7 @@ public abstract class DDF extends ALoggable //
    * Initialization to be done after constructor assignments, such as setting of the all-important DDFManager.
    */
   protected void initialize(DDFManager manager, Object data, Class<?>[]
-          typeSpecs, String engineName, String namespace, String name,
+          typeSpecs, String namespace, String name,
       Schema schema) throws DDFException {
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
@@ -170,11 +182,6 @@ public abstract class DDF extends ALoggable //
       String tableName = this.getSchemaHandler().newTableName();
       schema.setTableName(tableName);
     }
-
-    if (Strings.isNullOrEmpty(engineName)) {
-      engineName = this.getManager().getEngineName();
-    }
-    this.setEngineName(engineName);
 
     if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
     this.setNamespace(namespace);
@@ -203,10 +210,10 @@ public abstract class DDF extends ALoggable //
    * @throws DDFException
    */
   protected void initialize(DDFManager manager, Object data, Class<?>[]
-          typeSpecs, String engineName, String namespace, String name,
+          typeSpecs, String namespace, String name,
       Schema schema, String tableName) throws DDFException {
 
-    initialize(manager, data, typeSpecs, engineName, namespace, name, schema);
+    initialize(manager, data, typeSpecs, namespace, name, schema);
 
     if(schema != null && tableName != null) {
       schema.setTableName(tableName);
@@ -219,8 +226,6 @@ public abstract class DDF extends ALoggable //
 
 
   // //// IGloballyAddressable //////
-  @Expose private String mEngineName;
-
   @Expose private String mNamespace;
 
   @Expose private String mName;
@@ -249,23 +254,6 @@ public abstract class DDF extends ALoggable //
   @Override
   public void setNamespace(String namespace) {
     this.mNamespace = namespace;
-  }
-
-  @Override
-  public String getEngineName() {
-    if (mEngineName == null) {
-      try {
-        mEngineName = this.getManager().getEngineName();
-      } catch (Exception e) {
-        mLog.warn("Can't retrieve engineName for DDF " + this.getName(), e);
-      }
-    }
-    return mEngineName;
-  }
-
-  @Override
-  public void setEngineName(String engineName) {
-    this.mEngineName = engineName;
   }
 
   /**
@@ -348,6 +336,10 @@ public abstract class DDF extends ALoggable //
     return this.getManager().getEngine();
   }
 
+  public DDFManager.EngineType getEngineType() {
+    return this.getManager().getEngineType();
+  }
+
   // ////// MetaData that deserves to be right here at the top level ////////
 
   public Schema getSchema() {
@@ -393,9 +385,9 @@ public abstract class DDF extends ALoggable //
       // return this.getManager().sql(String.format(sqlCommand, this.getTableName()));
       sqlCommand = sqlCommand.replace("@this", "{1}");
       sqlCommand = String.format(sqlCommand, "{1}");
-      UUID[] uuidList = new UUID[1];
-      uuidList[0] = this.getUUID();
-      return this.getManager().sql(sqlCommand, null, uuidList);
+      SQLDataSourceDescriptor sqlDS = new SQLDataSourceDescriptor(sqlCommand,
+              null, null,null, this.getUUID().toString());
+      return this.getManager().sql(sqlCommand, null, sqlDS);
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }
@@ -415,9 +407,9 @@ public abstract class DDF extends ALoggable //
       // sqlCommand = sqlCommand.replace("@this", this.getTableName());
       sqlCommand = sqlCommand.replace("@this", "{1}");
       sqlCommand = String.format(sqlCommand, "{1}");
-      UUID[] uuidList = new UUID[1];
-      uuidList[0] = this.getUUID();
-      return  this.getManager().sql2ddf(sqlCommand, null, uuidList);
+      SQLDataSourceDescriptor sqlDS = new SQLDataSourceDescriptor(sqlCommand,
+              null, null,null, this.getUUID().toString());
+      return  this.getManager().sql2ddf(sqlCommand, null, sqlDS);
       // return this.getManager().sql2ddf(sqlCommand);
     } catch (Exception e) {
       throw new DDFException(String.format("Error executing queries for ddf %s", this.getTableName()), e);

@@ -99,7 +99,7 @@ public class SqlHandler extends ASqlHandler {
     rdd = this.getHiveContext().sql(command);
     if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[]
-                    {DataFrame.class}, null, null,
+                    {DataFrame.class}, null,
         null, schema);
     ddf.getRepresentationHandler().cache(false);
     ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});

@@ -24,7 +24,7 @@ public class BasicDDFManager extends DDFManager {
 
 
   @Override
-  public DDF transfer(String fromEngine, String ddfuri) {
+  public DDF transfer(UUID fromEngine, String ddfuri) {
     return null;
   }
 
@@ -32,8 +32,7 @@ public class BasicDDFManager extends DDFManager {
   }
 
 
-  public <T> DDF newDDF(List<T> rows, Class<T> unitType, String
-          engineName, String namespace, String name, Schema schema)
+  public <T> DDF newDDF(List<T> rows, Class<T> unitType, String namespace, String name, Schema schema)
       throws DDFException {
 
     if (rows == null || rows.isEmpty()) {
@@ -41,7 +40,7 @@ public class BasicDDFManager extends DDFManager {
     }
 
     return this.newDDF(this, rows, new Class[] { List.class, unitType },
-            engineName, namespace, name, schema);
+         namespace, name, schema);
   }
 
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {

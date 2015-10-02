@@ -21,8 +21,4 @@ public interface IGloballyAddressable {
   String getUri();
 
   String getGlobalObjectType();
-
-  String getEngineName();
-
-  void setEngineName(String engineName);
 }
