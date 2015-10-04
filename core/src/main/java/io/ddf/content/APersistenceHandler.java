@@ -95,10 +95,6 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
       if (parts.length > 1) {
         this.setNamespace(parts[parts.length - 2]);
       }
-
-      if (parts.length > 2) {
-        this.setEngineName(parts[parts.length-3]);
-      }
     }
 
     @Override
