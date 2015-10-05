@@ -140,7 +140,9 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   private DDF sql2ddf(String sqlCommand, String errorMessage) throws DDFException {
     try {
-      return this.getManager().sql2ddf(String.format(sqlCommand, this.getDDF().getTableName()), this.getEngine());
+      return this.getManager().sql2ddf(String.format(sqlCommand, "{1}"),
+          new SQLDataSourceDescriptor(sqlCommand, null, null, null, this
+              .getDDF().getUUID().toString()));
 
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getDDF().getTableName()), e);
