@@ -167,15 +167,13 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     mLog.info("Updated columns: " + Arrays.toString(columnExpr.toArray()));
 
     String sqlCmd = String.format("SELECT %s FROM %s", Joiner.on(", ").join
-        (colNames), "{1}");
+        (colNames), this.getDDF().getTableName());
     if (filter != null) {
       sqlCmd = String.format("%s WHERE %s", sqlCmd, filter.toSql());
     }
     mLog.info("sql = {}", sqlCmd);
 
-    DDF subset = this.getManager().sql2ddf(sqlCmd, new
-        SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF()
-        .getUUID().toString()));
+    DDF subset = this.getDDF().getSqlHandler().sql2ddf(sqlCmd);
     return subset;
   }
 
