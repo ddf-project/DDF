@@ -22,9 +22,14 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
     super(uri, credentials, schema, format);
   }
 
-  public SQLDataSourceDescriptor(DataSourceURI uri, IDataSourceCredentials credentials,
-                                 DataSourceSchema schema, FileFormat format, String sqlcmd,
-                                 String dataSource, String namespace, List<String> uriList,
+  public SQLDataSourceDescriptor(DataSourceURI uri,
+                                 IDataSourceCredentials credentials,
+                                 DataSourceSchema schema,
+                                 FileFormat format,
+                                 String sqlcmd,
+                                 String dataSource,
+                                 String namespace,
+                                 List<String> uriList,
                                  List<String> uuidList) {
     super(uri, credentials, schema, format);
     this.sqlCmd = sqlcmd;
@@ -38,7 +43,10 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
     this(sqlCommand, null, null, null, null);
   }
 
-  public SQLDataSourceDescriptor(String sqlCommand, String dataSource, String namespace, String uriListStr,
+  public SQLDataSourceDescriptor(String sqlCommand,
+                                 String dataSource,
+                                 String namespace,
+                                 String uriListStr,
                                  String uuidListStr) {
     super(null, null, null, null);
     this.sqlCmd = sqlCommand;
@@ -53,14 +61,6 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
     }
   }
 
-//  public SQLDataSourceDescriptor(String sqlCommand, String dataSource, String namespace,
-//      List<String> iuriList, List<String> iuuidList) {
-//    this.sqlCmd = sqlCommand;
-//    this.dataSource = dataSource;
-//    this.namespace = namespace;
-//
-//  }
-  // Getters and Setters.
   public String getSqlCommand() {
     return sqlCmd;
   }
