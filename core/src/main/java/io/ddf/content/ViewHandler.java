@@ -470,7 +470,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
   }
 
-  private void updateVectorName(Expression expression, DDF ddf) {
+  protected void updateVectorName(Expression expression, DDF ddf) {
     if (expression == null) {
       return;
     }
