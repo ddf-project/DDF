@@ -20,7 +20,7 @@ class RepresentationHandlerSuite extends ATestSuite {
   createTableAirline()
 
   test("Can get SchemaRDD and RDD[Vector]") {
-    val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
+    val ddf = manager.newDDF().getSqlHandler.sql2ddf("select month, year, dayofmonth from airline").asInstanceOf[SparkDDF]
     val rddVector = ddf.getRDD(classOf[Vector])
     assert(rddVector != null, "Can get RDD[Vector]")
     assert(rddVector.count == 295)
