@@ -30,7 +30,8 @@ public class AggregationHandlerTest extends BaseTest {
     // aggregation: select year, month, min(depdelay), max(arrdelay) from airline group by year, month;
     // Assert.assertEquals(13, ddf.aggregate("year, month, mean(depdelay), median(arrdelay)").size());
     Assert.assertEquals(13, ddf.aggregate("year, month, avg(depdelay), stddev(arrdelay)").size());
-    Assert.assertEquals(2, ddf.aggregate("year, month, min(depdelay), max(arrdelay)").get("2010,3").length);
+    Assert.assertEquals(2, ddf.aggregate("year, month, min(depdelay), max" +
+        "(arrdelay)").get("2010\t3").length);
 
     Assert.assertEquals(0.87, ddf.correlation("arrdelay", "depdelay"), 0.5);
     // project subset
