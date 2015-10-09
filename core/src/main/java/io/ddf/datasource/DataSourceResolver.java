@@ -21,7 +21,7 @@ public class DataSourceResolver {
       case "hdfs": {
         return resolveHDFS(options);
       }
-      case "jdbc":case "sfdc":case "postgres": {
+      case "jdbc":case "sfdc":case "postgres":case "redshift": {
         return resolveJDBC(options);
       }
       case "sql" : {

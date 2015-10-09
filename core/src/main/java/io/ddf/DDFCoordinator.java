@@ -178,8 +178,17 @@ public class DDFCoordinator extends ALoggable {
    * @param uri The uri of the ddf.
    * @return The uuid of the ddf.
    */
-  public UUID uuidFromUri(String uri) {
-    return null;
+  public UUID uuidFromUri(String uri) throws DDFException {
+    for (Map.Entry<UUID, DDFManager> entry : mDDFUUID2DDFManager.entrySet()) {
+      DDFManager ddfmanager = entry.getValue();
+      try {
+        DDF ddf = ddfmanager.getDDFByURI(uri);
+        return ddf.getUUID();
+      } catch (DDFException e) {
+        // e.printStackTrace();
+      }
+    }
+    throw new DDFException("Can't find ddf with uri: " + uri);
   }
 
   public DDFManager initEngine(EngineType engineType) throws DDFException {
@@ -281,8 +290,9 @@ public class DDFCoordinator extends ALoggable {
   }
 
   // TODO: is this used?
-  public DDF transfer(UUID fromEngine, UUID engineUUID, String ddfuri) throws DDFException {
+  public DDF transfer(UUID fromEngine, UUID engineUUID, UUID ddfUUID) throws
+      DDFException {
     DDFManager defaultManager = this.getEngine(engineUUID);
-    return defaultManager.transfer(fromEngine, ddfuri);
+    return defaultManager.transfer(fromEngine, ddfUUID);
   }
 }

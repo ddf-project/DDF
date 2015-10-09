@@ -4,7 +4,7 @@ package io.ddf.datasource;
  * Created by jing on 7/16/15.
  */
 public class S3DataSourceCredentials implements IDataSourceCredentials {
-    private String credentials;
+    private transient String credentials;
     private String awsKeyID;
     private String awsSecretKey;
 

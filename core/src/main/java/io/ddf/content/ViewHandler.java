@@ -140,7 +140,9 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   private DDF sql2ddf(String sqlCommand, String errorMessage) throws DDFException {
     try {
-      return this.getManager().sql2ddf(String.format(sqlCommand, this.getDDF().getTableName()), this.getEngine());
+      return this.getManager().sql2ddf(String.format(sqlCommand, "{1}"),
+          new SQLDataSourceDescriptor(sqlCommand, null, null, null, this
+              .getDDF().getUUID().toString()));
 
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getDDF().getTableName()), e);
@@ -167,15 +169,13 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     mLog.info("Updated columns: " + Arrays.toString(columnExpr.toArray()));
 
     String sqlCmd = String.format("SELECT %s FROM %s", Joiner.on(", ").join
-        (colNames), "{1}");
+        (colNames), this.getDDF().getTableName());
     if (filter != null) {
       sqlCmd = String.format("%s WHERE %s", sqlCmd, filter.toSql());
     }
     mLog.info("sql = {}", sqlCmd);
 
-    DDF subset = this.getManager().sql2ddf(sqlCmd, new
-        SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF()
-        .getUUID().toString()));
+    DDF subset = this.getDDF().getSqlHandler().sql2ddf(sqlCmd);
     return subset;
   }
 
@@ -472,7 +472,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
   }
 
-  private void updateVectorName(Expression expression, DDF ddf) {
+  protected void updateVectorName(Expression expression, DDF ddf) {
     if (expression == null) {
       return;
     }

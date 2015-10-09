@@ -7,8 +7,8 @@ import java.net.URISyntaxException;
  * Created by jing on 7/16/15.
  */
 public class S3DataSourceURI extends DataSourceURI {
-    private String awsKeyID = null;
-    private String awsSecretKey = null;
+    private transient String awsKeyID = null;
+    private transient String awsSecretKey = null;
 
     public S3DataSourceURI(String uri) throws URISyntaxException {
         super(new URI(uri));
