@@ -170,12 +170,16 @@ public class TableVisitor
     }
 
     public void visit(SetOperationList setOperationList) throws Exception {
-        for (SelectBody selectBody : setOperationList.getSelects()) {
-            selectBody.accept(this);
+        if (setOperationList.getSelects() != null) {
+            for (SelectBody selectBody : setOperationList.getSelects()) {
+                selectBody.accept(this);
+            }
         }
 
-        for (OrderByElement orderByElement : setOperationList.getOrderByElements()) {
-            orderByElement.accept(this);
+        if (setOperationList.getOrderByElements() != null) {
+            for (OrderByElement orderByElement : setOperationList.getOrderByElements()) {
+                orderByElement.accept(this);
+            }
         }
     }
 
