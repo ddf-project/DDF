@@ -4,13 +4,16 @@ package io.ddf;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.StatementVisitor;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 
+import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,8 +49,6 @@ public class TableNameReplacer extends TableVisitor {
     private Boolean mHasLocalTbl = false;
     // Whether the query contains remote table.
     private Boolean mHasRemoteTbl = false;
-    // How many remote engines are in the query.
-    private List<UUID> fromEngineUUIDList = new ArrayList<UUID>();
 
     // The information needed for a ddf.
     class DDFInfo {
@@ -146,32 +147,47 @@ public class TableNameReplacer extends TableVisitor {
         } else if (statement instanceof DescribeTable){
             ((DescribeTable)statement).accept(this);
         }
-        if (this.mDDFUUID2Tbl.isEmpty()) {
+
+        if (mHasLocalTbl && !mHasRemoteTbl) {
             return statement;
+        } else if (!mHasLocalTbl && !mHasRemoteTbl) {
+            throw new DDFException("ERROR in handle SQL query");
         } else {
             if (!this.mDDFManager.getEngine().equals("spark")) {
                 throw new DDFException("For this engine, only local table " +
+                    "can be referred");
+            }
+            if (mHasLocalTbl && mHasRemoteTbl) {
+                if (!this.mDDFManager.getEngine().equals("spark")) {
+                    throw new DDFException("For this engine, only local table " +
                         "can be referred");
-            }
-        }
-        if (containsLocalTable || mDDFUUID2Tbl.keySet().size() == 1) {
-            // contains local table, can only use local spark.
-            for (String uuidStr : this.mDDFUUID2Tbl.keySet()) {
-                UUID uuid = UUID.fromString(uuidStr);
-                DDFManager engine = this.mDDFManager.getDDFCoordinator()
-                    .getDDFManagerByDDFUUID(uuid);
-                DDF ddf = this.mDDFManager.transfer(engine.getUUID(),
+                }
+                for (Map.Entry<UUID, DDFInfo> entry
+                    : this.mDDFUUID2Info.entrySet()) {
+                    UUID uuid = entry.getKey();
+                    DDFInfo info = entry.getValue();
+                    DDFManager engine = this.mDDFManager.getDDFCoordinator()
+                        .getDDFManagerByDDFUUID(info.fromEngineUUID);
+                    DDF ddf = this.mDDFManager.transfer(engine.getUUID(),
                         uuid);
-                for (Table table : this.mDDFUUID2Tbl.get(uuidStr)) {
-                    table.setName(ddf.getTableName());
+                    for (Table table : info.tblList) {
+                        table.setName(ddf.getTableName());
+                    }
                 }
-            }
-        } else {
-            for (String uri : this.mDDFUUID2Tbl.keySet()) {
-                DDF ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(uri);
-                for (Table table : this.mDDFUUID2Tbl.get(uri)) {
-                    table.setName(ddf.getTableName());
+            } else if (!mHasLocalTbl && mHasRemoteTbl) {
+
+                for (UUID uuid : this.mDDFUUID2Info.keySet()) {
+                    DDF ddf = this.mDDFManager.getDDFCoordinator().getDDF(uuid);
+                    for (Table table : this.mDDFUUID2Info.get(uuid).tblList) {
+                        table.setName(ddf.getTableName());
+                    }
                 }
+                DDF ddf = this.mDDFManager.transferByTable(this.mDDFUUID2Info
+                    .entrySet().iterator().next().getValue().fromEngineUUID, " (" +
+                    statement.toString() + ") ");
+                CCJSqlParserManager parserManager = new CCJSqlParserManager();
+                StringReader reader = new StringReader("select * from " + ddf.getTableName());
+                return parserManager.parse(reader);
             }
         }
         return statement;
@@ -312,11 +328,10 @@ public class TableNameReplacer extends TableVisitor {
             mDDFUUID2Info.get(uuid).tblList.add(table);
         }
         if (this.mDDFManager.getDDFCoordinator() == null) {
-            return this.mDDFManager.getOrRestoreDDF(UUID.fromString(uuid))
-                    .getTableName();
+            return this.mDDFManager.getOrRestoreDDF(uuid).getTableName();
         } else {
-            return this.mDDFManager.getDDFCoordinator().getDDF(UUID.fromString
-                    (uuid)).getTableName();
+            return this.mDDFManager.getDDFCoordinator().getDDF(uuid)
+                .getTableName();
         }
     }
 
@@ -343,7 +358,7 @@ public class TableNameReplacer extends TableVisitor {
             if (this.mUriPattern.matcher(identifier).matches()) {
                 this.handleDDFURI(identifier, table);
             } else {
-                this.handleDDFUUID(identifier, table);
+                this.handleDDFUUID(UUID.fromString(identifier), table);
             }
 
         }

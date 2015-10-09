@@ -24,7 +24,12 @@ public class BasicDDFManager extends DDFManager {
 
 
   @Override
-  public DDF transfer(UUID fromEngine, String ddfuri) {
+  public DDF transfer(UUID fromEngine, UUID ddfUUID) {
+    return null;
+  }
+
+  @Override
+  public DDF transferByTable(UUID fromEngine, String tableName) throws DDFException {
     return null;
   }
 
