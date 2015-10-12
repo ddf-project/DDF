@@ -36,7 +36,7 @@ public class Schema implements Serializable {
    */
   @Deprecated
   // Require tableName at all times, even null
-  public Schema(String columns) throws DDFException {
+  public Schema(String columns) {
     this.initialize(null, this.parseColumnList(columns));
   }
 
@@ -49,34 +49,26 @@ public class Schema implements Serializable {
    * @param tableName
    * @param columns
    */
-  public Schema(String tableName, String columns) throws DDFException {
+  public Schema(String tableName, String columns) {
     this.initialize(tableName, this.parseColumnList(columns));
   }
 
   @Deprecated
   // Require tableName at all times, even null
-  public Schema(List<Column> columns) throws DDFException {
+  public Schema(List<Column> columns) {
     this.initialize(null, columns);
   }
 
-  public Schema(String tableName, List<Column> columns) throws DDFException {
+  public Schema(String tableName, List<Column> columns) {
     this.initialize(tableName, columns);
   }
 
   @SuppressWarnings("unchecked")
-  public Schema(String tableName, Column[] columns) throws DDFException {
+  public Schema(String tableName, Column[] columns) {
     this.initialize(tableName, Arrays.asList(columns));
   }
 
-  private void initialize(String tableName, List<Column> columns) throws DDFException {
-    Set<String> columnSet = new HashSet<String>();
-    for(Column column: columns) {
-      if(columnSet.contains(column.getName())) {
-        throw new DDFException(String.format("Duplicated column name %s", column.getName()));
-      } else {
-        columnSet.add(column.getName());
-      }
-    }
+  private void initialize(String tableName, List<Column> columns) {
     this.mTableName = tableName;
     this.mColumns = columns;
   }

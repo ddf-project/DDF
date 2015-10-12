@@ -40,7 +40,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
    * @brief Show tables in the database.
    * @return The table names.
    */
-  public SqlResult showTables() throws DDFException {
+  public SqlResult showTables() {
     List<String> tableNames = new ArrayList<String>();
     for (DDF ddf : this.getManager().listDDFs()) {
       if (ddf.getName() != null) {

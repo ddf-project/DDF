@@ -59,7 +59,7 @@ public class HDFSDataSourceDescriptor extends DataSourceDescriptor {
                                   Boolean hasHeader,
                                   String delimiter,
                                   String quote,
-                                  String comment) throws URISyntaxException, DDFException {
+                                  String comment) throws URISyntaxException {
     TextFileFormat textFileFormat = new TextFileFormat(format, hasHeader, delimiter, quote);
     List<Schema.Column> columnList;
     if (!Strings.isNullOrEmpty(schema)) {
