@@ -101,4 +101,17 @@ public class BasicDDFTests {
     
     manager.getDDFByURI(uri1);
   }
+  @Test(expected = DDFException.class)
+  public void testDuplicatedColumn() throws DDFException {
+    List<Object[]> list = new ArrayList<Object[]>();
+    list.add(new Object[] { "Last", "Nguyen" });
+    list.add(new Object[] { "First", "Christopher" });
+    String namespace = "random"; // use default
+    String name = this.getClass().getSimpleName();
+    
+    String columns = "row Int, \n\tprice double, \n\t lotsize int, \n\t bedrooms int,\n\tbathrms int, row Int";
+    Schema schema = new Schema(null, columns);
+    DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[]
+        .class, namespace, name, schema);
+  }
 }
