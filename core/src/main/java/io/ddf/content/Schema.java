@@ -69,9 +69,8 @@ public class Schema implements Serializable {
   }
 
   private void initialize(String tableName, List<Column> columns) throws DDFException {
-    this.validateColumns(columns);
+    this.setColumns(columns);
     this.mTableName = tableName;
-    this.mColumns = columns;
   }
 
   private void validateColumns(List<Column> columns) throws DDFException {
