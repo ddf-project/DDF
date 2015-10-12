@@ -73,19 +73,6 @@ public class Schema implements Serializable {
     this.mTableName = tableName;
   }
 
-  private void validateColumns(List<Column> columns) throws DDFException {
-    Set<String> columnSet = new HashSet<String>();
-    if(columns != null) {
-      for (Column column : columns) {
-        if (columnSet.contains(column.getName())) {
-          throw new DDFException(String.format("Duplicated column name %s", column.getName()));
-        } else {
-          columnSet.add(column.getName());
-        }
-      }
-    }
-  }
-
   private List<Column> parseColumnList(String columnList) {
     if (Strings.isNullOrEmpty(columnList))
       return null;
@@ -124,7 +111,6 @@ public class Schema implements Serializable {
   }
 
   public void setColumns(List<Column> columns) throws DDFException {
-    this.validateColumns(columns);
     this.mColumns = columns;
   }
 
