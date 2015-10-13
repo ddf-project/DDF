@@ -182,8 +182,7 @@ public class PersistenceHandler extends APersistenceHandler {
 
   @Override
   public IPersistible load(APersistenceHandler.PersistenceUri uri) throws DDFException {
-    PersistenceUri2 uri2 = new PersistenceUri2(uri);
-    return this.load(uri2.getNamespace(), uri2.getName());
+    return this.load(uri.getNamespace(), uri.getName());
   }
 
   /*
@@ -225,92 +224,6 @@ public class PersistenceHandler extends APersistenceHandler {
   public List<String> listItems(String namespace) throws DDFException {
     return Utils.listSubdirectories(this.locateOrCreatePersistenceSubdirectory(namespace));
   }
-
-
-  /**
-   * Like {@link PersistenceUri} but also with namespace and name parsed
-   */
-  public static class PersistenceUri2 extends PersistenceUri implements IGloballyAddressable {
-    public PersistenceUri2(String uri) throws DDFException {
-      super(uri);
-      this.parsePath();
-    }
-
-    public PersistenceUri2(PersistenceUri uri) throws DDFException {
-      super(uri.getEngine(), uri.getPath());
-      this.parsePath();
-    }
-
-    private String mNamespace;
-    private String mName;
-
-
-    /**
-     * Parse the path part of the uri into namespace and name
-     */
-    private void parsePath() {
-      if (Strings.isNullOrEmpty(this.getPath())) return;
-
-      String[] parts = this.getPath().split("/");
-      if (parts == null || parts.length == 0) return;
-
-      String name = parts[parts.length - 1];
-      if (!Strings.isNullOrEmpty(name) && name.toLowerCase().endsWith(".dat") || name.toLowerCase().endsWith(".sch")) {
-        name = name.substring(0, name.lastIndexOf('.'));
-        // Also trim our current path
-        this.setPath(this.getPath().substring(0, this.getPath().lastIndexOf('.')));
-      }
-      this.setName(name);
-
-      if (parts.length > 1) {
-        this.setNamespace(parts[parts.length - 2]);
-      }
-    }
-
-    /**
-     * @return the namespace
-     */
-    @Override
-    public String getNamespace() {
-      return mNamespace;
-    }
-
-    /**
-     * @param namespace the namespace to set
-     */
-    @Override
-    public void setNamespace(String namespace) {
-      this.mNamespace = namespace;
-    }
-
-    /**
-     * @return the name
-     */
-    @Override
-    public String getName() {
-      return mName;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-      this.mName = name;
-    }
-
-    @Override
-    public String getUri() {
-      return AGloballyAddressable.getUri(this);
-    }
-
-    @Override
-    public String getGlobalObjectType() {
-      return "persistence_uri";
-    }
-
-  }
-
-
 
   /**
    * Base class for objects that can persist themselves (e.g, Models) via the BasicObjectDDF persistence mechanism
