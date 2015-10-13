@@ -161,14 +161,25 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     Set<String> newColsInRExp = new HashSet<String>();
     for (String str : RExps) {
-      String[] udf = str.split("[=~](?![^()]*+\\))");
-      String newCol = (udf.length > 1) ?
+      int index = str.indexOf("=") >  str.indexOf("~")
+          ? str.indexOf("=")
+          : str.indexOf("~");
+      String[] udf = new String[2];
+      if (index == -1) {
+        udf[0] = str;
+      } else {
+        udf[0] = str.substring(0,index);
+        udf[1] = str.substring(index + 1);
+      }
+
+      // String[] udf = str.split("[=~](?![^()]*+\\))");
+      String newCol = (index != -1) ?
         udf[0].trim().replaceAll("\\W", "") :
         udf[0].trim();
       if (newColsInRExp.contains(newCol)) {
         throw new RuntimeException(String.format(dupColExp, newCol));
       }
-      String newDef = (udf.length > 1) ? udf[1].trim() : null;
+      String newDef = (index != -1) ? udf[1].trim() : null;
       if (!udfs.contains(newCol)) {
         udfs.add(newCol);
       }

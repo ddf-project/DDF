@@ -76,7 +76,8 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
         rs = this.getDDF()
             .sql(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).getRows()
             .get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t| ");
-      } else if (this.getDDF().getEngineType().equals(DDFManager.EngineType.POSTGRES)) {
+      } else if (this.getDDF().getEngineType().equals(DDFManager.EngineType.POSTGRES)
+              || this.getDDF().getEngineType().equals(DDFManager.EngineType.REDSHIFT)) {
 
         rs = new String[numericColumns.size()*5];
 

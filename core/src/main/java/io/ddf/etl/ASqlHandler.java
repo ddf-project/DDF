@@ -40,7 +40,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
    * @brief Show tables in the database.
    * @return The table names.
    */
-  public SqlResult showTables() {
+  public SqlResult showTables() throws DDFException {
     List<String> tableNames = new ArrayList<String>();
     for (DDF ddf : this.getManager().listDDFs()) {
       if (ddf.getName() != null) {
@@ -127,6 +127,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
             }
         }
     }
+
+
+    this.mLog.info("Handle SQL: " + sqlcmd);
     CCJSqlParserManager parserManager = new CCJSqlParserManager();
     StringReader reader = new StringReader(sqlcmd);
     try {
@@ -138,11 +141,10 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                 .getName(), tableNameReplacer.getNamespace());
       } else if (statement instanceof  Select) {
         // Standard SQL.
-          this.mLog.info("Replace: " + sqlcmd);
           statement = tableNameReplacer.run(statement);
           if (tableNameReplacer.containsLocalTable || tableNameReplacer
                   .mUri2TblObj.keySet().size() == 1) {
-              this.mLog.info("New stat is " + statement.toString());
+              this.mLog.info("Reformulate SQL to " + statement.toString());
               return this.sql(statement.toString(), maxRows, dataSource);
           } else {
             String selectString = statement.toString();
@@ -204,6 +206,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
             }
         }
     }
+
+    this.mLog.info("Handle SQL: " + command);
     CCJSqlParserManager parserManager = new CCJSqlParserManager();
     StringReader reader = new StringReader(command);
     try {
@@ -211,12 +215,11 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       if (!(statement instanceof Select)) {
         throw  new DDFException("ERROR: Only select is allowed in this sql2ddf");
       } else {
-          this.mLog.info("replace: " + command);
         statement = tableNameReplacer.run(statement);
           if (tableNameReplacer.containsLocalTable || tableNameReplacer
                   .mUri2TblObj.size() == 1) {
-              this.mLog.info("New stat is " + statement.toString());
-              return this.sql2ddf(statement.toString(), schema, dataSource,
+            this.mLog.info("Reformulate SQL to " + statement.toString());
+            return this.sql2ddf(statement.toString(), schema, dataSource,
                       dataFormat);
           } else {
               String selectString = statement.toString();
