@@ -1,12 +1,10 @@
 package io.ddf;
 
 
-import com.google.common.base.Strings;
 import io.ddf.DDFManager.EngineType;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
-import io.ddf.DDFManager.EngineType;
 import io.ddf.misc.ALoggable;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -152,17 +150,15 @@ public class DDFCoordinator extends ALoggable {
     throw new DDFException("Can't find ddf with uuid: " + uuid.toString());
   }
 
-
-  // TODO think here.
-  /**
   public DDF getDDFByURI(String uri) throws DDFException {
-    for (DDFManager ddfManager : mDDFManagerList) {
+    for (Map.Entry<UUID, DDFManager> entry : mEngineUUID2DDFManager.entrySet()) {
+      DDFManager manager = entry.getValue();
       try {
-        DDF ddf = ddfManager.getDDFByURI(uri);
+        DDF ddf = manager.getDDFByURI(uri);
         return ddf;
       } catch (Exception e) {
         try {
-          DDF ddf = ddfManager.getOrRestoreDDFUri(uri);
+          DDF ddf = manager.getOrRestoreDDFUri(uri);
           return ddf;
         } catch (Exception e2) {
           throw new DDFException("Can't find ddf with uri: " + uri, e2);
@@ -171,7 +167,6 @@ public class DDFCoordinator extends ALoggable {
     }
     throw new DDFException("Can't find ddf with uri: " + uri);
   }
-   **/
 
   /**
    * @brief Return the uuid for one uri.

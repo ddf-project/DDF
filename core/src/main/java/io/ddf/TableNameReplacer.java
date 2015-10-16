@@ -7,7 +7,6 @@ import io.ddf.exception.DDFException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.StatementVisitor;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
@@ -43,8 +42,7 @@ public class TableNameReplacer extends TableVisitor {
     // remember the alias, we only replace ddfview -> (ddfview).
     private Map<UUID, String> mViewMapping = new HashMap<UUID, String>();
     // The info for every ddf.
-    private Map<UUID, DDFInfo> mDDFUUID2Info
-            = new HashMap<UUID, DDFInfo>();
+    private Map<UUID, DDFInfo> mDDFUUID2Info = new HashMap<UUID, DDFInfo>();
     // Whether the query contains local table.
     private Boolean mHasLocalTbl = false;
     // Whether the query contains remote table.
