@@ -1,6 +1,7 @@
 package io.ddf.content;
 
 
+import io.ddf.exception.DDFException;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class SchemaTest {
   }
 
   @Test
-  public void testParseSchema() {
+  public void testParseSchema() throws DDFException {
     String columns = "row Int, \n\tprice double, \n\t lotsize int, \n\t bedrooms int,\n\tbathrms int";
     Schema schema = new Schema(null, columns);
     for(Schema.Column column: schema.getColumns()) {

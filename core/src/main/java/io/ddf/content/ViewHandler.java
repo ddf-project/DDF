@@ -360,7 +360,8 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
     @Override
     public String toSql() {
-      return String.format("'%s'", value);
+      String s = value.replaceAll("'", "\\\\'");
+      return String.format("'%s'", s);
     }
   }
 

@@ -36,7 +36,7 @@ public class Schema implements Serializable {
    */
   @Deprecated
   // Require tableName at all times, even null
-  public Schema(String columns) {
+  public Schema(String columns) throws DDFException {
     this.initialize(null, this.parseColumnList(columns));
   }
 
@@ -49,28 +49,28 @@ public class Schema implements Serializable {
    * @param tableName
    * @param columns
    */
-  public Schema(String tableName, String columns) {
+  public Schema(String tableName, String columns) throws DDFException {
     this.initialize(tableName, this.parseColumnList(columns));
   }
 
   @Deprecated
   // Require tableName at all times, even null
-  public Schema(List<Column> columns) {
+  public Schema(List<Column> columns) throws DDFException {
     this.initialize(null, columns);
   }
 
-  public Schema(String tableName, List<Column> columns) {
+  public Schema(String tableName, List<Column> columns) throws DDFException {
     this.initialize(tableName, columns);
   }
 
   @SuppressWarnings("unchecked")
-  public Schema(String tableName, Column[] columns) {
+  public Schema(String tableName, Column[] columns) throws DDFException {
     this.initialize(tableName, Arrays.asList(columns));
   }
 
-  private void initialize(String tableName, List<Column> columns) {
+  private void initialize(String tableName, List<Column> columns) throws DDFException {
+    this.setColumns(columns);
     this.mTableName = tableName;
-    this.mColumns = columns;
   }
 
   private List<Column> parseColumnList(String columnList) {
@@ -110,8 +110,8 @@ public class Schema implements Serializable {
     return columns;
   }
 
-  public void setColumns(List<Column> Columns) {
-    this.mColumns = Columns;
+  public void setColumns(List<Column> columns) throws DDFException {
+    this.mColumns = columns;
   }
 
   public List<String> getColumnNames() {

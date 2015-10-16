@@ -50,10 +50,7 @@ import io.ddf.util.PhantomReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -171,6 +168,7 @@ public abstract class DDF extends ALoggable //
   protected void initialize(DDFManager manager, Object data, Class<?>[]
           typeSpecs, String namespace, String name,
       Schema schema) throws DDFException {
+    this.validateSchema(schema);
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
     if (typeSpecs != null) {
@@ -218,7 +216,6 @@ public abstract class DDF extends ALoggable //
     if(schema != null && tableName != null) {
       schema.setTableName(tableName);
     }
-
   }
 
   // ////// Instance Fields & Methods ////////
@@ -341,6 +338,18 @@ public abstract class DDF extends ALoggable //
   }
 
   // ////// MetaData that deserves to be right here at the top level ////////
+  private void validateSchema(Schema schema) throws DDFException {
+    Set<String> columnSet = new HashSet<String>();
+    if(schema != null && schema.getColumns() != null) {
+      for (Column column : schema.getColumns()) {
+        if (columnSet.contains(column.getName())) {
+          throw new DDFException(String.format("Duplicated column name %s", column.getName()));
+        } else {
+          columnSet.add(column.getName());
+        }
+      }
+    }
+  }
 
   public Schema getSchema() {
     return this.getSchemaHandler().getSchema();
