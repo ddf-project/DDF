@@ -291,7 +291,7 @@ public class TableNameReplacer extends TableVisitor {
                 }
                 table.setName(tableName);
             } else {
-                table.setName(ddf.getTableName());
+                    table.setName(ddf.getTableName());
             }
         } else {
             // The ddf is from another engine.
@@ -301,8 +301,10 @@ public class TableNameReplacer extends TableVisitor {
             mUri2TblObj.get(uuid).add(table);
         }
         if (this.mDDFManager.getDDFCoordinator() == null) {
-            return this.mDDFManager.getOrRestoreDDF(UUID.fromString(uuid))
-                    .getTableName();
+            //return this.mDDFManager.getOrRestoreDDF(UUID.fromString(uuid))
+            //        .getTableName();
+            return this.mDDFManager.getDDF(UUID.fromString(uuid))
+                .getTableName();
         } else {
             return this.mDDFManager.getDDFCoordinator().getDDF(UUID.fromString
                     (uuid)).getTableName();
