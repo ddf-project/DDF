@@ -8,6 +8,7 @@ import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.DDFManager.EngineType;
 import io.ddf.misc.ALoggable;
+import io.ddf.misc.Config;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
@@ -25,10 +26,20 @@ public class DDFCoordinator extends ALoggable {
   // The default engine.
   private DDFManager mDefaultEngine;
   private String mComputeEngine;
-
+  private String mNamespace = null;
 
   public DDFManager getDefaultEngine() {
     return mDefaultEngine;
+  }
+
+  public String getNamespace() throws DDFException {
+    if (Strings.isNullOrEmpty(mNamespace)) {
+      mNamespace = Config.getValueWithGlobalDefault(Config.ConfigConstant
+              .SECTION_GLOBAL.toString(),
+          Config.ConfigConstant.FIELD_NAMESPACE);
+    }
+
+    return mNamespace;
   }
 
   public void removeEngine(UUID engineUUID) throws DDFException {
