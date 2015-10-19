@@ -480,6 +480,17 @@ public class TableVisitor
         // TODO: Not supported.
     }
 
+    @Override
+    public void visit(SQLArray sqlArray) throws Exception {
+        if (sqlArray.getColumn() != null) {
+            visit(sqlArray.getColumn());
+        }
+
+        if (sqlArray.getFunc() != null) {
+            sqlArray.getFunc().accept(this);
+        }
+    }
+
     public void visit(SubJoin subjoin) throws Exception {
         subjoin.getLeft().accept(this);
         subjoin.getJoin().getRightItem().accept(this);
@@ -600,5 +611,6 @@ public class TableVisitor
     public void visit(ClusterByElement clusterByElement) throws Exception {
         clusterByElement.getExpression().accept(this);
     }
+
 
 }
