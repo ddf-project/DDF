@@ -144,7 +144,12 @@ public class DDFCoordinator extends ALoggable {
         DDF ddf = ddfmanager.getDDF(uuid);
         return ddf;
       } catch (DDFException e) {
-        // e.printStackTrace();
+        try {
+          DDF ddf = ddfmanager.getOrRestoreDDF(uuid);
+          return ddf;
+        } catch (Exception e2) {
+          throw new DDFException("Can't find ddf with uuid: " + uuid.toString(), e2);
+        }
       }
     }
     throw new DDFException("Can't find ddf with uuid: " + uuid.toString());

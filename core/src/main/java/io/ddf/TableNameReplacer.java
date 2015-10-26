@@ -310,10 +310,10 @@ public class TableNameReplacer extends TableVisitor {
             // Restore the ddf first.
             // TODO: fix setDDFName.scala first.
             // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
-            if (this.mDDFManager.getEngine().equals("spark")) {
-                ddf = this.mDDFManager.getOrRestoreDDF(uuid);
+            if (this.mDDFManager.getDDFCoordinator() == null) {
+                ddf = this.mDDFManager.getDDFCoordinator().getDDF(uuid);
             } else {
-                ddf = this.mDDFManager.getDDF(uuid);
+                ddf = this.mDDFManager.getOrRestoreDDF(uuid);
             }
             // TODO(fanj) : Temporary fix for ddf.
             // If the ddf is a ddf-view, then we should use subquery method.
