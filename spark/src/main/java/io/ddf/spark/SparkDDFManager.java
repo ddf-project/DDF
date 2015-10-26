@@ -123,13 +123,14 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-    public DDF transfer(UUID fromEngine, String ddfuri) throws DDFException {
+    public DDF transfer(UUID fromEngine, UUID ddfUUID) throws DDFException {
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
-    mLog.info("Get the engine " + fromEngine + " to transfer ddf : " + ddfuri);
-    DDF fromDDF = fromManager.getDDFByURI(ddfuri);
+    mLog.info("Get the engine " + fromEngine + " to transfer ddf : " +
+        ddfUUID.toString());
+    DDF fromDDF = fromManager.getDDF(ddfUUID);
     if (fromDDF == null) {
-      throw new DDFException("There is no ddf with uri : " + ddfuri + " in " +
-              "another engine");
+      throw new DDFException("There is no ddf with uri : " + ddfUUID.toString()
+          + " in another engine");
     }
     String fromTableName = fromDDF.getTableName();
     return this.transferByTable(fromEngine, fromTableName);

@@ -26,7 +26,6 @@ import net.sf.jsqlparser.statement.show.ShowTables;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  */
@@ -142,17 +141,8 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       } else if (statement instanceof  Select) {
         // Standard SQL.
           statement = tableNameReplacer.run(statement);
-          if (tableNameReplacer.containsLocalTable || tableNameReplacer
-                  .mUri2TblObj.keySet().size() == 1) {
-              this.mLog.info("Reformulate SQL to " + statement.toString());
-              return this.sql(statement.toString(), maxRows, dataSource);
-          } else {
-            String selectString = statement.toString();
-            DDF ddf = this.getManager().transferByTable(tableNameReplacer
-                    .fromEngine, " (" + selectString + ") ");
-            return this.sql("select * from " + ddf.getTableName(), maxRows,
-                    dataSource);
-          }
+          this.mLog.info("Reformulate SQL to " + statement.toString());
+          return this.sql(statement.toString(), maxRows, dataSource);
       } else if (statement instanceof Drop) {
           // TODO: +rename
           return null;
@@ -216,17 +206,11 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         throw  new DDFException("ERROR: Only select is allowed in this sql2ddf");
       } else {
         statement = tableNameReplacer.run(statement);
-          if (tableNameReplacer.containsLocalTable || tableNameReplacer
-                  .mUri2TblObj.size() == 1) {
-            this.mLog.info("Reformulate SQL to " + statement.toString());
-            return this.sql2ddf(statement.toString(), schema, dataSource,
+        this.mLog.info("Reformulate SQL to " + statement.toString());
+        // TODO(fanj) optimization here;
+        return this.sql2ddf(statement.toString(), schema, dataSource,
                       dataFormat);
-          } else {
-              String selectString = statement.toString();
-              DDF ddf = this.getManager().transferByTable(tableNameReplacer
-                      .fromEngine, selectString);
-              return ddf;
-          }
+
       }
     } catch (JSQLParserException e) {
         throw  new DDFException(" SQL Syntax ERROR: " + e.getCause().getMessage().split("\n")[0]);

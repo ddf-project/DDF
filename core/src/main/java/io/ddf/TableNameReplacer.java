@@ -4,14 +4,15 @@ package io.ddf;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import net.sf.jsqlparser.statement.select.WithItem;
 
 
+import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +33,6 @@ public class TableNameReplacer extends TableVisitor {
     // The DDFManager.
     private DDFManager mDDFManager = null;
     // DDF uri to table name mapping.
-    private Map<String, String> mUri2Tbl = new HashMap<String, String>();
     // The mapping from ddf view to new table name.It contains the following
     // situation: (1) If only the view is referred, select ddfview. a from
     // ddfview, it should be converted into select tmp.a from (query) tmp. So
@@ -40,14 +40,27 @@ public class TableNameReplacer extends TableVisitor {
     // contains the alias, select alias.a from ddfview alias, then it should
     // be converted to select alias.a from (query) alias, then as we already
     // remember the alias, we only replace ddfview -> (ddfview).
-    private Map<String, String> mViewMapping = new HashMap<String, String>();
+    private Map<UUID, String> mViewMapping = new HashMap<UUID, String>();
+    // The info for every ddf.
+    private Map<UUID, DDFInfo> mDDFUUID2Info = new HashMap<UUID, DDFInfo>();
+    // Whether the query contains local table.
+    private Boolean mHasLocalTbl = false;
+    // Whether the query contains remote table.
+    private Boolean mHasRemoteTbl = false;
 
-    public Map<String, List<Table>> mUri2TblObj
-            = new HashMap<String, List<Table>>();
-    public Boolean containsLocalTable = false;
-    public UUID fromEngine = null;
+    // The information needed for a ddf.
+    class DDFInfo {
+        // The engine where the ddf is from.
+        UUID fromEngineUUID;
+        // The tables that refers to this ddf.
+        List<Table> tblList = new ArrayList<Table>();
 
+        DDFInfo(UUID fromEngineUUID) {
+            this.fromEngineUUID = fromEngineUUID;
+        }
+    }
 
+    // Used from random name.
     String possibleLetter = "abcdefghijklmnopqrstuvwxyz0123456789";
     String possibleStart = "abcdefghijklmnopqrstuvwxyz";
 
@@ -93,6 +106,10 @@ public class TableNameReplacer extends TableVisitor {
     }
 
 
+    /**
+     * @brief Get namespace.
+     * @return The namespace.
+     */
     public String getNamespace() {
         return this.mDS.getNamespace();
     }
@@ -134,30 +151,55 @@ public class TableNameReplacer extends TableVisitor {
         } else if (statement instanceof DescribeTable){
             ((DescribeTable)statement).accept(this);
         }
-        if (this.mUri2TblObj.isEmpty()) {
+
+        if (mHasLocalTbl && !mHasRemoteTbl) {
+            // Only contains local table, then all the ddfs have already be
+            // handled.
             return statement;
+        } else if (!mHasLocalTbl && !mHasRemoteTbl) {
+            throw new DDFException("ERROR in handle SQL query");
         } else {
             if (!this.mDDFManager.getEngine().equals("spark")) {
                 throw new DDFException("For this engine, only local table " +
+                    "can be referred");
+            }
+            if (mHasLocalTbl && mHasRemoteTbl) {
+                // Mixed situation. The sql query contains both local ddfs and
+                // remote ddfs, then we should load remote ddfs to local and
+                // run the query in local.
+                if (!this.mDDFManager.getEngine().equals("spark")) {
+                    throw new DDFException("For this engine, only local table " +
                         "can be referred");
-            }
-        }
-        if (containsLocalTable || mUri2TblObj.keySet().size() == 1) {
-            // contains local table, can only use local spark.
-            for (String uri : this.mUri2TblObj.keySet()) {
-                DDFManager engine = this.mDDFManager.getDDFCoordinator().getDDFManagerByURI(uri);
-                DDF ddf = this.mDDFManager.transfer(engine.getUUID(),
-                        uri);
-                for (Table table : this.mUri2TblObj.get(uri)) {
-                    table.setName(ddf.getTableName());
                 }
-            }
-        } else {
-            for (String uri : this.mUri2TblObj.keySet()) {
-                DDF ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(uri);
-                for (Table table : this.mUri2TblObj.get(uri)) {
-                    table.setName(ddf.getTableName());
+                for (Map.Entry<UUID, DDFInfo> entry
+                    : this.mDDFUUID2Info.entrySet()) {
+                    UUID uuid = entry.getKey();
+                    DDFInfo info = entry.getValue();
+                    DDFManager engine = this.mDDFManager.getDDFCoordinator()
+                        .getDDFManagerByDDFUUID(info.fromEngineUUID);
+                    DDF ddf = this.mDDFManager.transfer(engine.getUUID(),
+                        uuid);
+                    for (Table table : info.tblList) {
+                        table.setName(ddf.getTableName());
+                    }
                 }
+            } else if (!mHasLocalTbl && mHasRemoteTbl) {
+                // The query only contains remote ddfs, then we should do the
+                // query in remote first and only load the result to local ddf.
+                for (UUID uuid : this.mDDFUUID2Info.keySet()) {
+                    DDF ddf = this.mDDFManager.getDDFCoordinator().getDDF(uuid);
+                    for (Table table : this.mDDFUUID2Info.get(uuid).tblList) {
+                        table.setName(ddf.getTableName());
+                    }
+                }
+                // TODO(fanj): This part is hacky that assuming we are using
+                // spark datasource API.
+                DDF ddf = this.mDDFManager.transferByTable(this.mDDFUUID2Info
+                    .entrySet().iterator().next().getValue().fromEngineUUID, " (" +
+                    statement.toString() + ") ");
+                CCJSqlParserManager parserManager = new CCJSqlParserManager();
+                StringReader reader = new StringReader("select * from " + ddf.getTableName());
+                return parserManager.parse(reader);
             }
         }
         return statement;
@@ -233,27 +275,24 @@ public class TableNameReplacer extends TableVisitor {
      * @return The local tablename.
      */
     void handleDDFURI(String ddfuri, Table table) throws Exception {
-        DDF ddf = null;
+        UUID uuid = null;
         if (this.mDDFManager.getDDFCoordinator() != null) {
-            ddf = this.mDDFManager.getDDFCoordinator().getDDFByURI(ddfuri);
+            uuid = this.mDDFManager.getDDFCoordinator().uuidFromUri(ddfuri);
         } else {
-            ddf = this.mDDFManager.getDDFByURI(ddfuri);
+            uuid = this.mDDFManager.getDDFByURI(ddfuri).getUUID();
         }
-        if (ddf == null) {
-            this.mDDFManager.log("ddf is null when ddfuri is: " + ddfuri);
-            this.mDDFManager.log("enginename is : " + this.mDDFManager.getUUID());
-        }
-        this.handleDDFUUID(ddf.getUUID().toString(), table);
+
+        this.handleDDFUUID(uuid, table);
     }
 
     // Currently for uuid, we only support DDF from local engine.
     // TODO: Support ddf from other engine
-    String handleDDFUUID(String uuid, Table table) throws Exception {
+    String handleDDFUUID(UUID uuid, Table table) throws Exception {
         UUID engineUUID = null;
         try {
             if (this.mDDFManager.getDDFCoordinator() != null) {
                 DDFManager manager = this.mDDFManager.getDDFCoordinator()
-                        .getDDFManagerByUUID(UUID.fromString(uuid));
+                    .getDDFManagerByDDFUUID(uuid);
                 engineUUID = manager.getUUID();
             } else {
                 engineUUID = this.mDDFManager.getUUID();
@@ -262,22 +301,22 @@ public class TableNameReplacer extends TableVisitor {
            throw new DDFException("Can't find ddfmanger for " + uuid, e);
         }
 
-        this.mDDFManager.log("In handleDDFUUid, engine UUID is : " + engineUUID.toString());
 
         if (engineUUID == null
            || engineUUID.equals(this.mDDFManager.getUUID())) {
             // It's in the same engine.
+            this.mHasLocalTbl = true;
             DDF ddf = null;
             // Restore the ddf first.
             // TODO: fix setDDFName.scala first.
             // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
-            if (this.mDDFManager.getEngine().equals("spark")) {
-                ddf = this.mDDFManager.getOrRestoreDDF(UUID.fromString(uuid));
+            if (this.mDDFManager.getDDFCoordinator() == null) {
+                ddf = this.mDDFManager.getDDFCoordinator().getDDF(uuid);
             } else {
-                ddf = this.mDDFManager.getDDF(UUID.fromString(uuid));
+                ddf = this.mDDFManager.getOrRestoreDDF(uuid);
             }
-            containsLocalTable = true;
             // TODO(fanj) : Temporary fix for ddf.
+            // If the ddf is a ddf-view, then we should use subquery method.
             if (ddf.getIsDDFView()) {
                 String tableName = null;
                 if (mViewMapping.containsKey(uuid)) {
@@ -294,21 +333,28 @@ public class TableNameReplacer extends TableVisitor {
                 table.setName(ddf.getTableName());
             }
         } else {
+            this.mHasRemoteTbl = true;
             // The ddf is from another engine.
-            if (!this.mUri2TblObj.containsKey(uuid)) {
-                mUri2TblObj.put(uuid, new ArrayList<Table>());
+            if (!this.mDDFUUID2Info.containsKey(uuid)) {
+                mDDFUUID2Info.put(uuid, new DDFInfo(engineUUID));
             }
-            mUri2TblObj.get(uuid).add(table);
+            mDDFUUID2Info.get(uuid).tblList.add(table);
         }
         if (this.mDDFManager.getDDFCoordinator() == null) {
-            return this.mDDFManager.getOrRestoreDDF(UUID.fromString(uuid))
-                    .getTableName();
+            return this.mDDFManager.getOrRestoreDDF(uuid).getTableName();
         } else {
-            return this.mDDFManager.getDDFCoordinator().getDDF(UUID.fromString
-                    (uuid)).getTableName();
+            return this.mDDFManager.getDDFCoordinator().getDDF(uuid)
+                .getTableName();
         }
     }
 
+    /**
+     * @brief Handle the situation where indexes are used in query.
+     * @param index The index, should be in the format of "{number}".
+     * @param identifierList
+     * @param table
+     * @throws Exception
+     */
     void handleIndex(String index, List<String> identifierList, Table table)
             throws Exception {
         if (!mIndexPattern.matcher(index).matches()) {
@@ -332,7 +378,7 @@ public class TableNameReplacer extends TableVisitor {
             if (this.mUriPattern.matcher(identifier).matches()) {
                 this.handleDDFURI(identifier, table);
             } else {
-                this.handleDDFUUID(identifier, table);
+                this.handleDDFUUID(UUID.fromString(identifier), table);
             }
 
         }
