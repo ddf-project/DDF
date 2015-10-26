@@ -53,7 +53,7 @@ public class DDFCoordinator extends ALoggable {
       mDDFUUID2DDFManager.remove(uuid);
     }
   }
-  
+
   public String getNamespace() throws DDFException {
     if (Strings.isNullOrEmpty(mNamespace)) {
       mNamespace = Config.getValueWithGlobalDefault(Config.ConfigConstant
