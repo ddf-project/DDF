@@ -1,11 +1,13 @@
 package io.ddf;
 
 
+import com.google.common.base.Strings;
 import io.ddf.DDFManager.EngineType;
 import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
+import io.ddf.misc.Config;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
@@ -22,6 +24,8 @@ public class DDFCoordinator extends ALoggable {
           = new ConcurrentHashMap<UUID, DDFManager>();
   // The default engine.
   private DDFManager mDefaultEngine;
+
+  private String mNamespace = null;
 
   public DDFManager getDefaultEngine() {
     return mDefaultEngine;
@@ -49,6 +53,17 @@ public class DDFCoordinator extends ALoggable {
       mDDFUUID2DDFManager.remove(uuid);
     }
   }
+  
+  public String getNamespace() throws DDFException {
+    if (Strings.isNullOrEmpty(mNamespace)) {
+      mNamespace = Config.getValueWithGlobalDefault(Config.ConfigConstant
+              .SECTION_GLOBAL.toString(),
+          Config.ConfigConstant.FIELD_NAMESPACE);
+    }
+
+    return mNamespace;
+  }
+
 
   /**
    * @brief Restore the engines after restarting.
