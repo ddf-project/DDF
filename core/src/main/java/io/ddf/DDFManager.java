@@ -108,23 +108,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     }
   }
 
-
-  // The engine name, should be unique.
-  private UUID uuid = UUID.randomUUID();
   private EngineType engineType;
   // DataSourceDescriptor.
   private DataSourceDescriptor mDataSourceDescriptor;
-  // DDFCoordinator.
-  private DDFCoordinator mDDFCoordinator;
 
-
-  public UUID getUUID() {
-    return uuid;
-  }
-
-  public void setUUID(UUID uuid) {
-    this.uuid = uuid;
-  }
 
   public EngineType getEngineType() {
     return engineType;
@@ -132,14 +119,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public void setEngineType(EngineType engineType) {
     this.engineType = engineType;
-  }
-
-  public DDFCoordinator getDDFCoordinator() {
-    return mDDFCoordinator;
-  }
-
-  public void setDDFCoordinator(DDFCoordinator ddfCoordinator) {
-    this.mDDFCoordinator = ddfCoordinator;
   }
 
   public DataSourceDescriptor getDataSourceDescriptor() {
@@ -150,18 +129,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     this.mDataSourceDescriptor = dataSourceDescriptor;
   }
 
-  /**
-   * @brief Tranfer the ddf from another engine. This should be override by
-   * subclass.
-   * @param fromEngine The engine where the ddf is.
-   * @param ddfuuid The uuid of the ddf.
-   * @return The new ddf.
-   */
-  public abstract DDF transfer(UUID fromEngine, UUID ddfuuid) throws
-          DDFException;
-
-  public abstract DDF transferByTable(UUID fromEngine, String tableName) throws
-          DDFException;
 
   /**
    * List of existing DDFs, only in memory one.
@@ -172,9 +139,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public void addDDF(DDF ddf) throws DDFException {
     mDDFCache.addDDF(ddf);
-    if (this.mDDFCoordinator != null) {
-      mDDFCoordinator.setDDFUUID2DDFManager(ddf.getUUID(), this);
-    }
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
@@ -187,15 +151,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return mDDFCache.listDDFs();
   }
 
-  // TODO: Should we consider restore here?
-  public DDF getDDF(UUID uuid) throws DDFException {
-    return mDDFCache.getDDF(uuid);
-  }
-
-  // TODO: Should we consider restore here?
-  public boolean hasDDF(UUID uuid) {
-    return mDDFCache.hasDDF(uuid);
-  }
 
   // TODO: Should we consider restore here?
   public DDF getDDFByName(String name) throws DDFException {
@@ -204,16 +159,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
     mDDFCache.setDDFName(ddf, name);
-    mLog.info("set ddf uri : " + "ddf://" + ddf.getNamespace() + "/" + name);
   }
 
-  public synchronized void setDDFUUID(DDF ddf, UUID uuid) throws DDFException {
-    mDDFCache.setDDFUUID(ddf, uuid);
-  }
-
-  public DDF getDDFByURI(String uri) throws DDFException {
-    return mDDFCache.getDDFByUri(uri);
-  }
 
   public void addModel(IModel model) {
     mModels.put(model.getName(), model);
@@ -243,15 +190,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     this.startup();
   }
 
-  public DDFManager(DataSourceDescriptor dataSourceDescriptor, UUID engineUUID) {
-    this.setUUID(engineUUID);
-    this.startup();
-  }
-
-  public DDFManager(String namespace) {
-    this.setNamespace(namespace);
-    this.startup();
-  }
 
   public static DDFManager get(EngineType engineType, DataSourceDescriptor dataSourceDescriptor) throws DDFException {
     if (engineType == null) {
@@ -272,8 +210,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
       DDFManager manager = (DDFManager) Class.forName(className).getDeclaredConstructor(classType)
           .newInstance(dataSourceDescriptor, engineType);
-      UUID uuid = UUID.randomUUID();
-      manager.setUUID(uuid);
       return manager;
     } catch (Exception e) {
 
@@ -321,33 +257,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     if (mDummyDDF == null) mDummyDDF = this.newDDF(this);
     return mDummyDDF;
   }
-
-  //  /**
-  //   * Instantiates a new DDF of the type specified in ddf.ini as "DDF".
-  //   *
-  //   * @param manager
-  //   * @param data
-  //   * @param typeSpecs
-  //   * @param namespace
-  //   * @param name
-  //   * @param schema
-  //   * @return
-  //   * @throws DDFException
-  //   */
-  //  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-  //                    String namespace, String name, Schema
-  //                            schema)
-  //      throws DDFException {
-  //
-  //    // @formatter:off
-//    DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class, Object.class,
-//				Class[].class, String.class, String.class, Schema
-//                    .class },
-//				new Object[] { manager, data, typeSpecs,
-//                        namespace, name,
-//						schema });
-//    return ddf;
-//  }
 
   // TODO: For back compatability.
   public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
@@ -450,24 +359,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   @Override
   public void shutdown() {
     // Do nothing in the base
-  }
-
-
-  private String mNamespace;
-
-
-  @Override
-  public String getNamespace() throws DDFException {
-    if (Strings.isNullOrEmpty(mNamespace)) {
-      mNamespace = Config.getValueWithGlobalDefault(this.getEngine(), ConfigConstant.FIELD_NAMESPACE);
-    }
-
-    return mNamespace;
-  }
-
-  @Override
-  public void setNamespace(String namespace) {
-    mNamespace = namespace;
   }
 
 
@@ -614,18 +505,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @throws DDFException
    */
   public abstract DDF loadTable(String fileURL, String fieldSeparator) throws DDFException;
-
-  public DDF restoreDDF(UUID uuid) throws DDFException {
-    throw new DDFException(new UnsupportedOperationException());
-  }
-  /**
-   * @brief Restore the ddf given uri.
-   * @param ddfURI The URI of ddf.
-   * @return The ddf.
-   */
-  public abstract DDF getOrRestoreDDFUri(String ddfURI) throws DDFException;
-
-  public abstract DDF getOrRestoreDDF(UUID uuid) throws DDFException;
 
   public DDF load(DataSourceDescriptor ds) throws DDFException {
     return (new DataSourceManager()).load(ds, this);

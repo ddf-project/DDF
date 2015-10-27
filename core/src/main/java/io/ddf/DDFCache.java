@@ -13,18 +13,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DDFCache {
 
-  private Map<UUID, DDF> mDDFs = new ConcurrentHashMap<UUID, DDF>();
-  private Map<String, UUID> mUris = new ConcurrentHashMap<String, UUID>();
+  private Map<String, DDF> mDDFs = new ConcurrentHashMap<String, DDF>();
 
   public void addDDF(DDF ddf) throws DDFException {
-    mDDFs.put(ddf.getUUID(), ddf);
+    mDDFs.put(ddf.getName(), ddf);
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
-    mDDFs.remove(ddf.getUUID());
-    if(ddf.getUri() != null) {
-      mUris.remove(ddf.getUri());
-    }
+    mDDFs.remove(ddf.getName());
   }
 
   public DDF[] listDDFs() {
@@ -57,11 +53,7 @@ public class DDFCache {
 
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
     if(!Strings.isNullOrEmpty(name)) {
-      if(!Strings.isNullOrEmpty(ddf.getName())) {
-        this.mUris.remove(ddf.getUri());
-      }
       ddf.setName(name);
-      this.mUris.put(ddf.getUri(), ddf.getUUID());
     } else {
       throw new DDFException(String.format("DDF's name cannot be null or empty"));
     }

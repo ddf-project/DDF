@@ -142,7 +142,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     try {
       return this.getManager().sql2ddf(String.format(sqlCommand, "{1}"),
           new SQLDataSourceDescriptor(sqlCommand, null, null, null, this
-              .getDDF().getUUID().toString()));
+              .getDDF().getName()));
 
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getDDF().getTableName()), e);
