@@ -41,7 +41,6 @@ public class BasicDDFTests {
     DDF ddf = this.getDDFManager().newDDF();
     Assert.assertNotNull("DDF cannot be null", ddf);
 
-    Assert.assertNotNull(ddf.getNamespace());
     Assert.assertNotNull(ddf.getUUID());
 
     DDF ddf2 = this.getTestDDF();

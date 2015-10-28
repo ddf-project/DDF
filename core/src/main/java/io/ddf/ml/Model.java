@@ -155,8 +155,7 @@ public class Model implements IModel, Serializable {
 
     Schema schema = new Schema(this.getName(), columns);
 
-    return new BasicDDF(manager, listValues, String.class, manager
-            .getNamespace(), this.getName(), schema);
+    return new BasicDDF(manager, listValues, String.class, this.getName(), schema);
   }
 
   public static Model deserializeFromDDF(BasicDDF ddf) throws DDFException {

@@ -213,6 +213,7 @@ public abstract class DDF extends ALoggable //
 
   @Expose private String mName;
 
+  @Expose private UUID uuid;
 
   /**
    * @return the name of this DDF
@@ -229,6 +230,10 @@ public abstract class DDF extends ALoggable //
 
     this.mName = name;
   }
+
+  public UUID getUUID() {return uuid;}
+
+  protected void setUUID(UUID uuid) {this.uuid = uuid;}
 
   //Ensure name is unique
   //Also only allow alphanumberic and dash "-" and underscore "_"

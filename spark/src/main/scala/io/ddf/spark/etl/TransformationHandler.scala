@@ -122,8 +122,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val manager = this.getManager
     val ddf = manager.newDDF(manager, rReduced, Array(classOf[RDD[_]],
-      classOf[REXP]), manager.getNamespace, null,
-      newSchema)
+      classOf[REXP]), null, newSchema)
     ddf
   }
 
@@ -174,8 +173,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val manager = this.getManager
     val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]],
-      classOf[REXP]), manager.getNamespace, null,
-      newSchema)
+      classOf[REXP]), null, newSchema)
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
     ddf.getMetaDataHandler.copyFactor(this.getDDF)
     ddf
@@ -257,8 +255,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList)
 
     val manager = this.getManager
-    val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]], classOf[PyObject]),
-       manager.getNamespace, null, newSchema)
+    val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]], classOf[PyObject]), null, newSchema)
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
     ddf.getMetaDataHandler.copyFactor(this.getDDF)
     ddf

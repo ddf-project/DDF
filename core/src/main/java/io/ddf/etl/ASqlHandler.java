@@ -55,26 +55,12 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
   /**
    * @brief Get the column information of this table.
    * @param name The URI or the name of the ddf.
-   * @param namespace The namespace.
    * @return The column information.
    * @throws DDFException
    */
-  private SqlResult describeTable(String name, String namespace)
+  private SqlResult describeTable(String name)
           throws DDFException {
-    DDF ddf = null;
-    try {
-        ddf = this.getManager().getOrRestoreDDFUri(name);
-    } catch (Exception e) {
-        if (null == namespace) {
-            throw new DDFException("ERROR: there is no ddf " + name);
-        }
-        try {
-            mLog.info("trying to restore " + "ddf://" + namespace + "/" + name);
-            ddf = this.getManager().getOrRestoreDDFUri("ddf://" + namespace + "/" + name);
-        } catch (Exception e2) {
-            throw new DDFException("ERROR: there is no ddf " + name);
-        }
-    }
+    DDF ddf = this.getManager().getDDFByName(name);
 
     int colSize = ddf.getNumColumns();
     List<String> ret = new ArrayList<String>();
@@ -136,8 +122,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       if (statement instanceof ShowTables) {
         return this.showTables();
       } else if (statement instanceof  DescribeTable){
-        return this.describeTable(((DescribeTable)statement).getName()
-                .getName(), tableNameReplacer.getNamespace());
+        return this.describeTable(((DescribeTable)statement).getName().getName());
       } else if (statement instanceof  Select) {
         // Standard SQL.
           statement = tableNameReplacer.run(statement);

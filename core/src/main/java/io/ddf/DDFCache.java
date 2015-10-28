@@ -13,14 +13,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DDFCache {
 
-  private Map<String, DDF> mDDFs = new ConcurrentHashMap<String, DDF>();
+  private Map<UUID, DDF> mDDFs = new ConcurrentHashMap<UUID, DDF>();
+
+  private Map<String, UUID> mNames = new ConcurrentHashMap<String, UUID>();
 
   public void addDDF(DDF ddf) throws DDFException {
-    mDDFs.put(ddf.getName(), ddf);
+    mDDFs.put(ddf.getUUID(), ddf);
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
-    mDDFs.remove(ddf.getName());
+    mDDFs.remove(ddf.getUUID());
+    if (ddf.getName() != null) {
+      mNames.remove(ddf.getName());
+    }
   }
 
   public DDF[] listDDFs() {
@@ -53,7 +58,11 @@ public class DDFCache {
 
   public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
     if(!Strings.isNullOrEmpty(name)) {
+      if (!Strings.isNullOrEmpty(ddf.getName())) {
+        this.mNames.remove(ddf.getName());
+      }
       ddf.setName(name);
+      this.mNames.put(name, ddf.getUUID());
     } else {
       throw new DDFException(String.format("DDF's name cannot be null or empty"));
     }
@@ -70,18 +79,11 @@ public class DDFCache {
       }
       ddf.setUUID(uuid);
       mDDFs.put(uuid, ddf);
-      if(ddf.getUri() != null) {
-        mUris.remove(ddf.getUri());
-        mUris.put(ddf.getUri(), ddf.getUUID());
+      if(ddf.getName()!= null) {
+        mNames.remove(ddf.getName());
+        mNames.put(ddf.getName(), ddf.getUUID());
       }
     }
   }
 
-  public DDF getDDFByUri(String uri) throws DDFException {
-    UUID uuid = this.mUris.get(uri);
-    if(uuid == null) {
-      throw new DDFException(String.format("Cannot find ddf with uri %s", uri));
-    }
-    return this.getDDF(uuid);
-  }
 }

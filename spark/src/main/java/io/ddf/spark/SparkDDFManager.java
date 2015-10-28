@@ -52,10 +52,10 @@ public class SparkDDFManager extends DDFManager {
     this.initialize(sparkContext, null);
   }
 
-  @Override
   public DDF transferByTable(UUID fromEngine, String tableName) throws
           DDFException {
 
+    /*
     mLog.info("Get the engine " + fromEngine + " to transfer table : " +
             tableName);
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
@@ -87,7 +87,7 @@ public class SparkDDFManager extends DDFManager {
                 .getUsername() + ", " + loadDS.getCredentials().getPassword()
                 + ", " + loadDS.getDbTable());
         return this.load(loadDS);
-      }
+      }*/
       // TODO
       /*
       if (fromManager.getEngine().equals("sfdc")) {
@@ -116,14 +116,16 @@ public class SparkDDFManager extends DDFManager {
               {DataFrame.class}, null, null, null, schema);
       ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
       */
+    /*
     } else {
       throw new DDFException("Currently no other DataSourceDescriptor is " +
               "supported");
-    }
+    }*/
+    return null;
   }
 
-  @Override
     public DDF transfer(UUID fromEngine, UUID ddfUUID) throws DDFException {
+    /*
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
     mLog.info("Get the engine " + fromEngine + " to transfer ddf : " +
         ddfUUID.toString());
@@ -134,6 +136,8 @@ public class SparkDDFManager extends DDFManager {
     }
     String fromTableName = fromDDF.getTableName();
     return this.transferByTable(fromEngine, fromTableName);
+    */
+    return null;
   }
 
   /**
@@ -327,22 +331,17 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-      String namespace, String name, Schema
-                              schema)
+  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String name, Schema schema)
           throws DDFException {
-    DDF ddf = super.newDDF(manager, data, typeSpecs, namespace,
-            name, schema);
+    DDF ddf = super.newDDF(manager, data, typeSpecs, name, schema);
     ((SparkDDF) ddf).saveAsTable();
     return ddf;
   }
 
   @Override
-  public DDF newDDF(Object data, Class<?>[] typeSpecs,
-                    String namespace, String name, Schema schema)
+  public DDF newDDF(Object data, Class<?>[] typeSpecs, String name, Schema schema)
           throws DDFException {
-    DDF ddf = super.newDDF(data, typeSpecs, namespace, name,
-            schema);
+    DDF ddf = super.newDDF(data, typeSpecs, name, schema);
     ((SparkDDF) ddf).saveAsTable();
     return ddf;
   }
@@ -358,16 +357,6 @@ public class SparkDDFManager extends DDFManager {
     sql("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
         "INTO TABLE " + tableName, "SparkSQL");
     return sql2ddf("SELECT * FROM " + tableName, "SparkSQL");
-  }
-
-  @Override
-  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-    return this.mDDFCache.getDDFByUri(ddfURI);
-  }
-
-  @Override
-  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-    return this.mDDFCache.getDDF(uuid);
   }
 
   /**

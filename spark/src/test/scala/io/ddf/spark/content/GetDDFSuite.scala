@@ -10,7 +10,7 @@ class GetDDFSuite extends ATestSuite {
   test("test GetDDF") {
     val ddf = manager.sql2ddf("select * from airline", "SparkSQL")
     manager.setDDFName(ddf, "awesome_ddf")
-    val ddf1 = manager.getDDFByURI(ddf.getUri)
+    val ddf1 = manager.getDDFByName("awesome_ddf")
     assert(ddf1 != null)
     assert(ddf1.getNumRows == ddf.getNumRows)
   }

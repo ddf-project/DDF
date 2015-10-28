@@ -151,6 +151,13 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return mDDFCache.listDDFs();
   }
 
+  public DDF getDDF(UUID uuid) throws DDFException {
+    return mDDFCache.getDDF(uuid);
+  }
+
+  public boolean hasDDF(UUID uuid) {
+    return mDDFCache.hasDDF(uuid);
+  }
 
   // TODO: Should we consider restore here?
   public DDF getDDFByName(String name) throws DDFException {
@@ -161,6 +168,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     mDDFCache.setDDFName(ddf, name);
   }
 
+  public synchronized void setDDFUUID(DDF ddf, UUID uuid) throws DDFException {
+    mDDFCache.setDDFUUID(ddf, uuid);
+  }
 
   public void addModel(IModel model) {
     mModels.put(model.getName(), model);
@@ -259,28 +269,22 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   // TODO: For back compatability.
-  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-                    String namespace, String name, Schema schema) throws DDFException {
+  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String name, Schema schema)
+      throws DDFException {
     DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class, Object.class,
 				Class[].class, String.class, String.class, Schema
                     .class },
-				new Object[] { manager, data, typeSpecs,
-                        namespace, name,
-						schema });
+				new Object[] { manager, data, typeSpecs, name, schema });
     return ddf;
   }
 
-  public DDF newDDF(Object data, Class<?>[] typeSpecs,
-                    String namespace, String name, Schema schema)
+  public DDF newDDF(Object data, Class<?>[] typeSpecs, String name, Schema schema)
       throws DDFException {
 
     // @formatter:off
     DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class, Object.class,
 						Class[].class, String.class, String.class, Schema.class },
-						new Object[] { this, data, typeSpecs,
-                                namespace,
-                                name,
-								schema });
+						new Object[] { this, data, typeSpecs, name, schema });
     return ddf;
   }
 
@@ -346,12 +350,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
   @Override
   public void startup() {
-    try {
-      this.getNamespace(); // trigger the loading of the namespace
-
-    } catch (DDFException e) {
-      mLog.warn("Error while trying to getNamesapce()", e);
-    }
 
     PhantomReference.register(this);
   }

@@ -22,17 +22,6 @@ public class BasicDDFManager extends DDFManager {
     return "basic";
   }
 
-
-  @Override
-  public DDF transfer(UUID fromEngine, UUID ddfUUID) {
-    return null;
-  }
-
-  @Override
-  public DDF transferByTable(UUID fromEngine, String tableName) throws DDFException {
-    return null;
-  }
-
   public BasicDDFManager() {
   }
 
@@ -44,21 +33,11 @@ public class BasicDDFManager extends DDFManager {
       throw new DDFException("Non-null/zero-length List is required to instantiate a new BasicDDF");
     }
 
-    return this.newDDF(this, rows, new Class[] { List.class, unitType },
-         namespace, name, schema);
+    return this.newDDF(this, rows, new Class[] { List.class, unitType }, name, schema);
   }
 
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
     throw new DDFException("Load DDF from file is not supported!");
   }
 
-  @Override
-  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-    return null;
-  }
-
-  @Override
-  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-    return null;
-  }
 }

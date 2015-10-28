@@ -34,27 +34,22 @@ public class BasicDDF extends DDF {
 
   public BasicDDF(List<?> rows, Class<?> unitType, String
           namespace, String name, Schema schema) throws DDFException {
-    this((DDFManager) null, (List<?>) rows, unitType, namespace,
-            name,
-            schema);
+    this((DDFManager) null, (List<?>) rows, unitType, name, schema);
     if (rows != null) mUnitType = unitType;
   }
 
-  public BasicDDF(DDFManager manager, List<?> rows, Class<?> unitType,
-      String namespace, String name, Schema
-                          schema)
+  public BasicDDF(DDFManager manager, List<?> rows, Class<?> unitType, String name, Schema schema)
       throws DDFException {
 
     super(manager, sDummyBasicDDFManager);
     if (rows == null) throw new DDFException("Non-null rows List is required to instantiate a new BasicDDF");
     mUnitType = unitType;
-    this.initialize(manager, rows, new Class[] { List.class, unitType },
-         namespace, name, schema);
+    this.initialize(manager, rows, new Class[] { List.class, unitType }, name, schema);
   }
 
   /**
    * This signature is needed to support {@link DDFManager#newDDF(DDFManager,
-   * Object, Class[], String, String, String, Schema)}
+   * Object, Class[], String, String, Schema)}
    *
    * @param manager
    * @param rows
@@ -72,8 +67,7 @@ public class BasicDDF extends DDF {
     super(manager, sDummyBasicDDFManager);
     if (rows == null) throw new DDFException("Non-null rows Object is required to instantiate a new BasicDDF");
     mUnitType = (typeSpecs != null && typeSpecs.length > 0) ? typeSpecs[1] : null;
-    this.initialize(manager, rows, typeSpecs, namespace, name,
-            schema);
+    this.initialize(manager, rows, typeSpecs, name, schema);
   }
 
   /**
