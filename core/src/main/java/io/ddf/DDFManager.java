@@ -112,7 +112,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   // DataSourceDescriptor.
   private DataSourceDescriptor mDataSourceDescriptor;
 
-
   public EngineType getEngineType() {
     return engineType;
   }
@@ -128,7 +127,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public void setDataSourceDescriptor(DataSourceDescriptor dataSourceDescriptor) {
     this.mDataSourceDescriptor = dataSourceDescriptor;
   }
-
 
   /**
    * List of existing DDFs, only in memory one.
@@ -159,7 +157,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return mDDFCache.hasDDF(uuid);
   }
 
-  // TODO: Should we consider restore here?
+
   public DDF getDDFByName(String name) throws DDFException {
     return mDDFCache.getDDFByName(name);
   }
@@ -228,7 +226,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   /**
-   * Returns a new instance of {@link DDFManager} for the given engine name
+   * Returns a new instance of {@link DDFManager} for the given engine type
    *
    * @param engineType
    * @return
@@ -268,7 +266,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return mDummyDDF;
   }
 
-  // TODO: For back compatability.
+
   public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String name, Schema schema)
       throws DDFException {
     DDF ddf = this.newDDF(new Class<?>[] { DDFManager.class, Object.class,

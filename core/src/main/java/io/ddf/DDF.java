@@ -83,8 +83,6 @@ public abstract class DDF extends ALoggable //
    *
    * @param data
    *          The DDF data
-   * @param namespace
-   *          The namespace to place this DDF in. If null, it will be picked up from the DDFManager's current namespace.
    * @param name
    *          The name for this DDF. If null, it will come from the given schema. If that's null, a UUID-based name will
    *          be generated.
@@ -237,8 +235,6 @@ public abstract class DDF extends ALoggable //
 
   //Ensure name is unique
   //Also only allow alphanumberic and dash "-" and underscore "_"
-  // TODO: What's current namespace? Should we allow same name among
-  // different engines?
   private void validateName(String name) throws DDFException {
     Boolean isNameExisted;
     try {
@@ -254,8 +250,8 @@ public abstract class DDF extends ALoggable //
     Pattern p = Pattern.compile("^[a-zA-Z0-9_-]*$");
     Matcher m = p.matcher(name);
     if(!m.find()) {
-      throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
-              "and dash (\"-\") and underscore (\"_\")", name));
+      throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, " +
+          "numbers 0-9) and dash (\"-\") and underscore (\"_\")", name));
     }
   }
 
@@ -921,25 +917,6 @@ public abstract class DDF extends ALoggable //
   // //// IHandleViews //////
 
   public ViewsFacade VIEWS;
-
-
-  // public <T> Iterator<T> getRowIterator(Class<T> dataType) {
-  // return this.getViewHandler().getRowIterator(dataType);
-  // }
-  //
-  // public Iterator<?> getRowIterator() {
-  // return this.getViewHandler().getRowIterator();
-  // }
-  //
-  // public <D, C> Iterator<C> getElementIterator(Class<D> dataType, Class<C> columnType, String columnName) {
-  // return this.getViewHandler().getElementIterator(dataType, columnType, columnName);
-  // }
-  //
-  // public Iterator<?> getElementIterator(String columnName) {
-  // return this.getViewHandler().getElementIterator(columnName);
-  // }
-
-
 
   // //// ISupportStatistics //////
 
