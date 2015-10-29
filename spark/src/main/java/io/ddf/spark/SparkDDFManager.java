@@ -66,7 +66,7 @@ public class SparkDDFManager extends DDFManager {
       JDBCDataSourceDescriptor jdbcDS = (JDBCDataSourceDescriptor)
               dataSourceDescriptor;
 
-      if (fromManager.getEngine().equals("sfdc")) {
+      if (fromManager.getEngine().equalsIgnoreCase("sfdc")) {
         try {
           JDBCDataSourceDescriptor sfdcDS = new JDBCDataSourceDescriptor
                   (jdbcDS.getDataSourceUri().getUri().toString(),
