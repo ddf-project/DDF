@@ -265,6 +265,7 @@ object RootBuild extends Build {
               <artifactId>maven-surefire-plugin</artifactId>
               <version>2.15</version>
               <configuration>
+		<argLine>-Xmx2g -XX:MaxPermSize=512m</argLine>
                 <reuseForks>false</reuseForks>
                 <enableAssertions>false</enableAssertions>
                 <environmentVariables>

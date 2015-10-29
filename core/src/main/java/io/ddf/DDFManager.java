@@ -17,6 +17,7 @@ package io.ddf;
 
 
 import com.google.common.base.Strings;
+import io.basic.ddf.content.ModelPersistenceHandler;
 import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.IHandlePersistence.IPersistible;
 import io.ddf.content.IHandleRepresentations;
@@ -215,12 +216,39 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return mDDFCache.getDDFByUri(uri);
   }
 
+  /**
+   * Add the model to cache, as well as serialize it to hdfs (if it is already in hdfs, overrite it)
+   * @param model
+   */
   public void addModel(IModel model) {
     mModels.put(model.getName(), model);
+
+    try {
+      ModelPersistenceHandler.persistModel(model, true);
+    } catch (DDFException e){
+
+    }
   }
 
+  /**
+   * If the model is in the HashMap, return it
+   * else, check if it is persisted in hdfs, if so, deserialize the model, add it to cache, and return it
+   * @param modelName
+   * @return
+   */
   public IModel getModel(String modelName) {
-    return mModels.get(modelName);
+    if (mModels.containsKey(modelName)) {
+      return mModels.get(modelName);
+    } else {
+      try {
+        IModel model = ModelPersistenceHandler.getModelFromFile(modelName);
+        mModels.put(modelName, model);
+
+        return model;
+      } catch (Exception e) {
+        return null;
+      }
+    }
   }
 
   public DDF serialize2DDF(IModel model) throws DDFException {

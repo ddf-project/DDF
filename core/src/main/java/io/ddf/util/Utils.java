@@ -247,6 +247,48 @@ public class Utils {
     }
   }
 
+  public static Object readFromObjectFile(String fileName) throws IOException, ClassNotFoundException {
+    ObjectInputStream reader = null;
+    FileSystem hdfs = null;
+    Configuration configuration = getConfiguration();
+
+    try {
+      hdfs = FileSystem.get(configuration);
+      FSDataInputStream inputStream = hdfs.open(new Path(fileName));
+      reader = new ObjectInputStream(new BufferedInputStream(inputStream));
+      Object obj = reader.readObject();
+
+      return obj;
+    } catch (IOException ex) {
+      throw new IOException(String.format("Cannot read from file %s", fileName, ex));
+
+    } finally {
+      reader.close();
+      hdfs.close();
+    }
+  }
+
+  public static void writeObjectToFile(String fileName, Object obj) throws IOException {
+    ObjectOutputStream writer = null;
+    FileSystem hdfs = null;
+    Configuration configuration =  getConfiguration();
+
+    try {
+      hdfs = FileSystem.get(configuration);
+      FSDataOutputStream outputStream = hdfs.create(new Path(fileName));
+
+      writer = new ObjectOutputStream(new BufferedOutputStream(outputStream));
+      writer.writeObject(obj);
+
+    } catch (IOException ex) {
+      throw new IOException(String.format("Cannot write to file %s", fileName, ex));
+
+    } finally {
+      writer.close();
+      hdfs.close();
+    }
+  }
+
   /**
    * @param str e.g., "a, b, c"
    *            Add a comment to this line

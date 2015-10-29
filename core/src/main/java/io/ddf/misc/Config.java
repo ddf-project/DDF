@@ -32,6 +32,9 @@ public class Config {
     return String.format("%s/%s", getRuntimeDir(), getGlobalValue(ConfigConstant.FIELD_BASIC_PERSISTENCE_DIRECTORY));
   }
 
+  public static String getBasicModelPersistenceDir() throws IOException {
+    return String.format("%s/%s", getRuntimeDir(), getGlobalValue(ConfigConstant.FIELD_BASIC_MODEL_PERSISTENCE_DIRECTORY));
+  }
 
   public static String getValue(ConfigConstant section, ConfigConstant key) {
     return getValue(section.toString(), key.toString());
@@ -114,6 +117,7 @@ public class Config {
             .set("Namespace", "adatao") //
             .set("RuntimeDir", "ddf-runtime") //
             .set("BasicPersistenceDir", "basic-ddf-db") //
+            .set("BasicModelPersistenceDir", "basic-model-db") //
             .set("DDF", "io.ddf.DDF") //
             .set("io.ddf.DDF", "io.ddf.DDFManager") //
             .set("ISupportStatistics", "io.ddf.analytics.AStatisticsSupporter") //
@@ -170,7 +174,7 @@ public class Config {
     SECTION_GLOBAL("global"), 
     
     FIELD_RUNTIME_DIR("RuntimeDir"), FIELD_NAMESPACE("Namespace"), FIELD_DDF("DDF"), FIELD_DDF_MANAGER("DDFManager"),
-    FIELD_BASIC_PERSISTENCE_DIRECTORY("BasicPersistenceDir"),
+    FIELD_BASIC_PERSISTENCE_DIRECTORY("BasicPersistenceDir"),FIELD_BASIC_MODEL_PERSISTENCE_DIRECTORY("BasicModelPersistenceDir"),
 
     JDBC_DRIVER("Driver"), DEFAULT_JDBC_DRIVER("com.mysql.jdbc"),
     SFDC_JDBC_DRIVER("Driver"), DEFAULT_SFDC_JDBC_DRIVER("cdata.jdbc.salesforce.SalesforceDriver"),
