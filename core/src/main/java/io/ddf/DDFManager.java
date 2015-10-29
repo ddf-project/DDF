@@ -111,6 +111,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   private EngineType engineType;
   // DataSourceDescriptor.
   private DataSourceDescriptor mDataSourceDescriptor;
+  private DataSourceManager mDataSourceManager;
+
 
   public EngineType getEngineType() {
     return engineType;
@@ -503,6 +505,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public abstract DDF loadTable(String fileURL, String fieldSeparator) throws DDFException;
 
   public DDF load(DataSourceDescriptor ds) throws DDFException {
-    return (new DataSourceManager()).load(ds, this);
+    return mDataSourceManager.load(ds);
   }
 }

@@ -42,6 +42,7 @@ import io.ddf.ml.ISupportML;
 import io.ddf.ml.ISupportMLMetrics;
 import io.ddf.types.AggregateTypes.AggregateField;
 import io.ddf.types.AggregateTypes.AggregationResult;
+import io.ddf.types.IGloballyAddressable;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
 

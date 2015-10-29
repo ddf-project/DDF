@@ -175,13 +175,6 @@ public class SparkDDFManager extends DDFManager {
     DateUDF.registerUDFs(this.mHiveContext);
   }
 
-
-
-  public String getDDFEngine() {
-    return "spark";
-  }
-
-
   private SparkContext mSparkContext;
 
   private JavaSparkContext mJavaSparkContext;
@@ -211,34 +204,6 @@ public class SparkDDFManager extends DDFManager {
   public HiveContext getHiveContext() {
     return mHiveContext;
   }
-  //  private SparkUtils.createSharkContext mSharkContext;
-  //
-  //
-  //  public SharkContext getSharkContext() {
-  //    return mSharkContext;
-  //  }
-
-  //  private JavaSharkContext mJavaSharkContext;
-  //
-  //
-  //  public JavaSharkContext getJavaSharkContext() {
-  //    return mJavaSharkContext;
-  //  }
-
-  //  public void setJavaSharkContext(JavaSharkContext javaSharkContext) {
-  //    this.mJavaSharkContext = javaSharkContext;
-  //  }
-
-  /**
-   * Also calls setSparkContext() to the same sharkContext
-   *
-   * @param sharkContext
-   */
-  //  private void setSharkContext(SharkContext sharkContext) {
-  //    this.mSharkContext = sharkContext;
-  //    this.setSparkContext(sharkContext);
-  //  }
-
 
   private Map<String, String> mSparkContextParams;
 

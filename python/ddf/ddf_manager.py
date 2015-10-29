@@ -21,7 +21,8 @@ class DDFManager(object):
         :param engine_name: Name of the DDF engine, e.g. 'spark'
         """
         _gateway = start_gateway_server()
-        self._jdm = _gateway.jvm.io.ddf.DDFManager.get(engine_name)
+	engineType = _gateway.jvm.io.ddf.DDFManager.EngineType.fromString(engine_name)
+        self._jdm = _gateway.jvm.io.ddf.DDFManager.get(engineType)
 
     def sql(self, command):
         """

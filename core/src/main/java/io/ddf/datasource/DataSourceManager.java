@@ -15,7 +15,7 @@ import io.ddf.exception.DDFException;
 /**
  * author: daoduchuan, namma
  */
-public  class DataSourceManager {
+public abstract class DataSourceManager {
 
   public  DDF load(DataSourceDescriptor dataSourceDescriptor,
                   DDFManager manager) throws DDFException {
