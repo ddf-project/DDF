@@ -111,7 +111,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   private EngineType engineType;
   // DataSourceDescriptor.
   private DataSourceDescriptor mDataSourceDescriptor;
-  private DataSourceManager mDataSourceManager;
+  protected DataSourceManager mDataSourceManager;
 
 
   public EngineType getEngineType() {

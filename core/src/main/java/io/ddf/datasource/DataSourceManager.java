@@ -17,117 +17,78 @@ import io.ddf.exception.DDFException;
  */
 public abstract class DataSourceManager {
 
-  public  DDF load(DataSourceDescriptor dataSourceDescriptor,
-                  DDFManager manager) throws DDFException {
-    return load(dataSourceDescriptor, manager, true);
+    protected DDFManager mDDFManager;
+
+    public DataSourceManager(DDFManager manager) {
+        this.mDDFManager = manager;
+    }
+
+  public  DDF load(DataSourceDescriptor dataSourceDescriptor) throws DDFException {
+    return load(dataSourceDescriptor, true);
   }
 
   // To override
   public  DDF load(DataSourceDescriptor dataSourceDescriptor,
-                  DDFManager manager,
                   Boolean persist) throws DDFException {
     Class sourceClass = dataSourceDescriptor.getClass();
     DDF ddf = null;
     if (sourceClass.equals(S3DataSourceDescriptor.class)) {
-      ddf = loadFromS3((S3DataSourceDescriptor)dataSourceDescriptor, manager);
+      ddf = loadFromS3((S3DataSourceDescriptor)dataSourceDescriptor);
     } else if (sourceClass.equals(HDFSDataSourceDescriptor.class)){
-      ddf = loadFromHDFS((HDFSDataSourceDescriptor)dataSourceDescriptor, manager);
+      ddf = loadFromHDFS((HDFSDataSourceDescriptor)dataSourceDescriptor);
     } else if (sourceClass.equals(JDBCDataSourceDescriptor.class)) {
-      ddf = loadFromJDBC((JDBCDataSourceDescriptor)dataSourceDescriptor, manager);
+      ddf = loadFromJDBC((JDBCDataSourceDescriptor)dataSourceDescriptor);
     } else if (sourceClass.equals(SQLDataSourceDescriptor.class)) {
-      ddf = loadFromSQL((SQLDataSourceDescriptor) dataSourceDescriptor, manager);
+      ddf = loadFromSQL((SQLDataSourceDescriptor) dataSourceDescriptor);
     } else {
       throw new DDFException("Cannot find datasource " + sourceClass);
     }
     return ddf;
   }
 
-
   public DDF loadSpecialFormat(DataFormat format,
-                                URI fileURI,
-                                DDFManager manager) {
-    return loadSpecialFormat(format,
-            fileURI,
-            manager,
-            false);
+                                URI fileURI) throws DDFException {
+    return loadSpecialFormat(format, fileURI, false);
   }
 
-  // To override
-  public DDF loadSpecialFormat(DataFormat format,
-                                URI fileURI,
-                                DDFManager manager,
-                                Boolean flatten) {
-    return null;
+  public DDF loadFromS3(S3DataSourceDescriptor dataSource) throws DDFException {
+    return loadExternalFile(dataSource, dataSource.getFileFormat().getFormat(), dataSource.getDataSourceUri().getUri());
   }
 
-
-  public DDF loadTextFile(DataSourceDescriptor dataSource,
-                           DDFManager manager) {
-      // TODO: discuss about extract a function to generate the sql command.
-  /**
-    String hiveTableName = UUID.randomUUID().toString().replace("-", "_");
-    StringBuilder stringBuilder = new StringBuilder();
-    List<Schema.Column> columnList = dataSource.getDataSourceSchema().getColumns();
-    for (int i = 0; i < columnList.size(); ++i) {
-      if (i == 0) {
-        stringBuilder.append(columnList.get(i).getName() + " " + columnList.get(i).getType());
-      } else {
-        stringBuilder.append(", " + columnList.get(i).getName() + " " + columnList.get(i).getType());
-      }
-    }
-    String schemaStr = stringBuilder.toString();
-
-    TextFileFormat textFileFormat = (TextFileFormat)(dataSource.getFileFormat());
-    String quote = textFileFormat.getQuote();
-    String delimiter = textFileFormat.getDelimiter();
-
-    String serdesString = "ROW FORMAT SERDE 'com.bizo.hive.serde.csv.CSVSerde' " +
-            "WITH serdeproperties ('separatorChar' = '" +  delimiter + "', 'quoteChar' = '" + quote + "')";
-
-    URI uri = dataSource.getDataSourceUri().getUri();
-    String sqlCmd = "create external table " + hiveTableName + " (" + schemaStr  + ") "
-            + serdesString + " STORED AS TEXTFILE LOCATION '"+ uri.toString() + "'";
-   **/
-    // override;
-    return null;
-  }
-
-
-  public DDF loadFromS3(S3DataSourceDescriptor dataSource, DDFManager manager) {
+  public DDF loadFromHDFS(HDFSDataSourceDescriptor dataSource) throws DDFException {
     return loadExternalFile(dataSource,
             dataSource.getFileFormat().getFormat(),
-            dataSource.getDataSourceUri().getUri(),
-            manager);
-  }
-
-  public DDF loadFromHDFS(HDFSDataSourceDescriptor dataSource, DDFManager manager) {
-    return loadExternalFile(dataSource,
-            dataSource.getFileFormat().getFormat(),
-            dataSource.getDataSourceUri().getUri(),
-            manager);
-  }
-
-  // To override.
-  public DDF loadFromJDBC(JDBCDataSourceDescriptor dataSource, DDFManager manager) {
-    return null;
-  }
-
-  public DDF loadFromSQL(SQLDataSourceDescriptor dataSource, DDFManager manager) throws DDFException {
-      return manager.sql2ddf(dataSource.getSqlCommand(), dataSource);
+            dataSource.getDataSourceUri().getUri());
   }
 
 
-  public DDF loadExternalFile(DataSourceDescriptor dataSource, DataFormat dataFormat, URI fileURI, DDFManager manager) {
+  public DDF loadFromSQL(SQLDataSourceDescriptor dataSource) throws DDFException {
+      return this.mDDFManager.sql2ddf(dataSource.getSqlCommand(), dataSource);
+  }
+
+
+  public DDF loadExternalFile(DataSourceDescriptor dataSource, DataFormat dataFormat, URI fileURI) throws DDFException {
 
     DDF ddf;
     if (dataFormat.equals(DataFormat.JSON)) {
-        ddf = loadSpecialFormat(dataFormat, fileURI, manager);
+        ddf = loadSpecialFormat(dataFormat, fileURI);
     } else {
-        ddf = loadTextFile(dataSource, manager);
+        ddf = loadTextFile(dataSource);
     }
     // To override
     // ddf.getMetaDataHandler().setDataSourceDescriptor(dataSource)
     return ddf;
   }
+
+    public abstract DDF loadSpecialFormat(DataFormat format,
+                                          URI fileURI,
+                                          Boolean flatten) throws DDFException;
+
+    public abstract DDF loadFromJDBC(JDBCDataSourceDescriptor dataSource) throws DDFException;
+
+    public abstract DDF loadTextFile(DataSourceDescriptor dataSource) throws DDFException;
+    // TODO: discuss about extract a function to generate the sql command.
+
+    // override;
 
 }

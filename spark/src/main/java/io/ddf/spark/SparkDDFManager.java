@@ -11,6 +11,7 @@ import io.ddf.datasource.JDBCDataSourceCredentials;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.content.SchemaHandler;
+import io.ddf.spark.datasource.SparkDataSourceManager;
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
 import io.ddf.spark.etl.DateUDF;
@@ -50,6 +51,7 @@ public class SparkDDFManager extends DDFManager {
   public SparkDDFManager(SparkContext sparkContext) throws DDFException {
     this.setEngineType(EngineType.SPARK);
     this.initialize(sparkContext, null);
+    this.mDataSourceManager = new SparkDataSourceManager(this);
   }
 
   public DDF transferByTable(UUID fromEngine, String tableName) throws
@@ -215,6 +217,7 @@ public class SparkDDFManager extends DDFManager {
   private void setSparkContextParams(Map<String, String> mSparkContextParams) {
     this.mSparkContextParams = mSparkContextParams;
   }
+
    /* merge priority is as follows: (1) already set in params, (2) in system properties (e.g., -Dspark.home=xxx), (3) in
    * environment variables (e.g., export SPARK_HOME=xxx)
    *
