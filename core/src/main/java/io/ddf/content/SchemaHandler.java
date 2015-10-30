@@ -118,13 +118,16 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
 
 
   @Override
-  public Factor<?> setAsFactor(String columnName) {
+  public Factor<?> setAsFactor(String columnName) throws DDFException {
     if (this.getSchema() == null)
       return null;
 
     Factor<?> factor = null;
 
     Column column = this.getSchema().getColumn(columnName);
+    if(column == null) {
+      throw new DDFException(String.format("Column with name %s does not exist in DDF", columnName), null);
+    }
     switch (column.getType()) {
       case DOUBLE:
         factor = new Factor<Double>(this.getDDF(), columnName);
@@ -164,7 +167,7 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public Factor<?> setAsFactor(int columnIndex) {
+  public Factor<?> setAsFactor(int columnIndex) throws DDFException {
     return this.setAsFactor(this.getColumnName(columnIndex));
   }
 
