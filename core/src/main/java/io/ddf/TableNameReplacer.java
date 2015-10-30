@@ -176,7 +176,7 @@ public class TableNameReplacer extends TableVisitor {
                     UUID uuid = entry.getKey();
                     DDFInfo info = entry.getValue();
                     DDFManager engine = this.mDDFManager.getDDFCoordinator()
-                        .getDDFManagerByDDFUUID(info.fromEngineUUID);
+                        .getEngine(info.fromEngineUUID);
                     DDF ddf = this.mDDFManager.transfer(engine.getUUID(),
                         uuid);
                     for (Table table : info.tblList) {
@@ -291,8 +291,7 @@ public class TableNameReplacer extends TableVisitor {
         UUID engineUUID = null;
         try {
             if (this.mDDFManager.getDDFCoordinator() != null) {
-                DDFManager manager = this.mDDFManager.getDDFCoordinator()
-                    .getDDFManagerByDDFUUID(uuid);
+                DDFManager manager = this.mDDFManager.getDDFCoordinator().getDDF(uuid).getManager();
                 engineUUID = manager.getUUID();
             } else {
                 engineUUID = this.mDDFManager.getUUID();
