@@ -168,7 +168,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     }
 
     // convert R-processed data partitions back to RDD[Array[Object]]
-    val columnArr = TransformationHandler.RDataFrameToColumnList(rMapped)
+    val columnArr = TransformationHandler.RDataFrameToColumnList(rMapped, mDDF.getSchema.getColumns)
 
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList);
 
@@ -285,13 +285,13 @@ object TransformationHandler {
     rconn.eval("paste(capture.output(print(" + expr + ")), collapse='\\n')").asString()
   }
 
-  def RDataFrameToColumnList(rdd: RDD[REXP]): Array[Column] = {
+  def RDataFrameToColumnList(rdd: RDD[REXP], orgColumns: List[Column]): Array[Column] = {
     val firstdf = rdd.first()
     val names = firstdf.getAttribute("names").asStrings()
     val columns = new Array[Column](firstdf.length)
     for (j ← 0 until firstdf.length()) {
       val ddfType = firstdf.asList().at(j) match {
-        case v: REXPDouble ⇒ "DOUBLE"
+        case REXPDouble ⇒ "DOUBLE"
         case v: REXPInteger ⇒ "INT"
         case v: REXPString ⇒ "STRING"
         case _ ⇒ throw new DDFException("Only support atomic vectors of type int|double|string!")
