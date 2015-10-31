@@ -507,4 +507,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public DDF load(DataSourceDescriptor ds) throws DDFException {
     return mDataSourceManager.load(ds);
   }
+
+  public abstract DDF copyFrom(DDF ddf, String tgtname) throws DDFException;
+
+  public abstract DDF copyFrom(DDFManager manager, String ddfname, String tgtname) throws DDFException;
+
 }

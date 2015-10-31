@@ -7,7 +7,7 @@ import io.ddf.DDFManager;
 /**
  */
 
-abstract public class DataSourceDescriptor {
+public abstract class DataSourceDescriptor {
 
   private DataSourceSchema mDataSourceSchema;
 

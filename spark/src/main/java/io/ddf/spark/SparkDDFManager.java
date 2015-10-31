@@ -54,94 +54,6 @@ public class SparkDDFManager extends DDFManager {
     this.mDataSourceManager = new SparkDataSourceManager(this);
   }
 
-  public DDF transferByTable(UUID fromEngine, String tableName) throws
-          DDFException {
-
-    /*
-    mLog.info("Get the engine " + fromEngine + " to transfer table : " +
-            tableName);
-    DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
-    DataSourceDescriptor dataSourceDescriptor = fromManager
-            .getDataSourceDescriptor();
-    if (dataSourceDescriptor instanceof JDBCDataSourceDescriptor) {
-      // JDBCConnection.
-      JDBCDataSourceDescriptor jdbcDS = (JDBCDataSourceDescriptor)
-              dataSourceDescriptor;
-
-      if (fromManager.getEngine().equals("sfdc")) {
-        try {
-          JDBCDataSourceDescriptor sfdcDS = new JDBCDataSourceDescriptor
-                  (jdbcDS.getDataSourceUri().getUri().toString(),
-                   "",
-                   "",
-                   tableName);
-          return this.load(sfdcDS);
-        } catch (URISyntaxException e) {
-          throw new DDFException(e);
-        }
-      } else {
-        JDBCDataSourceDescriptor loadDS
-                = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(),
-                                               jdbcDS.getCredentials(),
-                                               tableName);
-        mLog.info("load from JDBCDatasource, " + loadDS.getDataSourceUri()
-                .getUri().toString() + ", " + loadDS.getCredentials()
-                .getUsername() + ", " + loadDS.getCredentials().getPassword()
-                + ", " + loadDS.getDbTable());
-        return this.load(loadDS);
-      }*/
-      // TODO
-      /*
-      if (fromManager.getEngine().equals("sfdc")) {
-        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri
-                ().toString());
-        mLog.info("sfdc uri: " + jdbcDataSourceDescriptor.getDataSourceUri()
-                .getUri().toString());
-      } else {
-        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri()
-                .toString() + "?user=" + jdbcCredential.getUsername() +
-                "&password="+jdbcCredential.getPassword());
-
-      }
-
-
-      // TODO: Pay attention here. Some maybe username?
-      // options.put("user", jdbcCredential.getUserName());
-      // options.put("password", jdbcCredential.getPassword());
-      // TODO: What if sfdc.
-      DataFrame rdd = mHiveContext.load("jdbc", options);
-      if (rdd == null) {
-        throw new DDFException("fail use spark datasource api");
-      }
-      Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
-      DDF ddf = this.newDDF(this, rdd, new Class<?>[]
-              {DataFrame.class}, null, null, null, schema);
-      ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
-      */
-    /*
-    } else {
-      throw new DDFException("Currently no other DataSourceDescriptor is " +
-              "supported");
-    }*/
-    return null;
-  }
-
-    public DDF transfer(UUID fromEngine, UUID ddfUUID) throws DDFException {
-    /*
-    DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
-    mLog.info("Get the engine " + fromEngine + " to transfer ddf : " +
-        ddfUUID.toString());
-    DDF fromDDF = fromManager.getDDF(ddfUUID);
-    if (fromDDF == null) {
-      throw new DDFException("There is no ddf with uri : " + ddfUUID.toString()
-          + " in another engine");
-    }
-    String fromTableName = fromDDF.getTableName();
-    return this.transferByTable(fromEngine, fromTableName);
-    */
-    return null;
-  }
-
   /**
    * Use system environment variables to configure the SparkContext creation.
    *
@@ -325,6 +237,28 @@ public class SparkDDFManager extends DDFManager {
     sql("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
         "INTO TABLE " + tableName, "SparkSQL");
     return sql2ddf("SELECT * FROM " + tableName, "SparkSQL");
+  }
+
+  @Override
+  public DDF copyFrom(DDF ddf, String tgtname) throws DDFException {
+    mLog.info(String.format(">>> Copy new ddf %s from ddf %s", tgtname, ddf.getName()));
+    DDFManager fromManager = ddf.getManager();
+    DataSourceDescriptor dataSourceDescriptor = fromManager.getDataSourceDescriptor();
+    if (dataSourceDescriptor instanceof JDBCDataSourceDescriptor) {
+      // It's a jdbc ddf.
+      JDBCDataSourceDescriptor jdbcDS = (JDBCDataSourceDescriptor) dataSourceDescriptor;
+      JDBCDataSourceDescriptor loadDS = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(), jdbcDS.getCredentials(), ddf.getTableName());
+      DDF tgtddf = this.load(loadDS);
+      this.setDDFName(tgtddf, tgtname);
+      return tgtddf;
+    } else {
+      throw new DDFException("Unsupported operation in copyFrom");
+    }
+  }
+
+  @Override
+  public DDF copyFrom(DDFManager manager, String ddfname, String tgtname) throws DDFException {
+    return this.copyFrom(manager.getDDFByName(ddfname), tgtname);
   }
 
   /**
