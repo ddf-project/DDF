@@ -173,6 +173,8 @@ public abstract class DDF extends ALoggable //
       schema.setTableName(tableName);
     }
 
+    manager.setDDFUUID(this, UUID.randomUUID());
+
     if(!Strings.isNullOrEmpty(name)) manager.setDDFName(this, name);
 
     // Facades
@@ -340,7 +342,7 @@ public abstract class DDF extends ALoggable //
       sqlCommand = sqlCommand.replace("@this", "{1}");
       sqlCommand = String.format(sqlCommand, "{1}");
       SQLDataSourceDescriptor sqlDS = new SQLDataSourceDescriptor(sqlCommand,
-              null, null,null, this.getName());
+              null, null,null, this.getUUID().toString());
       return this.getManager().sql(sqlCommand, null, sqlDS);
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
@@ -362,7 +364,7 @@ public abstract class DDF extends ALoggable //
       sqlCommand = sqlCommand.replace("@this", "{1}");
       sqlCommand = String.format(sqlCommand, "{1}");
       SQLDataSourceDescriptor sqlDS = new SQLDataSourceDescriptor(sqlCommand,
-              null, null,null, this.getName());
+              null, null,null, this.getUUID().toString());
       return  this.getManager().sql2ddf(sqlCommand, null, sqlDS);
       // return this.getManager().sql2ddf(sqlCommand);
     } catch (Exception e) {

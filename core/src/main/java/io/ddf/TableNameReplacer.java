@@ -147,7 +147,18 @@ public class TableNameReplacer extends TableVisitor {
             }
         }
 
-        DDF ddf = this.mDDFManager.getDDFByName(table.getName());
+        Matcher matcher = this.mIndexPattern.matcher(name);
+        DDF ddf = null;
+        if (matcher.matches()) {
+            if (this.mDS.getUriList() != null || this.mDS.getUuidList() != null) {
+                // The third situation.
+                ddf = this.handleIndex(name, this.mDS.getUriList() == null ? this.mDS
+                    .getUuidList() : this.mDS.getUriList(), table);
+            }
+        } else {
+            ddf = this.mDDFManager.getDDFByName(table.getName());
+        }
+
         if (ddf.getIsDDFView()) {
             String tableName = null;
             if (mViewMapping.containsKey(ddf.getName())) {
@@ -172,6 +183,35 @@ public class TableNameReplacer extends TableVisitor {
                     selectItem.accept(this);
                 }
             }
+        }
+    }
+
+    private DDF handleIndex(String index, List<String> identifierList, Table table)
+        throws Exception {
+        if (!mIndexPattern.matcher(index).matches()) {
+            // Not full uri, no namespace, the index can't match.
+            throw new Exception(">>> ERROR: Can't find the required ddf "
+                + index);
+        }
+        String number = index.substring(index.indexOf('{') + 1,
+            index.indexOf('}')).trim();
+        int idx = Integer.parseInt(number);
+        if (idx < 1) {
+            throw new Exception("In the SQL command, " +
+                "if you use {number} as index, the number should begin from 1");
+        }
+        if (idx > identifierList.size()) {
+            throw new Exception(new ArrayIndexOutOfBoundsException());
+        } else {
+            String identifier = identifierList.get(idx - 1);
+
+            DDF ddf = null;
+            try {
+                ddf = this.mDDFManager.getDDFByName(identifier);
+            } catch (DDFException e) {
+                ddf = this.mDDFManager.getDDF(UUID.fromString(identifier));
+            }
+            return ddf;
         }
     }
 

@@ -41,8 +41,7 @@ public class SparkDDF extends DDF {
     this.initialize(manager, rdd, new Class<?>[] { RDD.class, unitType }, name, schema);
   }
 
-  public SparkDDF(DDFManager manager, DataFrame rdd, String
-                  namespace, String name) throws DDFException {
+  public SparkDDF(DDFManager manager, DataFrame rdd, String name) throws DDFException {
     super(manager);
     if (rdd == null) throw new DDFException("Non-null RDD is required to instantiate a new SparkDDF");
     Schema schema = SparkUtils.schemaFromDataFrame(rdd);

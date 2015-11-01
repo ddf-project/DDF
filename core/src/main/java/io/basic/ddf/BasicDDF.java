@@ -32,8 +32,7 @@ public class BasicDDF extends DDF {
   @Expose private List<?> mData; // only needed during serialization
   @Expose private String mUnitTypeName; // only needed during serialization
 
-  public BasicDDF(List<?> rows, Class<?> unitType, String
-          namespace, String name, Schema schema) throws DDFException {
+  public BasicDDF(List<?> rows, Class<?> unitType, String name, Schema schema) throws DDFException {
     this((DDFManager) null, (List<?>) rows, unitType, name, schema);
     if (rows != null) mUnitType = unitType;
   }
@@ -49,18 +48,16 @@ public class BasicDDF extends DDF {
 
   /**
    * This signature is needed to support {@link DDFManager#newDDF(DDFManager,
-   * Object, Class[], String, String, Schema)}
+   * Object, Class[], String, Schema)}
    *
    * @param manager
    * @param rows
    * @param typeSpecs
-   * @param namespace
    * @param name
    * @param schema
    * @throws DDFException
    */
-  public BasicDDF(DDFManager manager, Object rows, Class<?>[] typeSpecs,
-                  String namespace, String name, Schema
+  public BasicDDF(DDFManager manager, Object rows, Class<?>[] typeSpecs, String name, Schema
                           schema)
       throws DDFException {
 

@@ -241,8 +241,7 @@ public class PersistenceHandler extends APersistenceHandler {
       List<Object[]> list = Lists.newArrayList();
       list.add(new Object[] { this, this.getClass().getName() });
       Schema schema = new Schema(this.getName(), "object BLOB, objectClass STRING");
-      BasicDDF ddf = new BasicDDF(list, Object[].class,
-              this.getNamespace(), this.getName(), schema);
+      BasicDDF ddf = new BasicDDF(list, Object[].class, this.getName(), schema);
 
       return ddf;
     }

@@ -22,11 +22,9 @@ public class BasicDDFManager extends DDFManager {
     return "basic";
   }
 
-  public BasicDDFManager() {
-  }
+  public BasicDDFManager() {}
 
-
-  public <T> DDF newDDF(List<T> rows, Class<T> unitType, String namespace, String name, Schema schema)
+  public <T> DDF newDDF(List<T> rows, Class<T> unitType, String name, Schema schema)
       throws DDFException {
 
     if (rows == null || rows.isEmpty()) {
@@ -40,4 +38,13 @@ public class BasicDDFManager extends DDFManager {
     throw new DDFException("Load DDF from file is not supported!");
   }
 
+  @Override
+  public DDF copyFrom(DDF ddf, String tgtname) throws DDFException {
+    throw new DDFException("Unsupported operation");
+  }
+
+  @Override
+  public DDF copyFrom(DDFManager manager, String ddfname, String tgtname) throws DDFException {
+    throw new DDFException("Unsupported operation");
+  }
 }
