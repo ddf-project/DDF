@@ -153,18 +153,13 @@ public class DDFCoordinator extends ALoggable {
    * @throws DDFException
    */
   public DDF getDDF(UUID uuid) throws DDFException {
-    for (Map.Entry<UUID, DDFManager> entry : mDDFUUID2DDFManager.entrySet()) {
+    for (Map.Entry<UUID, DDFManager> entry : mEngineUUID2DDFManager.entrySet()) {
       DDFManager ddfmanager = entry.getValue();
       try {
         DDF ddf = ddfmanager.getDDF(uuid);
         return ddf;
       } catch (DDFException e) {
-        try {
-          DDF ddf = ddfmanager.getOrRestoreDDF(uuid);
-          return ddf;
-        } catch (Exception e2) {
-          throw new DDFException("Can't find ddf with uuid: " + uuid.toString(), e2);
-        }
+
       }
     }
     throw new DDFException("Can't find ddf with uuid: " + uuid.toString());
@@ -181,7 +176,7 @@ public class DDFCoordinator extends ALoggable {
           DDF ddf = manager.getOrRestoreDDFUri(uri);
           return ddf;
         } catch (Exception e2) {
-          throw new DDFException("Can't find ddf with uri: " + uri, e2);
+
         }
       }
     }
