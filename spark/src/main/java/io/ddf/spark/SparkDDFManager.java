@@ -51,7 +51,6 @@ public class SparkDDFManager extends DDFManager {
   public SparkDDFManager(SparkContext sparkContext) throws DDFException {
     this.setEngineType(EngineType.SPARK);
     this.initialize(sparkContext, null);
-    this.mDataSourceManager = new SparkDataSourceManager(this);
   }
 
   /**
@@ -81,6 +80,7 @@ public class SparkDDFManager extends DDFManager {
 
     // register SparkSQL UDFs
     this.registerUDFs();
+    this.mDataSourceManager = new SparkDataSourceManager(this);
   }
   // TODO: Dynamically load UDFs
   private void registerUDFs() {
