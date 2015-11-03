@@ -291,8 +291,7 @@ public class TableNameReplacer extends TableVisitor {
         UUID engineUUID = null;
         try {
             if (this.mDDFManager.getDDFCoordinator() != null) {
-                DDFManager manager = this.mDDFManager.getDDFCoordinator()
-                    .getDDFManagerByDDFUUID(uuid);
+                DDFManager manager = this.mDDFManager.getDDFCoordinator().getDDF(uuid).getManager();
                 engineUUID = manager.getUUID();
             } else {
                 engineUUID = this.mDDFManager.getUUID();

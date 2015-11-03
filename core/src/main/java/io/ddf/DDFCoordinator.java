@@ -189,7 +189,7 @@ public class DDFCoordinator extends ALoggable {
    * @return The uuid of the ddf.
    */
   public UUID uuidFromUri(String uri) throws DDFException {
-    for (Map.Entry<UUID, DDFManager> entry : mDDFUUID2DDFManager.entrySet()) {
+    for (Map.Entry<UUID, DDFManager> entry : mEngineUUID2DDFManager.entrySet()) {
       DDFManager ddfmanager = entry.getValue();
       try {
         DDF ddf = ddfmanager.getDDFByURI(uri);
