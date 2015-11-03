@@ -58,7 +58,7 @@ public class SparkDataSourceManager extends DataSourceManager {
         JDBCDataSourceCredentials cred = (JDBCDataSourceCredentials)dataSource.getDataSourceCredentials();
         String fullURL = dataSource.getDataSourceUri().getUri().toString();
         if (cred.getUsername() != null &&  !cred.getUsername().equals("")) {
-            fullURL += String.format("?user=${%s}&password=${%s}", cred.getUsername(), cred.getPassword());
+            fullURL += String.format("?user=%s&password=%s", cred.getUsername(), cred.getPassword());
         }
 
         Map<String, String> options = new HashMap<String, String>();
