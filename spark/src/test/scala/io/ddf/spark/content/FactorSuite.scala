@@ -143,4 +143,24 @@ class FactorSuite extends ATestSuite {
     assert(cols2(5).getOptionalFactor.getLevelCounts.get("0") === 9.0)
     assert(cols2(4).getOptionalFactor.getLevelCounts.get("3") === 1.0)
   }
+
+  test("preserving factor in projection") {
+    val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
+    //    ddf.getRepresentationHandler.remove(classOf[RDD[_]], classOf[TablePartition])
+    val schemaHandler = ddf.getSchemaHandler
+    val factorColumns = Array("vs", "am", "gear", "carb")
+    factorColumns.foreach {
+      column => schemaHandler.setAsFactor(column)
+    }
+    schemaHandler.computeFactorLevelsAndLevelCounts()
+    val projectedColumns = Array("wt", "qsec", "vs", "am", "gear", "carb")
+    val projectedDDF = ddf.VIEWS.project(projectedColumns: _*)
+    factorColumns.foreach{
+      col =>
+        val column = projectedDDF.getColumn(col)
+        assert(column.getOptionalFactor != null)
+        assert(column.getOptionalFactor.getLevelCounts != null)
+        assert(column.getOptionalFactor.getLevels != null)
+    }
+  }
 }
