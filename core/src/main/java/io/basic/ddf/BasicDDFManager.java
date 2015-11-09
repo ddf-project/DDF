@@ -34,7 +34,7 @@ public class BasicDDFManager extends DDFManager {
     return this.newDDF(this, rows, new Class[] { List.class, unitType }, name, schema);
   }
 
-  public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
+  public DDF loadFile(String fileURL, String fieldSeparator) throws DDFException {
     throw new DDFException("Load DDF from file is not supported!");
   }
 

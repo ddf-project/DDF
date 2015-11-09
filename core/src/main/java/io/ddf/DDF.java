@@ -1073,4 +1073,9 @@ public abstract class DDF extends ALoggable //
     return deserializedObject;
   }
 
+
+  public void export2csv(String fileURL, String fieldSeparator, Boolean hasHead) throws DDFException {
+    this.getManager().export2csv(this, fileURL, fieldSeparator, hasHead);
+  }
+
 }

@@ -1,5 +1,9 @@
 package io.ddf.datasource;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 
 import io.ddf.DDFManager;
@@ -10,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import io.ddf.content.Schema;
+import io.ddf.content.SqlResult;
 import io.ddf.exception.DDFException;
 
 /**
@@ -87,8 +92,33 @@ public abstract class DataSourceManager {
     public abstract DDF loadFromJDBC(JDBCDataSourceDescriptor dataSource) throws DDFException;
 
     public abstract DDF loadTextFile(DataSourceDescriptor dataSource) throws DDFException;
-    // TODO: discuss about extract a function to generate the sql command.
 
-    // override;
 
+    public void export2csv(DDF ddf, String fileURL, String fieldSeparator, Boolean hasHead) throws DDFException {
+        if (!fieldSeparator.equalsIgnoreCase("\t")) {
+            throw new DDFException("only '\t' is supported as separator.");
+        }
+        SqlResult result = ddf.sql("select * from @this", "error");
+        this.export2csv(result, fileURL, fieldSeparator, hasHead);
+    }
+
+    public void export2csv(SqlResult result, String fileURL, String fieldSeparator, Boolean hasHead)
+        throws DDFException {
+        if (!fieldSeparator.equalsIgnoreCase("\t")) {
+            throw new DDFException("only '\t' is supported as separator.");
+        }
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileURL)));
+            if (hasHead) {
+                bw.write(result.toString());
+            } else {
+                for (String row : result.getRows()) {
+                    bw.write(row + "\n");
+                }
+            }
+            bw.close();
+        } catch (IOException e) {
+            throw new DDFException(String.format("Error when try to export the result to %s", fileURL));
+        }
+    }
 }

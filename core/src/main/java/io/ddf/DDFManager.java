@@ -501,10 +501,18 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    * @return
    * @throws DDFException
    */
-  public abstract DDF loadTable(String fileURL, String fieldSeparator) throws DDFException;
+  public abstract DDF loadFile(String fileURL, String fieldSeparator) throws DDFException;
 
   public DDF load(DataSourceDescriptor ds) throws DDFException {
     return mDataSourceManager.load(ds);
+  }
+
+  public void export2csv(DDF ddf, String fileURL, String fieldSeparator, Boolean hasHead) throws DDFException {
+    mDataSourceManager.export2csv(ddf, fileURL, fieldSeparator, hasHead);
+  }
+
+  public void export2csv(SqlResult result, String fileURL, String fieldSeparator, Boolean hasHead) throws DDFException {
+    mDataSourceManager.export2csv(result, fileURL, fieldSeparator, hasHead);
   }
 
   public abstract DDF copyFrom(DDF ddf, String tgtname) throws DDFException;
