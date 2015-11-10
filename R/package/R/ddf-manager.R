@@ -27,7 +27,7 @@ DDFManager <- function(engine=c("spark","flink", "jdbc","sfdc","postgres","aws",
   if (engine == "spark") {
     new("SparkDDFManager", J("io.ddf.DDFManager")$get(J("io.ddf.DDFManager$EngineType")$SPARK))
   } else if (engine == "flink") {
-    new("SparkDDFManager", J("io.ddf.DDFManager")$get(J("io.ddf.DDFManager$EngineType")$FLINK))
+    new("FlinkDDFManager", J("io.ddf.DDFManager")$get(J("io.ddf.DDFManager$EngineType")$FLINK))
   } else if (engine == "jdbc") {
     new("JDBCDDFManager", J("io.ddf.DDFManager")$get(J("io.ddf.DDFManager$EngineType")$JDBC))
   } else if (engine == "sfdc") {
