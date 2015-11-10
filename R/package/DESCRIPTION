@@ -17,3 +17,14 @@ Suggests:
     testthat,
     knitr
 VignetteBuilder: knitr
+RoxygenNote: 5.0.0
+Collate:
+    'ddf-ml.R'
+    'ddf.R'
+    'clustering.R'
+    'ddf-manager.R'
+    'ddf-package.R'
+    'regression.R'
+    'spark-ddf.R'
+    'utils.R'
+    'zzz.R'
