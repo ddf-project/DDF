@@ -12,7 +12,7 @@ setMethod("initialize",
           signature(.Object="MLModel"),
           function(.Object, jmlmodel) {
             if (is.null(jmlmodel) || !inherits(jmlmodel, "jobjRef") || !(jmlmodel %instanceof% "io.ddf.ml.IModel"))
-              stop('MLModel needs a Java object of class "com.adatao.ddf.ml.IModel"')
+              stop('MLModel needs a Java object of class "io.ddf.ml.IModel"')
             .Object@jmlmodel = jmlmodel
             .Object
           })

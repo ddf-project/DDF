@@ -106,7 +106,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       } else if (str.equalsIgnoreCase("flink")) {
         return FLINK;
       } else {
-        throw new DDFException("Engine type should be either spark, jdbc, postgres, aws, redshift, basic");
+        throw new DDFException("Engine type should be either spark, flink, jdbc, postgres, aws, redshift, basic");
       }
     }
   }
