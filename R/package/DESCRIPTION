@@ -25,6 +25,7 @@ Collate:
     'ddf-manager.R'
     'ddf-package.R'
     'regression.R'
+    'flink-ddf.R'
     'spark-ddf.R'
     'utils.R'
     'zzz.R'

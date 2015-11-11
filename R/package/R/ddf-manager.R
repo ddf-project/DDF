@@ -62,7 +62,7 @@ setMethod("load_file",
           signature("DDFManager"),
           function(x, path, sep=" ") {
             jdm <- x@jdm
-            java.ret <- jdm$loadTable(path, sep)
+            java.ret <- jdm$loadFile(path, sep)
             new("DDF", java.ret)
           }
 )
@@ -108,7 +108,9 @@ setMethod("sql",
             sql <- str_trim(sql)
             jdm <- x@jdm
             java.ret <- jdm$sql(sql, data.source)
-            parse.sql.result(java.ret)
+            if (!grepl("^create.+$", tolower(sql)) && !grepl("^load.+$", tolower(sql))) {
+              parse.sql.result(java.ret)
+            }
           }
 )
 

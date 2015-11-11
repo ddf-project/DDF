@@ -1,68 +1,68 @@
-#' @include ddf-manager.R ddf.R
+#' @include ddf-manager.R ddf.R regression.R
 NULL
 
-#============= SparkDDFManager =================================
+#============= FlinkDDFManager =================================
 #' @export
-setClass("SparkDDFManager",
+setClass("FlinkDDFManager",
          contains = "DDFManager"
 )
 
 setMethod("load_file",
-          signature("SparkDDFManager"),
+          signature("FlinkDDFManager"),
           function(x, path, sep=" ") {
             ddf <- callNextMethod(x, path, sep)
-            SparkDDF(ddf@jddf)
+            FlinkDDF(ddf@jddf)
           }
 )
 
 setMethod("load_jdbc",
-          signature("SparkDDFManager"),
+          signature("FlinkDDFManager"),
           function(x, uri, username, password, table) {
             jdm <- x@jdm
             # Create a JDBCDataSourceDescriptor
             descriptor <- .jnew("io/ddf/datasource/JDBCDataSourceDescriptor", uri, username, password, table)
             java.ret <- jdm$load(descriptor)
-            new("SparkDDF", java.ret)
+            new("FlinkDDF", java.ret)
           }
 )
 
 setMethod("sql2ddf",
-          signature("SparkDDFManager", "character"),
+          signature("FlinkDDFManager", "character"),
           function(x, sql, data.source) {
             ddf <- callNextMethod(x, sql, data.source)
-            SparkDDF(ddf@jddf)
+            FlinkDDF(ddf@jddf)
           }
 )
 
-#============ SparkDDF methods =================================
+#============ FlinkDDF methods =================================
 #' @export
-setClass("SparkDDF",
+setClass("FlinkDDF",
          contains = "DDF"
 )
 
 setMethod("initialize",
-          signature(.Object="SparkDDF"),
+          signature(.Object="FlinkDDF"),
           function(.Object, jddf) {
             callNextMethod(.Object, jddf)
           })
 
 #' @export
-SparkDDF <- function(jddf) {
-  new("SparkDDF", jddf)
+FlinkDDF <- function(jddf) {
+  new("FlinkDDF", jddf)
 }
 
 setMethod("summary",
-          signature("SparkDDF"),
+          signature("FlinkDDF"),
           function(object) {
-            cat("This is a SparkDDF\n")
+            cat("This is a FlinkDDF\n")
             callNextMethod(object)
           }
 )          
 
-setMethod("[", signature(x="SparkDDF"),
+setMethod("[", signature(x="FlinkDDF"),
           function(x, i,j,...,drop=TRUE) {
             ddf <- callNextMethod(x, i, j,...,drop)
-            SparkDDF(ddf@jddf)
+            FlinkDDF(ddf@jddf)
           }  
 )
 
@@ -70,30 +70,30 @@ setMethod("sample2ddf",
           signature("DDF"),
           function(x, percent, replace=FALSE, seed=123L) {
             ddf <- callNextMethod(x, percent, replace, seed)
-            SparkDDF(ddf@jddf)
+            FlinkDDF(ddf@jddf)
           }
 )
 
 setMethod("sql2ddf",
-          signature("SparkDDF"),
+          signature("FlinkDDF"),
           function(x, sql) {
             ddf <- callNextMethod(x, sql)
-            SparkDDF(ddf@jddf)
+            FlinkDDF(ddf@jddf)
           })
 
 setMethod("merge",
-          signature("SparkDDF","SparkDDF"),
+          signature("FlinkDDF","FlinkDDF"),
           function(x, y, by = intersect(colnames(x), colnames(y)),
                    by.x = by, by.y = by, type=c("inner", "left", "right")) {
             ddf <- callNextMethod(x, y, by, by.x, by.y, type)
-            SparkDDF(ddf@jddf)
+            FlinkDDF(ddf@jddf)
           })
 
-#============ ML for SparkDDF ==================================
-#' Linear Regression using Spark mllib's LinearRegressionSGD
+#============ ML for FlinkDDF ==================================
+#' Linear Regression using Flink ML's LinearRegressionSGD
 #' @rdname ml.linear.regression
 setMethod("ml.linear.regression",
-          signature("SparkDDF"),
+          signature("FlinkDDF"),
           function(x, numIterations=10L, stepSize=1, miniBatchFraction=1) {
             col.names <- colnames(x)
             nfeatures <- length(col.names)-1
@@ -114,10 +114,10 @@ setMethod("ml.linear.regression",
           }
 )
 
-#' Logistic Regression using Spark mllib's Logistic Regression
+#' Logistic Regression using Flink ML's Logistic Regression
 #' @rdname ml.logistic.regression
 setMethod("ml.logistic.regression",
-          signature("SparkDDF"),
+          signature("FlinkDDF"),
           function(x, numIterations=10L, stepSize=1, miniBatchFraction) {
             col.names <- colnames(x)
             nfeatures <- length(col.names)-1
@@ -135,10 +135,10 @@ setMethod("ml.logistic.regression",
           }
 )
 
-#' Kmeans using Spark mllib's Kmeans
+#' Kmeans using Flink ML's Kmeans
 #' @rdname ml.kmeans
 setMethod("ml.kmeans",
-          signature("SparkDDF"),
+          signature("FlinkDDF"),
           function(x,centers=2,runs=5,maxIters=10) {
             col.names <- colnames(x)
             #numeric.col.indices <- which(sapply(col.names, function(cn) {x@jddf$getColumn(cn)$isNumeric()})==TRUE)
