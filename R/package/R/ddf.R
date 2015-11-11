@@ -167,7 +167,7 @@ setMethod("head",
                 res <- t(sapply(res, function(x){x$split("\t")}))
             else
                 res <- as.matrix(sapply(res, function(x){x$split("\t")}))
-            get.data.frame(colnames(x), .coltypes(x), res)
+            get.data.frame(colnames(x), coltypes(x), res)
           }
 )
 
@@ -199,7 +199,7 @@ setMethod("sample",
             ncols <- ncol(x)
             parsed.res <- t(sapply(res, 
                           function(x) {sapply(1:ncols, function(y){.jarray(x)[[y]]$toString()})}))
-            get.data.frame(colnames(ddf), .coltypes(ddf), parsed.res)
+            get.data.frame(colnames(ddf), coltypes(ddf), parsed.res)
           }
 )
 
