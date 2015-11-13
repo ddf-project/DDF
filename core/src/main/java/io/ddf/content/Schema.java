@@ -174,69 +174,59 @@ public class Schema implements Serializable {
    */
   public void generateDummyCoding() throws NumberFormatException,
       DDFException {
-    DummyCoding dc = new DummyCoding();
+    DummyCoding dummyCoding = new DummyCoding();
     // initialize array xCols which is just 0, 1, 2 ..
-    dc.xCols = new int[this.getColumns().size()];
+    dummyCoding.xCols = new int[this.getColumns().size()];
     int i = 0;
-    while (i < dc.xCols.length) {
-      dc.xCols[i] = i;
+    while (i < dummyCoding.xCols.length) {
+      dummyCoding.xCols[i] = i;
       i += 1;
     }
 
     List<Column> columns = this.getColumns();
-    Iterator<Column> it = columns.iterator();
+    Iterator<Column> columnIterator = columns.iterator();
     int count = 0;
-    while (it.hasNext()) {
-      Column currentColumn = it.next();
+    while (columnIterator.hasNext()) {
+      Column currentColumn = columnIterator.next();
       int currentColumnIndex = this.getColumnIndex(currentColumn.getName());
       HashMap<String, java.lang.Double> temp = new HashMap<String, java.lang.Double>();
       // loop
       if (currentColumn.getColumnClass() == ColumnClass.FACTOR) {
-        //set as factor
-        //recompute level
-        List<String> levels = new ArrayList(currentColumn.getOptionalFactor().getLevels());
-        currentColumn.getOptionalFactor().setLevels(levels, true);
+        if (currentColumn.getOptionalFactor() != null && currentColumn.getOptionalFactor().getLevelMap() != null) {
+          Map<String, Integer> currentColumnFactor = currentColumn.getOptionalFactor().getLevelMap();
+          Iterator<String> valuesIterator = currentColumnFactor.keySet().iterator();
 
-        Map<String, Integer> currentColumnFactor = currentColumn.getOptionalFactor().getLevelMap();
-        Iterator<String> iterator = currentColumnFactor.keySet()
-            .iterator();
-
-        //TODO update this code
-        i = 0;
-        temp = new HashMap<String, java.lang.Double>();
-        while (iterator.hasNext()) {
-          String columnValue = iterator.next();
-          temp.put(columnValue, Double.parseDouble(i + ""));
-          i += 1;
+          //TODO update this code
+          i = 0;
+          temp = new HashMap<String, java.lang.Double>();
+          while (valuesIterator.hasNext()) {
+            String columnValue = valuesIterator.next();
+            temp.put(columnValue, Double.parseDouble(i + ""));
+            i += 1;
+          }
+          dummyCoding.getMapping().put(currentColumnIndex, temp);
+          count += temp.size() - 1;
         }
-        dc.getMapping().put(currentColumnIndex, temp);
-        count += temp.size() - 1;
       }
     }
-    dc.setNumDummyCoding(count);
+    dummyCoding.setNumDummyCoding(count);
 
-    // TODO hardcode remove this
-    // HashMap<String, Double> temp2 = new HashMap<String, Double>();
-    // temp2.put("IAD", 1.0);
-    // temp2.put("IND", 2.0);
-    // temp2.put("ISP", 3.0);
-    // dc.getMapping().put(1, temp2);
-    // dc.setNumDummyCoding(2);
 
     // ignore Y column
-    Integer _features = this.getNumColumns() - 1;
+    Integer numFeatures = this.getNumColumns() - 1;
     // plus bias term for linear model
-    _features += 1;
+    numFeatures += 1;
     // plus the new dummy coding columns
-    _features += dc.getNumDummyCoding();
+    numFeatures += dummyCoding.getNumDummyCoding();
 
     //dc.getMapping().size() means number of factor column
-    _features -= (!dc.getMapping().isEmpty()) ? dc.getMapping().size() : 0;
-    dc.setNumberFeatures(_features);
+    //numFeatures -= (!dummyCoding.getMapping().isEmpty()) ? dummyCoding.getMapping().size() : 0;
+    if(!dummyCoding.getMapping().isEmpty()) {
+      numFeatures -= dummyCoding.getMapping().size();
+    }
+    dummyCoding.setNumberFeatures(numFeatures);
     // set number of features in schema
-
-    this.setDummyCoding(dc);
-
+    this.setDummyCoding(dummyCoding);
   }
 
   public DummyCoding getDummyCoding() {
