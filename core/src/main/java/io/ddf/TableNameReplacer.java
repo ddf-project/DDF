@@ -293,7 +293,7 @@ public class TableNameReplacer extends TableVisitor {
             if (this.mDDFManager.getDDFCoordinator() != null) {
                 DDFManager manager = this.mDDFManager.getDDFCoordinator()
                     .getDDFManagerByDDFUUID(uuid);
-                engineUUID = manager.getUUID();
+                engineUUID = manager == null ? null : manager.getUUID();
             } else {
                 engineUUID = this.mDDFManager.getUUID();
             }
