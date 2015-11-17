@@ -45,7 +45,7 @@ public class DataSourceResolver {
     String uri = options.get("uri");
     String awsKeyID = getOrDefault(options,"awsKeyID", "");
     String awsSecretKey = getOrDefault(options,"awsSecretKey", "");
-    options.put("awsSecretKey", "<retracted>");
+    options.put("awsSecretKey", "<redacted>");
     String schema = options.get("schema");
     LOG.info("Loading from S3 with options: {}", options);
     // TODO format null?
@@ -84,7 +84,7 @@ public class DataSourceResolver {
     String uri = options.get("uri");
     String username = options.get("username");
     String password = options.get("password");
-    options.put("password", "<retracted>");
+    options.put("password", "<redacted>");
     // String dbTable = options.get("dbTable");
     String dbTable = getOrDefault(options, "dbTable", null);
     LOG.info("Loading from JDBC with options: {}", options);
