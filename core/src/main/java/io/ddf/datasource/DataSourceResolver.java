@@ -44,9 +44,10 @@ public class DataSourceResolver {
   public static S3DataSourceDescriptor resolveS3(Map<String, String> options) throws DDFException {
     String uri = options.get("uri");
     String awsKeyID = getOrDefault(options,"awsKeyID", "");
-    LOG.info("Loading from S3 path '{}' with access key '{}'", uri, awsKeyID);
     String awsSecretKey = getOrDefault(options,"awsSecretKey", "");
+    options.put("awsSecretKey", "<retracted>");
     String schema = options.get("schema");
+    LOG.info("Loading from S3 with options: {}", options);
     // TODO format null?
     DataFormat format = DataFormat.fromInt(Integer.parseInt(options.get("dataFormat")));
     if (options.get("serde") != null) {
@@ -64,10 +65,10 @@ public class DataSourceResolver {
 
   public static HDFSDataSourceDescriptor resolveHDFS(Map<String, String> options) throws DDFException, URISyntaxException {
     String uri = options.get("uri");
-    LOG.info("Loading from HDFS path '{}'", uri);
     String schema = getOrDefault(options,"schema", null);
     String originalSource = getOrDefault(options,"originalSource", "hdfs");
     DataFormat format = DataFormat.fromInt(Integer.parseInt(options.get("dataFormat")));
+    LOG.info("Loading from HDFS with options: {}", options);
     if(options.containsKey("serde")) {
       String serde = options.get("serde");
       return new HDFSDataSourceDescriptor(uri, schema, serde, originalSource, format);
@@ -82,10 +83,11 @@ public class DataSourceResolver {
   public static JDBCDataSourceDescriptor resolveJDBC(Map<String, String> options) throws DDFException {
     String uri = options.get("uri");
     String username = options.get("username");
-    LOG.info("Loading from JDBC uri '{}' with user '{}'", uri, username);
     String password = options.get("password");
+    options.put("password", "<retracted>");
     // String dbTable = options.get("dbTable");
     String dbTable = getOrDefault(options, "dbTable", null);
+    LOG.info("Loading from JDBC with options: {}", options);
     try {
       return new JDBCDataSourceDescriptor(uri, username, password, dbTable);
     } catch (URISyntaxException e) {
@@ -95,12 +97,12 @@ public class DataSourceResolver {
 
   public static SQLDataSourceDescriptor resolveSQL(Map<String, String> options) {
     String sql = options.get("sqlCmd");
-    LOG.info("Loading from SQL query '{}'", sql);
     String namespace = getOrDefault(options,"namespace", null);
     String uriListStr = getOrDefault(options,"uriListStr", null);
     String uuidListStr = getOrDefault(options,"uuidListStr", null);
     String dataSource = getOrDefault(options,"dataSource", null);
     // val ddfList = options("ddfList")
+    LOG.info("Loading from SQL with options: {}", options);
     return new SQLDataSourceDescriptor(sql, dataSource, namespace, uriListStr, uuidListStr);
   }
 
