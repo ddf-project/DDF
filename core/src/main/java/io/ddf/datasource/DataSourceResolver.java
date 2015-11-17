@@ -1,6 +1,8 @@
 package io.ddf.datasource;
 
 import io.ddf.exception.DDFException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -12,6 +14,8 @@ import java.util.Map;
  */
 
 public class DataSourceResolver {
+  private static Logger LOG = LoggerFactory.getLogger(DataSourceResolver.class);
+
   public static DataSourceDescriptor resolve(String source,
                         Map<String, String> options) throws DDFException, URISyntaxException {
     switch (source) {
@@ -40,6 +44,7 @@ public class DataSourceResolver {
   public static S3DataSourceDescriptor resolveS3(Map<String, String> options) throws DDFException {
     String uri = options.get("uri");
     String awsKeyID = getOrDefault(options,"awsKeyID", "");
+    LOG.info("Loading from S3 path '{}' with access key '{}'", uri, awsKeyID);
     String awsSecretKey = getOrDefault(options,"awsSecretKey", "");
     String schema = options.get("schema");
     // TODO format null?
@@ -59,6 +64,7 @@ public class DataSourceResolver {
 
   public static HDFSDataSourceDescriptor resolveHDFS(Map<String, String> options) throws DDFException, URISyntaxException {
     String uri = options.get("uri");
+    LOG.info("Loading from HDFS path '{}'", uri);
     String schema = getOrDefault(options,"schema", null);
     String originalSource = getOrDefault(options,"originalSource", "hdfs");
     DataFormat format = DataFormat.fromInt(Integer.parseInt(options.get("dataFormat")));
@@ -76,6 +82,7 @@ public class DataSourceResolver {
   public static JDBCDataSourceDescriptor resolveJDBC(Map<String, String> options) throws DDFException {
     String uri = options.get("uri");
     String username = options.get("username");
+    LOG.info("Loading from JDBC uri '{}' with user '{}'", uri, username);
     String password = options.get("password");
     // String dbTable = options.get("dbTable");
     String dbTable = getOrDefault(options, "dbTable", null);
@@ -88,6 +95,7 @@ public class DataSourceResolver {
 
   public static SQLDataSourceDescriptor resolveSQL(Map<String, String> options) {
     String sql = options.get("sqlCmd");
+    LOG.info("Loading from SQL query '{}'", sql);
     String namespace = getOrDefault(options,"namespace", null);
     String uriListStr = getOrDefault(options,"uriListStr", null);
     String uuidListStr = getOrDefault(options,"uuidListStr", null);
