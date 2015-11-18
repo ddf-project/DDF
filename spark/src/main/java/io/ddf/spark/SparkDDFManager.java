@@ -1,6 +1,8 @@
 package io.ddf.spark;
 
 
+import com.google.api.services.bigquery.model.JsonObject;
+import com.google.cloud.hadoop.io.bigquery.BigQueryConfiguration;
 import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
@@ -17,6 +19,7 @@ import io.ddf.spark.etl.DateUDF;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -25,7 +28,9 @@ import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 
+
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.*;
@@ -82,6 +87,29 @@ public class SparkDDFManager extends DDFManager {
         String inputTable = tableName;
         org.apache.hadoop.conf.Configuration conf = this.mSparkContext.hadoopConfiguration();
         conf.set(BigQueryConfiguration.PROJECT_ID_KEY, projectId);
+        String sysBucket = conf.get("fs.gs.system.bucket");
+        conf.set(BigQueryConfiguration.GCS_BUCKET_KEY, sysBucket);
+
+        try {
+          BigQueryConfiguration.configureBigQueryInput(conf, inputTable);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        RDD rdd = mSparkContext.newAPIHadoopRDD(conf, null /*TODO*/, LongWritable.class, JsonObject.class);
+
+
+         /*
+          Schema schema = SchemaHandler.get
+          DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[]
+                  {DataFrame.class}, null,
+              null, schema);
+          ddf.getRepresentationHandler().cache(false);
+          ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+          return ddf;
+        } catch (IOException e) {
+          throw new DDFException(e.getMessage());
+        }*/
+
       } else {
         JDBCDataSourceDescriptor loadDS
                 = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(),
