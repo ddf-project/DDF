@@ -84,7 +84,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     POSTGRES,
     AWS,
     REDSHIFT,
-    BASIC
+    BASIC,
+    BIGQUERY
     ;
 
     public static EngineType fromString(String str) throws DDFException {
@@ -102,6 +103,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
         return REDSHIFT;
       } else if(str.equalsIgnoreCase("basic")) {
         return BASIC;
+      } else if (str.equalsIgnoreCase("bigquery")) {
+        return BIGQUERY;
       } else {
         throw new DDFException("Engine type should be either spark, jdbc, postgres, aws, redshift, basic");
       }

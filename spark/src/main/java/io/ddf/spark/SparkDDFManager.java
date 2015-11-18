@@ -77,6 +77,11 @@ public class SparkDDFManager extends DDFManager {
         } catch (URISyntaxException e) {
           throw new DDFException(e);
         }
+      } if (fromManager.getEngine().equalsIgnoreCase("bigquery")) {
+        String projectId = "";
+        String inputTable = tableName;
+        org.apache.hadoop.conf.Configuration conf = this.mSparkContext.hadoopConfiguration();
+        conf.set(BigQueryConfiguration.PROJECT_ID_KEY, projectId);
       } else {
         JDBCDataSourceDescriptor loadDS
                 = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(),
