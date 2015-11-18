@@ -3,6 +3,7 @@ package io.ddf;
 
 import com.google.common.base.Strings;
 import io.ddf.exception.DDFException;
+import io.ddf.misc.ALoggable;
 
 import java.util.Map;
 import java.util.UUID;
@@ -11,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by huandao on 6/11/15.
  */
-public class DDFCache {
+public class DDFCache extends ALoggable{
 
   private Map<UUID, DDF> mDDFs = new ConcurrentHashMap<UUID, DDF>();
   private Map<String, UUID> mUris = new ConcurrentHashMap<String, UUID>();
@@ -60,7 +61,12 @@ public class DDFCache {
       if(!Strings.isNullOrEmpty(ddf.getName())) {
         this.mUris.remove(ddf.getUri());
       }
+      // ddf.setName(name);
       ddf.setName(name);
+      mLog.info("my namespace is: " + ddf.getNamespace());
+      mLog.info("my name is: " + ddf.getName());
+      mLog.info("my uri is: " + ddf.getUri());
+      mLog.info("my uuid is: " + ddf.getUUID().toString());
       this.mUris.put(ddf.getUri(), ddf.getUUID());
     } else {
       throw new DDFException(String.format("DDF's name cannot be null or empty"));

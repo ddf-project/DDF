@@ -330,7 +330,7 @@ public class TableNameReplacer extends TableVisitor {
                 }
                 table.setName(tableName);
             } else {
-                table.setName(ddf.getTableName());
+                table.setName("[" + ddf.getTableName() + "]");
             }
         } else {
             this.mHasRemoteTbl = true;

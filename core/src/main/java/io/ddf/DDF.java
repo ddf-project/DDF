@@ -175,6 +175,10 @@ public abstract class DDF extends ALoggable //
       this.getRepresentationHandler().set(data, typeSpecs);
     }
 
+    if (schema == null) {
+      mLog.info("Error: schema is null");
+    }
+
     this.getSchemaHandler().setSchema(schema);
     if(schema!= null && schema.getTableName() == null) {
       String tableName = this.getSchemaHandler().newTableName();
@@ -265,7 +269,7 @@ public abstract class DDF extends ALoggable //
    * @param name the DDF name to set
    */
   protected void setName(String name) throws DDFException {
-    if(name != null) validateName(name);
+    // if(name != null) validateName(name);
 
     this.mName = name;
   }
