@@ -111,7 +111,7 @@ object RootBuild extends Build {
   val scalaDependencies = scalaArtifacts.map( artifactId => "org.scala-lang" % artifactId % theScalaVersion)
 
   val spark_dependencies = Seq(
-    "com.google" % "bigquery" % "1.0.0",
+    "com.google.cloud.bigdataoss" % "bigquery-connector" % "0.7.3-hadoop2",
     "commons-configuration" % "commons-configuration" % "1.6",
     "com.google.code.gson"% "gson" % "2.2.2",
     "com.novocode" % "junit-interface" % "0.10" % "test",
@@ -213,6 +213,7 @@ object RootBuild extends Build {
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-xc" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-jaxrs" % "1.8.8",
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.4.4",
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4",
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.4.4",
     dependencyOverrides += "com.google.code.findbugs" % "jsr305" % "2.0.1",
