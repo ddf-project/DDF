@@ -96,7 +96,7 @@ public class SparkDDFManager extends DDFManager {
           e.printStackTrace();
         }
         RDD rdd = mSparkContext.newAPIHadoopRDD(conf, null /*TODO*/, LongWritable.class, JsonObject.class);
-
+        return null;
 
          /*
           Schema schema = SchemaHandler.get
