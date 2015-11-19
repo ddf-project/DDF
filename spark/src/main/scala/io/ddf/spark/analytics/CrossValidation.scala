@@ -10,7 +10,7 @@ import io.ddf.exception.DDFException
 import java.util
 import io.ddf.content.Schema
 import io.ddf.spark.SparkDDF
-import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.sql.Row
 
 private[spark]
 class SeededPartition(val prev: Partition, val seed: Int) extends Partition with Serializable {

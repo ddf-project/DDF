@@ -2,7 +2,7 @@ package io.ddf.spark.content
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.mllib.recommendation.Rating
-import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.sql.Row
 import io.ddf.content.{ Representation, ConvertFunction }
 import io.ddf.DDF
 

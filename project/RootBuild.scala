@@ -16,7 +16,7 @@ object RootBuild extends Build {
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
-  val SPARK_VERSION = "1.3.1-adatao"
+  val SPARK_VERSION = "1.5.1-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -245,6 +245,13 @@ object RootBuild extends Build {
     dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
     dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.7.1",
     dependencyOverrides += "com.google.code.gson"% "gson" % "2.3.1",
+    dependencyOverrides += "com.sun.xml.bind" % "jaxb-impl" % "2.2.7",
+    dependencyOverrides += "jline" % "jline" % "2.12",
+    dependencyOverrides += "joda-time" % "joda-time" % "2.8.1",
+    dependencyOverrides += "io.dropwizard.metrics" % "metrics-core" % "3.1.2",
+    dependencyOverrides += "io.dropwizard.metrics" % "metrics-json" % "3.1.2",
+    dependencyOverrides += "io.dropwizard.metrics" % "metrics-jvm" % "3.1.2",
+    dependencyOverrides += "org.apache.commons" % "commons-lang3" % "3.1",
       pomExtra := (
       <!--
       **************************************************************************************************

@@ -2,7 +2,7 @@ package io.ddf.spark.content
 
 import io.ddf.content.{Representation, ConvertFunction}
 import io.ddf.DDF
-import org.apache.spark.sql.catalyst.expressions.Row
+import org.apache.spark.sql.Row
 import io.ddf.content.Schema.Column
 import org.apache.spark.rdd.RDD
 
