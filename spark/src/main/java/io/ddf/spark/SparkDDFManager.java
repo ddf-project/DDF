@@ -1,5 +1,8 @@
 package io.ddf.spark;
-
+import com.google.cloud.hadoop.io.bigquery.GsonBigQueryInputFormat;
+import org.apache.spark.sql.types.StructType;
+import scala.Function1;
+import scala.runtime.AbstractFunction1;
 
 import com.google.api.services.bigquery.model.JsonObject;
 import com.google.cloud.hadoop.io.bigquery.BigQueryConfiguration;
@@ -26,7 +29,13 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.Row$class;
 import org.apache.spark.sql.hive.HiveContext;
+import scala.Function1;
+import scala.Function1$class;
+import scala.Tuple2;
+import scala.reflect.ClassTag;
+import scala.reflect.ClassTag$;
 
 
 import java.io.File;
@@ -57,6 +66,127 @@ public class SparkDDFManager extends DDFManager {
     this.initialize(sparkContext, null);
   }
 
+  public void test() {
+    String projectId = "adatao-dataproc";
+    String inputTable = "demo.cars93";
+    org.apache.hadoop.conf.Configuration conf = this.mSparkContext.hadoopConfiguration();
+    conf.set(BigQueryConfiguration.PROJECT_ID_KEY, projectId);
+    String sysBucket = conf.get("fs.gs.system.bucket");
+
+
+    conf.set(BigQueryConfiguration.GCS_BUCKET_KEY, sysBucket);
+
+    String outputTableSchema =
+        "[{'name': 'Word','type': 'STRING'},{'name': 'Count','type': 'INTEGER'}]";
+
+    try {
+      BigQueryConfiguration.configureBigQueryInput(conf, inputTable);
+      BigQueryConfiguration.configureBigQueryOutput(conf, "testTable", outputTableSchema);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    RDD<Tuple2<LongWritable, JsonObject>> rdd = mSparkContext.newAPIHadoopRDD(conf, GsonBigQueryInputFormat.class, LongWritable.class,
+        JsonObject
+            .class);
+    rdd.count();
+
+    // this.getHiveContext().sql("select * from testTable");
+    Function1<Tuple2<LongWritable, JsonObject>, String> func = new AbstractFunction1<Tuple2<LongWritable,JsonObject>,
+        String>() {
+
+      @Override
+      public String apply(Tuple2<LongWritable, JsonObject> v1) {
+        //return new Row((v1._1().toString(), v1._2().toString()));
+        return v1._1().toString() + "###" + v1._2().toString();
+      }
+
+
+/*
+      @Override
+      public <A> Function1<A, Row> compose(Function1<A, Tuple2<LongWritable, JsonObject>> g) {
+        return null;
+      }
+
+      @Override
+      public <A> Function1<Tuple2<LongWritable, JsonObject>, A> andThen(Function1<Row, A> g) {
+        return null;
+      }*/
+    };
+
+    RDD<String> rowRDD = rdd.map(func, ClassTag$.MODULE$.<String>apply(String.class));
+    String[] ss = rowRDD.collect();
+    for (String s : ss) {
+      System.out.println(s);
+      mLog.info("read s: " + s);
+    }
+  }
+
+  public DDF testTransfer(String tablename, Schema schema) throws DDFException {
+    String projectId = "adatao-dataproc";
+    String inputTable = tablename;
+    org.apache.hadoop.conf.Configuration conf = this.mSparkContext.hadoopConfiguration();
+    conf.set(BigQueryConfiguration.PROJECT_ID_KEY, projectId);
+    String sysBucket = conf.get("fs.gs.system.bucket");
+
+
+    conf.set(BigQueryConfiguration.GCS_BUCKET_KEY, sysBucket);
+
+    String outputTableSchema =
+        "[{'name': 'Word','type': 'STRING'},{'name': 'Count','type': 'INTEGER'}]";
+
+    try {
+      BigQueryConfiguration.configureBigQueryInput(conf, inputTable);
+      BigQueryConfiguration.configureBigQueryOutput(conf, "testTable", outputTableSchema);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    RDD<Tuple2<LongWritable, JsonObject>> rdd = mSparkContext.newAPIHadoopRDD(conf, null , LongWritable.class,
+        JsonObject
+        .class);
+    // this.getHiveContext().sql("select * from testTable");
+    Function1<Tuple2<LongWritable, JsonObject>, Row> func = new AbstractFunction1<Tuple2<LongWritable,JsonObject>, Row>() {
+
+      @Override
+      public Row apply(Tuple2<LongWritable, JsonObject> v1) {
+        //return new Row((v1._1().toString(), v1._2().toString()));
+        return null;
+      }
+/*
+      @Override
+      public <A> Function1<A, Row> compose(Function1<A, Tuple2<LongWritable, JsonObject>> g) {
+        return null;
+      }
+
+      @Override
+      public <A> Function1<Tuple2<LongWritable, JsonObject>, A> andThen(Function1<Row, A> g) {
+        return null;
+      }*/
+    };
+    RDD<Row> rowRDD = rdd.map(func, ClassTag$.MODULE$.<Row>apply(Row.class));
+    StructType rddSchema = SparkUtils.rddSchemaFromDDFSchema(schema);
+    DataFrame df = this.getHiveContext().applySchema(rowRDD, rddSchema);
+
+    DDF ddf = this.newDDF(this, df, new Class<?>[]{DataFrame.class}, null, null, schema);
+    ddf.getRepresentationHandler().cache(false);
+    ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+    return ddf;
+    // Generate the schema based on the string of schema
+    /*
+    val schema =
+        StructType(
+            schemaString.split(" ").map(fieldName => StructField(fieldName, StringType, true)))
+
+// Convert records of the RDD (people) to Rows.
+    val rowRDD = people.map(_.split(",")).map(p => Row(p(0), p(1).trim))
+
+// Apply the schema to the RDD.
+    val peopleSchemaRDD = sqlContext.applySchema(rowRDD, schema)
+
+// Register the SchemaRDD as a table.
+    peopleSchemaRDD.registerTempTable("people")*/
+
+  }
+
   @Override
   public DDF transferByTable(UUID fromEngine, String tableName) throws
           DDFException {
@@ -83,20 +213,32 @@ public class SparkDDFManager extends DDFManager {
           throw new DDFException(e);
         }
       } if (fromManager.getEngine().equalsIgnoreCase("bigquery")) {
-        String projectId = "";
+        String projectId = "test-ddf";
         String inputTable = tableName;
         org.apache.hadoop.conf.Configuration conf = this.mSparkContext.hadoopConfiguration();
         conf.set(BigQueryConfiguration.PROJECT_ID_KEY, projectId);
         String sysBucket = conf.get("fs.gs.system.bucket");
+
+
         conf.set(BigQueryConfiguration.GCS_BUCKET_KEY, sysBucket);
+
+        String outputTableSchema =
+            "[{'name': 'Word','type': 'STRING'},{'name': 'Count','type': 'INTEGER'}]";
 
         try {
           BigQueryConfiguration.configureBigQueryInput(conf, inputTable);
+          BigQueryConfiguration.configureBigQueryOutput(conf, "testTable", outputTableSchema);
         } catch (IOException e) {
           e.printStackTrace();
         }
-        RDD rdd = mSparkContext.newAPIHadoopRDD(conf, null /*TODO*/, LongWritable.class, JsonObject.class);
+        RDD rdd = mSparkContext.newAPIHadoopRDD(conf, null , LongWritable.class, JsonObject.class);
+        this.getHiveContext().sql("select * from testTable");
 
+        // RDD<Row> rdd_row = dd;
+
+        // Construct schema
+
+        return null;
 
          /*
           Schema schema = SchemaHandler.get

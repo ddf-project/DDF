@@ -465,6 +465,7 @@ public class TableNameReplacerTests {
         DDF ret = manager.sql2ddf("select * from testtable", "jdbc");*/
         // Add 2 test ddfs.
         manager = DDFManager.get(DDFManager.EngineType.SPARK);
+        ((SparkDDFManager)manager).test();
 
         parser = new CCJSqlParserManager();
     }

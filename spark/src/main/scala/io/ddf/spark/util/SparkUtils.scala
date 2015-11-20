@@ -63,6 +63,13 @@ object SparkUtils {
     new Schema(null, cols)
   }
 
+  def rddSchemaFromDDFSchema(schema: Schema): StructType = {
+    //StructType rddSchema = DataType.(new StructField("a", IntegerType, true));
+    val rddSchema = StructType(schema.getColumns.asScala.map(col => StructField(col.getName,
+      this.ddf2SparkType(col.getType),
+      true)));
+    rddSchema
+  }
   /**
    *
    * @param df the input dataframe
@@ -265,6 +272,27 @@ object SparkUtils {
       case StructType(_) => Schema.ColumnType.STRUCT
       case ArrayType(_, _) => Schema.ColumnType.ARRAY
       case MapType(_, _, _) => Schema.ColumnType.MAP
+      case x => throw new DDFException(s"Type not support $x")
+    }
+  }
+
+  def ddf2SparkType(colType: Schema.ColumnType): DataType = {
+    colType match {
+      case Schema.ColumnType.TINYINT => ByteType
+      case Schema.ColumnType.SMALLINT => ShortType
+      case Schema.ColumnType.INT => IntegerType
+      case Schema.ColumnType.BIGINT => LongType
+      case Schema.ColumnType.FLOAT => FloatType
+      case Schema.ColumnType.DOUBLE => DoubleType
+      case Schema.ColumnType.DECIMAL => DecimalType()
+      case Schema.ColumnType.STRING => StringType
+      case Schema.ColumnType.BOOLEAN => BooleanType
+      case Schema.ColumnType.BINARY => BinaryType
+      case Schema.ColumnType.TIMESTAMP => TimestampType
+      case Schema.ColumnType.DATE => DateType
+      // case Schema.ColumnType.STRUCT => StructType(_)
+      // case ArrayType(_, _) => Schema.ColumnType.ARRAY
+      // case MapType(_, _, _) => Schema.ColumnType.MAP
       case x => throw new DDFException(s"Type not support $x")
     }
   }
