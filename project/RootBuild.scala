@@ -61,13 +61,11 @@ object RootBuild extends Build {
   val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
   val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
-  val jdbcProjectName = projectName + "_jdbc"
 
-  // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, jdbc)
+  // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val core = Project("core", file("core"), settings = coreSettings)
-  lazy val jdbc = Project("jdbc", file("jdbc"), settings = jdbcSettings) dependsOn (core)
-  // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) dependsOn(jdbc)
+  // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
 
@@ -102,9 +100,9 @@ object RootBuild extends Build {
   // We define this explicitly rather than via unmanagedJars, so that make-pom will generate it in pom.xml as well
   // org % package % version
 
-  val com_adatao_unmanaged = Seq(
-    "com.adatao.unmanaged.net.rforge" % "REngine" % "2.1.1.compiled",
-    "com.adatao.unmanaged.net.rforge" % "Rserve" % "1.8.2.compiled"
+  val rforge = Seq(
+    "net.rforge" % "REngine" % "2.1.1.compiled",
+    "net.rforge" % "Rserve" % "1.8.2.compiled"
   )
 
   val scalaArtifacts = Seq("jline", "scala-compiler", "scala-library", "scala-reflect")
@@ -152,7 +150,7 @@ object RootBuild extends Build {
 
     conflictManager := ConflictManager.strict,
 
-    // This goes first for fastest resolution. We need this for com_adatao_unmanaged.
+    // This goes first for fastest resolution. We need this for rforge. 
     // Now, sometimes missing .jars in ~/.m2 can lead to sbt compile errors.
     // In that case, clean up the ~/.m2 local repository using bin/clean-m2-repository.sh
     
@@ -474,7 +472,7 @@ object RootBuild extends Build {
       //"Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
     ),
     testOptions in Test += Tests.Argument("-oI"),
-    libraryDependencies ++= com_adatao_unmanaged,
+    libraryDependencies ++= rforge,
     libraryDependencies ++= spark_dependencies,
     if(isLocal) {
       initialCommands in console :=
@@ -508,18 +506,6 @@ object RootBuild extends Build {
     //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch examples/" + targetDir + "/*timestamp") }
-  ) ++ assemblySettings ++ extraAssemblySettings
-
-val jdbc_dependencies = Seq(
-    "cdata.jdbc.salesforce" % "SalesforceDriver" % "1.0.0"
-)
-
-  def jdbcSettings = commonSettings ++ Seq(
-    name := jdbcProjectName,
-    // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
-    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch jdbc/" + targetDir + "/*timestamp") }, 
-    libraryDependencies ++= jdbc_dependencies,
-    testOptions in Test += Tests.Argument("-oI")
   ) ++ assemblySettings ++ extraAssemblySettings
 
 
