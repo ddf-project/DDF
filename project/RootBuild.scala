@@ -305,6 +305,11 @@ object RootBuild extends Build {
                 </execution>
               </executions>
             </plugin>
+	    <plugin>
+		 <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+           </plugin>
             <plugin>
               <groupId>net.alchim31.maven</groupId>
               <artifactId>scala-maven-plugin</artifactId>
