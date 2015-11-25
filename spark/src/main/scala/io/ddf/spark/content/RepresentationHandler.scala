@@ -47,6 +47,7 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   this.addConvertFunction(RDD_ROW, RDD_RATING, new Row2Rating(this.mDDF))
   this.addConvertFunction(RDD_INT, RDD_ROW, new RDDInt2RDDRow(this.mDDF))
   this.addConvertFunction(RDD_DOUBLE, RDD_ROW, new RDDDouble2RDDRow(this.mDDF))
+  this.addConvertFunction(RDD_ROW, RDD_STRING, new RDDRow2String(this.mDDF))
 
   override def getDefaultDataType: Array[Class[_]] = Array(classOf[RDD[_]], classOf[Array[Object]])
 
@@ -132,4 +133,5 @@ object RepresentationHandler {
   val RDD_RATING = new Representation(classOf[RDD[_]], classOf[Rating])
   val RDD_DOUBLE = new Representation(classOf[RDD[_]], classOf[Double])
   val RDD_INT = new Representation(classOf[RDD[_]], classOf[Int])
+  val RDD_STRING = new Representation(classOf[RDD[_]], classOf[String])
 }
