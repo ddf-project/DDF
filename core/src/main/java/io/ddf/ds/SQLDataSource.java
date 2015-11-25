@@ -11,7 +11,7 @@ public class SQLDataSource extends DataSource {
   private String namespace;
 
   public SQLDataSource(UUID id, URI uri, String namespace) {
-    super(id, uri);
+    super(id, uri, "SQL");
     this.namespace = namespace;
   }
 }

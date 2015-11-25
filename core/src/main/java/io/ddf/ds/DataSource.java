@@ -1,6 +1,7 @@
 package io.ddf.ds;
 
 
+import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.FileFormat;
 import io.ddf.exception.DDFException;
 
@@ -14,6 +15,26 @@ import java.util.UUID;
  */
 public class DataSource {
 
+  public enum DataSourceType {
+    S3, HDFS, JDBC, SQL, UNDEF;
+
+    public static DataSourceType fromString(String str) {
+      if(str.equalsIgnoreCase("S3")) {
+        return S3;
+      } else if(str.equalsIgnoreCase("HDFS")) {
+        return HDFS;
+      } else if(str.equalsIgnoreCase("JDBC")) {
+        return JDBC;
+      } else if(str.equalsIgnoreCase("SQL")) {
+        return SQL;
+      } else {
+        return UNDEF;
+      }
+    }
+  }
+
+  private DataSourceType type;
+
   private UUID id;
 
   private URI uri;
@@ -22,15 +43,17 @@ public class DataSource {
 
   private List<DataSet> dataSetList = new ArrayList<DataSet>();
 
-  public DataSource(UUID id, URI uri, List<DSUserCredentials> dsUserCredentialsList, List<DataSet> dataSetList) {
+  public DataSource(UUID id, URI uri, List<DSUserCredentials> dsUserCredentialsList, List<DataSet> dataSetList,
+      String dataSourceType) {
+    this.type = DataSourceType.fromString(dataSourceType);
     this.id = id;
     this.uri = uri;
     this.dsUserCredentialsList = dsUserCredentialsList;
     this.dataSetList = dataSetList;
   }
 
-  public DataSource(UUID id, URI uri) {
-    this(id, uri, new ArrayList<DSUserCredentials>(), new ArrayList<DataSet>());
+  public DataSource(UUID id, URI uri, String dataSourceType) {
+    this(id, uri, new ArrayList<DSUserCredentials>(), new ArrayList<DataSet>(), dataSourceType);
   }
 
   public UUID getId() {
@@ -47,6 +70,14 @@ public class DataSource {
 
   public void setUri(URI uri) {
     this.uri = uri;
+  }
+
+  public DataSourceType getType() {
+    return this.type;
+  }
+
+  public void setType(DataSourceType type) {
+    this.type = type;
   }
 
   public void addDsUserCredentials(DSUserCredentials dsUserCredentials) throws DDFException {
