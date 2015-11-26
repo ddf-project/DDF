@@ -4,10 +4,11 @@ import java.io.CharArrayWriter
 import java.util
 import java.util.{Map => JMap}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonFactory}
+import com.google.common.base.Strings
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
-
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.{Column => DFColumn}
@@ -155,15 +156,17 @@ object SparkUtils {
   def row2txt(rowSchema: StructType, row: Row, separator: String): String = {
     val writer = new CharArrayWriter()
     val gen = new JsonFactory().createGenerator(writer).setRootValueSeparator(null)
+    val complexTypes = Array("ArrayType", "StructType", "MapType")
     var i = 0
     rowSchema.zip(row.toSeq).foreach {
       case (field, v) =>
         if(i > 0)
           gen.writeRaw(separator)
         i = i+1
+        val simpleTypeString: String = field.dataType.simpleString
         if(v == null)
           gen.writeNull()
-        else if(field.dataType.isPrimitive)
+        else if(!complexTypes.contains(simpleTypeString))
           gen.writeRaw(v.toString.replaceAll("\t", "\\\\t"))
         else
           data2json(field.dataType, v, gen)
@@ -182,10 +185,11 @@ object SparkUtils {
   def cell2txt(dataType: DataType, data: Any): String = {
     val writer = new CharArrayWriter()
     val gen = new JsonFactory().createGenerator(writer).setRootValueSeparator(null)
-
+    val simpleTypeString: String = dataType.simpleString
+    val complexTypes = Array("ArrayType", "StructType", "MapType")
     if(data == null)
       gen.writeNull()
-    else if(dataType.isPrimitive)
+    else if(!complexTypes.contains(simpleTypeString))
       gen.writeRaw(data.toString)
     else
       data2json(dataType, data, gen)

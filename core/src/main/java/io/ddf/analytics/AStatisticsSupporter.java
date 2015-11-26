@@ -75,7 +75,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
         rs = this.getDDF()
             .sql(command, String.format("Unable to get fivenum summary of the given columns from table %%s")).getRows()
-            .get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t| ");
+            .get(0).replaceAll("\\[|\\]| ", "").replaceAll("\\(|\\)", "").replaceAll("WrappedArray", "").replaceAll(",", "\t").split("\t| ");
       } else if (this.getDDF().getEngineType().equals(DDFManager.EngineType.POSTGRES)
               || this.getDDF().getEngineType().equals(DDFManager.EngineType.REDSHIFT)) {
 
@@ -384,11 +384,14 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
 
 
     List<String> rs = getDDF().sql(cmd, "Cannot get vector quantiles from SQL queries").getRows();
+    for(String string: rs) {
+      System.out.println("result = " + string);
+    }
     if (rs == null || rs.size() == 0) {
       throw new DDFException("Cannot get vector quantiles from SQL queries");
     }
     String[] convertedResults = rs.get(0)
-        .replaceAll("\\[|\\]| ", "").replaceAll(",", "\t")
+        .replaceAll("\\[|\\]| ", "").replaceAll("\\(|\\)", "").replaceAll("WrappedArray", "").replaceAll(",", "\t")
         .replace("null", "NULL, NULL, NULL").split("\t");
     mLog.info("Raw info " + StringUtils.join(rs, "\n"));
 

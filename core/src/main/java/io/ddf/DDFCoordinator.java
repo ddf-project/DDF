@@ -20,7 +20,7 @@ public class DDFCoordinator extends ALoggable {
   protected Map<UUID, DDFManager> mDDFUUID2DDFManager
           = new ConcurrentHashMap<UUID, DDFManager>();
   // The mapping from engine uuid to ddfmanager
-  public Map<UUID, DDFManager> mEngineUUID2DDFManager
+  protected Map<UUID, DDFManager> mEngineUUID2DDFManager
           = new ConcurrentHashMap<UUID, DDFManager>();
   // The default engine.
   protected DDFManager mDefaultEngine;

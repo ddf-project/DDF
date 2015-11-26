@@ -16,7 +16,7 @@ object RootBuild extends Build {
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
-  val SPARK_VERSION = "1.3.1-adatao"
+  val SPARK_VERSION = "1.5.1-adatao"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
@@ -61,13 +61,11 @@ object RootBuild extends Build {
   val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
   val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
-  val jdbcProjectName = projectName + "_jdbc"
 
-  // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, jdbc)
+  // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val core = Project("core", file("core"), settings = coreSettings)
-  lazy val jdbc = Project("jdbc", file("jdbc"), settings = jdbcSettings) dependsOn (core)
-  // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) dependsOn(jdbc)
+  // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
 
@@ -102,9 +100,9 @@ object RootBuild extends Build {
   // We define this explicitly rather than via unmanagedJars, so that make-pom will generate it in pom.xml as well
   // org % package % version
 
-  val com_adatao_unmanaged = Seq(
-    "com.adatao.unmanaged.net.rforge" % "REngine" % "2.1.1.compiled",
-    "com.adatao.unmanaged.net.rforge" % "Rserve" % "1.8.2.compiled"
+  val rforge = Seq(
+    "net.rforge" % "REngine" % "2.1.1.compiled",
+    "net.rforge" % "Rserve" % "1.8.2.compiled"
   )
 
   val scalaArtifacts = Seq("jline", "scala-compiler", "scala-library", "scala-reflect")
@@ -155,7 +153,7 @@ object RootBuild extends Build {
 
     conflictManager := ConflictManager.strict,
 
-    // This goes first for fastest resolution. We need this for com_adatao_unmanaged.
+    // This goes first for fastest resolution. We need this for rforge. 
     // Now, sometimes missing .jars in ~/.m2 can lead to sbt compile errors.
     // In that case, clean up the ~/.m2 local repository using bin/clean-m2-repository.sh
     
@@ -249,6 +247,13 @@ object RootBuild extends Build {
     dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
     dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.7.1",
     dependencyOverrides += "com.google.code.gson"% "gson" % "2.3.1",
+    dependencyOverrides += "com.sun.xml.bind" % "jaxb-impl" % "2.2.7",
+    dependencyOverrides += "jline" % "jline" % "2.12",
+    dependencyOverrides += "joda-time" % "joda-time" % "2.8.1",
+    dependencyOverrides += "io.dropwizard.metrics" % "metrics-core" % "3.1.2",
+    dependencyOverrides += "io.dropwizard.metrics" % "metrics-json" % "3.1.2",
+    dependencyOverrides += "io.dropwizard.metrics" % "metrics-jvm" % "3.1.2",
+    dependencyOverrides += "org.apache.commons" % "commons-lang3" % "3.1",
       pomExtra := (
       <!--
       **************************************************************************************************
@@ -311,6 +316,11 @@ object RootBuild extends Build {
                 </execution>
               </executions>
             </plugin>
+	    <plugin>
+		 <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+           </plugin>
             <plugin>
               <groupId>net.alchim31.maven</groupId>
               <artifactId>scala-maven-plugin</artifactId>
@@ -471,7 +481,7 @@ object RootBuild extends Build {
       //"Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
     ),
     testOptions in Test += Tests.Argument("-oI"),
-    libraryDependencies ++= com_adatao_unmanaged,
+    libraryDependencies ++= rforge,
     libraryDependencies ++= spark_dependencies,
     if(isLocal) {
       initialCommands in console :=
@@ -505,18 +515,6 @@ object RootBuild extends Build {
     //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch examples/" + targetDir + "/*timestamp") }
-  ) ++ assemblySettings ++ extraAssemblySettings
-
-val jdbc_dependencies = Seq(
-    "cdata.jdbc.salesforce" % "SalesforceDriver" % "1.0.0"
-)
-
-  def jdbcSettings = commonSettings ++ Seq(
-    name := jdbcProjectName,
-    // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
-    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch jdbc/" + targetDir + "/*timestamp") }, 
-    libraryDependencies ++= jdbc_dependencies,
-    testOptions in Test += Tests.Argument("-oI")
   ) ++ assemblySettings ++ extraAssemblySettings
 
 
