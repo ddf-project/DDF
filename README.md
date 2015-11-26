@@ -59,43 +59,57 @@ First clone or fork a copy of DDF, e.g.:
 $ git clone https://github.com/ddf-project/DDF 
 ```
 
-Now you need to prepare the build, which prepares the libraries,
-creates pom.xml in the various sub-project directories, and Eclipse
-.project and .classpath files.
+Now set up the neccessary environment variables (MAVEN_OPTS, JAVA_TOOL_OPTIONS) for the build.
 
 ```
 $ cd DDF
-$ bin/run-once.sh
+$ bin/set-env.sh
 ```
+If you don't want to set up the environment variables every time,
+please add the commands into ~/.bashrc or ~/.bash_profile.
 
-If you ever need to regenerate the pom.xml files:
-
+If you don't have sbt and want to install, run the following command
 ```
-$ bin/make-poms.sh
+$ bin/get-sbt.sh
 ```
+This command will install a local sbt under bin/sbt
 
-The following regenerates Eclipse .project and .classpath files:
+(Optional) The following regenerates Eclipse .project and .classpath files:
 
 ```
 $ bin/make-eclipse-projects.sh
 ```
 
 ### Building `DDF_core` or `DDF_spark`
-
 ```
-$ (cd core ; mvn clean package)
-$ (cd spark ; mvn clean package)
+$ mvn clean install -DskipTests
 ```
 
+Or if you want to just build separate modules, you can go into module
+directories and build, for example,
+
+```
+$ (cd core ; mvn clean install -DskipTests)
+$ (cd spark ; mvn clean install -DskipTests)
+```
+
+Or if you are more familar with the sbt tool,
+```
+sbt (bin/sbt) clean compile publishLocal
+```
 ### Running tests
 	
 ```
-$ bin/sbt test
+mvn test
 ```
 
-or
-
+Or if you want to run test for individual modules,
 ```
 $ (cd core ; mvn test)
 $ (cd spark ; mvn test)
 ```
+
+Or if you are more familar with the sbt tool,
+```
+sbt (bin/sbt) test
+``` 
