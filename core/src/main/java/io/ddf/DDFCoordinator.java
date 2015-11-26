@@ -17,15 +17,15 @@ import java.util.*;
  */
 public class DDFCoordinator extends ALoggable {
   // The mapping from ddf uuid to ddfmanager.
-  private Map<UUID, DDFManager> mDDFUUID2DDFManager
+  protected Map<UUID, DDFManager> mDDFUUID2DDFManager
           = new ConcurrentHashMap<UUID, DDFManager>();
   // The mapping from engine uuid to ddfmanager
-  private Map<UUID, DDFManager> mEngineUUID2DDFManager
+  protected Map<UUID, DDFManager> mEngineUUID2DDFManager
           = new ConcurrentHashMap<UUID, DDFManager>();
   // The default engine.
-  private DDFManager mDefaultEngine;
+  protected DDFManager mDefaultEngine;
 
-  private String mNamespace = null;
+  protected String mNamespace = null;
 
   public DDFManager getDefaultEngine() {
     return mDefaultEngine;
