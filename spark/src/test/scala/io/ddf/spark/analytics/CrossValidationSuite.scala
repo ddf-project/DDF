@@ -77,4 +77,18 @@ class CrossValidationSuite extends ATestSuite {
       assert(testTableName != tableName)
     }
   }
+
+  test("number of splits") {
+    val ddf = manager.sql2ddf("select * from airline", "SparkSQL")
+
+    for(numSplits <- 2 until 10) {
+      val splits = ddf.ML.CVKFold(numSplits, 17)
+      assert(splits.size == numSplits)
+    }
+
+    for(numSplits <- 2 until 10) {
+      val splits = ddf.ML.CVRandom(numSplits, 0.85, 17)
+      assert(splits.size == numSplits)
+    }
+  }
 }
