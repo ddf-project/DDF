@@ -12,6 +12,8 @@ import io.ddf.content.Schema
 import io.ddf.spark.SparkDDF
 import org.apache.spark.sql.Row
 
+import scala.collection.mutable.ArrayBuffer
+
 private[spark]
 class SeededPartition(val prev: Partition, val seed: Int) extends Partition with Serializable {
   override val index: Int = prev.index
@@ -74,10 +76,18 @@ object CrossValidation {
     */
   def kFoldSplit[T](rdd: RDD[T], numSplits: Int, seed: Long)(implicit _cm: ClassManifest[T]): Iterator[(RDD[T], RDD[T])] = {
     require(numSplits > 0)
-    (for (lower <- 0.0 until 1.0 by 1.0 / numSplits)
-    yield (new RandomSplitRDD(rdd, seed, lower, lower + 1.0 / numSplits, true),
-        new RandomSplitRDD(rdd, seed, lower, lower + 1.0 / numSplits, false))
-      ).toIterator
+
+    val splits = ArrayBuffer[(RDD[T], RDD[T])]()
+    var i = 0;
+    var lower = 0.0
+    val increment = 1.0 / numSplits
+    while(i < numSplits) {
+      lower = increment * i
+      splits.append((new RandomSplitRDD(rdd, seed, lower, lower + 1.0 / numSplits, true),
+        new RandomSplitRDD(rdd, seed, lower, lower + 1.0 / numSplits, false)))
+      i += 1
+    }
+    splits.toIterator
   }
 
   def DDFRandomSplit(ddf: DDF, numSplits: Int, trainingSize: Double, seed: Long): JList[CrossValidationSet] = {
