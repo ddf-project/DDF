@@ -30,7 +30,7 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-  val rootVersion = "1.4.6"
+  val rootVersion = "1.4.7-SNAPSHOT"
   //val rootVersion = if(YARN_ENABLED) {
   //  "1.2-adatao"
   //} else {
