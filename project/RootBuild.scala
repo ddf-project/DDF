@@ -111,6 +111,7 @@ object RootBuild extends Build {
   val spark_dependencies = Seq(
     // "com.google" % "bigquery" % "1.0.0",
     // "com.google.cloud.bigdataoss" % "bigquery-connector-parent" % "0.7.3",
+	"com.google.apis" % "google-api-services-drive" % "v2-rev194-1.20.0",
    "com.google.cloud.bigdataoss" % "bigquery-connector" % "0.7.3-hadoop2", 
     "commons-configuration" % "commons-configuration" % "1.6",
     "com.google.code.gson"% "gson" % "2.2.2",
@@ -201,6 +202,7 @@ object RootBuild extends Build {
     publishLocalBoth <<= Seq(publishLocal in MavenCompile, publishLocal).dependOn,
 
 
+    dependencyOverrides += "com.google.api-client" % "google-api-client" % "1.20.0", 
     dependencyOverrides += "commons-lang" % "commons-lang" % "2.6",
     dependencyOverrides += "it.unimi.dsi" % "fastutil" % "6.4.4",
     dependencyOverrides += "log4j" % "log4j" % "1.2.17",

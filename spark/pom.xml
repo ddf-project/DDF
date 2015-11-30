@@ -319,6 +319,16 @@
             <version>1.8.2.compiled</version>
         </dependency>
         <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-drive</artifactId>
+            <version>v2-rev194-1.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud.bigdataoss</groupId>
+            <artifactId>bigquery-connector</artifactId>
+            <version>0.7.3-hadoop2</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
             <version>1.5.1-adatao</version>

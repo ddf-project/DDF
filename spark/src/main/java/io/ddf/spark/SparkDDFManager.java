@@ -4,7 +4,7 @@ import org.apache.spark.sql.types.StructType;
 import scala.Function1;
 import scala.runtime.AbstractFunction1;
 
-import com.google.api.services.bigquery.model.JsonObject;
+import com.google.gson.JsonObject;
 import com.google.cloud.hadoop.io.bigquery.BigQueryConfiguration;
 import com.google.gson.Gson;
 import io.ddf.DDF;
@@ -71,9 +71,9 @@ public class SparkDDFManager extends DDFManager {
     String inputTable = "demo.cars93";
     org.apache.hadoop.conf.Configuration conf = this.mSparkContext.hadoopConfiguration();
     conf.set(BigQueryConfiguration.PROJECT_ID_KEY, projectId);
-    String sysBucket = conf.get("fs.gs.system.bucket");
+    //String sysBucket = conf.get("fs.gs.system.bucket");
 
-
+    String sysBucket = "adatao-dataproc";
     conf.set(BigQueryConfiguration.GCS_BUCKET_KEY, sysBucket);
 
     String outputTableSchema =
@@ -81,7 +81,7 @@ public class SparkDDFManager extends DDFManager {
 
     try {
       BigQueryConfiguration.configureBigQueryInput(conf, inputTable);
-      BigQueryConfiguration.configureBigQueryOutput(conf, "testTable", outputTableSchema);
+      BigQueryConfiguration.configureBigQueryOutput(conf, "test.testtable", outputTableSchema);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -114,7 +114,7 @@ public class SparkDDFManager extends DDFManager {
     };
 
     RDD<String> rowRDD = rdd.map(func, ClassTag$.MODULE$.<String>apply(String.class));
-    String[] ss = rowRDD.collect();
+    List<String> ss = rowRDD.toJavaRDD().collect();
     for (String s : ss) {
       System.out.println(s);
       mLog.info("read s: " + s);
@@ -140,6 +140,7 @@ public class SparkDDFManager extends DDFManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
     RDD<Tuple2<LongWritable, JsonObject>> rdd = mSparkContext.newAPIHadoopRDD(conf, null , LongWritable.class,
         JsonObject
         .class);
@@ -162,10 +163,10 @@ public class SparkDDFManager extends DDFManager {
         return null;
       }*/
     };
+
     RDD<Row> rowRDD = rdd.map(func, ClassTag$.MODULE$.<Row>apply(Row.class));
     StructType rddSchema = SparkUtils.rddSchemaFromDDFSchema(schema);
     DataFrame df = this.getHiveContext().applySchema(rowRDD, rddSchema);
-
     DDF ddf = this.newDDF(this, df, new Class<?>[]{DataFrame.class}, null, null, schema);
     ddf.getRepresentationHandler().cache(false);
     ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
