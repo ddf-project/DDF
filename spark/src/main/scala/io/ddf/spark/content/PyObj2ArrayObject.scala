@@ -72,6 +72,10 @@ object PyObj2ArrayObject {
                 (0 until colData.size()).foreach {
                   i => jData(i)(j) = colData.get(i)
                 }
+              case v: java.lang.Boolean =>
+                (0 until colData.size()).foreach {
+                  i => jData(i)(j) = colData.get(i)
+                }
             }
         }
         jData

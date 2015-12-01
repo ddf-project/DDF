@@ -57,8 +57,9 @@ public class TransformFacade implements IHandleTransformations {
   }
 
   @Override
-  public DDF transformPython(String[] transformFunctions, String[] destColumns, String[][] sourceColumns) {
-    return mTransformationHandler.transformPython(transformFunctions, destColumns, sourceColumns);
+  public DDF transformPython(String[] transformFunctions, String[] functionNames,
+      String[] destColumns, String[][] sourceColumns) {
+    return mTransformationHandler.transformPython(transformFunctions, functionNames, destColumns, sourceColumns);
   }
 
   @Override
