@@ -189,10 +189,13 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
    * @param sourceColumns names of the source columns
    * @return
    */
-  override def transformPython(transformFunctions: Array[String], destColumns: Array[String],
+  override def transformPython(transformFunctions: Array[String], functionNames: Array[String],
+                               destColumns: Array[String],
                                sourceColumns: Array[Array[String]]): DDF = {
 
-    if (transformFunctions.length != destColumns.length || transformFunctions.length != sourceColumns.length ||
+    if (transformFunctions.length != destColumns.length ||
+      transformFunctions.length != functionNames.length ||
+      transformFunctions.length != sourceColumns.length ||
       transformFunctions.length <= 0) {
       throw new IllegalArgumentException("Lists of destination columns," +
         " source columns and transform functions must have the same length")
@@ -221,23 +224,21 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
           // hence casting is needed in the python code later.
           // Moreover loops will become awkward because __iter__ doesn't work with array.array
           interpreter.set("transform_codes", transformFunctions)
+          interpreter.set("function_names", functionNames)
           interpreter.set("src_cols", sourceColumns)
           interpreter.set("dest_cols", destColumns)
           interpreter.set("df_part", partdf)
 
           interpreter.exec(
             """
-              |import marshal, types, base64
+              |import base64
               |
-              |def load_code(code_string):
-              |  code = marshal.loads(base64.urlsafe_b64decode(code_string))
-              |  return types.FunctionType(code, globals(), "transformation_function")
+              |funcs = [base64.urlsafe_b64decode(str(x)) for x in transform_codes]
               |
-              |funcs = [load_code(str(x)) for x in transform_codes]
-              |
-              |for f, dest, src in zip(funcs, [x for x in dest_cols], [y for y in src_cols]):
+              |for f, f_name, dest, src in zip(funcs, function_names, dest_cols, src_cols):
+              |  exec(f)
               |  data_src = tuple(df_part[str(c)] for c in src)
-              |  df_part[str(dest)] = [f(*args) for args in zip(*data_src)]
+              |  df_part[str(dest)] = [eval('{}(*args)'.format(str(f_name))) for args in zip(*data_src)]
               |
             """.stripMargin
           )
@@ -324,7 +325,8 @@ object TransformationHandler {
         case v: java.lang.Double => "DOUBLE"
         case v: java.lang.Float => "DOUBLE"
         case v: java.lang.String => "STRING"
-        case x => throw new DDFException("Only support atomic vectors of type int|float|string")
+        case v: java.lang.Boolean => "BOOLEAN"
+        case x => throw new DDFException("Only support atomic vectors of type int|float|string|boolean")
       }
       columns(i) = new Column(k, ddfType)
     }
