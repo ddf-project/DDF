@@ -47,6 +47,9 @@ object RootBuild extends Build {
   val sparkProjectName = "ddf_spark"
   val sparkVersion = rootVersion
 
+  val s3ProjectName = "ddf_s3"
+  val s3Version = rootVersion
+
 //  val sparkVersion = if(YARN_ENABLED) {
 //    rootVersion
 //  } else {
@@ -68,7 +71,7 @@ object RootBuild extends Build {
   // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
-
+  lazy val s3 = Project("s3", file("s3"), settings = s3Settings) dependsOn (core)
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend(Compile)
   lazy val publishLocalBoth = TaskKey[Unit]("publish-local", "publish local for m2 and ivy")
@@ -127,8 +130,10 @@ object RootBuild extends Build {
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
     "com.google.protobuf" % "protobuf-java" % "2.5.0"
   )
-
-
+  val s3_dependencies = Seq(
+	"amazon.aws" % "redshift" % "1.1.7.1007",
+	"com.amazonaws" % "aws-java-sdk" % "1.10.8"
+  )
   /////// Common/Shared project settings ///////
 
   def commonSettings = Defaults.defaultSettings ++ Seq(
@@ -272,9 +277,6 @@ object RootBuild extends Build {
               <configuration>
                 <reuseForks>false</reuseForks>
                 <enableAssertions>false</enableAssertions>
-                <environmentVariables>
-                    <RSERVER_JAR>${{basedir}}/{targetDir}/*.jar,${{basedir}}/{targetDir}/lib/*</RSERVER_JAR>              
-                </environmentVariables>
                 <systemPropertyVariables>
                   <spark.serializer>org.apache.spark.serializer.KryoSerializer</spark.serializer>
                   <spark.kryo.registrator>io.ddf.spark.content.KryoRegistrator</spark.kryo.registrator>
@@ -513,8 +515,12 @@ object RootBuild extends Build {
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch examples/" + targetDir + "/*timestamp") }
   ) ++ assemblySettings ++ extraAssemblySettings
 
-
-
+  def s3Settings = commonSettings ++ Seq(
+    name := s3ProjectName,
+    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch spark/" + targetDir + "/*timestamp") },
+    testOptions in Test += Tests.Argument("-oI"),
+    libraryDependencies ++= s3_dependencies,
+  ) ++ assemblySettings ++ extraAssemblySettings
   def extraAssemblySettings() = Seq(test in assembly := {}) ++ Seq(
     mergeStrategy in assembly := {
       case m if m.toLowerCase.endsWith("manifest.mf") => MergeStrategy.discard
