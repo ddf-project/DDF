@@ -320,15 +320,30 @@ object TransformationHandler {
     for (i <- 0 until keys.size()) {
       val k = keys.get(i).asInstanceOf[String]
 
-      val ddfType = dct.get(k).asInstanceOf[PyList].get(0) match {
-        case v: Integer => "INT"
-        case v: java.lang.Double => "DOUBLE"
-        case v: java.lang.Float => "DOUBLE"
-        case v: java.lang.String => "STRING"
-        case v: java.lang.Boolean => "BOOLEAN"
-        case x => throw new DDFException("Only support atomic vectors of type int|float|string|boolean")
+      val dataCol = dct.get(k).asInstanceOf[PyList]
+      var ddfColType = ""
+      var j = 0
+      while (j < dataCol.size() && ddfColType.length == 0) {
+        val dataElem = Option(dataCol.get(j))
+        if (dataElem.isDefined) {
+          ddfColType = dataElem.get match {
+            case v: Integer => "INT"
+            case v: java.lang.Double => "DOUBLE"
+            case v: java.lang.Float => "DOUBLE"
+            case v: java.lang.String => "STRING"
+            case v: java.lang.Boolean => "BOOLEAN"
+            case x =>
+              throw new DDFException(s"Only support atomic vectors of type int|float|string|boolean, " +
+                  s"got type ${x.getClass.getCanonicalName}")
+          }
+        }
+        j += 1
       }
-      columns(i) = new Column(k, ddfType)
+      if (ddfColType.length == 0) {
+        // still can't guess, god helps us
+        ddfColType = "STRING"
+      }
+      columns(i) = new Column(k, ddfColType)
     }
     columns
   }
