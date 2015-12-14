@@ -960,11 +960,11 @@ public abstract class DDF extends ALoggable //
     return this.getSchema().getColumnName(columnIndex);
   }
 
-  public Factor<?> setAsFactor(int columnIndex) {
+  public Factor<?> setAsFactor(int columnIndex) throws DDFException {
     return this.getSchemaHandler().setAsFactor(columnIndex);
   }
 
-  public Factor<?> setAsFactor(String columnName) {
+  public Factor<?> setAsFactor(String columnName) throws DDFException {
     return this.getSchemaHandler().setAsFactor(columnName);
   }
 

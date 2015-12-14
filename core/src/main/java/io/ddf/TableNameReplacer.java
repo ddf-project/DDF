@@ -293,7 +293,7 @@ public class TableNameReplacer extends TableVisitor {
             if (this.mDDFManager.getDDFCoordinator() != null) {
                 DDFManager manager = this.mDDFManager.getDDFCoordinator()
                     .getDDFManagerByDDFUUID(uuid);
-                engineUUID = manager.getUUID();
+                engineUUID = manager == null ? null : manager.getUUID();
             } else {
                 engineUUID = this.mDDFManager.getUUID();
             }
@@ -310,7 +310,7 @@ public class TableNameReplacer extends TableVisitor {
             // Restore the ddf first.
             // TODO: fix setDDFName.scala first.
             // ddf = this.ddfManager.getOrRestoreDDFUri(ddfuri);
-            if (this.mDDFManager.getDDFCoordinator() == null) {
+            if (this.mDDFManager.getDDFCoordinator() != null) {
                 ddf = this.mDDFManager.getDDFCoordinator().getDDF(uuid);
             } else {
                 ddf = this.mDDFManager.getOrRestoreDDF(uuid);

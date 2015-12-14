@@ -46,9 +46,9 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
 
   void setFactorLevelsForStringColumns(String[] xCols) throws DDFException;
 
-  Factor<?> setAsFactor(String columnName);
+  Factor<?> setAsFactor(String columnName) throws DDFException;
 
-  Factor<?> setAsFactor(int columnIndex);
+  Factor<?> setAsFactor(int columnIndex) throws DDFException;
 
   void unsetAsFactor(String columnName);
 

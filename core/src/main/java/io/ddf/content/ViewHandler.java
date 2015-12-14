@@ -7,16 +7,14 @@ package io.ddf.content;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
+import io.ddf.Factor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import scala.Int;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -72,10 +70,9 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   @Override
   public DDF project(String... columnNames) throws DDFException {
     if (columnNames == null || columnNames.length == 0) throw new DDFException("columnNames must be specified");
-
-    String selectedColumns = Joiner.on(",").join(columnNames);
-    return sql2ddf(String.format("SELECT %s FROM %%s", selectedColumns),
-        String.format("Unable to project column(s) %s from table %%s", selectedColumns));
+    List<String> colNames = new ArrayList<String>(columnNames.length);
+    for(String col: columnNames) {colNames.add(col);}
+    return project(colNames);
   }
 
   @Override
@@ -83,8 +80,23 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     if (columnNames == null || columnNames.isEmpty()) throw new DDFException("columnNames must be specified");
 
     String selectedColumns = Joiner.on(",").join(columnNames);
-    return sql2ddf(String.format("SELECT %s FROM %%s", selectedColumns),
+    DDF projectedDDF = sql2ddf(String.format("SELECT %s FROM %%s", selectedColumns),
         String.format("Unable to project column(s) %s from table %%s", selectedColumns));
+    //reserve factor information
+    List<Schema.Column> columns = this.getDDF().getSchema().getColumns();
+    for(Schema.Column column: columns) {
+      if(projectedDDF.getColumn(column.getName()) != null) {
+        Factor<?> factor = column.getOptionalFactor();
+        if(factor != null) {
+          mLog.info(">>> set factor for column " + column.getName());
+          projectedDDF.getSchemaHandler().setAsFactor(column.getName());
+          Factor<?> newFactor = projectedDDF.getSchema().getColumn(column.getName()).getOptionalFactor();
+          if(factor.getLevelCounts() != null) {newFactor.setLevelCounts(factor.getLevelCounts());}
+          if(factor.getLevels() != null) {newFactor.setLevels(factor.getLevels());}
+        }
+      }
+    }
+    return projectedDDF;
   }
 
   @Override

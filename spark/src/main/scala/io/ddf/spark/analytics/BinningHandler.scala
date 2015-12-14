@@ -47,7 +47,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
     val ddf: DDF = this.getDDF.sql2ddf(command)
     mLog.info(ddf.VIEWS.head(1).toString)
     val rddbins = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]].collect
-    val histbins = rddbins(0).get(0).asInstanceOf[ArrayBuffer[Row]]
+    val histbins = rddbins(0).get(0).asInstanceOf[Seq[Row]]
 
     val bins = histbins.map(r => {
       val b = new AStatisticsSupporter.HistogramBin
