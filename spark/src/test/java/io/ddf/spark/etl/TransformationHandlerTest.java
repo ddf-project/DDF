@@ -23,6 +23,7 @@ public class TransformationHandlerTest extends BaseTest {
   @Before
   public void setUp() throws Exception {
     createTableAirline();
+    createTableAirlineBigInt();
     ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, " +
             "distance, arrdelay, depdelay from airline", "SparkSQL");
   }
@@ -38,6 +39,28 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertNotNull(newddf);
     Assert.assertEquals("newcol", newddf.getColumnName(8));
     Assert.assertEquals(10, res.size());
+  }
+
+  @Test
+  public void testTransformNativeRserveMultipleExpressions() throws DDFException {
+    String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
+    DDF newddf = ddf.Transform.transformNativeRserve(expressions);
+
+    Assert.assertEquals("newcol", newddf.getColumnName(8));
+    Assert.assertEquals("newcol2", newddf.getColumnName(9));
+  }
+
+  @Test
+  public void testTransformNativeRserveDoubleTypeConversion() throws DDFException {
+    DDF ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, " +
+            "distance, arrdelay, depdelay from airline_bigint", "SparkSQL");
+    String[] expressions = {"newcol = deptime / arrtime","depdelay=log(depdelay)"};
+    DDF newddf = ddf.Transform.transformNativeRserve(expressions);
+
+
+    Assert.assertEquals(newddf.getColumn("newcol").getType(), ColumnType.DOUBLE);
+    Assert.assertEquals(newddf.getColumn("depdelay").getType(), ColumnType.DOUBLE);
+    Assert.assertEquals(newddf.getColumn("arrdelay").getType(), ColumnType.BIGINT);
   }
 
   @Test

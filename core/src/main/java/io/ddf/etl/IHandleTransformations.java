@@ -15,6 +15,8 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
 
   public DDF transformNativeRserve(String transformExpression);
 
+  public DDF transformNativeRserve(String[] transformExpression);
+
   public DDF transformPython(String[] transformFunctions, String[] functionNames,
       String[] destColumns, String[][] sourceColumns);
 

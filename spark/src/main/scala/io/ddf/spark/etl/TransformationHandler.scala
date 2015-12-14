@@ -1,5 +1,7 @@
 package io.ddf.spark.etl
 
+import java.util
+
 import org.apache.spark.sql.DataFrame
 import org.python.core._
 import org.python.util.PythonInterpreter
@@ -115,7 +117,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     }
 
     // convert R-processed DF partitions back to BigR DataFrame
-    val columnArr = TransformationHandler.RDataFrameToColumnList(rReduced)
+    val columnArr = TransformationHandler.RDataFrameToColumnListMR(rReduced)
 
 
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList);
@@ -128,7 +130,10 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
   }
 
   override def transformNativeRserve(transformExpression: String): DDF = {
+    transformNativeRserve(Array(transformExpression))
+  }
 
+  override def transformNativeRserve(transformExpressions: Array[String]): DDF = {
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
 
     // process each DF partition in R
@@ -144,7 +149,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
           val dfvarname = "df.partition"
           rconn.assign(dfvarname, partdf)
 
-          val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpression)
+          val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpressions.mkString(","))
 
           // mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
 
@@ -167,8 +172,14 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
         }
     }
 
+    // new columns from the expressions
+    // Notice that the users can enter expression without the new column name
+    // Thus the extracted column name is not correct in these cases
+    val newCols = transformExpressions.map(_.split("=")(0))
+
     // convert R-processed data partitions back to RDD[Array[Object]]
-    val columnArr = TransformationHandler.RDataFrameToColumnList(rMapped, mDDF.getSchema.getColumns)
+    val columnArr = TransformationHandler.RDataFrameToColumnList(rMapped, mDDF.getSchema.getColumns, newCols)
+
 
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList);
 
@@ -286,13 +297,14 @@ object TransformationHandler {
     rconn.eval("paste(capture.output(print(" + expr + ")), collapse='\\n')").asString()
   }
 
-  def RDataFrameToColumnList(rdd: RDD[REXP], orgColumns: List[Column]): Array[Column] = {
+  def RDataFrameToColumnListMR(rdd: RDD[REXP]): Array[Column] = {
     val firstdf = rdd.first()
     val names = firstdf.getAttribute("names").asStrings()
     val columns = new Array[Column](firstdf.length)
+
     for (j ← 0 until firstdf.length()) {
       val ddfType = firstdf.asList().at(j) match {
-        case REXPDouble ⇒ "DOUBLE"
+        case v: REXPDouble ⇒ "DOUBLE"
         case v: REXPInteger ⇒ "INT"
         case v: REXPString ⇒ "STRING"
         case _ ⇒ throw new DDFException("Only support atomic vectors of type int|double|string!")
@@ -300,6 +312,37 @@ object TransformationHandler {
       columns(j) = new Column(names(j), ddfType)
     }
     columns
+  }
+
+  def RDataFrameToColumnList(rdd: RDD[REXP], orgColumns: List[Column], newColumns: Array[String]): Array[Column] = {
+    val firstdf = rdd.first()
+    val names = firstdf.getAttribute("names").asStrings()
+    val columns = new Array[Column](firstdf.length)
+
+    val orgColumnNames = orgColumns.asScala.map(_.getName).toSet
+
+    val orgColumnTypes = orgColumns.asScala.map(c => (c.getName, c.getType)).toMap
+
+    for (j ← 0 until firstdf.length()) {
+      val ddfType = firstdf.asList().at(j) match {
+        case v: REXPDouble ⇒
+          if (!orgColumnNames.contains(names(j)) || newColumns.toSet.contains(names(j))) {
+            "DOUBLE"
+          }
+          else {
+            // BigInt columns are converted to Double ones in R data.frame
+            // So if they are not mutated by expressions, we need to set their types
+            // correctly on the resulted DDF
+            orgColumnTypes(names(j)).toString
+          }
+        case v: REXPInteger ⇒ "INT"
+        case v: REXPString ⇒ "STRING"
+        case _ ⇒ throw new DDFException("Only support atomic vectors of type int|double|string!")
+      }
+      columns(j) = new Column(names(j), ddfType)
+    }
+    columns
+
   }
 
   /**

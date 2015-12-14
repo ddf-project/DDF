@@ -44,6 +44,16 @@ class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
                       buffer += row.getInt(i)
                     }
                   }
+
+                  case ColumnType.BIGINT => {
+                    val buffer = arrayBufferColumns(i).asInstanceOf[ArrayBuffer[Double]]
+                    if (row.isNullAt(i)) {
+                      buffer += REXPDouble.NA
+                    } else {
+                      buffer += row.getLong(i).toDouble
+                    }
+                  }
+
                   case ColumnType.DOUBLE | ColumnType.BIGINT => {
                     val buffer = arrayBufferColumns(i).asInstanceOf[ArrayBuffer[Double]]
                     if (row.isNullAt(i)) {
@@ -52,6 +62,7 @@ class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
                       buffer += row.getDouble(i)
                     }
                   }
+
                   case ColumnType.STRING => {
                     val buffer = arrayBufferColumns(i).asInstanceOf[ArrayBuffer[String]]
                     if (row.isNullAt(i)) {
