@@ -1,7 +1,5 @@
 package io.ddf.spark.etl
 
-import java.util
-
 import org.apache.spark.sql.DataFrame
 import org.python.core._
 import org.python.util.PythonInterpreter
@@ -10,9 +8,7 @@ import scala.collection.JavaConverters._
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.JavaConversions.seqAsJavaList
 
-import org.apache.spark.SparkContext.rddToPairRDDFunctions
 import org.apache.spark.rdd.RDD
-import org.apache.spark.storage.StorageLevel
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.REXPDouble
 import org.rosuda.REngine.REXPInteger
