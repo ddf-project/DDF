@@ -88,7 +88,7 @@ public class DataSourceResolver {
     if (LOG.isInfoEnabled()) {
       Map<String, String> sourceOptions = new HashMap<>(options);
       sourceOptions.put("password", "<redacted>");
-      LOG.info("Loading from S3 with options: {}", sourceOptions);
+      LOG.info("Loading from JDBC with options: {}", sourceOptions);
     }
 
     String uri = options.get("uri");
