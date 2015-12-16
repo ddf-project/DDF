@@ -3,13 +3,18 @@ package io.ddf.s3;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
+import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 
 /**
  * Created by jing on 12/2/15.
  */
 public class S3DDF extends DDF {
+    // Whether this ddf has header.
     Boolean mHasHeader = false;
+    // The format of this s3ddf.
+    DataFormat mDataFormat;
+
     /**
      * S3DDF is the ddf for s3. It point to a single S3DDFManager, and every S3DDF is a unqiue mapping to a s3 uri.
      * The schema should store the s3 uri as tablename.
@@ -42,12 +47,20 @@ public class S3DDF extends DDF {
         super();
     }
 
-    public Boolean getmHasHeader() {
+    public Boolean getHasHeader() {
         return mHasHeader;
     }
 
-    public void setmHasHeader(Boolean mHasHeader) {
+    public void setHasHeader(Boolean mHasHeader) {
         this.mHasHeader = mHasHeader;
+    }
+
+    public DataFormat getDataFormat() {
+        return mDataFormat;
+    }
+
+    public void setDataFormat(DataFormat mDataFormat) {
+        this.mDataFormat = mDataFormat;
     }
 
     @Override

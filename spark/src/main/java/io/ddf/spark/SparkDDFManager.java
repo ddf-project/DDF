@@ -6,10 +6,9 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.DDFManager.EngineType;
-import io.ddf.datasource.DataSourceDescriptor;
-import io.ddf.datasource.JDBCDataSourceCredentials;
-import io.ddf.datasource.JDBCDataSourceDescriptor;
+import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
+import io.ddf.s3.S3DDF;
 import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
@@ -77,6 +76,11 @@ public class SparkDDFManager extends DDFManager {
         } catch (URISyntaxException e) {
           throw new DDFException(e);
         }
+      } else if (dataSourceDescriptor instanceof S3DataSourceDescriptor) {
+        // Load from s3.
+        // Load data into spark. If has schema and doesn't has schema?
+        // Create ddf over it. Take care about persistence & lineage.
+        throw new DDFException("Unsupported operation");
       } else {
         JDBCDataSourceDescriptor loadDS
                 = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(),
@@ -132,8 +136,37 @@ public class SparkDDFManager extends DDFManager {
       throw new DDFException("There is no ddf with uri : " + ddfUUID.toString()
           + " in another engine");
     }
-    String fromTableName = fromDDF.getTableName();
-    return this.transferByTable(fromEngine, fromTableName);
+
+    if (fromDDF instanceof S3DDF) {
+      // different loading function.
+      S3DDF s3DDF = (S3DDF)fromDDF;
+      switch (s3DDF.getDataFormat()) {
+        case JSON:
+          // TODO: the partition number? Remeber to set the env var.
+          // export AWS_ACCESS_KEY_ID=<YOURKEY>
+          // export AWS_SECRET_ACCESS_KEY=<YOURSECRETKEY>
+          DataFrame df = this.getHiveContext().jsonFile(fromDDF.getTableName());
+          if (s3DDF.getSchema() == null) {
+            s3DDF.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
+          }
+          DDF ddf = this.newDDF(this, df, new Class<?>[] {DataFrame.class}, null,
+              null, s3DDF.getSchema());
+          ddf.getRepresentationHandler().cache(false);
+          ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+          break;
+        case CSV:
+          RDD rdd = this.getSparkContext().textFile(s3DDF.getTableName(), 0);
+          // Convert rdd to dataframe
+          //DataFrame df = this.getHiveContext().createDataFrame(rdd.toJavaRDD(), null);
+          this.getHiveContext().createdata
+          break;
+        case PQT: break;
+      }
+    } else {
+      String fromTableName = fromDDF.getTableName();
+      return this.transferByTable(fromEngine, fromTableName);
+    }
+
   }
 
   /**

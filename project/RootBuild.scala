@@ -66,10 +66,10 @@ object RootBuild extends Build {
 
 
   // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, s3, examples)
   lazy val core = Project("core", file("core"), settings = coreSettings)
   // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core, s3) 
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
   lazy val s3 = Project("s3", file("s3"), settings = s3Settings) dependsOn (core)
   // A configuration to set an alternative publishLocalConfiguration
@@ -276,7 +276,10 @@ object RootBuild extends Build {
               <version>2.15</version>
               <configuration>
                 <reuseForks>false</reuseForks>
-                <enableAssertions>false</enableAssertions>
+	<enableAssertions>false</enableAssertions>
+        <environmentVariables>
+		 <RSERVER_JAR>${{basedir}}/{targetDir}/*.jar,${{basedir}}/{targetDir}/lib/*</RSERVER_JAR>
+	</environmentVariables> 
                 <systemPropertyVariables>
                   <spark.serializer>org.apache.spark.serializer.KryoSerializer</spark.serializer>
                   <spark.kryo.registrator>io.ddf.spark.content.KryoRegistrator</spark.kryo.registrator>
@@ -519,7 +522,7 @@ object RootBuild extends Build {
     name := s3ProjectName,
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch spark/" + targetDir + "/*timestamp") },
     testOptions in Test += Tests.Argument("-oI"),
-    libraryDependencies ++= s3_dependencies,
+    libraryDependencies ++= s3_dependencies
   ) ++ assemblySettings ++ extraAssemblySettings
   def extraAssemblySettings() = Seq(test in assembly := {}) ++ Seq(
     mergeStrategy in assembly := {
