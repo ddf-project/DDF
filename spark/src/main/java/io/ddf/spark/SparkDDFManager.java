@@ -152,17 +152,18 @@ public class SparkDDFManager extends DDFManager {
     if (ddf instanceof S3DDF) {
       // different loading function.
       S3DDF s3DDF = (S3DDF)ddf;
+      DataFrameReader dfr =  this.getHiveContext().read();
       DataFrame df = null;
       String s3uri = "s3n://" + s3DDF.getBucket() + "/" + s3DDF.getKey();
       if (s3DDF.getIsDir()) {
         // TODO (For folders ,there will be several situation)s
-        // 1. All files in the folder are of a common shcema and it doesn't have head (what about pqt and json)
+        // 1. All files in the folder are of a common schema and it doesn't have head (what about pqt and json)?
         // 2. The folder is not clean
         if (s3DDF.getSchema() == null) {
           if (s3DDF.getSchemaString() == null) {
             throw new DDFException("There is not shcema for " + s3uri);
           } else {
-            df = this.getHiveContext().read().format("com.databricks.spark.csv")
+            df = dfr.format("com.databricks.spark.csv")
                 .schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()))
                 .load(s3uri);
           }
@@ -172,13 +173,11 @@ public class SparkDDFManager extends DDFManager {
       } else {
         switch (s3DDF.getDataFormat()) {
           case JSON:
-            df = this.getHiveContext().jsonFile(s3uri);
-            df.printSchema();
+            dfr = dfr.format("json");
             // TODO(Should we flatten the df here?)
             break;
           case CSV:
-            DataFrameReader dfr = this.getHiveContext().read().format("com.databricks.spark.csv");
-            dfr = dfr.option("header", s3DDF.getHasHeader() ? "true" : "false");
+            dfr = dfr.format("com.databricks.spark.csv").option("header", s3DDF.getHasHeader() ? "true" : "false");
             if (s3DDF.getSchema() == null) {
               if (s3DDF.getSchemaString() == null) {
                 dfr = dfr.option("inferSchema", "true");
@@ -188,12 +187,11 @@ public class SparkDDFManager extends DDFManager {
             } else {
               // TODO
             }
-            df = dfr.load(s3uri);
             break;
           case PQT:
-            df = this.getHiveContext().read().load(s3uri);
             break;
         }
+        df = dfr.load(s3uri);
       }
 
       if (s3DDF.getSchema() == null) {
