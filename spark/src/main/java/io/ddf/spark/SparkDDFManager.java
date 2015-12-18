@@ -176,6 +176,8 @@ public class SparkDDFManager extends DDFManager {
             dfr = dfr.format("json");
             // TODO(Should we flatten the df here?)
             break;
+          case TSV:
+            dfr = dfr.option("dlimiter", "\t");
           case CSV:
             dfr = dfr.format("com.databricks.spark.csv").option("header", s3DDF.getHasHeader() ? "true" : "false");
             if (s3DDF.getSchema() == null) {
