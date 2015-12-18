@@ -26,7 +26,7 @@ class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
             val arrayBufferColumns: List[ArrayBuffer[_]] = columnList.map {
               col => col.getType match {
                 case ColumnType.INT => new ArrayBuffer[Int]
-                case ColumnType.DOUBLE => new ArrayBuffer[Double]
+                case ColumnType.DOUBLE | ColumnType.BIGINT => new ArrayBuffer[Double]
                 case ColumnType.STRING => new ArrayBuffer[String]
               }
             }.toList
@@ -44,7 +44,17 @@ class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
                       buffer += row.getInt(i)
                     }
                   }
-                  case ColumnType.DOUBLE => {
+
+                  case ColumnType.BIGINT => {
+                    val buffer = arrayBufferColumns(i).asInstanceOf[ArrayBuffer[Double]]
+                    if (row.isNullAt(i)) {
+                      buffer += REXPDouble.NA
+                    } else {
+                      buffer += row.getLong(i).toDouble
+                    }
+                  }
+
+                  case ColumnType.DOUBLE | ColumnType.BIGINT => {
                     val buffer = arrayBufferColumns(i).asInstanceOf[ArrayBuffer[Double]]
                     if (row.isNullAt(i)) {
                       buffer += REXPDouble.NA
@@ -52,6 +62,7 @@ class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
                       buffer += row.getDouble(i)
                     }
                   }
+
                   case ColumnType.STRING => {
                     val buffer = arrayBufferColumns(i).asInstanceOf[ArrayBuffer[String]]
                     if (row.isNullAt(i)) {
@@ -69,7 +80,7 @@ class RDDROW2REXP(@transient ddf: DDF) extends ConvertFunction(ddf) {
                 case ColumnType.INT => {
                   new REXPInteger(buffer.asInstanceOf[ArrayBuffer[Int]].toArray).asInstanceOf[REXP]
                 }
-                case ColumnType.DOUBLE => {
+                case ColumnType.DOUBLE | ColumnType.BIGINT => {
                   new REXPDouble(buffer.asInstanceOf[ArrayBuffer[Double]].toArray).asInstanceOf[REXP]
                 }
                 case ColumnType.STRING => {

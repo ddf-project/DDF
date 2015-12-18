@@ -44,6 +44,23 @@ public class BaseTest {
 
     }
 
+    public void createTableAirlineBigInt() throws DDFException {
+        manager.sql("drop table if exists airline_bigint", "SparkSQL");
+
+        manager.sql("create table airline_bigint (Year int,Month int,DayofMonth int,"
+                + "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,"
+                + "CRSArrTime int,UniqueCarrier string, FlightNum int, "
+                + "TailNum string, ActualElapsedTime int, CRSElapsedTime int, "
+                + "AirTime int, ArrDelay bigint, DepDelay int, Origin string, "
+                + "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, "
+                + "CancellationCode string, Diverted string, CarrierDelay int, "
+                + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
+                + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", "SparkSQL");
+
+        manager.sql("load data local inpath '../resources/test/airline.csv' into table airline_bigint", "SparkSQL");
+
+    }
+
     public void createTableSmiths2() throws DDFException {
         manager.sql("drop table if exists smiths2", "SparkSQL");
 
