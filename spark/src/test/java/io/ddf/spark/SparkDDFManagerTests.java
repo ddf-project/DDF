@@ -19,7 +19,6 @@ import java.util.Map;
 
 public class SparkDDFManagerTests extends BaseTest {
 
-  
   @Test
   public void testDDFConfig() throws Exception {
 
@@ -56,7 +55,6 @@ public class SparkDDFManagerTests extends BaseTest {
     Assert.assertEquals(ddf, manager.getDDF(ddf.getUUID()));
   }
 
-
   @Test
   public void testCopyFromS3() throws DDFException {
     LOG = LoggerFactory.getLogger(SparkDDFManagerTests.class);
@@ -73,16 +71,36 @@ public class SparkDDFManagerTests extends BaseTest {
     SparkDDFManager sparkDDFManager = (SparkDDFManager) manager;
 
     // Test copy from a folder, the schema should be given.
-    S3DDF folderDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/folder", "year int, value int");
+    System.out.println("========== testFolder/folder ==========");
+    S3DDF folderDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/folder/", "year int, value int");
     DDF folderSparkDDF = sparkDDFManager.copyFrom(folderDDF);
+    System.out.println(folderSparkDDF.sql("select * from @this", "error").getRows());
+
     // Copy From a json, the schema should already be included in the json.
-    S3DDF jsonDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/a.json", null);
+    System.out.println("========== testFolder/folder/d.json ==========");
+    S3DDF jsonDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/d.json", null);
     DDF jsonSparkDDF = sparkDDFManager.copyFrom(jsonDDF);
+    System.out.println(jsonSparkDDF.sql("select * from @this", "error").getRows());
+
     // Copy From a csv, the schema is not given.
+    System.out.println("========== testFolder/hasHeader.csv ==========");
     S3DDF csvDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/hasHeader.csv", null);
+    csvDDF.setHasHeader(true);
     DDF csvSparkDDF = sparkDDFManager.copyFrom(csvDDF);
-    // Copy From a csv, the schema is given.
-    S3DDF csvDDFWithSchema = s3DDFManager.newDDF("jing-bucket", "testFolder/noHeader.csv", "year int, value string");
-    DDF csvSparkDDFWithSchema = sparkDDFManager.copyFrom(csvDDFWithSchema);
+    System.out.println(csvSparkDDF.sql("select * from @this", "error").getRows());
+
+    // Copy From a csv, the schema is not given, and has no header.
+    System.out.println("========== testFolder/noHeader.csv ==========");
+    S3DDF csvDDF2 = s3DDFManager.newDDF("jing-bucket", "testFolder/noHeader.csv", null);
+    DDF csvSparkDDF2= sparkDDFManager.copyFrom(csvDDF2);
+    System.out.println(csvSparkDDF2.sql("select * from @this", "error").getRows());
+
+    // Copy From a csv, the schema is given and has no header.
+    System.out.println("========== testFolder/noHeader.csv ==========");
+    S3DDF csvDDF3 = s3DDFManager.newDDF("jing-bucket", "testFolder/noHeader.csv", "year int, val " +
+        "string");
+    DDF csvSparkDDF3 = sparkDDFManager.copyFrom(csvDDF3);
+    System.out.println(csvSparkDDF3.sql("select * from @this", "error").getRows());
+
   }
 }

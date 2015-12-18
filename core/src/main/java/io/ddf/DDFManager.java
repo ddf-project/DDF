@@ -624,4 +624,12 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public DDF load(DataSourceDescriptor ds) throws DDFException {
     return (new DataSourceManager()).load(ds, this);
   }
+
+  /**
+   * @brief Copy the ddf content and return a local ddf.
+   * @param fromDDF The ddf from other engine. From example, copy a s3DDF/JDBCDDF into spark.
+   * @return
+   * @throws DDFException
+   */
+  public abstract DDF copyFrom(DDF fromDDF) throws DDFException;
 }

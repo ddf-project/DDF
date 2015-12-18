@@ -210,7 +210,7 @@ object RootBuild extends Build {
     dependencyOverrides += "org.slf4j" % "slf4j-api" % slf4jVersion,
     dependencyOverrides += "org.slf4j" % "slf4j-log4j12" % slf4jVersion,
     dependencyOverrides += "commons-io" % "commons-io" % "2.4", //tachyon 0.2.1
-    dependencyOverrides += "org.apache.httpcomponents" % "httpclient" % "4.1.3", //libthrift
+    dependencyOverrides += "org.apache.httpcomponents" % "httpclient" % "4.4.1", //libthrift
     dependencyOverrides += "com.google.guava" % "guava" % "14.0.1", //spark-core
     dependencyOverrides += "org.codehaus.jackson" % "jackson-core-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
@@ -221,7 +221,7 @@ object RootBuild extends Build {
     dependencyOverrides += "com.google.code.findbugs" % "jsr305" % "2.0.1",
     dependencyOverrides += "com.thoughtworks.paranamer" % "paranamer" % "2.4.1", //net.liftweb conflict with avro
     dependencyOverrides += "org.xerial.snappy" % "snappy-java" % "1.0.5", //spark-core conflicts with avro
-    dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.1.4",
+    dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.4.1",
     dependencyOverrides += "org.apache.avro" % "avro-ipc" % "1.7.4",
     dependencyOverrides += "org.apache.avro" % "avro" % "1.7.4",
     dependencyOverrides += "org.apache.zookeeper" % "zookeeper" % "3.4.5",

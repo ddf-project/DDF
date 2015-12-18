@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class S3DDF extends DDF {
     // Whether this ddf has header.
-    private Boolean mHasHeader;
+    private Boolean mHasHeader = false;
     // It's a directory or file.
     private Boolean mIsDir;
     // The format of this s3ddf.
@@ -31,7 +31,6 @@ public class S3DDF extends DDF {
      * S3DDF is the ddf for s3. It point to a single S3DDFManager, and every S3DDF is a unqiue mapping to a s3 uri.
      * The schema should store the s3 uri as tablename.
      */
-
 
     public S3DDF(S3DDFManager manager, String path, String schema) throws DDFException {
         super(manager, null, null, null, null, null);

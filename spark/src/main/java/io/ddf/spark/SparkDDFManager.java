@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
-import io.ddf.DDFManager.EngineType;
 import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
 import io.ddf.s3.S3DDF;
@@ -148,36 +147,55 @@ public class SparkDDFManager extends DDFManager {
   }
 
 
+  @Override
   public DDF copyFrom(DDF ddf) throws DDFException {
     if (ddf instanceof S3DDF) {
       // different loading function.
       S3DDF s3DDF = (S3DDF)ddf;
       DataFrame df = null;
-      switch (s3DDF.getDataFormat()) {
-        case JSON:
-          // TODO: the partition number? Remeber to set the env var.
-          // export AWS_ACCESS_KEY_ID=<YOURKEY>
-          // export AWS_SECRET_ACCESS_KEY=<YOURSECRETKEY>
-          df = this.getHiveContext().read().json("s3n://" + ddf.getTableName());
-          break;
-        case CSV:
-          DataFrameReader dfr = this.getHiveContext().read().format("com.databricks.spark.csv");
-          dfr = dfr.option("header", s3DDF.getHasHeader() ? "true" : "false");
-          if (s3DDF.getSchema() == null) {
-            if (s3DDF.getSchemaString() == null) {
-              dfr = dfr.option("inferSchema", "true");
-            } else {
-              dfr = dfr.option("inferSchema", "false").schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()));
-            }
+      String s3uri = "s3n://" + s3DDF.getBucket() + "/" + s3DDF.getKey();
+      if (s3DDF.getIsDir()) {
+        // TODO (For folders ,there will be several situation)s
+        // 1. All files in the folder are of a common shcema and it doesn't have head (what about pqt and json)
+        // 2. The folder is not clean
+        if (s3DDF.getSchema() == null) {
+          if (s3DDF.getSchemaString() == null) {
+            throw new DDFException("There is not shcema for " + s3uri);
           } else {
-            // TODO
+            df = this.getHiveContext().read().format("com.databricks.spark.csv")
+                .schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()))
+                .load(s3uri);
           }
-          df = dfr.load("s3n://" + s3DDF.getTableName());
-          break;
-        case PQT:
-          DataFrame dd2 = this.getHiveContext().read().load("s3n://" + ddf.getTableName());
-          break;
+        } else {
+          // TODO
+        }
+      } else {
+        switch (s3DDF.getDataFormat()) {
+          case JSON:
+            df = this.getHiveContext().jsonFile(s3uri);
+            df.printSchema();
+            // TODO(Should we flatten the df here?)
+            break;
+          case CSV:
+            DataFrameReader dfr = this.getHiveContext().read().format("com.databricks.spark.csv");
+            dfr = dfr.option("header", s3DDF.getHasHeader() ? "true" : "false");
+            if (s3DDF.getSchema() == null) {
+              if (s3DDF.getSchemaString() == null) {
+                dfr = dfr.option("inferSchema", "true");
+              } else {
+                dfr = dfr.option("inferSchema", "false").schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()));
+              }
+            } else {
+              // TODO
+            }
+            df = dfr.load(s3uri);
+            break;
+          case PQT:
+            df = this.getHiveContext().read().load(s3uri);
+            break;
+        }
       }
+
       if (s3DDF.getSchema() == null) {
         s3DDF.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
       }
@@ -187,8 +205,7 @@ public class SparkDDFManager extends DDFManager {
       newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
       return newDDF;
     } else {
-      // TODO
-      return null;
+      throw new DDFException(new UnsupportedOperationException());
     }
   }
 

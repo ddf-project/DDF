@@ -54,17 +54,31 @@ public class S3DDFManager extends DDFManager {
         return false;
     }
 
+    /**
+     * @brief To check whether the ddf is a directory.
+     * @param s3DDF
+     * @return
+     */
     public Boolean isDir(S3DDF s3DDF) {
         S3Object s3Object = mConn.getObject(s3DDF.getBucket(), s3DDF.getKey());
         return s3Object.getKey().endsWith("/");
     }
 
+    /**
+     * @breif To get the dataformat.
+     * @param s3DDF
+     * @return
+     */
     public DataFormat getDataFormat(S3DDF s3DDF) {
         String extension = s3DDF.getKey().substring(s3DDF.getKey().lastIndexOf('.') + 1);
         return DataFormat.valueOf(extension.toUpperCase());
     }
 
-    public List<String> listBuckets(String path) {
+    /**
+     * @brief List buckets.
+     * @return
+     */
+    public List<String> listBuckets() {
         List<Bucket> bucketList = mConn.listBuckets();
         List<String> ret = new ArrayList<String>();
         for (Bucket bucket : bucketList) {
@@ -75,12 +89,13 @@ public class S3DDFManager extends DDFManager {
 
     /**
      * @brief List all the files (including directories under one path)
-     * @param path The path.
+     * @param bucket The bucket.
+     * @param key The key.
      * @return The list of file names (TODO: should we return more info here.)
      */
-    public List<String> listFiles(String bucket, String path) {
+    public List<String> listFiles(String bucket, String key) {
         List<String> files = new ArrayList<String>();
-        ObjectListing objects = mConn.listObjects(bucket, path);
+        ObjectListing objects = mConn.listObjects(bucket, key);
         for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
             files.add(objectSummary.getKey());
         }
@@ -101,8 +116,8 @@ public class S3DDFManager extends DDFManager {
         return new S3DDF(this, path, schema);
     }
 
-    public S3DDF newDDF(String bucket, String pathWithoutBucket, String schema) throws DDFException {
-        return new S3DDF(this, bucket, pathWithoutBucket, schema);
+    public S3DDF newDDF(String bucket, String key, String schema) throws DDFException {
+        return new S3DDF(this, bucket, key, schema);
     }
 
     /**
@@ -150,17 +165,17 @@ public class S3DDFManager extends DDFManager {
 
     @Override
     public DDF transfer(UUID fromEngine, UUID ddfuuid) throws DDFException {
-        return null;
+        throw new DDFException(new UnsupportedOperationException());
     }
 
     @Override
     public DDF transferByTable(UUID fromEngine, String tableName) throws DDFException {
-        return null;
+        throw new DDFException(new UnsupportedOperationException());
     }
 
     @Override
     public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
-        return null;
+        throw new DDFException(new UnsupportedOperationException());
     }
 
     @Override
@@ -174,11 +189,16 @@ public class S3DDFManager extends DDFManager {
     }
 
     @Override
+    public DDF copyFrom(DDF fromDDF) throws DDFException {
+        throw new DDFException(new UnsupportedOperationException());
+    }
+
+    @Override
     public String getEngine() {
         return "s3";
     }
 
     public void stop() {
-        // TODO: Does s3 connection has close?
+        // TODO: Does s3 connection has to be closed?
     }
 }

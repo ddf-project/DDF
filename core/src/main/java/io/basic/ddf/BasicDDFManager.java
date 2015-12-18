@@ -61,4 +61,9 @@ public class BasicDDFManager extends DDFManager {
   public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
     return null;
   }
+
+  @Override
+  public DDF copyFrom(DDF fromDDF) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
 }

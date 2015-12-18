@@ -1,7 +1,5 @@
 package io.ddf.s3;
 
-
-import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.S3DataSourceCredentials;
@@ -15,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
+
 
 public class S3DDFManagerTests {
 
@@ -39,6 +37,27 @@ public class S3DDFManagerTests {
     }
 
     @Test
+    public void testListing() throws DDFException {
+        List<String> buckets = manager.listBuckets();
+        System.out.println("========== buckets ==========");
+        for (String bucket: buckets) {
+            System.out.println(bucket);
+        }
+
+        System.out.println("========== jing-bucket/testFolder/ ==========");
+        List<String> keys = manager.listFiles("jing-bucket", "testFolder/");
+        for (String key: keys) {
+            System.out.println(key);
+        }
+
+        System.out.println("========== jing-bucket/testFolder/a.json ==========");
+        keys = manager.listFiles("jing-bucket", "testFolder/a.json");
+        for (String key: keys) {
+            System.out.println(key);
+        }
+    }
+
+    @Test
     public void testCreateDDF() throws DDFException {
         S3DDF folderDDF = manager.newDDF("jing-bucket", "testFolder/", null);
         S3DDF jsonDDF = manager.newDDF("jing-bucket", "testFolder/a.json", null);
@@ -56,6 +75,7 @@ public class S3DDFManagerTests {
     public void testHead() throws DDFException {
         S3DDF csvDDF = manager.newDDF("jing-bucket", "testFolder/year.csv", null);
         List<String> rows = manager.head(csvDDF, 5);
+        System.out.println("========== content of year.csv ==========");
         for (String s : rows) {
             System.out.println(s);
         }
