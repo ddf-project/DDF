@@ -152,51 +152,44 @@ public class SparkDDFManager extends DDFManager {
     if (ddf instanceof S3DDF) {
       // different loading function.
       S3DDF s3DDF = (S3DDF)ddf;
+      DataFrame df = null;
       switch (s3DDF.getDataFormat()) {
         case JSON:
           // TODO: the partition number? Remeber to set the env var.
           // export AWS_ACCESS_KEY_ID=<YOURKEY>
           // export AWS_SECRET_ACCESS_KEY=<YOURSECRETKEY>
-          DataFrame df = this.getHiveContext().read().json("s3n://" + ddf.getTableName());
-          if (s3DDF.getSchema() == null) {
-            s3DDF.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
-          }
-          DDF newDDF = this.newDDF(this, df, new Class<?>[] {DataFrame.class}, null,
-              null, s3DDF.getSchema());
-          newDDF.getRepresentationHandler().cache(false);
-          newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
-          return newDDF;
+          df = this.getHiveContext().read().json("s3n://" + ddf.getTableName());
+          break;
         case CSV:
-
           DataFrameReader dfr = this.getHiveContext().read().format("com.databricks.spark.csv");
-          DataFrame dfcsv = null;
-          if (s3DDF.getHasHeader()) {
-            if (s3DDF.getSchema() == null) {
-              dfr = dfr.option("header", "true");
-              dfcsv = dfr.option("inferSchema", "true").load("s3n://" + s3DDF.getTableName());
+          dfr = dfr.option("header", s3DDF.getHasHeader() ? "true" : "false");
+          if (s3DDF.getSchema() == null) {
+            if (s3DDF.getSchemaString() == null) {
+              dfr = dfr.option("inferSchema", "true");
             } else {
-              dfcsv = dfr.option("inferSchema", "false").schema(null).load("s3n://" + s3DDF.getTableName());
+              dfr = dfr.option("inferSchema", "false").schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()));
             }
           } else {
-            dfr = dfr.option("header", "false");
-            if (s3DDF.getSchema() == null) {
-              throw new DDFException("Can't get schema");
-            }
-            dfr.schema(null).load("s3n://" + s3DDF.getTableName());
+            // TODO
           }
-
-          this.getHiveContext().read().option("header", "true");
-
-          // Convert rdd to dataframe
-          // DataFrame df = this.getHiveContext().createDataFrame(rdd.toJavaRDD(), null);
-          // this.getHiveContext().createdata
+          df = dfr.load("s3n://" + s3DDF.getTableName());
           break;
         case PQT:
           DataFrame dd2 = this.getHiveContext().read().load("s3n://" + ddf.getTableName());
           break;
       }
+      if (s3DDF.getSchema() == null) {
+        s3DDF.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
+      }
+      DDF newDDF = this.newDDF(this, df, new Class<?>[] {DataFrame.class}, null,
+          null, s3DDF.getSchema());
+      newDDF.getRepresentationHandler().cache(false);
+      newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+      return newDDF;
+    } else {
+      // TODO
+      return null;
     }
-    return null;
   }
 
   /**

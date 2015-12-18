@@ -31,8 +31,8 @@ public class S3DDFManagerTests {
     public static void startServer() throws Exception {
         Thread.sleep(1000);
         LOG = LoggerFactory.getLogger(S3DDFManagerTests.class);
-        S3DataSourceDescriptor s3dsd = new S3DataSourceDescriptor(new S3DataSourceURI(""),
-            new S3DataSourceCredentials("AKIAIUS54GGBFCR5BWMQ", "k6YNh5bNT6tTZZCBdO+kA7Kd8vCTrqdWBJazgP6T"),
+        S3DataSourceDescriptor  s3dsd = new S3DataSourceDescriptor(new S3DataSourceURI(""),
+            new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY")),
             null,
             null);
         manager = (S3DDFManager)DDFManager.get(DDFManager.EngineType.S3, s3dsd);

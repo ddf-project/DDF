@@ -122,6 +122,14 @@ public class S3DDF extends DDF {
         this.mKey = key;
     }
 
+    public String getSchemaString() {
+        return mSchemaString;
+    }
+
+    public void setSchemaString(String schemaString) {
+        this.mSchemaString = schemaString;
+    }
+
     @Override
     public DDF copy() throws DDFException {
         return null;
