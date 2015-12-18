@@ -156,6 +156,7 @@ public class S3DDFManager extends DDFManager {
                 rows.add(line);
                 --limit;
             }
+            br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
