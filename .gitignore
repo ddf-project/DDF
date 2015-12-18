@@ -1,3 +1,6 @@
+#!sangdn -- ignore for astah temp file
+*.bak
+*.lock
 *.class
 *.swp
 *.iml

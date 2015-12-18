@@ -38,8 +38,10 @@
                         <spark.serializer>org.apache.spark.serializer.KryoSerializer</spark.serializer>
                         <spark.kryo.registrator>io.ddf.spark.content.KryoRegistrator</spark.kryo.registrator>
                         <spark.ui.port>8085</spark.ui.port>
+                        <spark.driver.allowMultipleContexts>true</spark.driver.allowMultipleContexts>
                         <log4j.configuration>ddf-local-log4j.properties</log4j.configuration>
                         <derby.stream.error.file>${basedir}/target/derby.log</derby.stream.error.file>
+
                     </systemPropertyVariables>
                     <additionalClasspathElements>
                         <additionalClasspathElement>${basedir}/conf/</additionalClasspathElement>

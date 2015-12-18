@@ -2,6 +2,8 @@ package io.ddf.spark;
 
 
 import io.ddf.DDF;
+import io.ddf.DDFManager;
+import io.ddf.content.SqlResult;
 import io.ddf.exception.DDFException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,5 +47,6 @@ public class SparkDDFManagerTests extends BaseTest {
 
     manager.addDDF(ddf);
     Assert.assertEquals(ddf, manager.getDDF(ddf.getUUID()));
+
   }
 }
