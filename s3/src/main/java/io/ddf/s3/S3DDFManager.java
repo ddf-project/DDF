@@ -147,21 +147,20 @@ public class S3DDFManager extends DDFManager {
             }
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(mConn.getObject(s3DDF.getBucket(), s3DDF
-            .getKey()).getObjectContent()));
+        try (BufferedReader br = new BufferedReader(
+            new InputStreamReader(mConn.getObject(bucket, key).getObjectContent()))) {
         String line = null;
         List<String> rows = new ArrayList<String>();
-        try {
             while (limit > 0 &&  ((line = br.readLine()) != null)) {
                 rows.add(line);
                 --limit;
             }
             br.close();
+            return rows;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new DDFException(e);
         }
 
-        return rows;
     }
 
     @Override

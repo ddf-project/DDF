@@ -89,16 +89,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     ;
 
     public static EngineType fromString(String str) throws DDFException {
-      EngineType engineType = null;
-      if (str != null) {
-        engineType = EngineType.valueOf(str.toUpperCase());
+      try {
+        return EngineType.valueOf(str.toUpperCase());
+      } catch (RuntimeException e) {
+        throw new DDFException("Unknown engine type: " + str, e);
       }
-
-      if (engineType == null) {
-        throw new DDFException("There is no engine type: " + str);
-      }
-
-      return engineType;
     }
   }
 
