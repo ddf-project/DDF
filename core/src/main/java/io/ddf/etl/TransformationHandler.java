@@ -80,7 +80,12 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return null;
   }
 
-  public DDF transformPython(String[] transformFuctions, String[] destColumns, String[][] sourceColumns) {
+  public DDF transformNativeRserve(String[] transformExpressions) {
+    return null;
+  }
+
+  public DDF transformPython(String[] transformFuctions, String[] functionNames,
+      String[] destColumns, String[][] sourceColumns) {
     // TODO Auto-generated method stub
     return null;
   }

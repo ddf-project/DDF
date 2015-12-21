@@ -6,10 +6,10 @@ import org.apache.spark.rdd.RDD
 import org.python.core._
 
 /**
- * Convert a dict of lists PyObject into array of objects
- *
- * Created by vupham on 7/27/15.
- */
+  * Convert a dict of lists PyObject into array of objects
+  *
+  * Created by vupham on 7/27/15.
+  */
 class PyObj2ArrayObject(@transient ddf: DDF) extends ConvertFunction(ddf) {
 
   override def apply(representation: Representation): Representation = {
@@ -24,8 +24,8 @@ class PyObj2ArrayObject(@transient ddf: DDF) extends ConvertFunction(ddf) {
 object PyObj2ArrayObject {
 
   /**
-   * Convert a dict of lists PyObject into array of objects
-   */
+    * Convert a dict of lists PyObject into array of objects
+    */
   def RDataFrameToArrayObject(rdd: RDD[PyObject], columnList: java.util.List[Schema.Column]): RDD[Array[Object]] = {
 
     val rddarrobj = rdd.flatMap {
@@ -47,32 +47,21 @@ object PyObj2ArrayObject {
 
         val jData = Array.ofDim[Object](rows, cols)
 
-        (0 until cols).foreach {
-          j ⇒
-            val colData = dct.get(columnList.get(j).getName).asInstanceOf[PyList]
-            colData.get(0) match {
-              case v: java.lang.Double ⇒
-                (0 until colData.size()).foreach {
-                  i => {
-                    val vv = colData.get(i).asInstanceOf[java.lang.Double]
-                    if (vv.isNaN) {
-                      jData(i)(j) = null
-                    } else {
-                      jData(i)(j) = vv
-                    }
-                  }
-                }
-
-              case v: java.lang.Integer =>
-                (0 until colData.size()).foreach {
-                  i => jData(i)(j) = colData.get(i)
-                }
-
-              case v: java.lang.String =>
-                (0 until colData.size()).foreach {
-                  i => jData(i)(j) = colData.get(i)
-                }
+        for (j <- 0 until cols) {
+          val colData = dct.get(columnList.get(j).getName).asInstanceOf[PyList]
+          for (i <- 0 until colData.size()) {
+            val vv = Option(colData.get(i))
+            jData(i)(j) = if (vv.isDefined) {
+              vv.get match {
+                case v: java.lang.Double => v
+                case v: java.lang.Integer => v
+                case v: java.lang.String => v
+                case v: java.lang.Boolean => v
+              }
+            } else {
+              null
             }
+          }
         }
         jData
       }

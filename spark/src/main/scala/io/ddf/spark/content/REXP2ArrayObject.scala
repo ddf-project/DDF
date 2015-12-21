@@ -1,9 +1,12 @@
 package io.ddf.spark.content
 
 import io.ddf.DDF
-import io.ddf.content.{Representation, ConvertFunction}
+import io.ddf.content.{Representation, ConvertFunction, Schema}
 import org.apache.spark.rdd.RDD
 import org.rosuda.REngine.{REXPString, REXPInteger, REXPDouble, REXP}
+import scala.collection.JavaConverters._
+import scala.collection.JavaConversions.asScalaIterator
+import scala.collection.JavaConversions.seqAsJavaList
 
 /**
  */
@@ -12,7 +15,7 @@ class REXP2ArrayObject(@transient ddf: DDF) extends ConvertFunction(ddf) {
   override def apply(representation: Representation): Representation = {
     val rddArrObj = representation.getValue match {
       case rdd: RDD[REXP] => {
-        val rddArr = REXP2ArrayObject.RDataFrameToArrayObject(rdd)
+        val rddArr = REXP2ArrayObject.RDataFrameToArrayObject(rdd, ddf.getSchema.getColumns.asScala.map(_.getType).toList)
         rddArr
       }
     }
@@ -24,7 +27,7 @@ object REXP2ArrayObject {
   /**
    * Convert a RDD of R data.frames into a RDD of Object[]
    */
-  def RDataFrameToArrayObject(rdd: RDD[REXP]): RDD[Array[Object]] = {
+  def RDataFrameToArrayObject(rdd: RDD[REXP], colTypes: List[Schema.ColumnType]): RDD[Array[Object]] = {
 
     val rddarrobj = rdd.flatMap {
       partdf ⇒
@@ -51,8 +54,15 @@ object REXP2ArrayObject {
                 while (i < partitionSize) {
                   if (REXPDouble.isNA(data(i)))
                     jdata(i)(j) = null
-                  else
-                    jdata(i)(j) = data(i).asInstanceOf[Object]
+                  else {
+                    if (colTypes(j) == Schema.ColumnType.BIGINT) {
+                      jdata(i)(j) = data(i).toLong.asInstanceOf[Object]
+                    } else {
+                      jdata(i)(j) = data(i).asInstanceOf[Object]
+                    }
+
+                  }
+
                   i += 1
                 }
               }
