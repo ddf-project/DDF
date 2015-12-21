@@ -29,7 +29,7 @@ import java.util.UUID;
 
 public class S3DDFManager extends DDFManager {
     // Descriptor.
-    private DataSourceDescriptor mDsd;
+    private S3DataSourceCredentials mCredential;
     // Amazon client connection.
     private AmazonS3 mConn;
     // Upper limit for content preview.
@@ -37,13 +37,20 @@ public class S3DDFManager extends DDFManager {
 
 
     // TODO: Remove Engine Type
-    public S3DDFManager(DataSourceDescriptor s3dsd, EngineType engineType) throws DDFException {
-        mDsd = s3dsd;
-        S3DataSourceCredentials s3cred = (S3DataSourceCredentials)s3dsd.getDataSourceCredentials();
-        AWSCredentials credentials = new BasicAWSCredentials(s3cred.getAwsKeyID(), s3cred.getAwsScretKey());
+    public S3DDFManager(S3DataSourceDescriptor s3dsd, EngineType engineType) throws DDFException {
+
+        mCredential = (S3DataSourceCredentials)s3dsd.getDataSourceCredentials();
+        AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
         mConn = new AmazonS3Client(credentials);
     }
 
+
+    public S3DDFManager(S3DataSourceCredentials s3Credentials, EngineType engineType) throws DDFException {
+        mCredential = s3Credentials;
+        AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
+        mConn = new AmazonS3Client(credentials);
+
+    }
     /**
      * @brief To check whether the s3 file already contains header.
      * @param s3DDF The uri of the s3 file (single file).

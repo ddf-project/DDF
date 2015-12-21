@@ -256,8 +256,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
     try {
       Class[] classType = new Class[2];
-      classType[0] = DataSourceDescriptor.class;
-      classType[1] = EngineType.class;
+      classType[0] = dataSourceDescriptor.getClass();
+      classType[1] = engineType.getClass();
 
       DDFManager manager = (DDFManager) Class.forName(className).getDeclaredConstructor(classType)
           .newInstance(dataSourceDescriptor, engineType);
