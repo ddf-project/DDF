@@ -69,8 +69,9 @@ public class S3DDFManager extends DDFManager {
      * @param s3DDF
      * @return
      */
-    public DataFormat getDataFormat(S3DDF s3DDF) {
-        String extension = s3DDF.getKey().substring(s3DDF.getKey().lastIndexOf('.') + 1);
+    public DataFormat getDataFormat(S3DDF s3DDF) throws DDFException {
+        String key = this.firstFileKey(s3DDF);
+        String extension = key.substring(key.lastIndexOf('.') + 1);
         return DataFormat.valueOf(extension.toUpperCase());
     }
 
@@ -121,6 +122,26 @@ public class S3DDFManager extends DDFManager {
     }
 
     /**
+     * @brief Return the key of the first non-folder file under this folder.
+     * @param s3DDF The s3ddf.
+     * @return
+     */
+    private String firstFileKey(S3DDF s3DDF) throws DDFException {
+        if (s3DDF.getIsDir()) {
+            ObjectListing objectListing = mConn.listObjects(new ListObjectsRequest().withBucketName(s3DDF.getBucket())
+                .withPrefix(s3DDF.getKey()));
+            for (S3ObjectSummary summary: objectListing.getObjectSummaries()) {
+                if (!summary.getKey().endsWith("/")) {
+                    return summary.getKey();
+                }
+            }
+            throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
+        } else {
+            return s3DDF.getKey();
+        }
+    }
+
+    /**
      * @brief Show the first several rows of the s3ddf.
      * @param s3DDF
      * @param limit
@@ -133,19 +154,8 @@ public class S3DDFManager extends DDFManager {
         }
 
         String bucket = s3DDF.getBucket();
-        String key = s3DDF.getKey();
+        String key = this.firstFileKey(s3DDF);
 
-        if (s3DDF.getIsDir()) {
-            // Get the first object and show it's result.
-            ObjectListing objectListing = mConn.listObjects(new ListObjectsRequest().withBucketName(bucket)
-                .withPrefix(key));
-            for (S3ObjectSummary summary: objectListing.getObjectSummaries()) {
-                if (!summary.getKey().endsWith("/")) {
-                    key = summary.getKey();
-                    break;
-                }
-            }
-        }
 
         try (BufferedReader br = new BufferedReader(
             new InputStreamReader(mConn.getObject(bucket, key).getObjectContent()))) {
@@ -155,7 +165,6 @@ public class S3DDFManager extends DDFManager {
                 rows.add(line);
                 --limit;
             }
-            br.close();
             return rows;
         } catch (IOException e) {
             throw new DDFException(e);

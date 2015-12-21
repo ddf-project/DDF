@@ -6,6 +6,7 @@ import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.datasource.S3DataSourceURI;
 import io.ddf.exception.DDFException;
+import io.ddf.s3.S3DDF;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,6 +68,19 @@ public class S3DDFManagerTests {
         assert(csvDDF.getIsDir() == false);
         assert(jsonDDF.getDataFormat().equals(DataFormat.JSON));
         assert(csvDDF.getDataFormat().equals(DataFormat.CSV));
+        try {
+            // Test on non-exist folder/file. Should throw exception.
+            S3DDF nonExistDDF = manager.newDDF("jing-bucket", "nonexist.csv", null);
+            assert (false);
+        } catch (Exception e) {
+
+        }
+        try {
+            S3DDF nonExistDDF2 = manager.newDDF("jing-bucket", "nonexist/", null);
+            assert (false);
+        } catch (Exception e) {
+
+        }
         // TODO: Add pqt
     }
 

@@ -155,47 +155,29 @@ public class SparkDDFManager extends DDFManager {
       DataFrameReader dfr =  this.getHiveContext().read();
       DataFrame df = null;
       String s3uri = "s3n://" + s3DDF.getBucket() + "/" + s3DDF.getKey();
-      if (s3DDF.getIsDir()) {
-        // TODO (For folders ,there will be several situation)s
-        // 1. All files in the folder are of a common schema and it doesn't have head (what about pqt and json)?
-        // 2. The folder is not clean
-        if (s3DDF.getSchema() == null) {
-          if (s3DDF.getSchemaString() == null) {
-            throw new DDFException("There is not shcema for " + s3uri);
-          } else {
-            df = dfr.format("com.databricks.spark.csv")
-                .schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()))
-                .load(s3uri);
-          }
-        } else {
-          // TODO
-        }
-      } else {
-        switch (s3DDF.getDataFormat()) {
-          case JSON:
-            dfr = dfr.format("json");
-            // TODO(Should we flatten the df here?)
-            break;
-          case TSV:
-            dfr = dfr.option("dlimiter", "\t");
-          case CSV:
-            dfr = dfr.format("com.databricks.spark.csv").option("header", s3DDF.getHasHeader() ? "true" : "false");
-            if (s3DDF.getSchema() == null) {
-              if (s3DDF.getSchemaString() == null) {
-                dfr = dfr.option("inferSchema", "true");
-              } else {
-                dfr = dfr.option("inferSchema", "false").schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()));
-              }
+      switch (s3DDF.getDataFormat()) {
+        case JSON:
+          dfr = dfr.format("json");
+          // TODO(Should we flatten the df here?)
+          break;
+        case TSV:
+          dfr = dfr.option("dlimiter", "\t");
+        case CSV:
+          dfr = dfr.format("com.databricks.spark.csv").option("header", s3DDF.getHasHeader() ? "true" : "false");
+          if (s3DDF.getSchema() == null) {
+            if (s3DDF.getSchemaString() == null) {
+              dfr = dfr.option("inferSchema", "true");
             } else {
-              // TODO
+              dfr = dfr.option("inferSchema", "false").schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()));
             }
-            break;
-          case PQT:
-            break;
-        }
-        df = dfr.load(s3uri);
+          } else {
+            // TODO
+          }
+          break;
+        case PQT:
+          break;
       }
-
+      df = dfr.load(s3uri);
       if (s3DDF.getSchema() == null) {
         s3DDF.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
       }

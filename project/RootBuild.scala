@@ -525,6 +525,7 @@ object RootBuild extends Build {
     testOptions in Test += Tests.Argument("-oI"),
     libraryDependencies ++= s3_dependencies
   ) ++ assemblySettings ++ extraAssemblySettings
+  
   def extraAssemblySettings() = Seq(test in assembly := {}) ++ Seq(
     mergeStrategy in assembly := {
       case m if m.toLowerCase.endsWith("manifest.mf") => MergeStrategy.discard

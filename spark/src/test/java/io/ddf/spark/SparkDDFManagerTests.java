@@ -76,6 +76,12 @@ public class SparkDDFManagerTests extends BaseTest {
     DDF folderSparkDDF = sparkDDFManager.copyFrom(folderDDF);
     System.out.println(folderSparkDDF.sql("select * from @this", "error").getRows());
 
+    // Test copy from a folder with all json files.
+      System.out.println("========== testFolder/allJson ==========");
+      S3DDF allJsonDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/allJson/", null);
+      DDF allJsonSparkDDF = sparkDDFManager.copyFrom(allJsonDDF);
+      System.out.println(allJsonSparkDDF.sql("select * from @this", "error").getRows());
+
     // Copy From a json, the schema should already be included in the json.
     System.out.println("========== testFolder/folder/d.json ==========");
     S3DDF jsonDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/d.json", null);

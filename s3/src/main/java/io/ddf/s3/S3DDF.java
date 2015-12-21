@@ -18,7 +18,8 @@ public class S3DDF extends DDF {
     private Boolean mHasHeader = false;
     // It's a directory or file.
     private Boolean mIsDir;
-    // The format of this s3ddf.
+    // The format of this s3ddf. If it's a folder, we requires that all the files in the folder should have the same
+    // format, otherwise the dataformat will be set to the dataformat of the first file under this folder.
     private DataFormat mDataFormat;
     // Schema String.
     private String mSchemaString;
@@ -65,19 +66,17 @@ public class S3DDF extends DDF {
         mKey = path.substring(firstSlash + 1);
     }
 
-    public void checkStatus() {
+    public void checkStatus() throws DDFException {
         // Check directory or file.
         S3DDFManager s3DDFManager = (S3DDFManager)this.getManager();
         mIsDir = s3DDFManager.isDir(this);
         // Check dataformat.
-        if (!mIsDir) {
-            mDataFormat = s3DDFManager.getDataFormat(this);
-            if (mDataFormat.equals(DataFormat.CSV)) {
-                // Check header.
-                // TODO (discuss with bigapps guy)
-            } else {
-                mHasHeader = false;
-            }
+        mDataFormat = s3DDFManager.getDataFormat(this);
+        if (mDataFormat.equals(DataFormat.CSV)) {
+            // Check header.
+            // TODO (discuss with bigapps guy)
+        } else {
+            mHasHeader = false;
         }
     }
 
