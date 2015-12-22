@@ -126,6 +126,7 @@ public class DDFCoordinator extends ALoggable {
    * @param ddf The ddf.
    */
   public synchronized void addDDF(DDF ddf) {
+    //double locking
     if(this.mEngineUUID2DDFManager.get(ddf.getManager().getUUID()) == null) {
       this.addComputeEngine(ddf.getManager());
     }

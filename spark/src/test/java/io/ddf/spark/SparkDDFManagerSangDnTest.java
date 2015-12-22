@@ -9,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,7 +22,9 @@ public class SparkDDFManagerSangDnTest {
         try {
             ddfManager = DDFManager.get(DDFManager.EngineType.SPARK);
             dsName = "SparkSQL";
-            createnewAirLineTable(dsName);
+            createAndLoadNewAirlineTbl(dsName);
+//            createNotLoadNewAirlineTbl(dsName);
+//            createAndLoadNewAirlineFolderTbl(dsName);
         }catch(Exception ex){
             System.err.println("Couldn't init ddfManager");
             System.exit(-1);
@@ -32,7 +33,7 @@ public class SparkDDFManagerSangDnTest {
     @AfterClass
     public static void afterClass(){
         try{
-            ddfManager.cleanup();
+            ddfManager.shutdown();
         }catch (Exception ex){
 
         }
@@ -40,7 +41,7 @@ public class SparkDDFManagerSangDnTest {
     @Test
     public void testSql2DDF()throws DDFException {
 
-        //createnewAirLineTable("MyDsName"); // will throw error :omg:
+        //createAndLoadNewAirlineTbl("MyDsName"); // will throw error :omg:
 
 //        DDFManager ddfManager = DDFManager.get(DDFManager.EngineType.SPARK);
         SqlResult sql = ddfManager.sql("select * from airline", dsName);
@@ -56,7 +57,7 @@ public class SparkDDFManagerSangDnTest {
         System.out.println("Head 10: " + Arrays.toString(head.toArray()));
     }
 
-    private static void createnewAirLineTable(String dataSourcename)throws DDFException{
+    private static void createAndLoadNewAirlineTbl(String dataSourcename)throws DDFException{
 //        DDFManager ddfManager = DDFManager.get(DDFManager.EngineType.SPARK);
         ddfManager.sql("drop table if exists airline", dataSourcename);
 
@@ -68,9 +69,41 @@ public class SparkDDFManagerSangDnTest {
                 + "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, "
                 + "CancellationCode string, Diverted string, CarrierDelay int, "
                 + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
-                + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", dataSourcename);
+                + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ", dataSourcename);
 
         ddfManager.sql("load data local inpath '../resources/test/airline.csv' into table airline", dataSourcename);
+
+    }
+    private static void createAndLoadNewAirlineFolderTbl(String dataSourcename)throws DDFException{
+//        DDFManager ddfManager = DDFManager.get(DDFManager.EngineType.SPARK);
+        ddfManager.sql("drop table if exists airline", dataSourcename);
+
+        ddfManager.sql("create table airline (Year int,Month int,DayofMonth int,"
+                + "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,"
+                + "CRSArrTime int,UniqueCarrier string, FlightNum int, "
+                + "TailNum string, ActualElapsedTime int, CRSElapsedTime int, "
+                + "AirTime int, ArrDelay int, DepDelay int, Origin string, "
+                + "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, "
+                + "CancellationCode string, Diverted string, CarrierDelay int, "
+                + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
+                + "LOCATION '../resources/test/double-airline/*'"
+                + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ", dataSourcename);
+
+    }
+    private static void createNotLoadNewAirlineTbl(String dataSourcename)throws DDFException{
+//        DDFManager ddfManager = DDFManager.get(DDFManager.EngineType.SPARK);
+        ddfManager.sql("drop table if exists airline", dataSourcename);
+
+        ddfManager.sql("create external table airline (Year int,Month int,DayofMonth int,"
+                + "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,"
+                + "CRSArrTime int,UniqueCarrier string, FlightNum int, "
+                + "TailNum string, ActualElapsedTime int, CRSElapsedTime int, "
+                + "AirTime int, ArrDelay int, DepDelay int, Origin string, "
+                + "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, "
+                + "CancellationCode string, Diverted string, CarrierDelay int, "
+                + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
+                + "LOCATION '../resources/test/airline.csv'"
+                + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ", dataSourcename);
 
     }
 }
