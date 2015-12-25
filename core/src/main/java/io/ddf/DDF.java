@@ -264,7 +264,8 @@ public abstract class DDF extends ALoggable //
   /**
    * @param name the DDF name to set
    */
-  protected void setName(String name) throws DDFException {
+  @Override
+  public void setName(String name) throws DDFException {
     if(name != null) validateName(name);
 
     this.mName = name;
@@ -301,7 +302,7 @@ public abstract class DDF extends ALoggable //
 
   public UUID getUUID() {return uuid;}
 
-  protected void setUUID(UUID uuid) {this.uuid = uuid;}
+  public void setUUID(UUID uuid) {this.uuid = uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
