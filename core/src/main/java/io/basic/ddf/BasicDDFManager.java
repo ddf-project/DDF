@@ -7,9 +7,12 @@ package io.basic.ddf;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
+import io.ddf.ds.DataSourceCredential;
+import io.ddf.ds.User;
 import io.ddf.exception.DDFException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -60,5 +63,16 @@ public class BasicDDFManager extends DDFManager {
   @Override
   public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
     return null;
+  }
+
+  @Override
+  public DataSourceCredential addCredential(User user, Map<Object, Object> credential) {
+    // do nothing, credential is not needed in basic ddf manager
+    return null;
+  }
+
+  @Override
+  public DDF createDDF(User user, Map<Object, Object> options) throws DDFException {
+    throw new UnsupportedOperationException();
   }
 }

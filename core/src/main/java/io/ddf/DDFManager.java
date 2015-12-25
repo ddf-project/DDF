@@ -27,6 +27,8 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.DataSourceManager;
 import io.ddf.datasource.SQLDataSourceDescriptor;
+import io.ddf.ds.DataSourceCredential;
+import io.ddf.ds.User;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
@@ -630,4 +632,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public DDF load(DataSourceDescriptor ds) throws DDFException {
     return (new DataSourceManager()).load(ds, this);
   }
+
+  public abstract DataSourceCredential addCredential(User user, Map<Object, Object> credential) throws DDFException;
+
+  public abstract DDF createDDF(User user, Map<Object, Object> options) throws DDFException;
 }

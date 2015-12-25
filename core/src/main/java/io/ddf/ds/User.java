@@ -1,81 +1,64 @@
 package io.ddf.ds;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.google.common.base.Preconditions;
+import io.ddf.exception.UnauthenticatedDataSourceException;
 
-/**
- */
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class User {
 
-  private String id;
+  private final String id;
 
-  private String firstName;
+  private final String username;
 
-  private String lastName;
+  private final Map<String, DataSourceCredential> authenticatedSources = new ConcurrentHashMap<>();
 
-  private String email;
+  public User(String id, String username) {
+    Preconditions.checkArgument(id != null, "id cannot be null");
+    Preconditions.checkArgument(username != null, "username cannot be null");
 
-  private List<DSUserCredentials> dsUserCredentialsList = new ArrayList<DSUserCredentials>();
-
-  public User(String id, String firstName, String lastName, String email, List<DSUserCredentials> dsUserCredentials) {
-    this.dsUserCredentialsList = dsUserCredentials;
     this.id = id;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-  }
-
-  public User(String id, String firstName, String lastName, String email) {
-    this(id, firstName, lastName, email, new ArrayList<DSUserCredentials>());
+    this.username = username;
   }
 
   public String getId() {
     return id;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public String getUsername() {
+    return username;
   }
 
-  public String getFirstName() {
-    return firstName;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    User user = (User) o;
+    return Objects.equals(id, user.id) &&
+        Objects.equals(username, user.username);
   }
 
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, username);
   }
 
-  public String getLastName() {
-    return lastName;
+  public DataSourceCredential addCredential(String sourceUri, DataSourceCredential credential) {
+    return authenticatedSources.put(sourceUri, credential);
   }
 
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
+  public DataSourceCredential getCredential(String sourceUri) {
+    return authenticatedSources.get(sourceUri);
   }
 
-  public String getEmail() {
-    return email;
+  public DataSourceCredential removeCredential(DataSource source) {
+    return authenticatedSources.remove(source);
   }
 
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public void addDsUserCredentials(DSUserCredentials dsUserCredential) {
-    this.dsUserCredentialsList.add(dsUserCredential);
-  }
-
-  public List<DSUserCredentials> getDsUserCredentialsList() {
-    return new ArrayList<DSUserCredentials>(dsUserCredentialsList);
-  }
-
-  public void removeDsUserCredentials(UUID id) {
-    for(DSUserCredentials cred: dsUserCredentialsList) {
-      if(cred.getId() == id) {
-        dsUserCredentialsList.remove(cred);
-      }
-    }
+  public boolean hasCredentialFor(String sourceUri) {
+    return authenticatedSources.containsKey(sourceUri);
   }
 }
