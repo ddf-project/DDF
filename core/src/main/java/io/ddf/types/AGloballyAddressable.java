@@ -22,6 +22,10 @@ public abstract class AGloballyAddressable implements IGloballyAddressable {
     this.name = name;
   }
 
+  public String getName() {
+    return this.name;
+  }
+
   public static String getUri(IGloballyAddressable obj) {
     if(Strings.isNullOrEmpty(obj.getName())) {
       return null;
