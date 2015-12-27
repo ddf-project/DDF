@@ -5,6 +5,7 @@ import java.util
 import java.util.{Map => JMap}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonFactory}
 import com.google.common.base.Strings
+import io.ddf.{DDFManager, DDF}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.Row
@@ -271,5 +272,11 @@ object SparkUtils {
       case MapType(_, _, _) => Schema.ColumnType.MAP
       case x => throw new DDFException(s"Type not support $x")
     }
+  }
+
+  def df2ddf(dataFrame: DataFrame, manager: DDFManager): DDF = {
+    val df = SparkUtils.getDataFrameWithValidColnames(dataFrame)
+    val schema = SparkUtils.schemaFromDataFrame(df)
+    manager.newDDF(manager, df, Array(classOf[DataFrame]), null, null, schema)
   }
 }

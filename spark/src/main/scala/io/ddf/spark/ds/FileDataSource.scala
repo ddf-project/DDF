@@ -29,7 +29,7 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
     format match {
       case format: CsvFileFormat =>
         val table = createTable(dataUri, format)
-        val ddf = loadTableAsDDF(table)
+        val ddf = manager.sql2ddf(s"select * from $table", "spark")
         // TODO what is this setColumnNames for?
         ddf.setColumnNames(format.schema.getColumnNames)
         ddf
@@ -56,9 +56,8 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
       throw new DDFException(s"Loading of $fileUri is only supported with SparkDDFManager")
     }
     val context = manager.asInstanceOf[SparkDDFManager].getHiveContext
-    val df = SparkUtils.getDataFrameWithValidColnames(read(context, uri))
-    val schema = SparkUtils.schemaFromDataFrame(df)
-    manager.newDDF(manager, df, Array(classOf[DataFrame]), null, null, schema)
+    val df = read(context, uri)
+    SparkUtils.df2ddf(df, manager)
   }
 
   /**
@@ -78,24 +77,14 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
 
   protected def createTable(dataUri: String, format: CsvFileFormat): String = {
     val tableName = UUID.randomUUID().toString.replace("-", "_")
-    val schema = format.schema
-    val delimiter = format.delimiter
-    val quote = format.quote
     val sqlCmd =
-      s"""CREATE EXTERNAL TABLE $tableName ($schema)
+      s"""CREATE EXTERNAL TABLE $tableName (${format.schema})
           |   ROW FORMAT SERDE 'com.bizo.hive.serde.csv.CSVSerde'
-          |     WITH serdeproperties ('separatorChar' = '$delimiter', 'quoteChar' = '$quote')
+          |     WITH serdeproperties ('separatorChar' = '${format.delimiter}', 'quoteChar' = '${format.quote}')
           | STORED AS TEXTFILE LOCATION '$dataUri'""".stripMargin.replaceAll("\n", " ")
     manager.sql(sqlCmd, "spark")
     tableName
   }
-
-  protected def loadTableAsDDF(tableName: String): DDF = {
-    // create a DDF from the hive table
-    val sql = s"select * from $tableName"
-    manager.sql2ddf(sql, "spark")
-  }
-
 }
 
 /**
@@ -110,7 +99,7 @@ class S3DataSource(uri: String, manager: DDFManager) extends FileDataSource(uri,
     uri match {
       case S3DataSource.URI_PATTERN(bucket) =>
         val path = options.getOrElse("path", "").toString
-        val credential = Option(user.getCredential(getUri))
+        val credential = Option(user.getCredential(uri))
         credential match {
           case Some(credential: UsernamePasswordCredential) =>
             val username = credential.getUsername

@@ -13,6 +13,7 @@ import io.ddf.ds.DataSourceCredential;
 import io.ddf.ds.User;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.ds.FileDataSource;
+import io.ddf.spark.ds.JdbcDataSource;
 import io.ddf.spark.ds.S3DataSource;
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
@@ -386,6 +387,8 @@ public class SparkDDFManager extends DDFManager {
       ds = new S3DataSource(uri, this);
     } else if (uri.startsWith("hdfs:") || uri.startsWith("file:")) {
       ds = new FileDataSource(uri, this);
+    } else if (uri.startsWith("jdbc:")) {
+      ds = new JdbcDataSource(uri, this);
     } else {
       throw new DDFException("Unsupported datasource " + uri);
     }
