@@ -80,13 +80,18 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.10</version>
             </plugin>
+            <!--<plugin>-->
+                <!--<groupId>net.alchim31.maven</groupId>-->
+                <!--<artifactId>scala-maven-plugin</artifactId>-->
+                <!--<version>3.2.0</version>-->
+                <!--<configuration>-->
+                    <!--<recompileMode>incremental</recompileMode>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
             <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <recompileMode>incremental</recompileMode>
-                </configuration>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

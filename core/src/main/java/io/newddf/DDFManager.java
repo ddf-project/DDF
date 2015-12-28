@@ -7,12 +7,12 @@ import java.util.Map;
 /**
  * Created by sangdn on 12/21/15.
  */
-public abstract class NewDDFManager {
+public abstract class DDFManager {
 
-    protected NewDDFManager(Map params){
+    protected DDFManager(Map params){
 
     }
-    public static  <T extends NewDDFManager> T newInstance(Class<T> ddfManager,Map params){
+    public static  <T extends DDFManager> T newInstance(Class<T> ddfManager,Map params){
         try {
             Constructor<T> constructors = ddfManager.getDeclaredConstructor(Map.class);
             constructors.setAccessible(true);
@@ -22,6 +22,7 @@ public abstract class NewDDFManager {
             throw new RuntimeException(e);
         }
     }
+    public abstract <T extends DDF> T newDDF(IDataSource ds);
 
 
 }

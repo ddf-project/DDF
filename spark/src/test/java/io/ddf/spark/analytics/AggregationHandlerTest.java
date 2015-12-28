@@ -39,6 +39,8 @@ public class AggregationHandlerTest extends BaseTest {
     Assert.assertEquals(5, ddf.VIEWS.head(5).size());
   }
 
+
+
 //  @Ignore
 //  public void testGroupBy() throws DDFException {
 //    List<String> l1 = Arrays.asList("year", "month");

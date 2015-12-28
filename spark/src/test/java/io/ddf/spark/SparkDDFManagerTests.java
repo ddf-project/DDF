@@ -45,6 +45,7 @@ public class SparkDDFManagerTests extends BaseTest {
     manager.setDDFName(ddf, "myddf");
     Assert.assertEquals("ddf://adatao/" + ddf.getName(), ddf.getUri());
 
+    //select * from "đdf://adatao/abc_def
     manager.addDDF(ddf);
     Assert.assertEquals(ddf, manager.getDDF(ddf.getUUID()));
 
