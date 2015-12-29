@@ -51,16 +51,6 @@ public class DelegatingDDFManager extends DDFManager {
   }
 
   @Override
-  public DataSourceCredential addCredential(User user, Map<Object, Object> credential) throws DDFException {
-    DataSourceCredential dsCredential = null;
-    if (uri.startsWith("s3:") || uri.startsWith("jdbc:")) {
-      dsCredential = UsernamePasswordCredential.from(credential);
-      user.addCredential(uri, dsCredential);
-    }
-    return dsCredential;
-  }
-
-  @Override
   public DDF createDDF(User user, Map<Object, Object> options) throws DDFException {
     options.put("sourceUri", uri);
     DDF ddf = manager.createDDF(user, options);

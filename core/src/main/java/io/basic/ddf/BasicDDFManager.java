@@ -66,12 +66,6 @@ public class BasicDDFManager extends DDFManager {
   }
 
   @Override
-  public DataSourceCredential addCredential(User user, Map<Object, Object> credential) {
-    // do nothing, credential is not needed in basic ddf manager
-    return null;
-  }
-
-  @Override
   public DDF createDDF(User user, Map<Object, Object> options) throws DDFException {
     throw new UnsupportedOperationException();
   }

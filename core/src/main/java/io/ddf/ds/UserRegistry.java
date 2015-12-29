@@ -15,6 +15,8 @@ public class UserRegistry {
 
   private static final UserRegistry instance = new UserRegistry();
 
+  private static final ThreadLocal<User> currentUser = new ThreadLocal<>();
+
   private final LoadingCache<String, User> nameMap = CacheBuilder.newBuilder().build(
       new CacheLoader<String, User>() {
         @Override
@@ -33,6 +35,14 @@ public class UserRegistry {
 
   public static UserRegistry getInstance() {
     return instance;
+  }
+
+  public static User getCurrentUser() {
+    return currentUser.get();
+  }
+
+  public static void setCurrentUser(User user) {
+    currentUser.set(user);
   }
 
   public synchronized void add(User user) {

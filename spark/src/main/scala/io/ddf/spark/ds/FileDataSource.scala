@@ -3,6 +3,7 @@ package io.ddf.spark.ds
 import java.util
 import java.util.UUID
 
+import io.ddf.content.Schema
 import io.ddf.ds.{BaseDataSource, User, UsernamePasswordCredential}
 import io.ddf.exception.{DDFException, UnauthenticatedDataSourceException}
 import io.ddf.spark.SparkDDFManager
@@ -12,6 +13,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.hive.HiveContext
 
 import scala.collection.JavaConversions._
+import scala.util.{Success, Try}
 
 
 /**
@@ -26,13 +28,10 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
   override def loadDDF(user: User, options: util.Map[AnyRef, AnyRef]): DDF = {
     val dataUri = getDataFilesUri(user, options)
     val format = FileFormat(options)
-    format match {
+    val ddf = format match {
       case format: CsvFileFormat =>
         val table = createTable(dataUri, format)
-        val ddf = manager.sql2ddf(s"select * from $table", "spark")
-        // TODO what is this setColumnNames for?
-        ddf.setColumnNames(format.schema.getColumnNames)
-        ddf
+        manager.sql2ddf(s"select * from $table", "spark")
       case format: JsonFileFormat =>
         val ddf = sparkRead(dataUri) { (ctx, uri) => ctx.read.json(uri) }
         if (format.flatten) ddf.getFlattenedDDF else ddf
@@ -42,6 +41,18 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
       case _ =>
         throw new DDFException(s"Unsupported file format: $format")
     }
+
+    // try to set columns name if a schema option is passed
+    if (options.containsKey("schema")) {
+      val maybeSchema = Try {new Schema(options.get("schema").toString)}
+      maybeSchema match {
+        case Success(schema) =>
+          ddf.setColumnNames(schema.getColumnNames)
+        case _ => // do nothing
+      }
+    }
+
+    ddf
   }
 
   /**
@@ -56,7 +67,7 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
       throw new DDFException(s"Loading of $fileUri is only supported with SparkDDFManager")
     }
     val context = manager.asInstanceOf[SparkDDFManager].getHiveContext
-    val df = read(context, uri)
+    val df = read(context, fileUri)
     SparkUtils.df2ddf(df, manager)
   }
 
@@ -99,12 +110,13 @@ class S3DataSource(uri: String, manager: DDFManager) extends FileDataSource(uri,
     uri match {
       case S3DataSource.URI_PATTERN(bucket) =>
         val path = options.getOrElse("path", "").toString
+        val absolutePath = if (path.startsWith("/")) path else s"/$path"
         val credential = Option(user.getCredential(uri))
         credential match {
           case Some(credential: UsernamePasswordCredential) =>
             val username = credential.getUsername
             val password = credential.getPassword
-            s"s3n://$username:$password@$bucket/$path"
+            s"s3n://$username:$password@$bucket$absolutePath"
           case Some(cred) =>
             throw new UnauthenticatedDataSourceException(s"Incompatible credential for S3 source: $cred")
           case None =>

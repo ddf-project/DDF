@@ -239,12 +239,11 @@ public class TableNameReplacer extends TableVisitor {
         if (matcher.matches()) {
             // The first situation.
             this.handleDDFURI(name, table);
-
-        } else if (this.mDS.getUriList() != null || this.mDS.getUuidList() != null) {
+        } else if (this.mDS != null && (this.mDS.getUriList() != null || this.mDS.getUuidList() != null)) {
             // The third situation.
             this.handleIndex(name, this.mDS.getUriList() == null ? this.mDS
                     .getUuidList() : this.mDS.getUriList(), table);
-        } else if (this.mDS.getNamespace() != null) {
+        } else if (this.mDS != null && this.mDS.getNamespace() != null) {
             // The second situation.
             String uri  = "ddf://" + this.mDS.getNamespace() + "/" + name;
             this.handleDDFURI(uri, table);

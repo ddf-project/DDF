@@ -372,12 +372,6 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DataSourceCredential addCredential(User user, Map<Object, Object> credential) throws DDFException {
-    throw new DDFException("Don't call addCredential directly on SparkDDFManager " +
-        "but wrap it in a DelegatingDDFManager instead");
-  }
-
-  @Override
   public DDF createDDF(User user, Map<Object, Object> options) throws DDFException {
     Preconditions.checkArgument(options.containsKey("sourceUri"),
         "SparkDDFManager need sourceUri param in options");

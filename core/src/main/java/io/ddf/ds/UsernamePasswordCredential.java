@@ -3,6 +3,7 @@ package io.ddf.ds;
 import java.util.Map;
 
 public class UsernamePasswordCredential implements DataSourceCredential {
+
   private final String username;
   private final String password;
 
@@ -11,12 +12,11 @@ public class UsernamePasswordCredential implements DataSourceCredential {
     this.password = password;
   }
 
-  public static UsernamePasswordCredential from(Map<Object, Object> options) {
+  public UsernamePasswordCredential(Map<Object, Object> options) {
     Object username = options.get("username");
     Object password = options.get("password");
-    return new UsernamePasswordCredential(
-        username == null ? "" : username.toString(),
-        password == null ? "" : password.toString());
+    this.username = username == null? "" : username.toString();
+    this.password  = password == null? "" : password.toString();
   }
 
   public String getUsername() {
