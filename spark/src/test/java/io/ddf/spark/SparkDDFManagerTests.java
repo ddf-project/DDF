@@ -108,5 +108,13 @@ public class SparkDDFManagerTests extends BaseTest {
     DDF csvSparkDDF3 = sparkDDFManager.copyFrom(csvDDF3);
     System.out.println(csvSparkDDF3.sql("select * from @this", "error").getRows());
 
+    System.out.println("========== tsv ==========");
+    S3DDF tsvDDF = s3DDFManager.newDDF("adatao-sample-data", "test/tsv/noheader/results.tsv", "ID int, FlagTsunami " +
+        "string, Year int, " +
+        "Month int, Day int, Hour int, Minute int, Second double, FocalDepth int, EqPrimary double, EqMagMw double, EqMagMs double, EqMagMb double, EqMagMl double, EqMagMfd double, EqMagUnk double, Intensity int, Country string, State string, LocationName string, Latitude double, Longitude double, RegionCode int, Death int, DeathDescription int, Injuries int, InjuriesDescription int");
+    DDF tsvSparkDDF = sparkDDFManager.copyFrom(tsvDDF);
+    System.out.println(tsvSparkDDF.sql("select * from @this", "error").getRows());
+
+
   }
 }

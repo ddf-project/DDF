@@ -49,7 +49,6 @@ public class S3DDFManager extends DDFManager {
         mCredential = s3Credentials;
         AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
         mConn = new AmazonS3Client(credentials);
-
     }
     /**
      * @brief To check whether the s3 file already contains header.
