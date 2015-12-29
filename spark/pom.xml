@@ -5,7 +5,7 @@
     <artifactId>ddf_spark_2.10</artifactId>
     <packaging>jar</packaging>
     <description>ddf_spark</description>
-    <version>1.4.7-SNAPSHOT</version>
+    <version>1.4.8-SNAPSHOT</version>
     <name>ddf_spark</name>
     <organization>
         <name>io.ddf</name>
@@ -18,7 +18,7 @@
     <parent>
         <groupId>io</groupId>
         <artifactId>ddf</artifactId>
-        <version>1.4.7-SNAPSHOT</version>
+        <version>1.4.8-SNAPSHOT</version>
     </parent>
     <build>
         <directory>${basedir}/target/scala-2.10</directory>
@@ -217,12 +217,7 @@
         <dependency>
             <groupId>io.ddf</groupId>
             <artifactId>ddf_core_2.10</artifactId>
-            <version>1.4.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ddf</groupId>
-            <artifactId>ddf_s3_2.10</artifactId>
-            <version>1.4.7-SNAPSHOT</version>
+            <version>1.4.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -280,7 +275,7 @@
         <dependency>
             <groupId>net.sf</groupId>
             <artifactId>jsqlparser</artifactId>
-            <version>0.9.8.5</version>
+            <version>0.9.8.8</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -322,11 +317,6 @@
             <groupId>net.rforge</groupId>
             <artifactId>Rserve</artifactId>
             <version>1.8.2.compiled</version>
-        </dependency>
-        <dependency>
-            <groupId>com.databricks</groupId>
-            <artifactId>spark-csv_2.10</artifactId>
-            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
