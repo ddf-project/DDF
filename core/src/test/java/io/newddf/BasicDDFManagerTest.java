@@ -2,7 +2,6 @@ package io.newddf;
 
 import io.newddf.spark.SparkDDF;
 import io.newddf.spark.SparkDDFManager;
-import io.newddf.spark.SparkSqlDataSource;
 import org.junit.Test;
 
 import java.util.Collections;

@@ -11,6 +11,7 @@ import io.ddf.misc.IHandleStreamingData;
 import io.ddf.misc.IHandleTimeSeries;
 import io.ddf.ml.ISupportML;
 import io.ddf.ml.ISupportMLMetrics;
+import io.newddf.datasource.IDataSource;
 
 import java.util.Collections;
 import java.util.HashMap;

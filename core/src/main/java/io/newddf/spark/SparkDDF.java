@@ -2,7 +2,7 @@ package io.newddf.spark;
 
 import com.sun.istack.Nullable;
 import io.newddf.DDF;
-import io.newddf.IDataSource;
+import io.newddf.datasource.IDataSource;
 
 import java.util.Map;
 

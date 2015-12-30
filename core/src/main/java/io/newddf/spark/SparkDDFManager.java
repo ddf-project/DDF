@@ -3,7 +3,7 @@ package io.newddf.spark;
 import io.ddf.analytics.AggregationHandler;
 import io.newddf.DDF;
 import io.newddf.DDFManager;
-import io.newddf.IDataSource;
+import io.newddf.datasource.IDataSource;
 
 import java.util.Collections;
 import java.util.Map;
