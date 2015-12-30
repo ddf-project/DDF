@@ -34,7 +34,7 @@ public class UDFTest extends BaseTest {
     DDF ddf3 = ddf2.sql2ddf("select date_parse(dt, 'yyyy/MM/dd HH:mm:ss') from @this");
     List<String> rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2008-01-03 00:00:00"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2008-01-03 00:00:00'"));
   }
 
   @Test
@@ -43,52 +43,52 @@ public class UDFTest extends BaseTest {
     DDF ddf3 = ddf.sql2ddf("select date_parse('2015-01-22 20:23 +0000', \"yyyy-MM-dd HH:mm Z\") from @this");
     List<String> rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2015-01-22 20:23:00"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2015-01-22 20:23:00'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2015-01-22 20:23 +0000', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2015-01-22 20:23:00"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2015-01-22 20:23:00'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2015-03-20T15:04:37.617Z', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2015-03-20 15:04:37"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2015-03-20 15:04:37'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2015-06-05T01:05:00-0500', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2015-06-05 06:05:00"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2015-06-05 06:05:00'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2015-04-24 11:27:43.177', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2015-04-24 11:27:43"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2015-04-24 11:27:43'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2014-05-01T02:30:00+00', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2014-05-01 02:30:00"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2014-05-01 02:30:00'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2013-11-27 16:11:41', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2013-11-27 16:11:41"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2013-11-27 16:11:41'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2013', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2013-01-01 00:00:00"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2013-01-01 00:00:00'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2013-11', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2013-11-01 00:00:00"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2013-11-01 00:00:00'"));
 
     ddf3 = ddf.sql2ddf("select date_parse('2013-11-27', \"iso\") from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("2013-11-27 00:00:00"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'2013-11-27 00:00:00'"));
 
 
     // Make sure the output of data_parse is consumable to other UDFs
@@ -305,17 +305,17 @@ public class UDFTest extends BaseTest {
     ddf3 = ddf.sql2ddf("select month_as_text('2015-01-22 20:23 +0000', 'number') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("1"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'1'"));
 
     ddf3 = ddf.sql2ddf("select month_as_text('2015-01-22 20:23 +0000', 'text') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("January"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'January'"));
 
     ddf3 = ddf.sql2ddf("select month_as_text('2015-01-22 20:23 +0000', 'shorttext') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("Jan"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'Jan'"));
 
     ddf3 = ddf.sql2ddf("select weekyear('2015-01-22 20:23 +0000') from @this");
     rows = ddf3.VIEWS.head(1);
@@ -340,17 +340,17 @@ public class UDFTest extends BaseTest {
     ddf3 = ddf.sql2ddf("select dayofweek_as_text('2015-01-22 20:23 +0000', 'number') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("4"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'4'"));
 
     ddf3 = ddf.sql2ddf("select dayofweek_as_text('2015-01-22 20:23 +0000', 'text') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("Thursday"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'Thursday'"));
 
     ddf3 = ddf.sql2ddf("select dayofweek_as_text('2015-01-22 20:23 +0000', 'shorttext') from @this");
     rows = ddf3.VIEWS.head(1);
     System.out.println(rows.get(0));
-    Assert.assertTrue(rows.get(0).equalsIgnoreCase("Thu"));
+    Assert.assertTrue(rows.get(0).equalsIgnoreCase("'Thu'"));
 
     ddf3 = ddf.sql2ddf("select dayofyear('2015-01-22 20:23 +0000') from @this");
     rows = ddf3.VIEWS.head(1);
