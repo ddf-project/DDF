@@ -3,6 +3,7 @@ package io.ddf.ds;
 
 import com.google.common.base.Preconditions;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,5 +70,10 @@ public class User {
 
   public boolean hasCredentialFor(String sourceUri) {
     return authenticatedSources.containsKey(sourceUri);
+  }
+
+  public Map<String, DataSourceCredential> getAuthenticatedSources() {
+    // don't allow the returned map to be modified
+    return Collections.unmodifiableMap(authenticatedSources);
   }
 }
