@@ -25,5 +25,6 @@ public interface IDDF {
 	public  IAggregationHandler getAggregationHandler();
 	public  IBinningHandler getBinningHandler();
 	public  ITransformHandler getTransformHandler();
+
 }
  

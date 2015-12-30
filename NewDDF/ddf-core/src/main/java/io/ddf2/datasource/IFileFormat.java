@@ -1,4 +1,4 @@
-package io.ddf2.datasource.filesystem;
+package io.ddf2.datasource;
 
 public interface IFileFormat {
     boolean firstRowIsHeader();

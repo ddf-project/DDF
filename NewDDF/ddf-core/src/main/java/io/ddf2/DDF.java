@@ -1,5 +1,6 @@
 package io.ddf2;
 
+import io.ddf2.datasource.IDataSourceResolver;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.schema.Schema;
 import io.ddf2.handlers.*;
@@ -16,7 +17,8 @@ public abstract class DDF implements IDDF {
 	protected IDataSource dataSource;
 	/* Num Row Of DDF */
 	protected long numRows;
-
+	/*Each DDFManager will pass all required Properties to its DDF */
+	protected Map mapDDFProperties;
 	/*
 		Common Handler. Each handler provide subset function for Analytics & Machine Learning
 	 */
@@ -35,6 +37,11 @@ public abstract class DDF implements IDDF {
 		this.dataSource = dataSource;
 	}
 
+	/**
+	 * Finally build DDF. Called from builder.
+	 * @param mapDDFProperties is a contract between concrete DDFManager & concrete DDF
+	 */
+	protected abstract void build(Map mapDDFProperties);
 
 	/**
 	 * @see io.ddf2.IDDF#getDataSource()
@@ -90,43 +97,47 @@ public abstract class DDF implements IDDF {
 	 * @see io.ddf2.IDDF#getViewHandler()
 	 */
 	public IViewHandler getViewHandler() {
-		return null;
+		return viewHandler;
 	}
 	 
 	/**
 	 * @see io.ddf2.IDDF#getMLHandler()
 	 */
 	public IMLHandler getMLHandler() {
-		return null;
+		return mlHandler;
 	}
 	 
 	/**
 	 * @see io.ddf2.IDDF#getMLMetricHandler()
 	 */
 	public IMLMetricHandler getMLMetricHandler() {
-		return null;
+		return mlMetricHandler;
 	}
 	 
 	/**
 	 * @see io.ddf2.IDDF#getAggregationHandler()
 	 */
 	public IAggregationHandler getAggregationHandler() {
-		return null;
+		return aggregationHandler;
 	}
 	 
 	/**
 	 * @see io.ddf2.IDDF#getBinningHandler()
 	 */
 	public IBinningHandler getBinningHandler() {
-		return null;
+		return binningHandler;
 	}
 	 
 	/**
 	 * @see io.ddf2.IDDF#getTransformHandler()
 	 */
 	public ITransformHandler getTransformHandler() {
-		return null;
+		return transformHandler;
 	}
+
+	protected abstract IDataSourceResolver getDataSourceResolver();
+
+
 
 
 	public static abstract class Builder<T extends DDF>{
@@ -142,7 +153,11 @@ public abstract class DDF implements IDDF {
 		}
 		protected  abstract T newInstance(IDataSource ds);
 		protected  abstract T newInstance(String ds);
-		public T build(){return ddf;}
+		/* Finally Initialize DDF */
+		public T build(){
+			ddf.build(mapProperties);
+			return ddf;
+		}
 		public Builder<T> setAggregationHandler(IAggregationHandler aggregationHandler) {
 			ddf.aggregationHandler = aggregationHandler; return this;
 		}

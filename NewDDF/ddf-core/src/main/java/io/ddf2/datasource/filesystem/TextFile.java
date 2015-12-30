@@ -1,5 +1,7 @@
 package io.ddf2.datasource.filesystem;
 
+import io.ddf2.datasource.IFileFormat;
+
 public class TextFile implements IFileFormat {
 
 	protected String delimiter;

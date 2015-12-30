@@ -19,11 +19,6 @@ public abstract class DDFManager implements IDDFManager {
 	 */
 	public abstract IDDF newDDF(IDataSource ds);
 
-	/**
-	 * @see io.ddf2.IDDFManager#newDDF(java.lang.String)
-	 */
-	public abstract IDDF newDDF(String sql);
-
 
 	/*
 	 	Get concrete DDFManager from className

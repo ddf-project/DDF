@@ -1,6 +1,5 @@
 package io.ddf2.datasource;
 
-import io.ddf2.datasource.filesystem.IFileFormat;
 import io.ddf2.datasource.schema.Schema;
 
 import java.util.List;

@@ -5,7 +5,7 @@ import io.ddf2.handlers.IPersistentHandler;
 
 
 /**
- * Each DDFManager have an unique UUID, will be Singleton by Concrete & mapProperties
+ * Each DDFManager have an unique UUID
  * Abstract factory, entry point of application to get concrete DDFManager (ex: SparkDDFManager)
  * Provide method to new IDDF & get IDDFMetaData
  * Manage all created DDF/DDFManager instance.
@@ -14,9 +14,9 @@ import io.ddf2.handlers.IPersistentHandler;
  */
 public interface IDDFManager {
 
-	public IDDF newDDF(IDataSource ds);
-	public IDDF newDDF(String sql);
+	public IDDF newDDF(IDataSource ds) throws UnsupportedDataSourceException;
 	public IDDFMetaData getDDFMetaData();
 	public IPersistentHandler getPersistentHandler();
+	public String getDDFManagerId();
 }
  

@@ -4,13 +4,48 @@ import io.ddf2.DDF;
 import io.ddf2.IDDF;
 import io.ddf2.IDDFResultSet;
 import io.ddf2.datasource.IDataSource;
+import io.ddf2.datasource.IDataSourceResolver;
 import io.ddf2.datasource.SqlDataSource;
+import io.ddf2.datasource.filesystem.FileDataSource;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.sources.DataSourceRegister;
+
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class SparkDDF extends DDF {
+
+    protected JavaSparkContext javaSparkContext;
+    protected SQLContext sqlContext;
 
     SparkDDF(IDataSource dataSource) {
         super(dataSource);
     }
+
+    /**
+     * @see DDF#build(Map)
+     * @param mapDDFProperties required to contains JavaSparkContext
+     */
+    @Override
+    protected void build(Map mapDDFProperties) {
+        JavaSparkContext javaSparkContext = (JavaSparkContext)mapDDFProperties.get("JavaSparkContext");
+        if(javaSparkContext == null) throw new RuntimeException("SparkDDF required to have JavaSparkContext On DdfProperties");
+        this.javaSparkContext = javaSparkContext;
+        this.sqlContext = new SQLContext(javaSparkContext);
+        this.mapDDFProperties = mapDDFProperties;
+        resolveDataSource();
+    }
+
+    /**
+     *
+     */
+    private void resolveDataSource() {
+
+    }
+
 
     /**
      * @param sql
@@ -18,7 +53,9 @@ public class SparkDDF extends DDF {
      */
     @Override
     public IDDFResultSet sql(String sql) {
+        IDDFResultSet resultSet;
         return null;
+
     }
 
     @Override
@@ -26,11 +63,20 @@ public class SparkDDF extends DDF {
         return 0;
     }
 
+    @Override
+    protected IDataSourceResolver getDataSourceResolver() {
+        return null;
+    }
+
     protected abstract static class Builder<T extends SparkDDF> extends DDF.Builder<T> {
         public Builder(IDataSource dataSource) {
             super(dataSource);
         }
     }
+
+
+
+
 
     public static Builder<?> builder(IDataSource dataSource){
         return new Builder<SparkDDF>(dataSource) {
@@ -42,6 +88,12 @@ public class SparkDDF extends DDF {
             @Override
             protected SparkDDF newInstance(String ds) {
                 return newInstance(new SqlDataSource(ds));
+            }
+
+            @Override
+            public SparkDDF build() {
+                ddf.build(mapProperties);
+                return ddf;
             }
         };
     }
