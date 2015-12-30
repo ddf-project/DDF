@@ -7,8 +7,6 @@ package io.basic.ddf;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
-import io.ddf.ds.DataSourceCredential;
-import io.ddf.ds.User;
 import io.ddf.exception.DDFException;
 
 import java.util.List;
@@ -66,7 +64,7 @@ public class BasicDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF createDDF(User user, Map<Object, Object> options) throws DDFException {
+  public DDF createDDF(Map<Object, Object> options) throws DDFException {
     throw new UnsupportedOperationException();
   }
 }

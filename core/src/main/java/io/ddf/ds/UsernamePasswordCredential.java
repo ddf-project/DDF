@@ -26,4 +26,11 @@ public class UsernamePasswordCredential implements DataSourceCredential {
   public String getPassword() {
     return password;
   }
+
+  @Override
+  public String toString() {
+    return "UsernamePasswordCredential{" +
+        "username='" + username + '\'' +
+        '}';
+  }
 }

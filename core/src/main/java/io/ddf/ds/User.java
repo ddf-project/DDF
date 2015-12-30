@@ -2,13 +2,22 @@ package io.ddf.ds;
 
 
 import com.google.common.base.Preconditions;
-import io.ddf.exception.UnauthenticatedDataSourceException;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class User {
+
+  private static final ThreadLocal<User> currentUser = new ThreadLocal<>();
+
+  public static User getCurrentUser() {
+    return currentUser.get();
+  }
+
+  public static void setCurrentUser(User user) {
+    currentUser.set(user);
+  }
 
   private final String id;
 
@@ -54,8 +63,8 @@ public class User {
     return authenticatedSources.get(sourceUri);
   }
 
-  public DataSourceCredential removeCredential(DataSource source) {
-    return authenticatedSources.remove(source);
+  public DataSourceCredential removeCredential(String sourceUri) {
+    return authenticatedSources.remove(sourceUri);
   }
 
   public boolean hasCredentialFor(String sourceUri) {
