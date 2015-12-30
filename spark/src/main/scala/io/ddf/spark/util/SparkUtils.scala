@@ -160,7 +160,13 @@ object SparkUtils {
         if(v == null)
           gen.writeNull()
         else if(!complexTypes.contains(simpleTypeString))
-          gen.writeRaw(v.toString.replaceAll("\t", "\\\\t"))
+
+          if (!simpleTypeString.toLowerCase().equals("string")) {
+            gen.writeRaw(v.toString.replaceAll("\t", "\\\\t"))
+          } else {
+            // TODO: What if the string contains ' itself
+            gen.writeRaw("'" + v.toString.replaceAll("\t", "\\\\t") + "'")
+          }
         else
           data2json(field.dataType, v, gen)
     }
