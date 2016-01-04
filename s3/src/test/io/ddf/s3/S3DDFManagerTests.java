@@ -50,7 +50,8 @@ public class S3DDFManagerTests {
         for (String key: keys) {
             LOG.info(key);
         }
-        assert (keys.size()== 19);
+        assert (keys.size()== 20);
+        assert (keys.contains("testFolder/(-_*')!.@&:,$=+?;#.csv"));
 
         LOG.info("========== jing-bucket/testFolder/a.json ==========");
         keys = manager.listFiles("jing-bucket", "testFolder/a.json");
@@ -58,6 +59,9 @@ public class S3DDFManagerTests {
             LOG.info(key);
         }
         assert (keys.size()==1);
+
+        keys = manager.listFiles("jing-bucket", "testFolder/(-_*')!.@&:,$=+?;#.csv");
+        assert (keys.size() == 1);
 
     }
 
