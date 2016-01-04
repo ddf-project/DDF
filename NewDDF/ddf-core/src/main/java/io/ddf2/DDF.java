@@ -1,8 +1,8 @@
 package io.ddf2;
 
-import io.ddf2.datasource.IDataSourceResolver;
+import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.IDataSource;
-import io.ddf2.datasource.schema.Schema;
+import io.ddf2.datasource.schema.ISchema;
 import io.ddf2.handlers.*;
 
 import java.util.HashMap;
@@ -13,10 +13,12 @@ public abstract class DDF implements IDDF {
 		Common Properties For DDF
 	 */
 
-	/* DataSource keeps all data info of DDF like Schema, Storage */
+	/* DataSource keeps all data info of DDF like ISchema, Storage */
 	protected IDataSource dataSource;
 	/* Num Row Of DDF */
 	protected long numRows;
+	/* DDF Name */
+	protected String ddfName;
 	/*Each DDFManager will pass all required Properties to its DDF */
 	protected Map mapDDFProperties;
 	/*
@@ -54,14 +56,14 @@ public abstract class DDF implements IDDF {
 	 * @see io.ddf2.IDDF#getDDFName()
 	 */
 	public String getDDFName() {
-		return dataSource.getDDFName();
+		return ddfName;
 	}
 	 
 	/**
 	 * @see io.ddf2.IDDF#getSchema()
 	 */
-	public Schema getSchema() {
-		return dataSource.getSchema();
+	public ISchema getSchema() {
+		return dataSource.getISchema();
 	}
 	 
 	/**
@@ -135,7 +137,7 @@ public abstract class DDF implements IDDF {
 		return transformHandler;
 	}
 
-	protected abstract IDataSourceResolver getDataSourceResolver();
+	protected abstract IDataSourcePreparer getDataSourcePreparer();
 
 
 

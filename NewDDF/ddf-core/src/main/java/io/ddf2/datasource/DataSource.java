@@ -1,40 +1,21 @@
 package io.ddf2.datasource;
 
-import io.ddf2.datasource.schema.Schema;
-
-import java.util.List;
+import io.ddf2.datasource.schema.ISchema;
 
 /**
  * Created by sangdn on 12/30/15.
  */
 public abstract class DataSource implements IDataSource {
-    protected List<String> paths;
-    protected IFileFormat fileFormat;
-    protected  Schema schema;
-    protected  String ddfName;
+    protected ISchema ISchema;
     protected  long createdTime;
 
-    public List<String> getPaths() {
-        return paths;
-    }
-
-    public IFileFormat getFileFormat() {
-        return fileFormat;
-    }
-
     /**
-     * @see io.ddf2.datasource.IDataSource#getSchema()
+     * @see io.ddf2.datasource.IDataSource#getISchema()
      */
-    public Schema getSchema() {
-        return schema;
+    public ISchema getISchema() {
+        return ISchema;
     }
 
-    /**
-     * @see io.ddf2.datasource.IDataSource#getDDFName()
-     */
-    public String getDDFName() {
-        return ddfName;
-    }
 
     /**
      * @see io.ddf2.datasource.IDataSource#getNumColumn()

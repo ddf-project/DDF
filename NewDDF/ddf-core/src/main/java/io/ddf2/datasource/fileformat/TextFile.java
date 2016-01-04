@@ -1,6 +1,4 @@
-package io.ddf2.datasource.filesystem;
-
-import io.ddf2.datasource.IFileFormat;
+package io.ddf2.datasource.fileformat;
 
 public class TextFile implements IFileFormat {
 

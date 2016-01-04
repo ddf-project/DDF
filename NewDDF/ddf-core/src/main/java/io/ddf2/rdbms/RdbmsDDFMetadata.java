@@ -2,7 +2,8 @@ package io.ddf2.rdbms;
 
 import io.ddf2.IDDFMetaData;
 import java.util.List;
-import io.ddf2.datasource.schema.Schema;
+
+import io.ddf2.datasource.schema.ISchema;
 
 public class RdbmsDDFMetadata implements IDDFMetaData {
  
@@ -23,7 +24,7 @@ public class RdbmsDDFMetadata implements IDDFMetaData {
 	/**
 	 * @see io.ddf2.IDDFMetaData#getTableSchema(java.lang.String)
 	 */
-	public Schema getTableSchema(String tblName) {
+	public ISchema getTableSchema(String tblName) {
 		return null;
 	}
 	 

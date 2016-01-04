@@ -4,6 +4,7 @@ import io.ddf2.DDF;
 import io.ddf2.IDDF;
 import io.ddf2.IDDFResultSet;
 import io.ddf2.datasource.IDataSource;
+import io.ddf2.datasource.IDataSourcePreparer;
 
 import java.util.Map;
 
@@ -30,6 +31,11 @@ public class RdbmsDDF extends DDF {
     @Override
     protected long _getNumRows() {
         return 0;
+    }
+
+    @Override
+    protected IDataSourcePreparer getDataSourcePreparer() {
+        return null;
     }
 }
  

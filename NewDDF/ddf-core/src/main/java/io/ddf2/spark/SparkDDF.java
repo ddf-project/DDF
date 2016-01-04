@@ -4,17 +4,13 @@ import io.ddf2.DDF;
 import io.ddf2.IDDF;
 import io.ddf2.IDDFResultSet;
 import io.ddf2.datasource.IDataSource;
-import io.ddf2.datasource.IDataSourceResolver;
+import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.SqlDataSource;
-import io.ddf2.datasource.filesystem.FileDataSource;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.sources.DataSourceRegister;
 
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class SparkDDF extends DDF {
 
@@ -64,7 +60,7 @@ public class SparkDDF extends DDF {
     }
 
     @Override
-    protected IDataSourceResolver getDataSourceResolver() {
+    protected IDataSourcePreparer getDataSourcePreparer() {
         return null;
     }
 

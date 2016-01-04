@@ -5,7 +5,7 @@ import io.ddf2.datasource.fileformat.IFileFormat;
 
 import java.util.List;
 
-public class HdfsDataSource extends FileDataSource {
+public class LocalFileDataSource extends FileDataSource {
 
     /**
      * @see IDataSource#getNumColumn()

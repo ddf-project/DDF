@@ -1,7 +1,5 @@
 package io.ddf2.datasource;
 
-import io.ddf2.datasource.schema.Schema;
-
 /**
  * Created by sangdn on 12/30/15.
  */
