@@ -40,22 +40,25 @@ public class S3DDFManagerTests {
     @Test
     public void testListing() throws DDFException {
         List<String> buckets = manager.listBuckets();
-        System.out.println("========== buckets ==========");
+        LOG.info("========== buckets ==========");
         for (String bucket: buckets) {
-            System.out.println(bucket);
+            LOG.info(bucket);
         }
 
-        System.out.println("========== jing-bucket/testFolder/ ==========");
+        LOG.info("========== jing-bucket/testFolder/ ==========");
         List<String> keys = manager.listFiles("jing-bucket", "testFolder/");
         for (String key: keys) {
-            System.out.println(key);
+            LOG.info(key);
         }
+        assert (keys.size()== 19);
 
-        System.out.println("========== jing-bucket/testFolder/a.json ==========");
+        LOG.info("========== jing-bucket/testFolder/a.json ==========");
         keys = manager.listFiles("jing-bucket", "testFolder/a.json");
         for (String key: keys) {
-            System.out.println(key);
+            LOG.info(key);
         }
+        assert (keys.size()==1);
+
     }
 
     @Test
@@ -89,9 +92,16 @@ public class S3DDFManagerTests {
     public void testHead() throws DDFException {
         S3DDF csvDDF = manager.newDDF("jing-bucket", "testFolder/year.csv", null);
         List<String> rows = manager.head(csvDDF, 5);
-        System.out.println("========== content of year.csv ==========");
+        assert(rows.size() == 2);
+        LOG.info("========== content of year.csv ==========");
         for (String s : rows) {
-            System.out.println(s);
+            LOG.info(s);
         }
+
+        rows = manager.head(csvDDF, 20000);
+        assert(rows.size() == 2);
+
+        rows = manager.head(csvDDF, 1000);
+        assert(rows.size() == 2);
     }
 }
