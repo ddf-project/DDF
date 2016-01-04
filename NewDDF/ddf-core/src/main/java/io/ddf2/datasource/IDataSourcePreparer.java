@@ -15,5 +15,5 @@ import java.util.Set;
  *  + prepare anything for DDF to work well on this dataSource.
  */
 public interface IDataSourcePreparer {
-    void prepare(IDataSource dataSource) throws UnsupportedDataSourceException;
+    IDataSource prepare(String ddfName,IDataSource dataSource) throws PrepareDataSourceException;
 }

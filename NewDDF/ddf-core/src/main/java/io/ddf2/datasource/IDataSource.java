@@ -10,7 +10,7 @@ import io.ddf2.datasource.schema.ISchema;
  * 
  */
 public interface IDataSource {
-	public ISchema getISchema();
+	public ISchema getSchema();
 	public int getNumColumn();
 	public long getCreatedTime();
 }

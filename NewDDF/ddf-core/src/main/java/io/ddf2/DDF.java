@@ -63,7 +63,7 @@ public abstract class DDF implements IDDF {
 	 * @see io.ddf2.IDDF#getSchema()
 	 */
 	public ISchema getSchema() {
-		return dataSource.getISchema();
+		return dataSource.getSchema();
 	}
 	 
 	/**

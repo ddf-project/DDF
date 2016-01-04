@@ -1,31 +1,115 @@
 package io.ddf2.spark.resolver;
 
-import io.ddf2.UnsupportedDataSourceException;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.IDataSourcePreparer;
+import io.ddf2.datasource.PrepareDataSourceException;
+import io.ddf2.datasource.fileformat.resolver.TextFileResolver;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
 import io.ddf2.datasource.fileformat.TextFile;
-import org.apache.spark.api.java.JavaSparkContext;
+import io.ddf2.datasource.schema.IColumn;
+import io.ddf2.datasource.schema.ISchema;
+import org.apache.spark.SparkContext;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.hive.HiveContext;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * Created by sangdn on 12/30/15.
  */
 
 /**
- * Spark FSResolver
- *  + Do prepare for SparkDDF
+ * SparkLocalFilePreparer will prepare for SparkDDF from Local File.
+ * + Ensure Schema
+ * + Create HiveTable
+ * + Load Local Data Into HiveTable.
  */
 
-public class SparkLocalFilePreparer implements IDataSourcePreparer {
-    protected JavaSparkContext javaSparkContext;
-    public SparkLocalFilePreparer(JavaSparkContext javaSparkContext){
-        javaSparkContext = javaSparkContext;
+public class SparkLocalFilePreparer extends SparkDataSourcePreparer {
+    protected SparkContext sparkContext;
+    protected HiveContext hiveContext;
+    protected static TextFileResolver textFileResolver = new TextFileResolver();
+    protected static final int NUM_SAMPLE_ROW = 10; //Num Sample Row for inferschema.
+
+
+    public SparkLocalFilePreparer(SparkContext sparkContext) {
+        this.sparkContext = sparkContext;
+        hiveContext = new HiveContext(this.sparkContext);
     }
+
     @Override
-    public void prepare(IDataSource dataSource) throws UnsupportedDataSourceException{
-        LocalFileDataSource fsDataSource = (LocalFileDataSource) dataSource;
-        TextFile txtFormat = (TextFile)fsDataSource.getFileFormat();
+    public IDataSource prepare(String ddfName,IDataSource dataSource) throws PrepareDataSourceException {
+        try {
+            LocalFileDataSource fileDataSource = (LocalFileDataSource) dataSource;
+            ISchema schema = dataSource.getSchema();
+
+            //check if schema exist, if not, inferschema.
+            if (schema == null) {
+                schema = inferSchema(fileDataSource);
+            }
+            prepareData(ddfName, schema, fileDataSource.getFileFormat().firstRowIsHeader(), fileDataSource.getPaths());
+            //build prepared already datasource
+//            LocalFileDataSource newFileDataSource = LocalFileDataSource.
+
+            //ToDo: Create FileDataSource builder
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new PrepareDataSourceException(e.getMessage());
+        }
 
 
     }
+
+    protected ISchema inferSchema(LocalFileDataSource localFileDataSource) throws Exception {
+        TextFile textFileFormat = (TextFile) localFileDataSource.getFileFormat();
+        String fileName = localFileDataSource.getPaths().get(0);
+        List<String> preferColumnName = new ArrayList<>();
+        List<List<String>> sampleRows = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))) {
+            if (textFileFormat.firstRowIsHeader()) {
+                String header = br.readLine();
+                String[] split = header.split(textFileFormat.getDelimiter());
+                preferColumnName = Arrays.asList(split);
+            } else {
+                for (int i = 0; i < NUM_SAMPLE_ROW; ++i) {
+                    String row = br.readLine();
+                    if (row == null) break;
+                    String[] columns = row.split(textFileFormat.getDelimiter());
+                    sampleRows.add(Arrays.asList(columns));
+                }
+            }
+        }
+
+        ISchema schema = textFileResolver.resolve(preferColumnName, sampleRows);
+        assert schema != null && schema.getColumns() != null && schema.getNumColumn() > 0;
+        return schema;
+
+    }
+    protected void prepareData(String ddfName,ISchema schema,boolean containHeader,List<String> paths) throws PrepareDataSourceException {
+        //Create Table ddfName with Schema
+        List<IColumn> columns = schema.getColumns();
+        StringBuilder strCreateTable = new StringBuilder();
+        strCreateTable.append("create table if not exist ").append(ddfName).append("( ");
+        StringBuilder sbTableSchema = new StringBuilder();
+        for(int i =0; i < columns.size();++i){
+            if(sbTableSchema.length()>0) sbTableSchema.append(",");
+            String name = columns.get(i).getName();
+            Class javaType= columns.get(i).getClass();
+            String hiveType = getHiveType(javaType);
+
+            strCreateTable.append(name).append(" ").append(hiveType);
+        }
+        strCreateTable.append(sbTableSchema.toString()).append(" )");
+
+        hiveContext.sql(strCreateTable.toString());
+
+        //load local data from paths
+        for(String path : paths) {
+            String strLoadData = "load data local inpath " + path + " into table " + ddfName;
+            hiveContext.sql(strLoadData);
+        }
+
+    }
+
 }

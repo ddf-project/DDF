@@ -10,9 +10,9 @@ public abstract class DataSource implements IDataSource {
     protected  long createdTime;
 
     /**
-     * @see io.ddf2.datasource.IDataSource#getISchema()
+     * @see io.ddf2.datasource.IDataSource#getSchema()
      */
-    public ISchema getISchema() {
+    public ISchema getSchema() {
         return ISchema;
     }
 
