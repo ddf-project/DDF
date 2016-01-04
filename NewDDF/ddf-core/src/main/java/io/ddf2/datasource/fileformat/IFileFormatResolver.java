@@ -12,5 +12,5 @@ import java.util.List;
  * Responsible to resolve @IFileFormat to ISchema
  */
 public interface IFileFormatResolver {
-    ISchema resolve(List<String> preferColumnName,List<List<String>> sampleRows);
+    ISchema resolve(List<String> preferColumnName,List<List<String>> sampleRows) throws Exception;
 }

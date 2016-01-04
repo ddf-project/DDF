@@ -39,7 +39,7 @@ public class TypeResolver {
             return getType("long");
         }catch (NumberFormatException nfe){}
         try{
-            Boolean.parseBoolean(data);
+            if(data.equalsIgnoreCase("true") || data.equalsIgnoreCase("false"))
             return  getType("bool");
         }catch (NumberFormatException nfe){}
 

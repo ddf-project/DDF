@@ -46,6 +46,7 @@ public class Schema implements ISchema {
     public void append(IColumn column) {
         if (colNames.add(column.getName()))
             columns.add(column);
+
     }
 
     public void remove(int index) {
@@ -61,6 +62,15 @@ public class Schema implements ISchema {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for(IColumn column : columns){
+            sb.append(column.getName() + ":" + column.getType().toString() + "|");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
 
     public class Builder {
         protected Schema schema;
