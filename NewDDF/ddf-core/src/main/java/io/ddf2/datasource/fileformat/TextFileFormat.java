@@ -2,6 +2,9 @@ package io.ddf2.datasource.fileformat;
 
 public class TextFileFormat implements IFileFormat {
 
+	public static final String TAB_SEPARATOR = "'\\t'";
+	public static final String COMMA_SEPARATOR = "','";
+
 	protected String delimiter;
 	protected String quote;
 	protected boolean firstRowIsHeader;

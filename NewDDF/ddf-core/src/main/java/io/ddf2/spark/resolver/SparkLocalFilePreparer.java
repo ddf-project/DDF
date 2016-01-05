@@ -38,13 +38,15 @@ public class SparkLocalFilePreparer extends SparkDataSourcePreparer {
     public IDataSource prepare(String ddfName,IDataSource dataSource) throws PrepareDataSourceException {
         try {
             LocalFileDataSource fileDataSource = (LocalFileDataSource) dataSource;
+            TextFileFormat textFileFormat = (TextFileFormat) fileDataSource.getFileFormat();
             ISchema schema = dataSource.getSchema();
 
             //check if schema exist, if not, inferschema.
             if (schema == null) {
                 schema = inferSchema(fileDataSource);
             }
-            prepareData(ddfName, schema, fileDataSource.getFileFormat().firstRowIsHeader(), fileDataSource.getPaths());
+
+            prepareData(ddfName, schema.getColumns(), textFileFormat,fileDataSource.getPaths());
             //build prepared already datasource
 
             return LocalFileDataSource.builder()
@@ -86,9 +88,8 @@ public class SparkLocalFilePreparer extends SparkDataSourcePreparer {
         return schema;
 
     }
-    protected void prepareData(String ddfName,ISchema schema,boolean containHeader,List<String> paths) throws PrepareDataSourceException {
+    protected void prepareData(String ddfName,List<IColumn>columns,TextFileFormat textFileFormat,List<String> paths) throws PrepareDataSourceException {
         //Create Table name with Schema
-        List<IColumn> columns = schema.getColumns();
         StringBuilder strCreateTable = new StringBuilder();
         strCreateTable.append("create table if not exists ").append(ddfName).append(" ( ");
         StringBuilder sbTableSchema = new StringBuilder();
@@ -101,7 +102,8 @@ public class SparkLocalFilePreparer extends SparkDataSourcePreparer {
             sbTableSchema.append(name).append(" ").append(hiveType);
         }
         strCreateTable.append(sbTableSchema.toString()).append(" )");
-        if(containHeader)
+        strCreateTable.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY " + textFileFormat.getDelimiter());
+        if(textFileFormat.firstRowIsHeader())
             strCreateTable.append(" tblproperties('skip.header.line.count'='1')");
         hiveContext.sql(strCreateTable.toString());
 

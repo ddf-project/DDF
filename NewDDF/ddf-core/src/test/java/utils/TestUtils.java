@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class TestUtils {
     static String tabDelimiter = String.valueOf('\t');
+    static String commaDelimiter = ",";
 
     /**
      * random generate user info
@@ -21,9 +22,9 @@ public class TestUtils {
         String birthday = "%d %d %d";
         String date =String.format(birthday,genInt()%30,genInt()%12,1960 + genInt()%30);
         StringBuilder sb = new StringBuilder();
-        sb.append(genString()).append(tabDelimiter)
-                .append(genInt()).append(tabDelimiter)
-                .append(genBool()).append(tabDelimiter)
+        sb.append(genString()).append(commaDelimiter)
+                .append(genInt()).append(commaDelimiter)
+                .append(genBool()).append(commaDelimiter)
                 .append(date);
         return sb.toString();
 
