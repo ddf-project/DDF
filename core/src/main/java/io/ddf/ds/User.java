@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class User {
@@ -25,6 +26,10 @@ public class User {
   private final String username;
 
   private final Map<String, DataSourceCredential> authenticatedSources = new ConcurrentHashMap<>();
+
+  public User(String username) {
+    this(UUID.randomUUID().toString(), username);
+  }
 
   public User(String id, String username) {
     Preconditions.checkArgument(id != null, "id cannot be null");
