@@ -44,13 +44,14 @@ public class S3DDFManagerTests {
         for (String bucket: buckets) {
             LOG.info(bucket);
         }
+        assert(buckets.contains("jing-bucket"));
 
         LOG.info("========== jing-bucket/testFolder/ ==========");
         List<String> keys = manager.listFiles("jing-bucket", "testFolder/");
         for (String key: keys) {
             LOG.info(key);
         }
-        assert (keys.size()== 20);
+        assert (keys.size()== 21);
         assert (keys.contains("testFolder/(-_*')!.@&:,$=+?;#.csv"));
 
         LOG.info("========== jing-bucket/testFolder/a.json ==========");
@@ -67,10 +68,18 @@ public class S3DDFManagerTests {
 
     @Test
     public void testCreateDDF() throws DDFException {
-        S3DDF folderDDF = manager.newDDF("jing-bucket", "testFolder/", null);
+        try {
+            S3DDF folderDDF = manager.newDDF("jing-bucket", "testFolder/", null);
+            assert (false);
+            assert(folderDDF.getIsDir() == true);
+        } catch (Exception e) {
+
+        }
+
+        S3DDF cleanFolderDDF = manager.newDDF("jing-bucket", "testFolder/folder/", null);
         S3DDF jsonDDF = manager.newDDF("jing-bucket", "testFolder/a.json", null);
         S3DDF csvDDF = manager.newDDF("jing-bucket", "testFolder/year.csv", null);
-        assert(folderDDF.getIsDir() == true);
+        assert (cleanFolderDDF.getIsDir() == true);
         assert(jsonDDF.getIsDir() == false);
         assert(csvDDF.getIsDir() == false);
         assert(jsonDDF.getDataFormat().equals(DataFormat.JSON));
@@ -107,5 +116,14 @@ public class S3DDFManagerTests {
 
         rows = manager.head(csvDDF, 1000);
         assert(rows.size() == 2);
+
+        S3DDF folderDDF = manager.newDDF("jing-bucket", "testFolder/folder/", null);
+        rows = manager.head(folderDDF, 5);
+        assert (rows.size() == 4);
+
+        S3DDF ddf1024 = manager.newDDF("jing-bucket", "testFolder/1024.csv", null);
+        rows = manager.head(ddf1024, 9999);
+        assert (rows.size() == 1000);
+
     }
 }

@@ -33,7 +33,7 @@ public class S3DDFManager extends DDFManager {
     // Amazon client connection.
     private AmazonS3 mConn;
     // Upper limit for content preview.
-    final int K_LIMIT = 10000;
+    final int K_LIMIT = 1000;
 
 
     // TODO: Remove Engine Type
@@ -65,8 +65,14 @@ public class S3DDFManager extends DDFManager {
      * @param s3DDF
      * @return
      */
-    public Boolean isDir(S3DDF s3DDF) {
+    public Boolean isDir(S3DDF s3DDF) throws DDFException {
         S3Object s3Object = mConn.getObject(s3DDF.getBucket(), s3DDF.getKey());
+        List<String> keys = this.listFiles(s3DDF.getBucket(), s3Object.getKey());
+        for (String key : keys) {
+            if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
+                throw new DDFException("This folder contains subfolder, please recheck.");
+            }
+        }
         return s3Object.getKey().endsWith("/");
     }
 
@@ -134,17 +140,27 @@ public class S3DDFManager extends DDFManager {
      */
     private String firstFileKey(S3DDF s3DDF) throws DDFException {
         if (s3DDF.getIsDir()) {
-            ObjectListing objectListing = mConn.listObjects(new ListObjectsRequest().withBucketName(s3DDF.getBucket())
-                .withPrefix(s3DDF.getKey()));
-            for (S3ObjectSummary summary: objectListing.getObjectSummaries()) {
-                if (!summary.getKey().endsWith("/")) {
-                    return summary.getKey();
-                }
+            List<String> ret = this.fileKeys(s3DDF);
+            if (ret.isEmpty()) {
+                throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
+            } else {
+                return ret.get(0);
             }
-            throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
         } else {
             return s3DDF.getKey();
         }
+    }
+
+    private List<String> fileKeys(S3DDF s3DDF) throws DDFException {
+        List<String> ret = new ArrayList<String>();
+        ObjectListing objectListing = mConn.listObjects(new ListObjectsRequest().withBucketName(s3DDF.getBucket())
+            .withPrefix(s3DDF.getKey()));
+        for (S3ObjectSummary summary: objectListing.getObjectSummaries()) {
+            if (!summary.getKey().endsWith("/")) {
+                ret.add(summary.getKey());
+            }
+        }
+        return ret;
     }
 
     /**
@@ -160,22 +176,22 @@ public class S3DDFManager extends DDFManager {
         }
 
         String bucket = s3DDF.getBucket();
-        String key = this.firstFileKey(s3DDF);
-
-
-        try (BufferedReader br = new BufferedReader(
-            new InputStreamReader(mConn.getObject(bucket, key).getObjectContent()))) {
-        String line = null;
+        List<String> keys = this.fileKeys(s3DDF);
         List<String> rows = new ArrayList<String>();
-            while (limit > 0 &&  ((line = br.readLine()) != null)) {
-                rows.add(line);
-                --limit;
-            }
-            return rows;
-        } catch (IOException e) {
-            throw new DDFException(e);
-        }
 
+        for (int i = 0; i < keys.size() && limit > 0; ++i) {
+            try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(mConn.getObject(bucket, keys.get(i)).getObjectContent()))) {
+                String line = null;
+                while (limit > 0 &&  ((line = br.readLine()) != null)) {
+                    rows.add(line);
+                    --limit;
+                }
+            } catch (IOException e) {
+                throw new DDFException(e);
+            }
+        }
+        return rows;
     }
 
     @Override
