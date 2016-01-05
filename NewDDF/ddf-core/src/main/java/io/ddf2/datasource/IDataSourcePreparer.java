@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  * Take responsible preparing for DDF
- *  + ensure ISchema
+ *  + ensure schema
  *  + prepare anything for DDF to work well on this dataSource.
  */
 public interface IDataSourcePreparer {

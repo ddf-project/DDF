@@ -2,6 +2,7 @@ package io.ddf2;
 
 import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.IDataSource;
+import io.ddf2.datasource.PrepareDataSourceException;
 import io.ddf2.datasource.schema.ISchema;
 import io.ddf2.handlers.*;
 
@@ -13,12 +14,12 @@ public abstract class DDF implements IDDF {
 		Common Properties For DDF
 	 */
 
-	/* DataSource keeps all data info of DDF like ISchema, Storage */
+	/* DataSource keeps all data info of DDF like schema, Storage */
 	protected IDataSource dataSource;
 	/* Num Row Of DDF */
 	protected long numRows;
 	/* DDF Name */
-	protected String ddfName;
+	protected String name;
 	/*Each DDFManager will pass all required Properties to its DDF */
 	protected Map mapDDFProperties;
 	/*
@@ -36,6 +37,7 @@ public abstract class DDF implements IDDF {
 
 
 	protected DDF(IDataSource dataSource){
+		assert  dataSource != null;
 		this.dataSource = dataSource;
 	}
 
@@ -43,7 +45,7 @@ public abstract class DDF implements IDDF {
 	 * Finally build DDF. Called from builder.
 	 * @param mapDDFProperties is a contract between concrete DDFManager & concrete DDF
 	 */
-	protected abstract void build(Map mapDDFProperties);
+	protected abstract void build(Map mapDDFProperties) throws PrepareDataSourceException, UnsupportedDataSourceException;
 
 	/**
 	 * @see io.ddf2.IDDF#getDataSource()
@@ -56,7 +58,7 @@ public abstract class DDF implements IDDF {
 	 * @see io.ddf2.IDDF#getDDFName()
 	 */
 	public String getDDFName() {
-		return ddfName;
+		return name;
 	}
 	 
 	/**
@@ -76,7 +78,7 @@ public abstract class DDF implements IDDF {
 	/**
 	 * @see io.ddf2.IDDF#sql(java.lang.String)
 	 */
-	public abstract IDDFResultSet sql(String sql);
+	public abstract ISqlResult sql(String sql);
 	 
 	/**
 	 * @see io.ddf2.IDDF#getNumRows()
@@ -137,7 +139,11 @@ public abstract class DDF implements IDDF {
 		return transformHandler;
 	}
 
-	protected abstract IDataSourcePreparer getDataSourcePreparer();
+	/**
+	 * @see IDataSourcePreparer
+	 * @return
+	 */
+	protected abstract IDataSourcePreparer getDataSourcePreparer() throws UnsupportedDataSourceException;
 
 
 
@@ -156,10 +162,23 @@ public abstract class DDF implements IDDF {
 		protected  abstract T newInstance(IDataSource ds);
 		protected  abstract T newInstance(String ds);
 		/* Finally Initialize DDF */
-		public T build(){
+		public T build() throws DDFException {
 			ddf.build(mapProperties);
 			return ddf;
 		}
+		public Builder<T> setName(String ddfName){
+			ddf.name = ddfName;
+			return  this;
+		}
+		public Builder<T> putProperty(String key,Object value){
+			mapProperties.put(key, value);
+			return this;
+		}
+		public Builder<T> putProperty(Map<String,Object> mapProperties){
+			this.mapProperties.putAll(mapProperties);
+			return this;
+		}
+		/* DDF Handler */
 		public Builder<T> setAggregationHandler(IAggregationHandler aggregationHandler) {
 			ddf.aggregationHandler = aggregationHandler; return this;
 		}
@@ -167,8 +186,6 @@ public abstract class DDF implements IDDF {
 		public Builder<T> setBinningHandler(IBinningHandler binningHandler) {
 			ddf.binningHandler = binningHandler; return this;
 		}
-
-		
 
 		public Builder<T> setMLMetricHandler(IMLMetricHandler mlMetricHandler) {
 			ddf.mlMetricHandler = mlMetricHandler; return this;
@@ -194,14 +211,7 @@ public abstract class DDF implements IDDF {
 			ddf.viewHandler = viewHandler; return this;
 		}
 
-		public Builder<T> putProperty(String key,Object value){
-			mapProperties.put(key, value);
-			return this;
-		}
-		public Builder<T> putProperty(Map<String,Object> mapProperties){
-			this.mapProperties.putAll(mapProperties);
-			return this;
-		}
+
 	}
 }
  

@@ -2,7 +2,7 @@ package io.ddf2.rdbms;
 
 import io.ddf2.DDF;
 import io.ddf2.IDDF;
-import io.ddf2.IDDFResultSet;
+import io.ddf2.ISqlResult;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.IDataSourcePreparer;
 
@@ -24,7 +24,7 @@ public class RdbmsDDF extends DDF {
      * @see IDDF#sql(String)
      */
     @Override
-    public IDDFResultSet sql(String sql) {
+    public ISqlResult sql(String sql) {
         return null;
     }
 

@@ -1,15 +1,13 @@
 package io.ddf2.spark.resolver;
 
 import io.ddf2.datasource.IDataSource;
-import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.PrepareDataSourceException;
 import io.ddf2.datasource.fileformat.resolver.TextFileResolver;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
-import io.ddf2.datasource.fileformat.TextFile;
+import io.ddf2.datasource.fileformat.TextFileFormat;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.datasource.schema.ISchema;
 import org.apache.spark.SparkContext;
-import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.*;
@@ -27,15 +25,13 @@ import java.util.*;
  */
 
 public class SparkLocalFilePreparer extends SparkDataSourcePreparer {
-    protected SparkContext sparkContext;
     protected HiveContext hiveContext;
     protected static TextFileResolver textFileResolver = new TextFileResolver();
     protected static final int NUM_SAMPLE_ROW = 10; //Num Sample Row for inferschema.
 
 
-    public SparkLocalFilePreparer(SparkContext sparkContext) {
-        this.sparkContext = sparkContext;
-        hiveContext = new HiveContext(this.sparkContext);
+    public SparkLocalFilePreparer(HiveContext hiveContext) {
+        this.hiveContext = hiveContext;
     }
 
     @Override
@@ -50,9 +46,13 @@ public class SparkLocalFilePreparer extends SparkDataSourcePreparer {
             }
             prepareData(ddfName, schema, fileDataSource.getFileFormat().firstRowIsHeader(), fileDataSource.getPaths());
             //build prepared already datasource
-//            LocalFileDataSource newFileDataSource = LocalFileDataSource.
 
-            //ToDo: Create FileDataSource builder
+            return LocalFileDataSource.builder()
+                    .addPaths(fileDataSource.getPaths())
+                    .setFileFormat(fileDataSource.getFileFormat())
+                    .setSchema(schema)
+                    .setCreatedTime(System.currentTimeMillis())
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             throw new PrepareDataSourceException(e.getMessage());
@@ -62,7 +62,7 @@ public class SparkLocalFilePreparer extends SparkDataSourcePreparer {
     }
 
     protected ISchema inferSchema(LocalFileDataSource localFileDataSource) throws Exception {
-        TextFile textFileFormat = (TextFile) localFileDataSource.getFileFormat();
+        TextFileFormat textFileFormat = (TextFileFormat) localFileDataSource.getFileFormat();
         String fileName = localFileDataSource.getPaths().get(0);
         List<String> preferColumnName = new ArrayList<>();
         List<List<String>> sampleRows = new ArrayList<>();
@@ -87,26 +87,27 @@ public class SparkLocalFilePreparer extends SparkDataSourcePreparer {
 
     }
     protected void prepareData(String ddfName,ISchema schema,boolean containHeader,List<String> paths) throws PrepareDataSourceException {
-        //Create Table ddfName with Schema
+        //Create Table name with Schema
         List<IColumn> columns = schema.getColumns();
         StringBuilder strCreateTable = new StringBuilder();
-        strCreateTable.append("create table if not exist ").append(ddfName).append("( ");
+        strCreateTable.append("create table if not exists ").append(ddfName).append(" ( ");
         StringBuilder sbTableSchema = new StringBuilder();
         for(int i =0; i < columns.size();++i){
             if(sbTableSchema.length()>0) sbTableSchema.append(",");
             String name = columns.get(i).getName();
-            Class javaType= columns.get(i).getClass();
+            Class javaType= columns.get(i).getType();
             String hiveType = getHiveType(javaType);
 
-            strCreateTable.append(name).append(" ").append(hiveType);
+            sbTableSchema.append(name).append(" ").append(hiveType);
         }
         strCreateTable.append(sbTableSchema.toString()).append(" )");
-
+        if(containHeader)
+            strCreateTable.append(" tblproperties('skip.header.line.count'='1')");
         hiveContext.sql(strCreateTable.toString());
 
         //load local data from paths
         for(String path : paths) {
-            String strLoadData = "load data local inpath " + path + " into table " + ddfName;
+            String strLoadData = "load data local inpath '" + path + "' into table " + ddfName;
             hiveContext.sql(strLoadData);
         }
 

@@ -1,5 +1,6 @@
 package io.ddf2.rdbms;
 
+import io.ddf2.DDFException;
 import io.ddf2.DDFManager;
 import io.ddf2.IDDF;
 import io.ddf2.IDDFManager;
@@ -11,6 +12,11 @@ public class RdbmsDDFManager extends DDFManager {
 
     protected RdbmsDDFManager(Map mapProperties) {
         super(mapProperties);
+    }
+
+    @Override
+    public IDDF newDDF(String name, IDataSource ds) throws DDFException {
+        return null;
     }
 
     /**

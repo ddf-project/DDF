@@ -68,15 +68,26 @@ public class Schema implements ISchema {
         for(IColumn column : columns){
             sb.append(column.getName() + ":" + column.getType().toString() + "|");
         }
-        sb.deleteCharAt(sb.length()-1);
+        if(sb.length()>0)
+            sb.deleteCharAt(sb.length()-1);
         return sb.toString();
     }
 
-    public class Builder {
-        protected Schema schema;
+    public static Builder builder(){
+        return new Builder() {
+            @Override
+            public Schema newSchema() {
+                return new Schema();
+            }
+        };
+    }
+    public static abstract class Builder<T extends Schema> {
+        protected T schema;
+        public abstract T newSchema();
+
 
         public Builder() {
-            schema = new Schema();
+            schema = newSchema();
         }
 
         /**

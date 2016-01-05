@@ -6,25 +6,40 @@ import io.ddf2.handlers.*;
 
 
 /**
- * a DDF have an unique Name, ISchema & datasource.
- * a DDF is a table-like abstraction which provide custom function like: execute sql, getHandler
+ * a DDF have an unique Name, schema & datasource.
+ * a DDF is a table-like abstraction which provide custom function via its handler.
+ * @see IStatisticHandler
+ * @see IViewHandler
+ * @see IMLHandler
  */
 public interface IDDF {
- 
-	 
-	public IDataSource getDataSource();
-	public String getDDFName();
-	public ISchema getSchema();
-	public  int getNumColumn();
-	public IDDFResultSet sql(String sql);
-	public  long getNumRows();
-	public  IStatisticHandler getStatisticHandler();
-	public  IViewHandler getViewHandler();
-	public  IMLHandler getMLHandler();
-	public  IMLMetricHandler getMLMetricHandler();
-	public  IAggregationHandler getAggregationHandler();
-	public  IBinningHandler getBinningHandler();
-	public  ITransformHandler getTransformHandler();
+
+
+    public IDataSource getDataSource();
+
+    public String getDDFName();
+
+    public ISchema getSchema();
+
+    public int getNumColumn();
+
+    public ISqlResult sql(String sql);
+
+    public long getNumRows();
+
+    public IStatisticHandler getStatisticHandler();
+
+    public IViewHandler getViewHandler();
+
+    public IMLHandler getMLHandler();
+
+    public IMLMetricHandler getMLMetricHandler();
+
+    public IAggregationHandler getAggregationHandler();
+
+    public IBinningHandler getBinningHandler();
+
+    public ITransformHandler getTransformHandler();
 
 }
  

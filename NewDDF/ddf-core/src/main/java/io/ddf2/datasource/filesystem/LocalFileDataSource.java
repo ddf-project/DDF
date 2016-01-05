@@ -6,23 +6,18 @@ import io.ddf2.datasource.fileformat.IFileFormat;
 import java.util.List;
 
 public class LocalFileDataSource extends FileDataSource {
+    /** Only Allow Builder To Build New Instance **/
+    private LocalFileDataSource(){}
 
-    /**
-     * @see IDataSource#getNumColumn()
-     */
-    @Override
-    public int getNumColumn() {
-        return 0;
-    }
 
-    @Override
-    public List<String> getPaths() {
-        return null;
-    }
+    public static Builder<LocalFileDataSource> builder() {
+        return new Builder<LocalFileDataSource>() {
+            @Override
+            protected LocalFileDataSource newInstance() {
+                return new LocalFileDataSource();
+            }
+        };
 
-    @Override
-    public IFileFormat getFileFormat() {
-        return null;
     }
 }
  

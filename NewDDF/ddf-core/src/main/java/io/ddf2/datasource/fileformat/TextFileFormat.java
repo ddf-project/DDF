@@ -1,12 +1,15 @@
 package io.ddf2.datasource.fileformat;
 
-public class TextFile implements IFileFormat {
+public class TextFileFormat implements IFileFormat {
 
 	protected String delimiter;
 	protected String quote;
 	protected boolean firstRowIsHeader;
-	public TextFile(String delimiter,String quote,boolean fistRowIsHeader){
-		delimiter = delimiter; quote = quote; firstRowIsHeader = fistRowIsHeader;
+	public TextFileFormat(String delimiter){
+		this(delimiter,"",false);
+	}
+	public TextFileFormat(String delimiter, String quote, boolean fistRowIsHeader){
+		this.delimiter = delimiter; this.quote = quote; this.firstRowIsHeader = fistRowIsHeader;
 	}
 	public String getDelimiter() {
 		return delimiter;

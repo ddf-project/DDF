@@ -2,6 +2,7 @@ package io.ddf2;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,13 +13,13 @@ public abstract class DDFManager implements IDDFManager {
 
 	protected IDDFMetaData ddfMetaData;
 	protected IPersistentHandler persistentHandler;
-	protected Map mapProperties;
-	protected DDFManager(Map mapProperties){this.mapProperties = mapProperties;}
-	/**
-	 * @see io.ddf2.IDDFManager#newDDF(io.ddf2.datasource.IDataSource)
-	 */
-	public abstract IDDF newDDF(IDataSource ds);
-
+	protected final Map mapProperties;
+	protected DDFManager(Map mapProperties){
+		this.mapProperties = new HashMap<>();
+		if(mapProperties != null && mapProperties.size()>0){
+			this.mapProperties.putAll(mapProperties);
+		}
+	}
 
 	/*
 	 	Get concrete DDFManager from className

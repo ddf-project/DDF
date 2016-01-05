@@ -9,7 +9,7 @@ import java.util.List;
  */
 
 /**
- * Responsible to resolve @IFileFormat to ISchema
+ * Responsible to resolve @IFileFormat to schema
  */
 public interface IFileFormatResolver {
     ISchema resolve(List<String> preferColumnName,List<List<String>> sampleRows) throws Exception;
