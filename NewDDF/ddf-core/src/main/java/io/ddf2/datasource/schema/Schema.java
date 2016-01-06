@@ -1,10 +1,8 @@
 package io.ddf2.datasource.schema;
 
-import io.ddf2.datasource.fileformat.resolver.TypeResolver;
-import io.ddf2.datasource.fileformat.resolver.UnsupportedTypeException;
-
 import javax.annotation.concurrent.NotThreadSafe;
-import java.sql.Timestamp;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -66,49 +64,90 @@ public class Schema implements ISchema {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for(IColumn column : columns){
-            sb.append(column.getName() + ":" + column.getType().toString() + "|");
+            try {
+                sb.append(column.getName() + ":" + column.getType().getSimpleName() + "|");
+            }catch(Exception ex){
+            }
+
         }
         if(sb.length()>0)
             sb.deleteCharAt(sb.length()-1);
         return sb.toString();
     }
 
-    public static Builder builder(){
-        return new Builder() {
+    public static SchemaBuilder builder(){
+        return new SchemaBuilder() {
             @Override
             public Schema newSchema() {
                 return new Schema();
             }
+
+            @Override
+            protected Class inferType(String typeName) throws SchemaException {
+                typeName = typeName.toLowerCase();
+                switch (typeName){
+                    case "byte":
+                    case "smallint":
+                    case "int":
+                    case "integer":
+                        return Integer.class;
+                    case "float":
+                    case "double":
+                    case "number":
+                        return Double.class;
+                    case "bigdecimal":
+                        return BigDecimal.class;
+                    case "long":
+                    case "bigint":
+                        return Long.class;
+                    case "string":
+                        return String.class;
+                    case "bool":
+                    case "boolean":
+                        return Boolean.class;
+                    case "timestamp":
+                        return Timestamp.class;
+                    case "date":
+                    case "datetime":
+                        return java.sql.Date.class;
+                    default:
+                        throw new SchemaException("Couldn't inferType for " + typeName);
+                }
+            }
         };
     }
-    public static abstract class Builder<T extends Schema> {
+    public static abstract class SchemaBuilder<T extends Schema> {
         protected T schema;
-        public abstract T newSchema();
+        protected abstract T newSchema();
 
-
-        public Builder() {
+        protected abstract Class inferType(String typeName) throws SchemaException;
+        public SchemaBuilder() {
             schema = newSchema();
         }
 
         /**
          * @param nameAndType A column name with type.
-         *                    Type Support: @see Schema.ReserveType
-         *                    example. Builder.add("username string").add("age int")
+         *                    example. SchemaBuilder.add("username string").add("age int")
          * @return
          */
-        public Builder add(String nameAndType) throws UnsupportedTypeException {
+        public SchemaBuilder add(String nameAndType) throws SchemaException {
             String[] nameAndTypes = nameAndType.split(" ");
             if (nameAndTypes != null && nameAndTypes.length == 2) {
-                add(nameAndTypes[0], TypeResolver.getType(nameAndTypes[1]));
+                add(nameAndTypes[0], inferType(nameAndTypes[1]));
             } else {
                 throw new IllegalArgumentException("Wrong Format Expect: ColumnName Type");
             }
             return this;
         }
 
-        public Builder add(String colName, Class colType) {
+        public SchemaBuilder add(String colName, Class colType) {
             schema.append(new Column(colName, colType));
             return this;
         }
+        public T build(){
+            return schema;
+        }
+
+
     }
 }

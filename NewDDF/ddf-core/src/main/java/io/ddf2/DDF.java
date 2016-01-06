@@ -148,14 +148,14 @@ public abstract class DDF implements IDDF {
 
 
 
-	public static abstract class Builder<T extends DDF>{
+	public static abstract class DDFBuilder<T extends DDF>{
 		protected T ddf;
 		protected Map<String,Object> mapProperties;
-		public Builder(IDataSource dataSource){
+		public DDFBuilder(IDataSource dataSource){
 			ddf = newInstance(dataSource);
 			mapProperties = new HashMap<>();
 		}
-		public Builder(String sqlQuery){
+		public DDFBuilder(String sqlQuery){
 			ddf = newInstance(sqlQuery);
 			mapProperties = new HashMap<>();
 		}
@@ -166,48 +166,48 @@ public abstract class DDF implements IDDF {
 			ddf.build(mapProperties);
 			return ddf;
 		}
-		public Builder<T> setName(String ddfName){
+		public DDFBuilder<T> setName(String ddfName){
 			ddf.name = ddfName;
 			return  this;
 		}
-		public Builder<T> putProperty(String key,Object value){
+		public DDFBuilder<T> putProperty(String key,Object value){
 			mapProperties.put(key, value);
 			return this;
 		}
-		public Builder<T> putProperty(Map<String,Object> mapProperties){
+		public DDFBuilder<T> putProperty(Map<String,Object> mapProperties){
 			this.mapProperties.putAll(mapProperties);
 			return this;
 		}
 		/* DDF Handler */
-		public Builder<T> setAggregationHandler(IAggregationHandler aggregationHandler) {
+		public DDFBuilder<T> setAggregationHandler(IAggregationHandler aggregationHandler) {
 			ddf.aggregationHandler = aggregationHandler; return this;
 		}
 
-		public Builder<T> setBinningHandler(IBinningHandler binningHandler) {
+		public DDFBuilder<T> setBinningHandler(IBinningHandler binningHandler) {
 			ddf.binningHandler = binningHandler; return this;
 		}
 
-		public Builder<T> setMLMetricHandler(IMLMetricHandler mlMetricHandler) {
+		public DDFBuilder<T> setMLMetricHandler(IMLMetricHandler mlMetricHandler) {
 			ddf.mlMetricHandler = mlMetricHandler; return this;
 		}
 
-		public Builder<T> setMLHandler(IMLHandler mlHandler) {
+		public DDFBuilder<T> setMLHandler(IMLHandler mlHandler) {
 			ddf.mlHandler = mlHandler; return this;
 		}
 
 		
 
-		public Builder<T> setStatisticHandler(IStatisticHandler statisticHandler) {
+		public DDFBuilder<T> setStatisticHandler(IStatisticHandler statisticHandler) {
 			ddf.statisticHandler = statisticHandler; return this;
 		}
 
 
 
-		public Builder<T> setTransformHandler(ITransformHandler transformHandler) {
+		public DDFBuilder<T> setTransformHandler(ITransformHandler transformHandler) {
 			ddf.transformHandler = transformHandler; return this;
 		}
 
-		public Builder<T> setViewHandler(IViewHandler viewHandler) {
+		public DDFBuilder<T> setViewHandler(IViewHandler viewHandler) {
 			ddf.viewHandler = viewHandler; return this;
 		}
 

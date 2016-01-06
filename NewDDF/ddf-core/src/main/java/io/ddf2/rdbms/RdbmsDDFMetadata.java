@@ -8,44 +8,44 @@ import io.ddf2.datasource.schema.ISchema;
 public class RdbmsDDFMetadata implements IDDFMetaData {
  
 	/**
-	 * @see io.ddf2.IDDFMetaData#getAllTables()
+	 * @see io.ddf2.IDDFMetaData#getAllDDFNames()
 	 */
-	public List<String> getAllTables() {
+	public List<String> getAllDDFNames() {
 		return null;
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#getAllTablesWithSchema()
+	 * @see io.ddf2.IDDFMetaData#getAllDDFNameWithSchema()
 	 */
-	public List getAllTablesWithSchema() {
+	public List getAllDDFNameWithSchema() {
 		return null;
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#getTableSchema(java.lang.String)
+	 * @see io.ddf2.IDDFMetaData#getDDFSchema(java.lang.String)
 	 */
-	public ISchema getTableSchema(String tblName) {
+	public ISchema getDDFSchema(String ddfName) {
 		return null;
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#dropAllTables()
+	 * @see io.ddf2.IDDFMetaData#dropAllDDF()
 	 */
-	public int dropAllTables() {
+	public int dropAllDDF() {
 		return 0;
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#getNumTables()
+	 * @see io.ddf2.IDDFMetaData#getNumDDF()
 	 */
-	public int getNumTables() {
+	public int getNumDDF() {
 		return 0;
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#dropTable(java.lang.String)
+	 * @see io.ddf2.IDDFMetaData#dropDDF(java.lang.String)
 	 */
-	public boolean dropTable(String tblName) {
+	public boolean dropDDF(String ddfName) {
 		return false;
 	}
 	 

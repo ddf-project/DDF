@@ -2,6 +2,7 @@ package io.ddf2.datasource.fileformat.resolver;
 
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.datasource.schema.ISchema;
+import io.ddf2.spark.preparer.BasicTextFileResolver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +16,7 @@ import static org.junit.Assert.*;
 public class TextFileResolverTest {
 
 
-    TextFileResolver textFileResolver = new TextFileResolver();
+    BasicTextFileResolver textFileResolver = new BasicTextFileResolver();
 
     @org.junit.Test
     public void testResolve() throws Exception {

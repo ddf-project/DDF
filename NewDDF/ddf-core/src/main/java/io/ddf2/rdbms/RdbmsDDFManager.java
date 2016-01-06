@@ -1,9 +1,6 @@
 package io.ddf2.rdbms;
 
-import io.ddf2.DDFException;
-import io.ddf2.DDFManager;
-import io.ddf2.IDDF;
-import io.ddf2.IDDFManager;
+import io.ddf2.*;
 import io.ddf2.datasource.IDataSource;
 
 import java.util.Map;
@@ -30,6 +27,11 @@ public class RdbmsDDFManager extends DDFManager {
 
     @Override
     public String getDDFManagerId() {
+        return null;
+    }
+
+    @Override
+    public ISqlResult sql(String query) {
         return null;
     }
 }

@@ -1,52 +1,77 @@
 package io.ddf2.spark;
 
 import io.ddf2.IDDFMetaData;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import io.ddf2.ISqlResult;
 import io.ddf2.datasource.schema.ISchema;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.hive.HiveContext;
 
 public class SparkDDFMetadata implements IDDFMetaData {
- 
+
+	protected HiveContext hiveContext;
+	public SparkDDFMetadata(HiveContext hiveContext){
+		this.hiveContext = hiveContext;
+	}
 	/**
-	 * @see io.ddf2.IDDFMetaData#getAllTables()
+	 * @see io.ddf2.IDDFMetaData#getAllDDFNames()
 	 */
-	public List<String> getAllTables() {
+	public List<String> getAllDDFNames() {
+
+		DataFrame df = hiveContext.sql("show tables");
+		ISqlResult sqlResult = SparkUtils.dataFrameToSqlResult(df);
+		List<String> ddfNames  = new ArrayList<>();
+		while(sqlResult.next()){
+			ddfNames.add(sqlResult.getString(0));
+		}
+		return ddfNames;
+	}
+	 
+	/**
+	 * @see io.ddf2.IDDFMetaData#getAllDDFNameWithSchema()
+	 */
+	public List getAllDDFNameWithSchema() {
 		return null;
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#getAllTablesWithSchema()
+	 * @see io.ddf2.IDDFMetaData#getDDFSchema(java.lang.String)
 	 */
-	public List getAllTablesWithSchema() {
+	public ISchema getDDFSchema(String ddfName) {
 		return null;
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#getTableSchema(java.lang.String)
+	 * @see io.ddf2.IDDFMetaData#dropAllDDF()
 	 */
-	public ISchema getTableSchema(String tblName) {
-		return null;
+	public int dropAllDDF() {
+		List<String> ddfNames = getAllDDFNames();
+		ddfNames.forEach(ddfName -> dropDDF(ddfName));
+		return ddfNames.size();
+
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#dropAllTables()
+	 * @see io.ddf2.IDDFMetaData#getNumDDF()
 	 */
-	public int dropAllTables() {
-		return 0;
+	public int getNumDDF() {
+		return getAllDDFNames().size();
 	}
 	 
 	/**
-	 * @see io.ddf2.IDDFMetaData#getNumTables()
+	 * @see io.ddf2.IDDFMetaData#dropDDF(java.lang.String)
 	 */
-	public int getNumTables() {
-		return 0;
-	}
-	 
-	/**
-	 * @see io.ddf2.IDDFMetaData#dropTable(java.lang.String)
-	 */
-	public boolean dropTable(String tblName) {
-		return false;
+	public boolean dropDDF(String ddfName) {
+		try {
+			DataFrame sql = hiveContext.sql("drop table if exists " + ddfName);
+			return sql != null;
+		}catch (Exception ex){
+			return false;
+		}
+
 	}
 	 
 }

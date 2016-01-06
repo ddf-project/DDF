@@ -6,7 +6,7 @@ import io.ddf2.datasource.fileformat.IFileFormat;
 import java.util.List;
 
 public class LocalFileDataSource extends FileDataSource {
-    /** Only Allow Builder To Build New Instance **/
+    /** Only Allow SchemaBuilder To Build New Instance **/
     private LocalFileDataSource(){}
 
 

@@ -1,5 +1,8 @@
 package utils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -8,23 +11,42 @@ import java.util.concurrent.ThreadLocalRandom;
  * Created by sangdn on 1/5/16.
  */
 public class TestUtils {
-    static String tabDelimiter = String.valueOf('\t');
-    static String commaDelimiter = ",";
+    public static final String TAB_SEPARATOR = String.valueOf('\t');
+    public static final String COMMA_SEPARATOR = ",";
 
+
+
+    public static boolean makeFileUserInfo(String fileName,int numOfLine,String delimiter){
+        File fileUser = new File(fileName);
+        if(fileUser.exists()) fileUser.delete();
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(fileUser))){
+
+            for(int i = 0; i < numOfLine; ++i) {
+                //user info schema
+                //username age isMarried birthday
+                bw.write(TestUtils.generateUserInfo(delimiter));
+                bw.newLine();
+            }
+        }catch (Exception ex){
+            System.err.println(ex.getMessage());
+            return false;
+        }
+        return true;
+    }
     /**
      * random generate user info
      * username age isMarried birthday
      *
      * @return
      */
-    public static String generateUserInfo() {
-        //birthday: dd MM yyyy
-        String birthday = "%d %d %d";
-        String date =String.format(birthday,genInt()%30,genInt()%12,1960 + genInt()%30);
+    public static String generateUserInfo(String delimiter) {
+        //birthday: dd-MM-yyyy
+        String birthday = "%d-%d-%d";
+        String date =String.format(birthday,1960 + genInt()%30,genInt()%12+1,genInt()%30+1);
         StringBuilder sb = new StringBuilder();
-        sb.append(genString()).append(commaDelimiter)
-                .append(genInt()).append(commaDelimiter)
-                .append(genBool()).append(commaDelimiter)
+        sb.append(genString()).append(delimiter)
+                .append(genInt()).append(delimiter)
+                .append(genBool()).append(delimiter)
                 .append(date);
         return sb.toString();
 

@@ -1,27 +1,28 @@
 package io.ddf2.spark;
 
-import io.ddf2.DDFException;
-import io.ddf2.DDFManager;
-import io.ddf2.IDDF;
-import io.ddf2.IDDFManager;
+import io.ddf2.*;
 import io.ddf2.datasource.IDataSource;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.hive.HiveContext;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SparkDDFManager extends DDFManager {
     protected SparkConf sparkConf;
     protected SparkContext sparkContext;
+    protected HiveContext hiveContext;
 
     protected static AtomicInteger instanceCounter;
     protected final String ddfManagerId;
 
-    public static final String PROPERTY_SPARK_CONF = "SparkConf";
-    public static final String PROPERTY_SPARK_CONTEXT = "SparkContext";
+    public static final String KEY_SPARK_CONF = "SPARK-CONFIG";
+    public static final String KEY_SPARK_CONTEXT = "SPARK-CONTEXT";
+    public static final String KEY_HIVE_PROPERTIES = "HIVE-PROPERTIES";
+
 
     protected SparkDDFManager(Map properties) {
         super(properties);
@@ -29,22 +30,44 @@ public class SparkDDFManager extends DDFManager {
         int instanceCount = instanceCounter.incrementAndGet();
         ddfManagerId = "SparkDDFManager_" + instanceCount;
         /* Init Spark */
-        if (mapProperties.containsKey(PROPERTY_SPARK_CONF)) {
-            sparkConf = (SparkConf) mapProperties.get(PROPERTY_SPARK_CONF);
+        if (mapProperties.containsKey(KEY_SPARK_CONF)) {
+            sparkConf = (SparkConf) mapProperties.get(KEY_SPARK_CONF);
         }
         if (sparkConf == null) {
             sparkConf = new SparkConf();
             sparkConf.setAppName(ddfManagerId);
             sparkConf.setMaster("local");
         }
-        if (mapProperties.containsKey(PROPERTY_SPARK_CONTEXT)) {
-            sparkContext = (SparkContext) mapProperties.get(PROPERTY_SPARK_CONTEXT);
+        if (mapProperties.containsKey(KEY_SPARK_CONTEXT)) {
+            sparkContext = (SparkContext) mapProperties.get(KEY_SPARK_CONTEXT);
         }
         if (sparkContext == null) {
             sparkContext = new SparkContext(sparkConf);
         }
-        this.mapProperties.put("SparkContext", sparkContext);
 
+
+        /* Init Hive Context*/
+        this.hiveContext = new HiveContext(sparkContext);
+        Properties hiveProperties = null;
+        if(mapProperties.containsKey(KEY_HIVE_PROPERTIES)){
+            try {
+                hiveProperties = (Properties) mapProperties.get(KEY_HIVE_PROPERTIES);
+            }catch(Exception e){
+                hiveProperties = null;
+            }
+        }
+        if(hiveProperties == null){
+            hiveProperties = new Properties();
+            hiveProperties.setProperty("hive.metastore.warehouse.dir","/tmp/hive_warehouse");
+
+        }
+        this.hiveContext.setConf(hiveProperties);
+
+        /*Init SparkDDFMetaData */
+        this.ddfMetaData = new SparkDDFMetadata(hiveContext);
+        /*Init Properties to pass to SparkDDF*/
+        mapProperties.put(SparkDDF.PROPERTY_HIVE_CONTEXT,this.hiveContext);
+        mapProperties.put(SparkDDF.PROPERTY_SPARK_CONTEXT,this.sparkContext);
 
     }
 
@@ -66,6 +89,12 @@ public class SparkDDFManager extends DDFManager {
     @Override
     public String getDDFManagerId() {
         return ddfManagerId;
+    }
+
+    @Override
+    public ISqlResult sql(String query) {
+        DataFrame dataFrame = hiveContext.sql(query);
+        return SparkUtils.dataFrameToSqlResult(dataFrame);
     }
 
 

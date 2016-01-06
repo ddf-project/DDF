@@ -19,5 +19,6 @@ public interface IDDFManager {
 	public IDDFMetaData getDDFMetaData();
 	public IPersistentHandler getPersistentHandler();
 	public String getDDFManagerId();
+	public ISqlResult sql(String query);
 }
  

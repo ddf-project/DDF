@@ -4,16 +4,16 @@ import java.util.List;
 import io.ddf2.datasource.schema.ISchema;
 
 /**
- * Provide all utility function (getAllTable, dropTable, getTableSchema …)
+ * Provide all utility function (getAllTable, dropDDF, getDDFSchema …)
  * 
  */
 public interface IDDFMetaData {
  
-	public  List<String> getAllTables();
-	public  List getAllTablesWithSchema();
-	public ISchema getTableSchema(String tblName);
-	public  int dropAllTables();
-	public  int getNumTables();
-	public  boolean dropTable(String tblName);
+	public  List<String> getAllDDFNames();
+	public  List getAllDDFNameWithSchema();
+	public ISchema getDDFSchema(String ddfName);
+	public  int dropAllDDF();
+	public  int getNumDDF();
+	public  boolean dropDDF(String ddfName);
 }
  

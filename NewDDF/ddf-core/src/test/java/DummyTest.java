@@ -1,3 +1,6 @@
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DecimalType;
+
 import java.sql.Timestamp;
 
 /**
@@ -6,7 +9,8 @@ import java.sql.Timestamp;
 public class DummyTest {
     public static void main(String[] args) {
 //        testTernaryOperator();
-        testTypeParser();
+//        testTypeParser();
+
     }
 
     public static final void testTernaryOperator(){
