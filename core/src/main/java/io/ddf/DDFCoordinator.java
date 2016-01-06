@@ -153,16 +153,12 @@ public class DDFCoordinator extends ALoggable {
    * @throws DDFException
    */
   public DDF getDDF(UUID uuid) throws DDFException {
-    for (Map.Entry<UUID, DDFManager> entry : mEngineUUID2DDFManager.entrySet()) {
-      DDFManager ddfmanager = entry.getValue();
-      try {
-        DDF ddf = ddfmanager.getDDF(uuid);
-        return ddf;
-      } catch (DDFException e) {
-
-      }
+    DDFManager manager = mDDFUUID2DDFManager.get(uuid);
+    if (manager == null) {
+      throw new DDFException("Can't find ddf with uuid: " + uuid.toString());
+    } else {
+      return manager.getDDF(uuid);
     }
-    throw new DDFException("Can't find ddf with uuid: " + uuid.toString());
   }
 
   public DDF getDDFByURI(String uri) throws DDFException {
