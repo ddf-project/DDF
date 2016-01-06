@@ -1,12 +1,5 @@
 package io.ddf.s3;
 
-import io.ddf.DDFManager;
-import io.ddf.datasource.DataFormat;
-import io.ddf.datasource.S3DataSourceCredentials;
-import io.ddf.datasource.S3DataSourceDescriptor;
-import io.ddf.datasource.S3DataSourceURI;
-import io.ddf.exception.DDFException;
-import io.ddf.s3.S3DDF;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -14,6 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import io.ddf.DDFManager;
+import io.ddf.datasource.DataFormat;
+import io.ddf.datasource.S3DataSourceCredentials;
+import io.ddf.datasource.S3DataSourceDescriptor;
+import io.ddf.datasource.S3DataSourceURI;
+import io.ddf.exception.DDFException;
 
 
 public class S3DDFManagerTests {
