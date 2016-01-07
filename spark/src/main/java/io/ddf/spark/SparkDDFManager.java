@@ -375,10 +375,6 @@ public class SparkDDFManager extends DDFManager {
     Preconditions.checkArgument(options.containsKey("sourceUri"),
         "SparkDDFManager need sourceUri param in options");
     User currentUser = User.getCurrentUser();
-    if (currentUser == null) {
-      throw new DDFException("Error creating new DDF, current user is not set.");
-    }
-
     String uri = options.get("sourceUri").toString();
     DataSource ds;
     if (uri.startsWith("s3:")) {

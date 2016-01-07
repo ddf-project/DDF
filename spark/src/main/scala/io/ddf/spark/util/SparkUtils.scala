@@ -274,6 +274,13 @@ object SparkUtils {
     }
   }
 
+  /**
+    * Create a new DDF from a Spark DataFrame.
+    *
+    * @param dataFrame the Spark DataFrame
+    * @param manager the DDFManager to create the new DDF
+    * @return a new DDF
+    */
   def df2ddf(dataFrame: DataFrame, manager: DDFManager): DDF = {
     val df = SparkUtils.getDataFrameWithValidColnames(dataFrame)
     val schema = SparkUtils.schemaFromDataFrame(df)

@@ -213,8 +213,8 @@ public class Schema implements Serializable {
   }
 
   /*
-     *
-     */
+   *
+   */
   public void generateDummyCoding() throws NumberFormatException,
       DDFException {
     DummyCoding dummyCoding = new DummyCoding();

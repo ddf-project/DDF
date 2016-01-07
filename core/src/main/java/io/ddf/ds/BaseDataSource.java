@@ -3,6 +3,9 @@ package io.ddf.ds;
 
 import io.ddf.DDFManager;
 
+/**
+ * A abstract base {@link DataSource} with keep a source URI.
+ */
 public abstract class BaseDataSource implements DataSource {
 
   private final String uri;

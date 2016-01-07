@@ -6,6 +6,10 @@ import io.ddf.exception.DDFException;
 
 import java.util.Map;
 
+/**
+ * A generic {@link DataSourceDescriptor} that contains the source URI and options map.
+ * Intended to use as source for DDF created with {@link DDFManager#createDDF(Map)}.
+ */
 public class GenericDataSourceDescriptor extends DataSourceDescriptor {
 
   private final String sourceUri;

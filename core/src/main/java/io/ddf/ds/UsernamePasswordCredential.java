@@ -2,6 +2,9 @@ package io.ddf.ds;
 
 import java.util.Map;
 
+/**
+ * Simple {@link DataSourceCredential} with username and password.
+ */
 public class UsernamePasswordCredential implements DataSourceCredential {
 
   private final String username;
