@@ -3,6 +3,7 @@ package io.ddf2.spark.preparer;
 import io.ddf2.datasource.fileformat.TextFileFormat;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
 import io.ddf2.datasource.schema.ISchema;
+import io.ddf2.datasource.schema.TextFileSchemaResolver;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import utils.TestUtils;
@@ -26,8 +27,9 @@ public class SparkLocalFilePreparerTest {
                 .addPath(pathUserData)
                 .setFileFormat(new TextFileFormat(TextFileFormat.COMMA_SEPARATOR))
                 .build();
-        ISchema schema = preparer.inferSchema(localFileDataSource);
-        assert schema.getNumColumn() == 4;
+        TextFileSchemaResolver schemaResolver= new TextFileSchemaResolver();
+        ISchema resolve = schemaResolver.resolve(localFileDataSource);
+        assert resolve.getNumColumn() == 4;
 
 
         FileUtils.deleteQuietly(new File(pathUserData));

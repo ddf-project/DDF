@@ -10,6 +10,7 @@ public class DummyTest {
     public static void main(String[] args) {
 //        testTernaryOperator();
 //        testTypeParser();
+        listHiveDataType();
 
     }
 
@@ -41,9 +42,13 @@ public class DummyTest {
 
         s = "1";
         d = Double.parseDouble(s);
-        out(s,"1",String.valueOf(d));
+        out(s, "1", String.valueOf(d));
     }
     public static void out(String input, String expect,String actual){
         System.out.println("Parse " + input + " Expect=" + expect + "Result=" + actual);
+    }
+
+    public static void listHiveDataType(){
+        System.out.println(DataType.fromCaseClassString("DecimalType"));
     }
 }

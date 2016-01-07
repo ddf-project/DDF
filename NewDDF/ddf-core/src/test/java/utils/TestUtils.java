@@ -1,5 +1,9 @@
 package utils;
 
+import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
+import org.apache.spark.sql.hive.HiveContext;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +18,18 @@ public class TestUtils {
     public static final String TAB_SEPARATOR = String.valueOf('\t');
     public static final String COMMA_SEPARATOR = ",";
 
-
+        public static final SparkConf sparkConf = new SparkConf();
+    public static final SparkContext sparkContext;
+    public static final HiveContext hiveContext;
+    static  {
+        sparkConf.setAppName("SparkTest");
+        sparkConf.setMaster("local");
+        sparkContext = new SparkContext(sparkConf);
+        hiveContext = new HiveContext(sparkContext);
+    }
+    public static HiveContext getHiveContext(){
+        return  hiveContext;
+    }
 
     public static boolean makeFileUserInfo(String fileName,int numOfLine,String delimiter){
         File fileUser = new File(fileName);
@@ -50,6 +65,10 @@ public class TestUtils {
                 .append(date);
         return sb.toString();
 
+    }
+    public static void deleteFile(String path){
+        File tmp = new File(path);
+        if(tmp.exists()) tmp.delete();
     }
 
 

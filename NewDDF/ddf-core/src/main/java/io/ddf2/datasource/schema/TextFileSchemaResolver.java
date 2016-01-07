@@ -1,12 +1,17 @@
-package io.ddf2.spark.preparer;
+package io.ddf2.datasource.schema;
 
+import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.fileformat.FileFormatResolverException;
-import io.ddf2.datasource.fileformat.IFileFormatResolver;
+import io.ddf2.datasource.fileformat.TextFileFormat;
+import io.ddf2.datasource.filesystem.LocalFileDataSource;
+import io.ddf2.datasource.schema.ISchemaResolver;
 import io.ddf2.datasource.schema.Column;
-import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.datasource.schema.ISchema;
 import io.ddf2.datasource.schema.Schema;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -14,9 +19,10 @@ import java.util.*;
  * Resolve a sample data to get its schema
  * Currently support basic data type:
  */
-public class BasicTextFileResolver implements IFileFormatResolver {
-    @Override
-    public  ISchema resolve(List<String> preferColumnName, List<List<String>> sampleRows) throws Exception {
+public class TextFileSchemaResolver implements ISchemaResolver {
+    protected static final int NUM_SAMPLE_ROW = 10; //Num Sample Row for inferschema.
+
+    protected   ISchema _resolve(List<String> preferColumnName, List<List<String>> sampleRows) throws Exception {
         //For every colulmn, we detect how many kind of data type exist in sampleRows.
         //Map <"Column-Index", "Map< Type, NumCounterDetected>">
         Map<String, Map<Class, Integer>> mapDataTypeCounter = new HashMap<>();
@@ -103,5 +109,30 @@ public class BasicTextFileResolver implements IFileFormatResolver {
         return String.class;
     }
 
+    @Override
+    public ISchema resolve(IDataSource dataSource) throws Exception {
+        LocalFileDataSource localFileDataSource = (LocalFileDataSource) dataSource;
+        TextFileFormat textFileFormat = (TextFileFormat) localFileDataSource.getFileFormat();
+        String fileName = localFileDataSource.getPaths().get(0);
+        List<String> preferColumnName = new ArrayList<>();
+        List<List<String>> sampleRows = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))) {
+            if (textFileFormat.firstRowIsHeader()) {
+                String header = br.readLine();
+                String[] split = header.split(textFileFormat.getDelimiter());
+                preferColumnName = Arrays.asList(split);
+            } else {
+                for (int i = 0; i < NUM_SAMPLE_ROW; ++i) {
+                    String row = br.readLine();
+                    if (row == null) break;
+                    String[] columns = row.split(textFileFormat.getDelimiter());
+                    sampleRows.add(Arrays.asList(columns));
+                }
+            }
+        }
 
+        ISchema schema = _resolve(preferColumnName, sampleRows);
+        assert schema != null && schema.getColumns() != null && schema.getNumColumn() > 0;
+        return schema;
+    }
 }

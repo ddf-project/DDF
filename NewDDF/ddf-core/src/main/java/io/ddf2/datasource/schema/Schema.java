@@ -130,12 +130,24 @@ public class Schema implements ISchema {
          *                    example. SchemaBuilder.add("username string").add("age int")
          * @return
          */
-        public SchemaBuilder add(String nameAndType) throws SchemaException {
+        protected SchemaBuilder _add(String nameAndType) throws SchemaException {
             String[] nameAndTypes = nameAndType.split(" ");
             if (nameAndTypes != null && nameAndTypes.length == 2) {
                 add(nameAndTypes[0], inferType(nameAndTypes[1]));
             } else {
                 throw new IllegalArgumentException("Wrong Format Expect: ColumnName Type");
+            }
+            return this;
+        }
+        /**
+         * @param multiNameAndType a list of multi column name with type, seperate by comma
+         *                    example. SchemaBuilder.add("username string, age int, birthdate date")
+         * @return
+         */
+        public SchemaBuilder add(String multiNameAndType) throws SchemaException {
+            String[] nameAndTypes = multiNameAndType.split(",");
+            for(String nameAndType : nameAndTypes){
+                _add(nameAndType);
             }
             return this;
         }

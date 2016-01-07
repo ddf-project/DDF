@@ -7,13 +7,11 @@ import io.ddf2.datasource.filesystem.LocalFileDataSource;
 import io.ddf2.datasource.fileformat.TextFileFormat;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.datasource.schema.ISchema;
+import io.ddf2.datasource.schema.TextFileSchemaResolver;
 import io.ddf2.spark.SparkUtils;
 import org.apache.spark.SparkContext;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.hive.HiveContext;
-import org.apache.spark.sql.types.StructType;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -30,8 +28,8 @@ import java.util.*;
 public class SparkLocalFilePreparer implements IDataSourcePreparer {
     protected HiveContext hiveContext;
     protected SparkContext sparkContext;
-    protected static final int NUM_SAMPLE_ROW = 10; //Num Sample Row for inferschema.
-    protected static BasicTextFileResolver textFileResolver = new BasicTextFileResolver();
+
+    protected static TextFileSchemaResolver textFileSchemaResolver = new TextFileSchemaResolver();
 
     public SparkLocalFilePreparer(SparkContext sparkContext, HiveContext hiveContext) {
 
@@ -48,7 +46,7 @@ public class SparkLocalFilePreparer implements IDataSourcePreparer {
 
             //check if schema exist, if not, inferschema.
             if (schema == null) {
-                schema = inferSchema(fileDataSource);
+                schema = textFileSchemaResolver.resolve(fileDataSource);
             }
 
             prepareData(ddfName, schema.getColumns(), textFileFormat, fileDataSource.getPaths());
@@ -66,31 +64,7 @@ public class SparkLocalFilePreparer implements IDataSourcePreparer {
         }
 
     }
-    protected ISchema inferSchema(LocalFileDataSource localFileDataSource) throws Exception {
-        TextFileFormat textFileFormat = (TextFileFormat) localFileDataSource.getFileFormat();
-        String fileName = localFileDataSource.getPaths().get(0);
-        List<String> preferColumnName = new ArrayList<>();
-        List<List<String>> sampleRows = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))) {
-            if (textFileFormat.firstRowIsHeader()) {
-                String header = br.readLine();
-                String[] split = header.split(textFileFormat.getDelimiter());
-                preferColumnName = Arrays.asList(split);
-            } else {
-                for (int i = 0; i < NUM_SAMPLE_ROW; ++i) {
-                    String row = br.readLine();
-                    if (row == null) break;
-                    String[] columns = row.split(textFileFormat.getDelimiter());
-                    sampleRows.add(Arrays.asList(columns));
-                }
-            }
-        }
 
-        ISchema schema = textFileResolver.resolve(preferColumnName, sampleRows);
-        assert schema != null && schema.getColumns() != null && schema.getNumColumn() > 0;
-        return schema;
-
-    }
 
 
     protected void prepareData(String ddfName, List<IColumn> columns, TextFileFormat textFileFormat, List<String> paths) throws PrepareDataSourceException {

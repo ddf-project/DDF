@@ -67,11 +67,10 @@ public class SparkLocalFileTest {
     public void testLocalFileDSAndSchema() throws Exception {
 
         IDDFManager ddfManager = DDFManager.getInstance(SparkDDFManager.class, Collections.emptyMap());
-        Schema schemaUserInfo = Schema.builder()
+        Schema schemaUserInfo = Schema.builder() //.add(username string,age int, isMarried bool,birthday date)
                                             .add("username string")
                                             .add("age", Integer.class)
-                                            .add("isMarried bool")
-                                            .add("birthday date")
+                                            .add("isMarried bool,birthday date")
                                             .build();
         IDataSource localFileDataSource = LocalFileDataSource.builder()
                 .addPath(pathUserData)
