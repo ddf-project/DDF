@@ -1,6 +1,8 @@
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DecimalType;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.Timestamp;
 
 /**
@@ -10,8 +12,9 @@ public class DummyTest {
     public static void main(String[] args) {
 //        testTernaryOperator();
 //        testTypeParser();
-        listHiveDataType();
-
+//        listHiveDataType();
+//            getSysPro();
+        printClassPath();
     }
 
     public static final void testTernaryOperator(){
@@ -51,4 +54,18 @@ public class DummyTest {
     public static void listHiveDataType(){
         System.out.println(DataType.fromCaseClassString("DecimalType"));
     }
+    public static void getSysPro(){
+        System.out.println("SparkHome = " + System.getProperty("SPARK_HOME"));
+
+    }
+    public static final void printClassPath(){
+        ClassLoader cl = ClassLoader.getSystemClassLoader();
+
+        URL[] urls = ((URLClassLoader)cl).getURLs();
+
+        for(URL url: urls){
+            System.out.println(url.getFile());
+        }
+    }
+
 }

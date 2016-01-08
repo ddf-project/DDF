@@ -20,10 +20,10 @@ public class BasicDDFManagerTest {
 
     @Test
     public void testInitDDF(){
-        Map<String,Object> mapSparkManagerProperties = Collections.emptyMap();
-        SparkDDFManager sparkDDFManager = DDFManager.newInstance(SparkDDFManager.class, mapSparkManagerProperties);
-        SparkDDF sparkDDF = sparkDDFManager.newDDF(new SparkSqlDataSource("select * from tblAirline"));
-        sparkDDF.sql("select * from {this}");
+//        Map<String,Object> mapSparkManagerProperties = Collections.emptyMap();
+//        SparkDDFManager sparkDDFManager = DDFManager.newInstance(SparkDDFManager.class, mapSparkManagerProperties);
+//        SparkDDF sparkDDF = sparkDDFManager.newDDF(new SparkSqlDataSource("select * from tblAirline"));
+//        sparkDDF.sql("select * from {this}");
 
     }
 

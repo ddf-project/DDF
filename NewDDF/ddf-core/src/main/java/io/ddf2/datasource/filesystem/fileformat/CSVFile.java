@@ -1,6 +1,6 @@
-package io.ddf2.datasource.fileformat;
+package io.ddf2.datasource.filesystem.fileformat;
 
-public class TextFileFormat implements IFileFormat {
+public class CSVFile implements IFileFormat {
 
 	public static final String TAB_SEPARATOR = "\\t";
 	public static final String COMMA_SEPARATOR = ",";
@@ -8,10 +8,10 @@ public class TextFileFormat implements IFileFormat {
 	protected String delimiter;
 	protected String quote;
 	protected boolean firstRowIsHeader;
-	public TextFileFormat(String delimiter){
+	public CSVFile(String delimiter){
 		this(delimiter,"",false);
 	}
-	public TextFileFormat(String delimiter, String quote, boolean fistRowIsHeader){
+	public CSVFile(String delimiter, String quote, boolean fistRowIsHeader){
 		this.delimiter = delimiter; this.quote = quote; this.firstRowIsHeader = fistRowIsHeader;
 	}
 	public String getDelimiter() {

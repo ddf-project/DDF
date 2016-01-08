@@ -1,13 +1,9 @@
 package io.ddf2.datasource.schema;
 
 import io.ddf2.datasource.IDataSource;
-import io.ddf2.datasource.fileformat.FileFormatResolverException;
-import io.ddf2.datasource.fileformat.TextFileFormat;
+import io.ddf2.datasource.filesystem.fileformat.FileFormatResolverException;
+import io.ddf2.datasource.filesystem.fileformat.CSVFile;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
-import io.ddf2.datasource.schema.ISchemaResolver;
-import io.ddf2.datasource.schema.Column;
-import io.ddf2.datasource.schema.ISchema;
-import io.ddf2.datasource.schema.Schema;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -111,9 +107,9 @@ public class TextFileSchemaResolver implements ISchemaResolver {
 
     @Override
     public ISchema resolve(IDataSource dataSource) throws Exception {
-        LocalFileDataSource localFileDataSource = (LocalFileDataSource) dataSource;
-        TextFileFormat textFileFormat = (TextFileFormat) localFileDataSource.getFileFormat();
-        String fileName = localFileDataSource.getPaths().get(0);
+        LocalFileDataSource LocalFileDataSource = (LocalFileDataSource) dataSource;
+        CSVFile textFileFormat = (CSVFile) LocalFileDataSource.getFileFormat();
+        String fileName = LocalFileDataSource.getPaths().get(0);
         List<String> preferColumnName = new ArrayList<>();
         List<List<String>> sampleRows = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))) {

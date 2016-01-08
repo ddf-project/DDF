@@ -24,11 +24,11 @@ public abstract class DDFManager implements IDDFManager {
 	/*
 	 	Get concrete DDFManager from className
 	 */
-	public static DDFManager getInstance(String ddfManagerClsName, Map mapProperties){
+	public static DDFManager getInstance(String ddfManagerClsName, Map options){
 		try {
 			Class cls = Class.forName(ddfManagerClsName);
 			if(cls.isAssignableFrom(DDFManager.class)){
-				return getInstance(cls,mapProperties);
+				return getInstance(cls,options);
 			}else{
 				throw new IllegalArgumentException("Class " + ddfManagerClsName + " Must extend from DDFManager");
 			}
@@ -39,11 +39,11 @@ public abstract class DDFManager implements IDDFManager {
 
 	}
 	/* get concrete DDFManager for its class */
-	public static  <T extends DDFManager> T getInstance(Class<T> ddfManager, Map params){
+	public static  <T extends DDFManager> T getInstance(Class<T> ddfManager, Map options){
 		try {
 			Constructor<T> constructors = ddfManager.getDeclaredConstructor(Map.class);
 			constructors.setAccessible(true);
-			return constructors.newInstance(params);
+			return constructors.newInstance(options);
 		} catch (InstantiationException |IllegalAccessException|InvocationTargetException | NoSuchMethodException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);

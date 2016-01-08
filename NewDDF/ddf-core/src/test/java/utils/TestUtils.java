@@ -1,13 +1,6 @@
 package utils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,20 +18,7 @@ public class TestUtils {
     public static final String TAB_SEPARATOR = String.valueOf('\t');
     public static final String COMMA_SEPARATOR = ",";
 
-    public static final SparkConf sparkConf = new SparkConf();
-    public static final SparkContext sparkContext;
-    public static final HiveContext hiveContext;
 
-    static {
-        sparkConf.setAppName("SparkTest");
-        sparkConf.setMaster("local");
-        sparkContext = new SparkContext(sparkConf);
-        hiveContext = new HiveContext(sparkContext);
-    }
-
-    public static HiveContext getHiveContext() {
-        return hiveContext;
-    }
 
     public static boolean makeCSVFileUserInfo(String fileName, int numOfLine, String delimiter) {
         File fileUser = new File(fileName);
@@ -76,15 +56,7 @@ public class TestUtils {
         return true;
     }
 
-    public static boolean makeParquetFileUserInfo(HiveContext hiveContext, String fileName, int numOfLine) {
-        String jsonTempData = "/tmp/ + " + genString() + ".json";
-        assert makeJSONFileUserInfo(jsonTempData, numOfLine) == true;
-        DataFrame load = hiveContext.jsonFile(jsonTempData);
-        deleteFile(fileName);
-        load.saveAsParquetFile(fileName);
-        deleteFile(jsonTempData);
-        return true;
-    }
+
 
     /**
      * random generate user info

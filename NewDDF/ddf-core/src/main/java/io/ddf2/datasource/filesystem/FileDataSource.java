@@ -1,7 +1,7 @@
 package io.ddf2.datasource.filesystem;
 
 import io.ddf2.datasource.DataSource;
-import io.ddf2.datasource.fileformat.IFileFormat;
+import io.ddf2.datasource.filesystem.fileformat.IFileFormat;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,7 +6,7 @@ import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.PrepareDataSourceException;
 import io.ddf2.datasource.SqlDataSource;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
-import io.ddf2.spark.preparer.SparkLocalFilePreparer;
+import io.ddf2.spark.preparer.LocalFilePreparer;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
@@ -35,22 +35,22 @@ public class SparkDDF extends DDF {
 
     /**
      * @see DDF#build(Map)
-     * @param mapDDFProperties required to contains JavaSparkContext
+     * @param options required to contains JavaSparkContext
      */
     @Override
-    protected void build(Map mapDDFProperties) throws PrepareDataSourceException {
+    protected void build(Map options) throws PrepareDataSourceException {
 
-        sparkContext = (SparkContext)mapDDFProperties.get(PROPERTY_SPARK_CONTEXT);
+        sparkContext = (SparkContext)options.get(PROPERTY_SPARK_CONTEXT);
         if(sparkContext == null) throw new RuntimeException("SparkDDF required to have SparkContext On DdfProperties");
 
-        hiveContext = (HiveContext)mapDDFProperties.get(PROPERTY_HIVE_CONTEXT);
+        hiveContext = (HiveContext)options.get(PROPERTY_HIVE_CONTEXT);
         if(hiveContext == null) throw new RuntimeException("SparkDDF required to have HiveContext On DdfProperties");
 
 
-        this.mapDDFProperties = mapDDFProperties;
+        this.mapDDFProperties = options;
         //all support datasource preparer
         mapDataSourcePreparer = new HashMap<>();
-        mapDataSourcePreparer.put(LocalFileDataSource.class,new SparkLocalFilePreparer(sparkContext,hiveContext));
+        mapDataSourcePreparer.put(LocalFileDataSource.class,new LocalFilePreparer(hiveContext));
         resolveDataSource();
     }
 
@@ -65,7 +65,7 @@ public class SparkDDF extends DDF {
             e.printStackTrace();
             throw new PrepareDataSourceException("Not find DataSourcePreparer For " + dataSource.getClass().getSimpleName());
         }
-        preparer.prepare(name, dataSource);
+        this.dataSource = preparer.prepare(name, dataSource);
     }
 
 

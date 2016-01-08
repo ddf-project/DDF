@@ -2,22 +2,16 @@ package io.ddf2.spark.preparer;
 
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.PrepareDataSourceException;
-import io.ddf2.datasource.fileformat.IFileFormat;
-import io.ddf2.datasource.fileformat.JSonFile;
-import io.ddf2.datasource.fileformat.ParquetFile;
-import io.ddf2.datasource.fileformat.TextFileFormat;
-import io.ddf2.datasource.filesystem.FileDataSource;
+import io.ddf2.datasource.filesystem.fileformat.IFileFormat;
+import io.ddf2.datasource.filesystem.fileformat.JSonFile;
+import io.ddf2.datasource.filesystem.fileformat.ParquetFile;
+import io.ddf2.datasource.filesystem.fileformat.CSVFile;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
 import io.ddf2.datasource.schema.ISchemaResolver;
 import io.ddf2.datasource.schema.ISchema;
-import io.ddf2.datasource.schema.SchemaException;
 import io.ddf2.spark.SparkUtils;
-import org.apache.spark.SparkContext;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
-
-import java.util.List;
 
 /**
  * Created by sangdn on 1/7/16.
@@ -27,44 +21,42 @@ import java.util.List;
  */
 public class SparkFileResolver implements ISchemaResolver {
 
-    protected SparkContext sparkContext;
     protected HiveContext hiveContext;
 
 
-    public SparkFileResolver(SparkContext sparkContext, HiveContext hiveContext) {
-        this.sparkContext = sparkContext;
+    public SparkFileResolver(HiveContext hiveContext) {
         this.hiveContext = hiveContext;
     }
 
     @Override
     public ISchema resolve(IDataSource dataSource) throws Exception {
         if (dataSource.getClass().isAssignableFrom(LocalFileDataSource.class)) {
-            LocalFileDataSource localFileDataSource = (LocalFileDataSource) dataSource;
-            return resolveFileDataSource(localFileDataSource);
+            LocalFileDataSource LocalFileDataSource = (LocalFileDataSource) dataSource;
+            return resolveFileDataSource(LocalFileDataSource);
         } else {
             throw new PrepareDataSourceException(dataSource);
         }
 
     }
 
-    protected ISchema resolveFileDataSource(LocalFileDataSource localFileDataSource) throws PrepareDataSourceException {
-        String path = localFileDataSource.getPaths().get(0);
-        Class<? extends IFileFormat> fileFormat = localFileDataSource.getFileFormat().getClass();
-        if (fileFormat.isAssignableFrom(TextFileFormat.class)) {
-            return resolveTextFileFormat(localFileDataSource);
+    protected ISchema resolveFileDataSource(LocalFileDataSource LocalFileDataSource) throws PrepareDataSourceException {
+        String path = LocalFileDataSource.getPaths().get(0);
+        Class<? extends IFileFormat> fileFormat = LocalFileDataSource.getFileFormat().getClass();
+        if (fileFormat.isAssignableFrom(CSVFile.class)) {
+            return resolveTextFileFormat(LocalFileDataSource);
         } else if (fileFormat.isAssignableFrom(JSonFile.class)) {
-            return resolveJsonFileFormat(localFileDataSource);
+            return resolveJsonFileFormat(LocalFileDataSource);
         }else if(fileFormat.isAssignableFrom(ParquetFile.class)){
-            return resolveParquet(localFileDataSource);
+            return resolveParquet(LocalFileDataSource);
         }else{
             throw new PrepareDataSourceException("Not found SchemaResolver to resolve " + fileFormat.getSimpleName());
         }
 
     }
 
-    protected ISchema resolveTextFileFormat(LocalFileDataSource localFileDataSource) {
-        TextFileFormat textFile = (TextFileFormat) localFileDataSource.getFileFormat();
-        String sampleFile = localFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
+    protected ISchema resolveTextFileFormat(LocalFileDataSource LocalFileDataSource) {
+        CSVFile textFile = (CSVFile) LocalFileDataSource.getFileFormat();
+        String sampleFile = LocalFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
         boolean containHeader = textFile.firstRowIsHeader();
 
         DataFrame load = hiveContext.read()
@@ -79,9 +71,9 @@ public class SparkFileResolver implements ISchemaResolver {
     }
 
 
-    protected ISchema resolveJsonFileFormat(LocalFileDataSource localFileDataSource) throws PrepareDataSourceException {
-        JSonFile jsonFile = (JSonFile) localFileDataSource.getFileFormat();
-        String sampleFile = localFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
+    protected ISchema resolveJsonFileFormat(LocalFileDataSource LocalFileDataSource) throws PrepareDataSourceException {
+        JSonFile jsonFile = (JSonFile) LocalFileDataSource.getFileFormat();
+        String sampleFile = LocalFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
 
 
         DataFrame load = hiveContext.jsonFile(sampleFile);
@@ -91,9 +83,9 @@ public class SparkFileResolver implements ISchemaResolver {
 
     }
 
-    protected ISchema resolveParquet(LocalFileDataSource localFileDataSource) throws PrepareDataSourceException {
-        ParquetFile parquetFile = (ParquetFile) localFileDataSource.getFileFormat();
-        String sampleFile = localFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
+    protected ISchema resolveParquet(LocalFileDataSource LocalFileDataSource) throws PrepareDataSourceException {
+        ParquetFile parquetFile = (ParquetFile) LocalFileDataSource.getFileFormat();
+        String sampleFile = LocalFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
 
         DataFrame load = hiveContext.parquetFile(sampleFile);
 

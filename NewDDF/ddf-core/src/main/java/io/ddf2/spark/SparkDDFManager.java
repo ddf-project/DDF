@@ -21,47 +21,48 @@ public class SparkDDFManager extends DDFManager {
 
     public static final String KEY_SPARK_CONF = "SPARK-CONFIG";
     public static final String KEY_SPARK_CONTEXT = "SPARK-CONTEXT";
+    public static final String KEY_HIVE_CONTEXT = "HIVE-CONTEXT";
     public static final String KEY_HIVE_PROPERTIES = "HIVE-PROPERTIES";
 
 
-    protected SparkDDFManager(Map properties) {
-        super(properties);
+    protected SparkDDFManager(Map options) {
+        super(options);
         instanceCounter = new AtomicInteger();
         int instanceCount = instanceCounter.incrementAndGet();
         ddfManagerId = "SparkDDFManager_" + instanceCount;
         /* Init Spark */
-        if (mapProperties.containsKey(KEY_SPARK_CONF)) {
-            sparkConf = (SparkConf) mapProperties.get(KEY_SPARK_CONF);
-        }
-        if (sparkConf == null) {
-            sparkConf = new SparkConf();
-            sparkConf.setAppName(ddfManagerId);
-            sparkConf.setMaster("local");
-        }
+
         if (mapProperties.containsKey(KEY_SPARK_CONTEXT)) {
             sparkContext = (SparkContext) mapProperties.get(KEY_SPARK_CONTEXT);
         }
         if (sparkContext == null) {
+            if (mapProperties.containsKey(KEY_SPARK_CONF)) {
+                sparkConf = (SparkConf) mapProperties.get(KEY_SPARK_CONF);
+            }
+            if (sparkConf == null) {
+                sparkConf = new SparkConf();
+                sparkConf.setAppName(ddfManagerId);
+                sparkConf.setMaster("local");
+            }
             sparkContext = new SparkContext(sparkConf);
         }
 
 
         /* Init Hive Context*/
-        this.hiveContext = new HiveContext(sparkContext);
+        if(mapProperties.containsKey(KEY_HIVE_CONTEXT)){
+            this.hiveContext = (HiveContext) mapProperties.get(KEY_HIVE_CONTEXT);
+        }else {
+            this.hiveContext = new HiveContext(sparkContext);
+        }
         Properties hiveProperties = null;
         if(mapProperties.containsKey(KEY_HIVE_PROPERTIES)){
             try {
                 hiveProperties = (Properties) mapProperties.get(KEY_HIVE_PROPERTIES);
+                this.hiveContext.setConf(hiveProperties);
             }catch(Exception e){
                 hiveProperties = null;
             }
         }
-        if(hiveProperties == null){
-            hiveProperties = new Properties();
-            hiveProperties.setProperty("hive.metastore.warehouse.dir","/tmp/hive_warehouse");
-
-        }
-        this.hiveContext.setConf(hiveProperties);
 
         /*Init SparkDDFMetaData */
         this.ddfMetaData = new SparkDDFMetadata(hiveContext);

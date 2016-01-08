@@ -1,4 +1,4 @@
-package io.ddf2.datasource.fileformat;
+package io.ddf2.datasource.filesystem.fileformat;
 
 /**
  *

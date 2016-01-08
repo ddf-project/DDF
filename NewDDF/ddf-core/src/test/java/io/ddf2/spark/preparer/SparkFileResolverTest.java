@@ -1,10 +1,11 @@
 package io.ddf2.spark.preparer;
 
-import io.ddf2.datasource.fileformat.JSonFile;
-import io.ddf2.datasource.fileformat.ParquetFile;
-import io.ddf2.datasource.fileformat.TextFileFormat;
+import io.ddf2.datasource.filesystem.fileformat.JSonFile;
+import io.ddf2.datasource.filesystem.fileformat.ParquetFile;
+import io.ddf2.datasource.filesystem.fileformat.CSVFile;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
 import io.ddf2.datasource.schema.ISchema;
+import io.ddf2.spark.SparkTestUtils;
 import org.apache.spark.sql.hive.HiveContext;
 import org.junit.Test;
 import utils.TestUtils;
@@ -14,8 +15,8 @@ import utils.TestUtils;
  */
 public class SparkFileResolverTest {
 
-    HiveContext hiveContext = TestUtils.getHiveContext();
-    SparkFileResolver resolver = new SparkFileResolver(null, hiveContext);
+    HiveContext hiveContext = SparkTestUtils.getHiveContext();
+    SparkFileResolver resolver = new SparkFileResolver(hiveContext);
 
     @Test
     public void testCSVResolver() throws Exception {
@@ -25,7 +26,7 @@ public class SparkFileResolverTest {
 
         LocalFileDataSource localFileDataSource = LocalFileDataSource.builder()
                 .addPath(pathUserData)
-                .setFileFormat(new TextFileFormat(TextFileFormat.COMMA_SEPARATOR))
+                .setFileFormat(new CSVFile(CSVFile.COMMA_SEPARATOR))
                 .build();
         ISchema schema = resolver.resolve(localFileDataSource);
         System.out.println("Schema After Resolver");
@@ -36,7 +37,7 @@ public class SparkFileResolverTest {
     @Test
     public void testParquetResolver() throws Exception {
         String pathUserData = "/tmp/Data4SparkResolver.pqt";
-        TestUtils.makeParquetFileUserInfo(hiveContext, pathUserData, 10);
+        SparkTestUtils.makeParquetFileUserInfo(hiveContext, pathUserData, 10);
 
         LocalFileDataSource localFileDataSource = LocalFileDataSource.builder()
                 .addPath(pathUserData)

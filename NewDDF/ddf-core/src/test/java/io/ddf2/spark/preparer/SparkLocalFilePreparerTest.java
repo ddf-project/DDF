@@ -1,6 +1,6 @@
 package io.ddf2.spark.preparer;
 
-import io.ddf2.datasource.fileformat.TextFileFormat;
+import io.ddf2.datasource.filesystem.fileformat.CSVFile;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
 import io.ddf2.datasource.schema.ISchema;
 import io.ddf2.datasource.schema.TextFileSchemaResolver;
@@ -20,10 +20,10 @@ public class SparkLocalFilePreparerTest {
         String pathUserData = "/tmp/infer-schema-comma.dat";
         TestUtils.makeCSVFileUserInfo(pathUserData, 10, TestUtils.COMMA_SEPARATOR);
 
-        SparkLocalFilePreparer preparer = new SparkLocalFilePreparer(null,null);
+        SparkFilePreparer preparer = new LocalFilePreparer(null);
         LocalFileDataSource localFileDataSource = LocalFileDataSource.builder()
                 .addPath(pathUserData)
-                .setFileFormat(new TextFileFormat(TextFileFormat.COMMA_SEPARATOR))
+                .setFileFormat(new CSVFile(CSVFile.COMMA_SEPARATOR))
                 .build();
         TextFileSchemaResolver schemaResolver= new TextFileSchemaResolver();
         ISchema resolve = schemaResolver.resolve(localFileDataSource);

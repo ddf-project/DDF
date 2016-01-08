@@ -1,6 +1,6 @@
 package io.ddf2;
 
-import io.ddf2.datasource.fileformat.TextFileFormat;
+import io.ddf2.datasource.filesystem.fileformat.CSVFile;
 import io.ddf2.datasource.filesystem.LocalFileDataSource;
 import utils.TestUtils;
 
@@ -32,11 +32,11 @@ public class IDDFMetaDataTest {
         for (String ddfName : ddfName4Test) {
             String fileName = rootPath + ddfName;
             TestUtils.makeCSVFileUserInfo(fileName, 10, TestUtils.COMMA_SEPARATOR);
-            LocalFileDataSource localFileDataSource = LocalFileDataSource.builder()
+            LocalFileDataSource LocalFileDataSource = io.ddf2.datasource.filesystem.LocalFileDataSource.builder()
                     .addPath(fileName)
-                    .setFileFormat(new TextFileFormat(TextFileFormat.COMMA_SEPARATOR))
+                    .setFileFormat(new CSVFile(CSVFile.COMMA_SEPARATOR))
                     .build();
-            ddfManager.newDDF(ddfName, localFileDataSource);
+            ddfManager.newDDF(ddfName, LocalFileDataSource);
         }
         //TEST getAllDDFName
         assert ddfMetaData.getNumDDF() == ddfName4Test.length;
