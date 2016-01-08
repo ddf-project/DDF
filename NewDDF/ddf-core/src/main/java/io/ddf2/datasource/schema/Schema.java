@@ -159,6 +159,16 @@ public class Schema implements ISchema {
         public T build(){
             return schema;
         }
+        /**
+         * Fastest way to build
+         * @param multiNameAndType a list of multi column name with type, seperate by comma
+         *                    example. SchemaBuilder.add("username string, age int, birthdate date")
+         * @return Schema
+         */
+        public T build(String multiNameAndTpe) throws SchemaException {
+            this.add(multiNameAndTpe);
+            return build();
+        }
 
 
     }

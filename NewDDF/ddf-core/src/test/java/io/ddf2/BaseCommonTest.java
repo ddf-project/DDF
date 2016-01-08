@@ -30,10 +30,10 @@ public class BaseCommonTest {
         assert schema.getColumns().size() > 0;
         //execute simple sql
         ISqlResult sqlResult = ddf.sql("select * from " + ddf.getDDFName());
-//        while(sqlResult.next()){
-//            System.out.println(sqlResult.getRaw());
-//            assert sqlResult.getSchema().equals(schema);
-//        }
+        while(sqlResult.next()){
+            System.out.println(sqlResult.getRaw());
+//            assert sqlResult.getSchema().equals(schema); //ToDo review schema not same because of diff column order
+        }
         System.out.println("Schema" + schema.toString());
         manager.getDDFMetaData().dropDDF(ddfName);
         System.out.println("BaseCommonTest::TestSql End Test");

@@ -10,6 +10,8 @@ import io.ddf2.datasource.schema.Schema;
 import org.junit.Test;
 import utils.TestUtils;
 
+import java.util.Arrays;
+
 /**
  * Created by sangdn on 1/5/16.
  * Test SparkEngine when working on LocalDataSource
@@ -45,37 +47,28 @@ public class SqlOnLocalDatasourceTest {
 
     @Test
     public void testLocalFileDSAndSchema() throws Exception {
-        String csvFile = "/tmp/userInfo.csv";
-        TestUtils.makeCSVFileUserInfo(csvFile, 10, TestUtils.TAB_SEPARATOR);
+        String csvFile1 = "/tmp/userInfo1.csv";
+        String csvFile2 = "/tmp/userInfo2.csv";
+        TestUtils.makeCSVFileUserInfo(csvFile1, 10, TestUtils.TAB_SEPARATOR);
+        TestUtils.makeCSVFileUserInfo(csvFile2, 10, TestUtils.TAB_SEPARATOR);
 
-        Schema schemaUserInfo = Schema.builder() //.add(username string,age int, isMarried bool,birthday date)
-                .add("username string")
-                .add("age", Integer.class)
-                .add("isMarried bool,birthday date")
-                .build();
+        Schema schemaUserInfo = Schema.builder().build("username string,age int,married bool,birthday date");
+
         IDataSource localFileDataSource = LocalFileDataSource.builder()
-                .addPath(csvFile)
+                .addPath(csvFile1)
+                .addPath(csvFile2)
                 .setFileFormat(new CSVFile(CSVFile.TAB_SEPARATOR))
                 .setSchema(schemaUserInfo)
                 .build();
+
         ddfManager.getDDFMetaData().dropDDF("DDF_USER_INFO");
         IDDF ddf = ddfManager.newDDF("DDF_USER_INFO", localFileDataSource);
-        ISqlResult sql = ddf.sql("select username as name,age,isMarried,birthday from " + ddf.getDDFName());
-
-        System.out.println("----------- Infer Schema --------- ");
-        System.out.println(sql.getSchema().toString());
-        System.out.println("----------- Data Result --------- ");
-        String outputFormat = "%10s \t %5d \t %5s \t %20s";
-        System.out.println(String.format("%10s \t %5s \t %5s \t %20s", "name", "age", "isMarried", "birthday"));
-        while (sql.next()) {
-            try {
-                String tmp = String.format(outputFormat, sql.getString(0), sql.getInt(1), sql.getBoolean(2).toString(), sql.getDate(3));
-                System.out.println(tmp);
-            } catch (Exception ex) {
-                System.out.println(ex.toString());
-            }
+        ISqlResult sql = ddf.sql("select username as name,age,married,birthday from " + ddf.getDDFName());
+        while(sql.next()){
+            System.out.println(sql.getRaw());
         }
-        System.out.println(":: End Test Local File DataSource Without Schema::");
+
+
 
 
     }
