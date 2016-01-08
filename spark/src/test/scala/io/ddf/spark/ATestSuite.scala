@@ -41,6 +41,28 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
        "INTO TABLE text8sample", "SparkSQL")
   }
   
+  /**
+    * Get config value from system property or environment variable.
+    *
+    * @param key
+    * @return
+    */
+  protected def getConfig(key: String): Option[String] = {
+    val sysEnvName = key.toUpperCase().replace(".", "_")
+    sys.props.get(key).orElse(sys.env.get(sysEnvName))
+  }
+
+  /**
+    * Only run the test if given condition is satisfied. Otherwise ignore it.
+    *
+    * @param cond the condition to run this test
+    * @param name name of the test
+    * @param testFunc the test function
+    */
+  protected def testIf(cond: Boolean, name: String)(testFunc: => Unit): Unit = {
+    if (cond) test(name)(testFunc _) else ignore(name)(testFunc _)
+  }
+
   def createTableMtcars() {
     manager.sql("set shark.test.data.path=../resources", "SparkSQL")
     manager.sql("drop table if exists mtcars", "SparkSQL")
