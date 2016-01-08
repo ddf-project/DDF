@@ -189,7 +189,8 @@ object RootBuild extends Build {
       "mysql" % "mysql-connector-java" % "5.1.25",
       "org.python" % "jython-standalone" % "2.7.0",
       "joda-time" % "joda-time" % "2.8.1",
-      "org.joda" % "joda-convert" % "1.7"
+      "org.joda" % "joda-convert" % "1.7",
+      "org.hive.serde" % "csv-serde" % "0.9.1"
     ),
 
 

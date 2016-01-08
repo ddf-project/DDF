@@ -4,6 +4,7 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -49,6 +50,8 @@ public class DelegatingDDFManager extends DDFManager {
 
   @Override
   public DDF createDDF(Map<Object, Object> options) throws DDFException {
+    // clone the options so that we can add our new field for source uri
+    options = new HashMap<>(options);
     options.put("sourceUri", uri);
     return manager.createDDF(options);
   }
