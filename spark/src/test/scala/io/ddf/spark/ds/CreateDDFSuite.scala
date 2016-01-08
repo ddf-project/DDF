@@ -1,16 +1,19 @@
 package io.ddf.spark.ds
 
 import io.ddf.ds.{User, UsernamePasswordCredential}
+import io.ddf.exception.UnauthenticatedDataSourceException
 import io.ddf.spark.{ATestSuite, DelegatingDDFManager}
+import org.scalatest.Matchers
 
 import scala.collection.JavaConversions.mapAsJavaMap
 
-class CreateDDFSuite extends ATestSuite {
-
-  override val invokeBeforeAllAndAfterAllEvenIfNoTestsAreExpected = true
-
+class CreateDDFSuite extends ATestSuite with Matchers {
   val s3SourceUri = getConfig("s3.source.uri").getOrElse("s3://adatao-sample-data")
+  val s3Manager = new DelegatingDDFManager(manager, s3SourceUri)
+
   val mysqlSourceUri = getConfig("mysql.source.uri").getOrElse("jdbc:mysql://ci.adatao.com:3306/testdata")
+  val mysqlManager = new DelegatingDDFManager(manager, mysqlSourceUri)
+
   val s3Credential = getCredentialFromConfig("s3.access", "s3.secret")
   val mysqlCredential = getCredentialFromConfig("mysql.user", "mysql.pwd")
 
@@ -20,7 +23,14 @@ class CreateDDFSuite extends ATestSuite {
       | District int, Ward int, CommunityArea int, FBICode string, XCoordinate int,
       | YCoordinate int, Year int, UpdatedOn string, Latitude double, Longitude double,
       | Location string
-    """.stripMargin.replaceAll("\n", "")
+    """.stripMargin.replace("\n", "")
+  val result_schema =
+    """ID int, FlagTsunami string, Year int, Month int, Day int, Hour int, Minute int,
+      | Second double, FocalDepth int, EqPrimary double, EqMagMw double, EqMagMs double,
+      | EqMagMb double, EqMagMl double, EqMagMfd double, EqMagUnk double, Intensity int,
+      | Country string, State string, LocationName string, Latitude double, Longitude double,
+      | RegionCode int, Death int, DeathDescription int, Injuries int, InjuriesDescription int
+    """.stripMargin.replace("\n", "")
   val sleep_schema = "StartTime int, SleepMinutes int, UID string, DeepSleepMinutes int, EndTime int"
 
   private def getCredentialFromConfig(usernameKey: String, passwordKey: String) = {
@@ -32,7 +42,7 @@ class CreateDDFSuite extends ATestSuite {
       None
   }
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeEach(): Unit = {
     val user = new User("foo")
     User.setCurrentUser(user)
     getCredentialFromConfig("s3.access", "s3.secret") map {
@@ -43,40 +53,63 @@ class CreateDDFSuite extends ATestSuite {
     }
   }
 
-  testIf(s3Credential.isDefined, "create DDF from csv file on S3") {
-    val manager = new DelegatingDDFManager(this.manager, s3SourceUri)
+  test("create ddf without credential") {
+    User.getCurrentUser.removeCredential(s3SourceUri)
     val options = Map[AnyRef, AnyRef](
       "path" -> "/test/csv/noheader/",
       "format" -> "csv",
       "schema" -> crimes_schema
     )
-    val ddf = manager.createDDF(options)
+    a[UnauthenticatedDataSourceException] should be thrownBy {
+      s3Manager.createDDF(options)
+    }
+  }
+
+  when(s3Credential.isDefined) test "create DDF from csv file on S3" in {
+    val options = Map[AnyRef, AnyRef](
+      "path" -> "/test/csv/noheader/",
+      "format" -> "csv",
+      "schema" -> crimes_schema
+    )
+    val ddf = s3Manager.createDDF(options)
 
     assert(ddf.getNumColumns == 22)
     assert(ddf.getNumRows == 100)
     assert(ddf.getColumnName(0) == "ID")
   }
 
-  testIf(s3Credential.isDefined, "create DDF from json file on S3") {
-    val manager = new DelegatingDDFManager(this.manager, s3SourceUri)
+  when(s3Credential.isDefined) test "create DDF from tsv file on S3" in {
+    val options = Map[AnyRef, AnyRef](
+      "path" -> "/test/tsv/noheader/",
+      "format" -> "csv",
+      "schema" -> result_schema,
+      "delimiter" -> "\t"
+    )
+    val ddf = s3Manager.createDDF(options)
+
+    assert(ddf.getNumColumns == 27)
+    assert(ddf.getNumRows == 73)
+    assert(ddf.getColumnName(0) == "ID")
+  }
+
+  when(s3Credential.isDefined) test "create DDF from json file on S3" in {
     val options = Map[AnyRef, AnyRef](
       "path" -> "/test/json/noheader/",
       "format" -> "json",
       "schema" -> sleep_schema
     )
-    val ddf = manager.createDDF(options)
+    val ddf = s3Manager.createDDF(options)
 
     assert(ddf.getNumColumns == 5)
     assert(ddf.getNumRows == 10000)
     assert(ddf.getColumnName(0) == "StartTime")
   }
 
-  testIf(mysqlCredential.isDefined, "create DDF from MySQL") {
-    val manager = new DelegatingDDFManager(this.manager, mysqlSourceUri)
+  when(mysqlCredential.isDefined) test "create DDF from MySQL" in {
     val options = Map[AnyRef, AnyRef](
       "table" -> "crimes_small_case_sensitive"
     )
-    val ddf = manager.createDDF(options)
+    val ddf = mysqlManager.createDDF(options)
 
     assert(ddf.getNumColumns == 22)
     assert(ddf.getNumRows == 40000)

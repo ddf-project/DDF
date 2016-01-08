@@ -2,19 +2,16 @@
 package io.ddf.spark
 
 
-import org.scalatest.FunSuite
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.scalatest.BeforeAndAfterEach
+import io.ddf.DDFManager
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.BeforeAndAfterAll
-import io.ddf.DDFManager
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite}
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
- * This makes a Logger LOG variable available to the test suite.
- * Also makes beforeEach/afterEach as well as beforeAll/afterAll behaviors available.
- */
+  * This makes a Logger LOG variable available to the test suite.
+  * Also makes beforeEach/afterEach as well as beforeAll/afterAll behaviors available.
+  */
 @RunWith(classOf[JUnitRunner])
 abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
   val LOG: Logger = LoggerFactory.getLogger(this.getClass())
@@ -53,14 +50,27 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
   }
 
   /**
-    * Only run the test if given condition is satisfied. Otherwise ignore it.
-    *
-    * @param cond the condition to run this test
-    * @param name name of the test
-    * @param testFunc the test function
+    * This enable the "when <condition> test <name> in {func}" syntax
+    * to test the function only when some condition is true.
     */
-  protected def testIf(cond: Boolean, name: String)(testFunc: => Unit): Unit = {
-    if (cond) test(name)(testFunc _) else ignore(name)(testFunc _)
+  def when(condition: Boolean): When = new When(condition)
+
+  protected class When(condition: Boolean) {
+    def test(testName: String): Test = new Test(condition, testName)
+
+    protected class Test(condition: Boolean, testName: String) {
+      def in(testFun: => Unit) = {
+        if (condition)
+          ATestSuite.this.test(testName) {
+            testFun
+          }
+        else
+          ignore(testName) {
+            testFun
+          }
+      }
+    }
+
   }
 
   def createTableMtcars() {
@@ -153,8 +163,8 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
 }
 
 /**
- * This logs the begin/end of each test with timestamps and test #
- */
+  * This logs the begin/end of each test with timestamps and test #
+  */
 abstract class ATimedTestSuite extends ATestSuite {
   private lazy val testNameArray: Array[String] = testNames.toArray
   private var testNumber: Int = 0
