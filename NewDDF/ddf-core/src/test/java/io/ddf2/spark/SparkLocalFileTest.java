@@ -23,7 +23,7 @@ public class SparkLocalFileTest {
     @BeforeClass
     public static void before(){
         pathUserData = "/tmp/userinfo.dat";
-        if(!TestUtils.makeFileUserInfo(pathUserData,10,TestUtils.TAB_SEPARATOR)){
+        if(!TestUtils.makeCSVFileUserInfo(pathUserData, 10, TestUtils.TAB_SEPARATOR)){
             System.exit(1);
         }
 

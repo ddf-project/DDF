@@ -31,7 +31,7 @@ public class IDDFMetaDataTest {
 
         for (String ddfName : ddfName4Test) {
             String fileName = rootPath + ddfName;
-            TestUtils.makeFileUserInfo(fileName, 10, TestUtils.COMMA_SEPARATOR);
+            TestUtils.makeCSVFileUserInfo(fileName, 10, TestUtils.COMMA_SEPARATOR);
             LocalFileDataSource localFileDataSource = LocalFileDataSource.builder()
                     .addPath(fileName)
                     .setFileFormat(new TextFileFormat(TextFileFormat.COMMA_SEPARATOR))

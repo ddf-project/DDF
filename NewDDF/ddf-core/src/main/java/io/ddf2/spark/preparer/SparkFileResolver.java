@@ -66,12 +66,6 @@ public class SparkFileResolver implements ISchemaResolver {
         TextFileFormat textFile = (TextFileFormat) localFileDataSource.getFileFormat();
         String sampleFile = localFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
         boolean containHeader = textFile.firstRowIsHeader();
-//
-//        RDD<String> rdd = sparkContext.textFile(sampleFile, 1);
-//        String[] preferColumn = null;
-//        if (containHeader) {
-//            preferColumn = rdd.first().split(textFile.getDelimiter());
-//        }
 
         DataFrame load = hiveContext.read()
                 .format("com.databricks.spark.csv")
@@ -80,20 +74,31 @@ public class SparkFileResolver implements ISchemaResolver {
                 .option("delimiter",textFile.getDelimiter())
                 .load(sampleFile);
 
-        load.printSchema();
         return SparkUtils.structTypeToSchema(load.schema());
 
     }
 
 
     protected ISchema resolveJsonFileFormat(LocalFileDataSource localFileDataSource) throws PrepareDataSourceException {
-        //ToDo inferschema for json
-        throw new PrepareDataSourceException("Not implement !");
+        JSonFile jsonFile = (JSonFile) localFileDataSource.getFileFormat();
+        String sampleFile = localFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
+
+
+        DataFrame load = hiveContext.jsonFile(sampleFile);
+
+        return SparkUtils.structTypeToSchema(load.schema());
+
+
     }
 
     protected ISchema resolveParquet(LocalFileDataSource localFileDataSource) throws PrepareDataSourceException {
-        //ToDo inferschema for parquet
-        throw new PrepareDataSourceException("Not implement !");
+        ParquetFile parquetFile = (ParquetFile) localFileDataSource.getFileFormat();
+        String sampleFile = localFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
+
+        DataFrame load = hiveContext.parquetFile(sampleFile);
+
+        return SparkUtils.structTypeToSchema(load.schema());
+
     }
 
 }

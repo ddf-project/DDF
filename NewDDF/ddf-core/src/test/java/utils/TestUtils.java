@@ -1,13 +1,20 @@
 package utils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -18,46 +25,77 @@ public class TestUtils {
     public static final String TAB_SEPARATOR = String.valueOf('\t');
     public static final String COMMA_SEPARATOR = ",";
 
-        public static final SparkConf sparkConf = new SparkConf();
+    public static final SparkConf sparkConf = new SparkConf();
     public static final SparkContext sparkContext;
     public static final HiveContext hiveContext;
-    static  {
+
+    static {
         sparkConf.setAppName("SparkTest");
         sparkConf.setMaster("local");
         sparkContext = new SparkContext(sparkConf);
         hiveContext = new HiveContext(sparkContext);
     }
-    public static HiveContext getHiveContext(){
-        return  hiveContext;
+
+    public static HiveContext getHiveContext() {
+        return hiveContext;
     }
 
-    public static boolean makeFileUserInfo(String fileName,int numOfLine,String delimiter){
+    public static boolean makeCSVFileUserInfo(String fileName, int numOfLine, String delimiter) {
         File fileUser = new File(fileName);
-        if(fileUser.exists()) fileUser.delete();
-        try(BufferedWriter bw = new BufferedWriter(new FileWriter(fileUser))){
+        if (fileUser.exists()) fileUser.delete();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileUser))) {
 
-            for(int i = 0; i < numOfLine; ++i) {
+            for (int i = 0; i < numOfLine; ++i) {
                 //user info schema
                 //username age isMarried birthday
-                bw.write(TestUtils.generateUserInfo(delimiter));
+                bw.write(TestUtils.generateStringUserInfo(delimiter));
                 bw.newLine();
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println(ex.getMessage());
             return false;
         }
         return true;
     }
+
+    public static boolean makeJSONFileUserInfo(String fileName, int numOfLine) {
+        File fileUser = new File(fileName);
+        if (fileUser.exists()) fileUser.delete();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileUser))) {
+
+            for (int i = 0; i < numOfLine; ++i) {
+                //user info schema
+                //username age isMarried birthday
+                bw.write(TestUtils.generateJsonUserInfo());
+                bw.newLine();
+            }
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean makeParquetFileUserInfo(HiveContext hiveContext, String fileName, int numOfLine) {
+        String jsonTempData = "/tmp/ + " + genString() + ".json";
+        assert makeJSONFileUserInfo(jsonTempData, numOfLine) == true;
+        DataFrame load = hiveContext.jsonFile(jsonTempData);
+        deleteFile(fileName);
+        load.saveAsParquetFile(fileName);
+        deleteFile(jsonTempData);
+        return true;
+    }
+
     /**
      * random generate user info
      * username age isMarried birthday
      *
      * @return
      */
-    public static String generateUserInfo(String delimiter) {
+    public static String generateStringUserInfo(String delimiter) {
         //birthday: dd-MM-yyyy
         String birthday = "%d-%d-%d";
-        String date =String.format(birthday,1960 + genInt()%30,genInt()%12+1,genInt()%30+1);
+        String date = String.format(birthday, 1960 + genInt() % 30, genInt() % 12 + 1, genInt() % 30 + 1);
         StringBuilder sb = new StringBuilder();
         sb.append(genString()).append(delimiter)
                 .append(genInt()).append(delimiter)
@@ -66,9 +104,41 @@ public class TestUtils {
         return sb.toString();
 
     }
-    public static void deleteFile(String path){
-        File tmp = new File(path);
-        if(tmp.exists()) tmp.delete();
+
+    public static String generateJsonUserInfo() {
+        //birthday: dd-MM-yyyy
+        String birthday = "%d-%d-%d";
+        String date = String.format(birthday, 1960 + genInt() % 30, genInt() % 12 + 1, genInt() % 30 + 1);
+        String jsonString = "{\"username\":\"%s\",\"age\":%d,\"isMarried\":\"%s\",\"birthday\":\"%s\"}";
+
+        return String.format(jsonString, genString(), genInt(), String.valueOf(genBool()), date);
+
+    }
+
+    public static String generateParquetUserInfo(String delimiter) {
+        //birthday: dd-MM-yyyy
+        String birthday = "%d-%d-%d";
+        String date = String.format(birthday, 1960 + genInt() % 30, genInt() % 12 + 1, genInt() % 30 + 1);
+        StringBuilder sb = new StringBuilder();
+        sb.append(genString()).append(delimiter)
+                .append(genInt()).append(delimiter)
+                .append(genBool()).append(delimiter)
+                .append(date);
+        return sb.toString();
+
+    }
+
+    public static void deleteFile(String path) {
+        try {
+            File tmp = new File(path);
+            if (tmp.isDirectory()) {
+                FileUtils.deleteDirectory(tmp);
+            } else {
+                if (tmp.exists()) tmp.delete();
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
     }
 
 
@@ -82,7 +152,7 @@ public class TestUtils {
 
     public static List<Long> genListLong() {
         List<Long> list = new ArrayList<Long>();
-        int n = genInt()%10 +1;
+        int n = genInt() % 10 + 1;
         for (int i = 0; i < n; ++i) {
             list.add((long) genInt());
         }
@@ -91,7 +161,7 @@ public class TestUtils {
 
     public static List<String> genListString() {
         List<String> list = new ArrayList<String>();
-        int n = genInt() % 10 +1;
+        int n = genInt() % 10 + 1;
         for (int i = 0; i < n; ++i) {
             list.add(genString());
         }

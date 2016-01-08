@@ -10,8 +10,6 @@ import utils.TestUtils;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by sangdn on 1/6/16.
  */
@@ -20,7 +18,7 @@ public class SparkLocalFilePreparerTest {
     @Test
     public void inferCommaSchemaTest() throws Exception {
         String pathUserData = "/tmp/infer-schema-comma.dat";
-        TestUtils.makeFileUserInfo(pathUserData,10,TestUtils.COMMA_SEPARATOR);
+        TestUtils.makeCSVFileUserInfo(pathUserData, 10, TestUtils.COMMA_SEPARATOR);
 
         SparkLocalFilePreparer preparer = new SparkLocalFilePreparer(null,null);
         LocalFileDataSource localFileDataSource = LocalFileDataSource.builder()
