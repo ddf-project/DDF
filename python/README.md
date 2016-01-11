@@ -68,4 +68,4 @@ Now inside the Python interpreter, the DDF API is ready for usage:
 
     $ cd <YOUR_DDF_DIRECTORY>/python
     $ DDF_HOME=../ python examples/basics.py
-    $ DDF_HOME=../ python tests/manager.py
+    $ DDF_HOME=../ python tests/test_ddf.py
