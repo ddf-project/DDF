@@ -184,8 +184,17 @@ class DistributedDataFrame(object):
     def five_nums(self):
         """
         Calculate Turkey five number for numeric columns
+        :return: a pandas DataFrame in which each column is a vector containing the summary information
         """
-        return self._jddf.getFiveNumSummary()
+        column_names = self.colnames
+        data = {}
+        five_num_summary = list(self._jddf.getFiveNumSummary())
+        labels = ['Min.', '1st Qu.', 'Median', '3rd Qu.', 'Max.']
+        for s, col_name in zip(five_num_summary, column_names):
+            if self._jddf.getColumn(col_name).isNumeric():
+                data[col_name] = dict(zip(labels, [s.getMin(), s.getFirstQuantile(), s.getMedian(),
+                                                   s.getThirdQuantile(), s.getMax()]))
+        return pd.DataFrame(data=data, index=labels)
 
     def aggregate(self, aggr_columns, by_columns):
         """

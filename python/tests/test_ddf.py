@@ -47,5 +47,10 @@ class TestDDF(test_base.BaseTest):
         self.assertIsInstance(ddf2, DistributedDataFrame)
         self.assertItemsEqual(ddf2.colnames, self.airlines.colnames)
 
+    def testFiveNums(self):
+        df = self.airlines.five_nums()
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(len(df), 5)
+
 if __name__ == '__main__':
     unittest.main()
