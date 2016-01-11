@@ -10,6 +10,7 @@ import numpy as np
 import json
 
 import util
+from gateway import current_gateway
 
 
 class DistributedDataFrame(object):
@@ -210,6 +211,31 @@ class DistributedDataFrame(object):
         col_name = util.parse_column_str(self.colnames, column)
         return tuple([float(x) for x in self._jddf.getVectorVariance(col_name)])
 
+    def drop_na(self, axis='row', inplace=False):
+        """
+        Drop NA values
+
+        :param axis: the axis by which to drop if NA value exits, ROW represents by Row as default, COLUMN is column.
+        :param inplace: whether to treat the ddf inplace, default is FALSE.
+        :return: a DDF with no NA values.
+        """
+        axis = axis.lower()
+        if axis not in ['row', 'column']:
+            raise ValueError('axis: only "row" or "column" is supported')
+        gateway = current_gateway()
+
+        if axis == 'row':
+            by = gateway.jvm.io.ddf.etl.IHandleMissingData.Axis.ROW
+        else:
+            by = gateway.jvm.io.ddf.etl.IHandleMissingData.Axis.COLUMN
+
+        if not inplace:
+            return DistributedDataFrame(self._jddf.dropNA(by))
+
+        self._jddf.setMutable(inplace)
+        self._jddf.dropNA(by)
+        return self
+
     def aggregate(self, aggr_columns, by_columns):
         """
         Split the DistributedDataFrame into sub-sets
@@ -226,9 +252,6 @@ class DistributedDataFrame(object):
         :return: a float
         """
         return self._jddf.correlation(col1, col2)
-
-    def drop_na(self):
-        return DistributedDataFrame(self._jddf.dropNA())
 
     ###########################################################################
 

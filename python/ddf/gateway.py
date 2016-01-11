@@ -10,8 +10,24 @@ from threading import Thread
 from conf import DDF_HOME, SCALA_VERSION
 
 
+_CURRENT_GATEWAY = None
+
+
 def pre_exec_func():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+
+def compute_classpath(root_path):
+
+    lib_jars = list_jar_files('{}/spark/target/scala-{}/lib'.format(root_path, SCALA_VERSION))
+    spark_jars = list_jar_files('{}/spark/target/scala-{}'.format(root_path, SCALA_VERSION))
+
+    return '{}:{}:{}/spark/conf/local'.format(lib_jars, spark_jars, DDF_HOME)
+
+
+def list_jar_files(path):
+    jar_files = [(path + "/" + f) for f in os.listdir(path) if f.endswith('.jar')]
+    return ':'.join(map(str, jar_files))
 
 
 def start_gateway_server():
@@ -61,15 +77,10 @@ def start_gateway_server():
     return gateway
 
 
-def compute_classpath(root_path):
+def current_gateway():
+    global _CURRENT_GATEWAY
+    if _CURRENT_GATEWAY is None:
+        _CURRENT_GATEWAY = start_gateway_server()
+    return _CURRENT_GATEWAY
 
-    lib_jars = list_jar_files('{}/spark/target/scala-{}/lib'.format(root_path, SCALA_VERSION))
-    spark_jars = list_jar_files('{}/spark/target/scala-{}'.format(root_path, SCALA_VERSION))
-
-    return '{}:{}:{}/spark/conf/local'.format(lib_jars, spark_jars, DDF_HOME)
-
-
-def list_jar_files(path):
-    jar_files = [(path + "/" + f) for f in os.listdir(path) if f.endswith('.jar')]
-    return ':'.join(map(str, jar_files))
 

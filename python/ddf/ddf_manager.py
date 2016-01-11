@@ -6,7 +6,7 @@ Created on Jun 22, 2014
 from __future__ import unicode_literals
 
 from dataframe import DistributedDataFrame
-from gateway import start_gateway_server
+import gateway
 
 
 class DDFManager(object):
@@ -21,9 +21,8 @@ class DDFManager(object):
         Constructor
         :param engine_name: Name of the DDF engine, e.g. 'spark'
         """
-        _gateway = start_gateway_server()
-        engine_type = _gateway.jvm.io.ddf.DDFManager.EngineType.fromString(engine_name)
-        self._jdm = _gateway.jvm.io.ddf.DDFManager.get(engine_type)
+        engine_type = gateway.current_gateway().jvm.io.ddf.DDFManager.EngineType.fromString(engine_name)
+        self._jdm = gateway.current_gateway().jvm.io.ddf.DDFManager.get(engine_type)
 
     def list_ddfs(self):
         """

@@ -61,5 +61,17 @@ class TestDDF(test_base.BaseTest):
         self.assertIsInstance(tp, tuple)
         self.assertEqual(len(tp), 2)
 
+    def testDropNA(self):
+        ddf2 = self.airlines.drop_na(axis='row')
+        self.assertIsInstance(ddf2, DistributedDataFrame)
+        self.assertEqual(ddf2.ncol, self.airlines.ncol)
+
+        ddf2 = self.airlines.drop_na(axis='column')
+        self.assertIsInstance(ddf2, DistributedDataFrame)
+        self.assertEqual(ddf2.nrow, self.airlines.nrow)
+
+        with self.assertRaises(ValueError):
+            self.airlines.drop_na(axis='whatever')
+
 if __name__ == '__main__':
     unittest.main()
