@@ -5,6 +5,9 @@ Created on Jun 22, 2014
 """
 from __future__ import unicode_literals
 
+import pandas as pd
+import numpy as np
+
 
 class DistributedDataFrame(object):
     """
@@ -19,6 +22,32 @@ class DistributedDataFrame(object):
 
     ###########################################################################
 
+    def __str__(self):
+        name = self.name
+        if name is None:
+            return 'DistributedDataFrame(rows: {}, columns: {})'.format(self.nrow, self.ncol)
+        return 'DistributedDataFrame(name: {}, rows: {}, columns: {})'.format(name, self.nrow, self.ncol)
+
+    def __repr__(self):
+        name = self.name
+        if name is None:
+            return 'DistributedDataFrame(rows: {}, columns: {})'.format(self.nrow, self.ncol)
+        return 'DistributedDataFrame(name: {}, rows: {}, columns: {})'.format(name, self.nrow, self.ncol)
+
+    def __len__(self):
+        return self.nrow
+
+    ###########################################################################
+
+    @property
+    def name(self):
+        """
+        Get name of this DDF
+        :return: a str
+        """
+        s = self._jddf.getName()
+        return s if s is None else str(s)
+
     @property
     def colnames(self):
         """
@@ -29,7 +58,40 @@ class DistributedDataFrame(object):
         return self._jddf.getColumnNames()
 
     @property
+    def coltypes(self):
+        """
+        The types of all columns of this DDF
+
+        :return: a list of strings
+        """
+        return ['{}'.format(self._jddf.getColumn(c).getType()) for c in self.colnames]
+
+    @property
     def rows(self):
+        """
+        Get number of rows of this DDF
+
+        .. deprecated::
+            Use :func:`nrow` instead.
+
+        :return: an int
+        """
+        return self.nrow
+
+    @property
+    def cols(self):
+        """
+        Get number of columns of this DDF
+
+        .. deprecated::
+            Use :func:`ncol` instead.
+
+        :return: an int
+        """
+        return self.ncol
+
+    @property
+    def nrow(self):
         """
         Get number of rows of this DDF
 
@@ -38,7 +100,7 @@ class DistributedDataFrame(object):
         return int(self._jddf.getNumRows())
 
     @property
-    def cols(self):
+    def ncol(self):
         """
         Get number of columns of this DDF
 
@@ -87,9 +149,19 @@ class DistributedDataFrame(object):
 
     def summary(self):
         """
-        Calculate this DistributedDataFrame's columns'summary numbers
+        Return a statistical summary of a DistributedDataFrame's columns
+        :return: a pandas DataFrame containing summaries
         """
-        return self._jddf.getSummary()
+        data = {}
+        ls = list(self._jddf.getSummary())
+        for colname, s in zip(self.colnames, ls):
+            if s is not None:
+                data[colname] = {'mean': float(s.mean()), 'stdev': float(s.stdev()), 'count': int(s.count()),
+                                 'cNA': int(s.NACount()), 'min': float(s.min()), 'max': float(s.max())}
+            else:
+                data[colname] = {'mean': np.nan, 'stdev': np.nan, 'count': np.nan,
+                                 'cNA': np.nan, 'min': np.nan, 'max': np.nan}
+        return pd.DataFrame(data=data, index=['mean', 'stdev', 'count', 'cNA', 'min', 'max'])
 
     def five_nums(self):
         """
