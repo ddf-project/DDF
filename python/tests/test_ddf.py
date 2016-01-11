@@ -52,6 +52,10 @@ class TestDDF(test_base.BaseTest):
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(len(df), 5)
 
+    def testMean(self):
+        self.assertIsInstance(self.airlines.mean(0), float)
+        self.assertIsInstance(self.airlines.mean('lateaircraftdelay'), float)
+
     def testVar(self):
         tp = self.airlines.var(0)
         self.assertIsInstance(tp, tuple)

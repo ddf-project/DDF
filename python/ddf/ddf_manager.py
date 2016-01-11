@@ -72,4 +72,3 @@ class DDFManager(object):
         Shut down the DDF Manager
         """
         self._jdm.shutdown()
-        print('Bye bye')

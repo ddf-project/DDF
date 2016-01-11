@@ -211,6 +211,16 @@ class DistributedDataFrame(object):
         col_name = util.parse_column_str(self.colnames, column)
         return tuple([float(x) for x in self._jddf.getVectorVariance(col_name)])
 
+    def mean(self, column):
+        """
+        Calculate Mean value of DDF Column
+
+        :param column: the column name or index
+        :return: the mean value
+        """
+        col_name = util.parse_column_str(self.colnames, column)
+        return float(self._jddf.getVectorMean(col_name))
+
     def drop_na(self, axis='row', inplace=False):
         """
         Drop NA values

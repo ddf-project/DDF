@@ -52,7 +52,7 @@ def start_gateway_server():
     command = ['java', '-classpath', classpath] + java_opts + ['py4j.GatewayServer', '--die-on-broken-pipe', '0']
 
     # launch GatewayServer in a new process
-    process = Popen(command, stdout=PIPE, stdin=PIPE, preexec_fn=pre_exec_func)
+    process = Popen(command, stdout=PIPE, stdin=PIPE, preexec_fn=None)
 
     # get the port of the GatewayServer
     port = int(process.stdout.readline())
