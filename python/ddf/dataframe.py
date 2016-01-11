@@ -246,6 +246,62 @@ class DistributedDataFrame(object):
         self._jddf.dropNA(by)
         return self
 
+    def join(self, other, by=None, by_left=None, by_right=None, join_type='inner'):
+        """
+        Join two DistributedDataFrames together.
+
+        Join, like merge, is designed for the types of problems where you would use a sql join.
+
+        :param other: the other DDF
+        :type other: DistributedDataFrame
+        :param by: columns used for joining. Default is common columns of `self` and `other`.
+        :param by_left: columns used for joining. Default is common columns of `self` and `other`.
+        :param by_right: columns used for joining. Default is common columns of `self` and `other`.
+        :param join_type: type of join: inner (default), left, right, full or leftsemi
+                - inner: only rows with matching keys in both `self` and `other`.
+                - left: all rows in `self`, adding matching columns from `other`.
+                - right: all rows in `other`, adding matching columns from `self`.
+                - full: all rows in `self` with matching columns in `other`,
+                        then the rows of `other` that don't match `self`
+                - leftsemi: only rows in `self` with matching keys in `other`.
+        :return: a DistributedDataFrame
+        """
+        join_types = ['inner', 'left', 'right', 'full', 'leftsemi']
+        join_type = join_type.lower()
+
+        if join_type not in join_types:
+            raise ValueError('Invalid join type: {}, valid types are: {}'.format(join_type, ', '.join(join_types)))
+
+        if isinstance(by, basestring):
+            by = [by]
+        if isinstance(by_left, basestring):
+            by_left = [by_left]
+        if isinstance(by_right, basestring):
+            by_right = [by_right]
+
+        if by is None and by_left is None and by_right is None:
+            by = list(set(self.colnames) & set(other.colnames))
+            if len(by) == 0:
+                raise ValueError('Unable to get the intersection of the column names for joining. Please specify '
+                                 'the columns using by, by_x or by_y')
+
+        if join_type == 'inner':
+            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.INNER
+        elif join_type == 'left':
+            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.LEFT
+        elif join_type == 'right':
+            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.RIGHT
+        elif join_type == 'full':
+            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.FULL
+        else:
+            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.LEFTSEMI
+
+        gc = current_gateway()._gateway_client
+        return DistributedDataFrame(self._jddf.join(other._jddf, jjtype,
+                                                    util.to_java_list(by, gc),
+                                                    util.to_java_list(by_left, gc),
+                                                    util.to_java_list(by_right, gc)))
+
     def aggregate(self, aggr_columns, by_columns):
         """
         Split the DistributedDataFrame into sub-sets

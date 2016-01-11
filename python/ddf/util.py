@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 import numpy as np
 import json
 
+from py4j import java_collections
+
 
 """
 Mapping from DDF types to python types
@@ -119,3 +121,13 @@ def parse_column(col_names, column):
     :return: column index
     """
     return validate_column_generic(col_names, column, False)
+
+
+def to_java_list(ls, gateway_client):
+    """
+    Convert a python list into java list
+    :param ls: python list to be converted
+    :param gateway_client: gateway client object
+    :return: java list
+    """
+    return java_collections.ListConverter().convert([] if ls is None else ls, gateway_client)

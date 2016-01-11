@@ -77,5 +77,9 @@ class TestDDF(test_base.BaseTest):
         with self.assertRaises(ValueError):
             self.airlines.drop_na(axis='whatever')
 
+    def testJoin(self):
+        ddf2 = self.airlines.join(self.airlines, self.airlines.colnames[0])
+        self.assertIsInstance(ddf2, DistributedDataFrame)
+
 if __name__ == '__main__':
     unittest.main()
