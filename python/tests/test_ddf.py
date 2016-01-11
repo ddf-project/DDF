@@ -52,5 +52,14 @@ class TestDDF(test_base.BaseTest):
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(len(df), 5)
 
+    def testVar(self):
+        tp = self.airlines.var(0)
+        self.assertIsInstance(tp, tuple)
+        self.assertEqual(len(tp), 2)
+
+        tp = self.airlines.var('lateaircraftdelay')
+        self.assertIsInstance(tp, tuple)
+        self.assertEqual(len(tp), 2)
+
 if __name__ == '__main__':
     unittest.main()

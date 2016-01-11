@@ -181,6 +181,10 @@ class DistributedDataFrame(object):
                                  'cNA': np.nan, 'min': np.nan, 'max': np.nan}
         return pd.DataFrame(data=data, index=['mean', 'stdev', 'count', 'cNA', 'min', 'max'])
 
+    """
+    Statistic functions
+    """
+
     def five_nums(self):
         """
         Calculate Turkey five number for numeric columns
@@ -195,6 +199,16 @@ class DistributedDataFrame(object):
                 data[col_name] = dict(zip(labels, [s.getMin(), s.getFirstQuantile(), s.getMedian(),
                                                    s.getThirdQuantile(), s.getMax()]))
         return pd.DataFrame(data=data, index=labels)
+
+    def var(self, column):
+        """
+        Compute variance and standard deviation of a DistributedDataFrame's column
+
+        :param column: the column name or index
+        :return: a tuple of two elements (variance, standard deviation)
+        """
+        col_name = util.parse_column_str(self.colnames, column)
+        return tuple([float(x) for x in self._jddf.getVectorVariance(col_name)])
 
     def aggregate(self, aggr_columns, by_columns):
         """

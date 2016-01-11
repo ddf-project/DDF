@@ -77,3 +77,45 @@ def convert_column_types(df, column_types, raise_on_error=False):
         # convert type
         df[c] = df[c].astype(dest_type, raise_on_error=raise_on_error)
     return df
+
+
+"""
+Validating column arguments
+"""
+
+
+def validate_column_generic(col_names, column, get_name=True):
+    """
+    Validate a column name or index, return the column name
+    :param col_names: list of column names
+    :param column: column name or index
+    :param get_name:
+    :return: column index
+    """
+    if type(column) is int:
+        if column < 0 or column >= len(col_names):
+            raise ValueError('Column index out of range: {}'.format(column))
+        return col_names[column] if get_name else column
+    elif isinstance(column, (str, unicode)) and column in col_names:
+        return column if get_name else col_names.index(column)
+    raise ValueError('Column not found: {}'.format(column))
+
+
+def parse_column_str(col_names, column):
+    """
+    Validate a column name or index, return the column name
+    :param col_names: list of column names
+    :param column: column name or index
+    :return: column index
+    """
+    return validate_column_generic(col_names, column, True)
+
+
+def parse_column(col_names, column):
+    """
+    Convert a column to index
+    :param col_names: list of column names
+    :param column: column name or index
+    :return: column index
+    """
+    return validate_column_generic(col_names, column, False)
