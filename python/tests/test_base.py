@@ -8,6 +8,7 @@ class BaseTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dm_spark = DDFManager('spark')
+        cls.airlines = cls.loadAirlines()
 
     @classmethod
     def tearDownClass(cls):
@@ -30,4 +31,4 @@ class BaseTest(unittest.TestCase):
         cls.dm_spark.sql("load data local inpath '{}/resources/test/airlineWithNA.csv' "
                          "into table airline_na".format(DDF_HOME))
 
-        cls.airlines = cls.dm_spark.sql2ddf('select * from airline_na')
+        return cls.dm_spark.sql2ddf('select * from airline_na')
