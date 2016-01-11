@@ -120,17 +120,7 @@ class DistributedDataFrame(object):
         :param n: number of rows to get
         """
         res = self._jddf.getViewHandler().head(n)
-        column_names = self.colnames
-        n = len(res)
-        data = dict([(c, [None] * n) for c in column_names])
-        nulls = ("null", "NULL")
-        for i in range(0, n):
-            row = str(res[i]).split('\t')
-            for j, c in enumerate(column_names):
-                value = row[j].replace('\\\\t', '\t')
-                if value not in nulls:
-                    data[c][i] = value
-        return self._convert_type(pd.DataFrame(data=data, columns=column_names), False)
+        return util.parse_ddf_data(res, self.colnames, self.coltypes)
 
     def project(self, column_names):
         """

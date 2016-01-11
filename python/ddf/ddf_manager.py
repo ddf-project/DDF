@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 
 from dataframe import DistributedDataFrame
 import gateway
+import util
 
 
 class DDFManager(object):
@@ -56,7 +57,11 @@ class DDFManager(object):
         :param command: the sql command to run
         :param data_source: data source
         """
-        return self._jdm.sql(command, data_source)
+        command = command.strip()
+        res = self._jdm.sql(command, data_source)
+        if not (command.lower().startswith('create') or command.lower().startswith('load')):
+            return util.parse_sql_result(res)
+        return res
 
     def sql2ddf(self, command, data_source='spark'):
         """
@@ -65,6 +70,10 @@ class DDFManager(object):
         :param data_source: data source
         :return: a DDF
         """
+        command = command.strip()
+        if not command.lower().startswith('select'):
+            raise ValueError('Only SELECT query is supported')
+
         return DistributedDataFrame(self._jdm.sql2ddf(command, data_source))
 
     def shutdown(self):

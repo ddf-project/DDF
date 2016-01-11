@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import numpy as np
 import json
 
+import pandas as pd
 from py4j import java_collections
 
 
@@ -131,3 +132,26 @@ def to_java_list(ls, gateway_client):
     :return: java list
     """
     return java_collections.ListConverter().convert([] if ls is None else ls, gateway_client)
+
+
+def parse_ddf_data(rows, colnames, coltypes):
+    n = len(rows)
+    data = dict([(c, [None] * n) for c in colnames])
+    nulls = ("null", "NULL")
+    for i in range(0, n):
+        row = str(rows[i]).split('\t')
+        for j, c in enumerate(colnames):
+            value = row[j].replace('\\\\t', '\t')
+            if value not in nulls:
+                data[c][i] = value
+
+    return convert_column_types(pd.DataFrame(data=data, columns=colnames), coltypes, raise_on_error=False)
+
+
+def parse_sql_result(java_result):
+    rows = java_result.getRows()
+    cols = java_result.getSchema().getColumns()
+    coltypes = [str(x.getType().toString()) for x in cols]
+    colnames = [str(x.getName()) for x in cols]
+
+    return parse_ddf_data(rows, colnames, coltypes)
