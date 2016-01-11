@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 
 import pandas as pd
 import numpy as np
+import json
 
 import util
 
@@ -143,9 +144,12 @@ class DistributedDataFrame(object):
         :param size: number of samples
         :param replacement: sample with or without replacement
         :param seed: random seed
-        :return: WRITE ME
+        :return: a pandas DataFrame
         """
-        return self._jddf.getViewHandler().getRandomSample(size, replacement, seed)
+        res = self._jddf.getViewHandler().getRandomSample(size, replacement, seed)
+        df = pd.read_json(json.dumps([list(c) for c in res]))
+        df.columns = self.colnames
+        return self._convert_type(df, raise_on_error=False)
 
     def sample2ddf(self, fraction, replacement=False, seed=123):
         """
