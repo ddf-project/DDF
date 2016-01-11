@@ -1,5 +1,5 @@
 .. pyddf documentation master file, created by
-   sphinx-quickstart on Fri Jul  3 12:09:32 2015.
+   sphinx-quickstart on Tue Jan 12 00:31:39 2016.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
