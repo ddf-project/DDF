@@ -8,6 +8,8 @@ from __future__ import unicode_literals
 import pandas as pd
 import numpy as np
 
+import util
+
 
 class DistributedDataFrame(object):
     """
@@ -55,7 +57,7 @@ class DistributedDataFrame(object):
 
         :return: a list of strings
         """
-        return self._jddf.getColumnNames()
+        return [str(x) for x in self._jddf.getColumnNames()]
 
     @property
     def coltypes(self):
@@ -113,8 +115,20 @@ class DistributedDataFrame(object):
     def head(self, n=10):
         """
         Return this DistributedDataFrame's some first rows
+        :param n: number of rows to get
         """
-        return self._jddf.getViewHandler().head(n)
+        res = self._jddf.getViewHandler().head(n)
+        column_names = self.colnames
+        n = len(res)
+        data = dict([(c, [None] * n) for c in column_names])
+        nulls = ("null", "NULL")
+        for i in range(0, n):
+            row = str(res[i]).split('\t')
+            for j, c in enumerate(column_names):
+                value = row[j].replace('\\\\t', '\t')
+                if value not in nulls:
+                    data[c][i] = value
+        return self._convert_type(pd.DataFrame(data=data, columns=column_names), False)
 
     def project(self, column_names):
         """
@@ -188,3 +202,22 @@ class DistributedDataFrame(object):
 
     def drop_na(self):
         return DistributedDataFrame(self._jddf.dropNA())
+
+    ###########################################################################
+
+    def _convert_type(self, df, raise_on_error):
+        """
+        Utility function to convert the type of a pandas DataFrame
+        to make it consistent with this DDF coltypes
+        This function also detect and handle JSON data
+        :param df: a pandas Data Frame
+        :type df: pd.DataFrame
+        :param raise_on_error: whether or not to raise Exception if
+                there is errors when casting column data types
+        :return: type-converted pandas Data Frame
+        """
+        if (len(self.colnames) != len(df.columns) or
+                any([a != b for (a, b) in zip(self.colnames, df.columns.tolist())])):
+            raise ValueError('Invalid column names of the data frame')
+
+        return util.convert_column_types(df, self.coltypes, raise_on_error)
