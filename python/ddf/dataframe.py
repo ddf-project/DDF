@@ -3,6 +3,7 @@ Created on Jun 22, 2014
 
 @author: nhanitvn
 """
+from __future__ import unicode_literals
 
 
 class DistributedDataFrame(object):

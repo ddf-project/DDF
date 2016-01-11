@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 def find_ddf():
     import os
     if 'DDF_HOME' not in os.environ:

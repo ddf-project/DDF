@@ -7,6 +7,7 @@ Created on Jun 22, 2014
 import unittest
 from ddf import DDFManager, DDF_HOME
 
+
 class TestDDFManager(unittest.TestCase):
 
     def setUp(self):

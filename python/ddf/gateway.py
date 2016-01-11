@@ -7,8 +7,10 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from conf import DDF_HOME, SCALA_VERSION
 
+
 def pre_exec_func():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+
 
 def start_gateway_server():
     classpath = compute_classpath(DDF_HOME)
@@ -56,12 +58,14 @@ def start_gateway_server():
     java_import(gateway.jvm, 'io.ddf.spark.*')
     return gateway
 
+
 def compute_classpath(root_path):
 
     lib_jars = list_jar_files('{}/spark/target/scala-{}/lib'.format(root_path, SCALA_VERSION))
     spark_jars = list_jar_files('{}/spark/target/scala-{}'.format(root_path, SCALA_VERSION))
 
     return '{}:{}:{}/spark/conf/local'.format(lib_jars, spark_jars, DDF_HOME)
+
 
 def list_jar_files(path):
     jar_files = [(path + "/" + f) for f in os.listdir(path) if f.endswith('.jar')]
