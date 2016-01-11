@@ -61,13 +61,16 @@ object RootBuild extends Build {
   val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
   val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
+  val testProjectName = projectName + "_test"
+  val testVersion = rootVersion
+  val testJarName = testProjectname + "-" + rootVersion + ".jar"
+ 
 
-  // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val core = Project("core", file("core"), settings = coreSettings)
-  // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
+  lazy val test = Project("test", file("test"), settings = tesetSettings)
 
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend(Compile)
