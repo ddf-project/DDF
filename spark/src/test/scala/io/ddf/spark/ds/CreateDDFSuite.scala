@@ -14,6 +14,9 @@ class CreateDDFSuite extends ATestSuite with Matchers {
   val mysqlSourceUri = getConfig("mysql.source.uri").getOrElse("jdbc:mysql://ci.adatao.com:3306/testdata")
   val mysqlManager = new DelegatingDDFManager(manager, mysqlSourceUri)
 
+  val localManager = new DelegatingDDFManager(manager, "file://")
+  val hdfsManager = new DelegatingDDFManager(manager, "hdfs://")
+
   val s3Credential = getCredentialFromConfig("s3.access", "s3.secret")
   val mysqlCredential = getCredentialFromConfig("mysql.user", "mysql.pwd")
 
@@ -31,7 +34,16 @@ class CreateDDFSuite extends ATestSuite with Matchers {
       | Country string, State string, LocationName string, Latitude double, Longitude double,
       | RegionCode int, Death int, DeathDescription int, Injuries int, InjuriesDescription int
     """.stripMargin.replace("\n", "")
+  val airline_schema =
+    """year int, month int, dayofmonth int, dayofweek int, deptime int,crsdeptime int,
+      | arrtime int, crsarrtime int, uniquecarrier string, flightnum int, tailnum string,
+      | actualelapsedtime int, crselapsedtime int, airtime int, arrdelay int, depdelay int,
+      | origin string, dest string, distance int, taxiin int, taxiout int, cancelled int,
+      | cancellationcode string, diverted string, carrierdelay int, weatherdelay int,
+      | nasdelay int, securitydelay int, lateaircraftdelay int""".stripMargin.replace("\n", "")
   val sleep_schema = "StartTime int, SleepMinutes int, UID string, DeepSleepMinutes int, EndTime int"
+
+  val current_dir = sys.props.getOrElse("user.dir", "/")
 
   private def getCredentialFromConfig(usernameKey: String, passwordKey: String) = {
     val username = getConfig(usernameKey)
@@ -105,6 +117,17 @@ class CreateDDFSuite extends ATestSuite with Matchers {
     assert(ddf.getColumnName(0) == "StartTime")
   }
 
+  test("create DDF from parquet file local") {
+    val options = Map[AnyRef, AnyRef](
+      "path" -> s"$current_dir/resources/test/sleep.parquet",
+      "format" -> "parquet"
+    )
+    val ddf = localManager.createDDF(options)
+    assert(ddf.getNumColumns == 5)
+    assert(ddf.getNumRows == 10000)
+    assert(ddf.getColumnName(0) == "deep_sleep_minutes")
+  }
+
   when(mysqlCredential.isDefined) test "create DDF from MySQL" in {
     val options = Map[AnyRef, AnyRef](
       "table" -> "crimes_small_case_sensitive"
@@ -114,5 +137,31 @@ class CreateDDFSuite extends ATestSuite with Matchers {
     assert(ddf.getNumColumns == 22)
     assert(ddf.getNumRows == 40000)
     assert(ddf.getColumnName(0) == "ID")
+  }
+
+  test("create DDF from local file") {
+    val options = Map[AnyRef, AnyRef](
+      "path" -> s"$current_dir/resources/test/airline",
+      "format" -> "csv",
+      "schema" -> airline_schema
+    )
+    val ddf = localManager.createDDF(options)
+
+    assert(ddf.getNumColumns == 29)
+    assert(ddf.getNumRows == 31)
+    assert(ddf.getColumnName(0) == "year")
+  }
+
+  test("create DDF from local hdfs") {
+    val options = Map[AnyRef, AnyRef](
+      "path" -> s"$current_dir/resources/test/airline",
+      "format" -> "csv",
+      "schema" -> airline_schema
+    )
+    val ddf = hdfsManager.createDDF(options)
+
+    assert(ddf.getNumColumns == 29)
+    assert(ddf.getNumRows == 31)
+    assert(ddf.getColumnName(0) == "year")
   }
 }

@@ -83,7 +83,12 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
     */
   protected def getDataFilesUri(user: User, options: util.Map[AnyRef, AnyRef]): String = {
     val path = options.getOrElse("path", "").toString
-    if (path.startsWith("/")) s"$uri$path" else s"$uri/$path"
+    if (uri == "hdfs://" || uri == "file://") {
+      // special uri for local hdfs
+      path
+    } else {
+      s"$uri$path"
+    }
   }
 
   protected def createTable(dataUri: String, format: CsvFileFormat): String = {
