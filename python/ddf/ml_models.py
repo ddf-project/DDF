@@ -40,3 +40,22 @@ class KMeansModel(Model):
 
     def __str__(self):
         return 'KMeansModel({} clusters)'.format(len(self.centers))
+
+
+class GeneralizedLinearModel(Model):
+
+    def __init__(self, jml_model, gateway_client, weights):
+        super(GeneralizedLinearModel, self).__init__(jml_model, gateway_client)
+        self.weights = weights
+
+
+class LinearRegressionModel(GeneralizedLinearModel):
+
+    def __init__(self, jml_model, gateway_client, weights):
+        super(LinearRegressionModel, self).__init__(jml_model, gateway_client, weights)
+
+
+class LogisticRegressionModel(GeneralizedLinearModel):
+
+    def __init__(self, jml_model, gateway_client, weights):
+        super(LogisticRegressionModel, self).__init__(jml_model, gateway_client, weights)

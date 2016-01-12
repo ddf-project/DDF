@@ -24,5 +24,27 @@ class TestMl(test_base.BaseTest):
         with self.assertRaises(Py4JJavaError):
             model.predict([0, 1, 2])
 
+    def testLinearRegression(self):
+        model = ml.linear_regression_gd(self.mtcars, 0.1, 0.1, 10)
+        self.assertIsInstance(model, ml.LinearRegressionModel)
+        self.assertIsInstance(model.weights, pd.DataFrame)
+        self.assertEqual(len(model.weights), 1)
+        self.assertEqual(len(model.weights.columns), self.mtcars.ncol)
+
+        self.assertIsInstance(model.predict(range(0, self.mtcars.ncol - 1)), float)
+        with self.assertRaises(Py4JJavaError):
+            model.predict([0, 1, 2])
+
+    def testLogisticRegression(self):
+        model = ml.logistic_regression_gd(self.mtcars, 0.1, 10)
+        self.assertIsInstance(model, ml.LogisticRegressionModel)
+        self.assertIsInstance(model.weights, pd.DataFrame)
+        self.assertEqual(len(model.weights), 1)
+        self.assertEqual(len(model.weights.columns), self.mtcars.ncol)
+
+        self.assertIsInstance(model.predict(range(0, self.mtcars.ncol - 1)), float)
+        with self.assertRaises(Py4JJavaError):
+            model.predict([0, 1, 2])
+
 if __name__ == '__main__':
     unittest.main()
