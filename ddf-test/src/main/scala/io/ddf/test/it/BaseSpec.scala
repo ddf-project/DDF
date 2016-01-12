@@ -18,7 +18,6 @@
  */
 package io.ddf.test.it
 
-import com.google.common.base.Strings
 import io.ddf.datasource.{DataSourceDescriptor, DataSourceURI, JDBCDataSourceCredentials, JDBCDataSourceDescriptor}
 import io.ddf.misc.Config
 import io.ddf.util.ConfigHandler
@@ -96,7 +95,7 @@ trait BaseSpec extends FeatureSpec {
 
   def getValue(key: String) = {
     val value = configHandler.getValue(engineName, key)
-    if (Strings.isNullOrEmpty(value)) configHandler.getValue("global", key)
+    if (value == null || value == "") configHandler.getValue("global", key)
     else value
   }
 
