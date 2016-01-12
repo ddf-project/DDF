@@ -14,7 +14,7 @@ class RDDRow2ArrayString (@transient ddf: DDF) extends ConvertFunction(ddf) {
           row => {
             row.getString(0).split("[ ,]")
           }
-        }.filter(row => row != null)
+        }
         new Representation(rddArrString, RepresentationHandler.RDD_ARR_STRING.getTypeSpecsString)
     }
   }
