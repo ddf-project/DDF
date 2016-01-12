@@ -16,14 +16,20 @@ class DDFManager(object):
     to create DDFs that are implemented for Spark framework.
     """
     _jdm = None
+    _gateway_client = None
 
     def __init__(self, engine_name):
         """
         Constructor
         :param engine_name: Name of the DDF engine, e.g. 'spark'
         """
-        engine_type = gateway.current_gateway().jvm.io.ddf.DDFManager.EngineType.fromString(engine_name)
-        self._jdm = gateway.current_gateway().jvm.io.ddf.DDFManager.get(engine_type)
+        self._gateway_client = gateway.new_gateway_client()
+        try:
+            engine_type = self._gateway_client.jvm.io.ddf.DDFManager.EngineType.fromString(engine_name)
+            self._jdm = self._gateway_client.jvm.io.ddf.DDFManager.get(engine_type)
+        except Exception:
+            self._gateway_client.close()
+            raise
 
     def list_ddfs(self):
         """
@@ -31,7 +37,7 @@ class DDFManager(object):
 
         :return: list of DDF objects
         """
-        return [DistributedDataFrame(x) for x in list(self._jdm.listDDFs())]
+        return [DistributedDataFrame(x, self._gateway_client) for x in list(self._jdm.listDDFs())]
 
     def get_ddf_by_name(self, ddf_name):
         """
@@ -39,7 +45,7 @@ class DDFManager(object):
         :param ddf_name: the name of the DDF object to be retrieved
         :return: a DDF object
         """
-        return DistributedDataFrame(self._jdm.getDDFByName(ddf_name))
+        return DistributedDataFrame(self._jdm.getDDFByName(ddf_name), self._gateway_client)
 
     def set_ddf_name(self, ddf, name):
         """
@@ -74,10 +80,11 @@ class DDFManager(object):
         if not command.lower().startswith('select'):
             raise ValueError('Only SELECT query is supported')
 
-        return DistributedDataFrame(self._jdm.sql2ddf(command, data_source))
+        return DistributedDataFrame(self._jdm.sql2ddf(command, data_source), self._gateway_client)
 
     def shutdown(self):
         """
         Shut down the DDF Manager
         """
         self._jdm.shutdown()
+        self._gateway_client.close()

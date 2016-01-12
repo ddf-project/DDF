@@ -10,7 +10,6 @@ import numpy as np
 import json
 
 import util
-from gateway import current_gateway
 
 
 class DistributedDataFrame(object):
@@ -18,11 +17,14 @@ class DistributedDataFrame(object):
     A Distributed Data Frame, the basic abstraction in DistributedDataFrame library.
     """
 
-    def __init__(self, jddf):
+    def __init__(self, jddf, gateway_client):
         """
         Constructor
+        :param jddf: the java DDF object
+        :param gateway_client: gateway client
         """
         self._jddf = jddf
+        self._gateway_client = gateway_client
 
     ###########################################################################
 
@@ -125,8 +127,9 @@ class DistributedDataFrame(object):
     def project(self, column_names):
         """
         Project on some columns and return a new DistributedDataFrame
+        :param column_names:
         """
-        return DistributedDataFrame(self._jddf.getViewHandler().project(column_names))
+        return DistributedDataFrame(self._jddf.getViewHandler().project(column_names), self._gateway_client)
 
     def sample(self, size, replacement=False, seed=123):
         """
@@ -154,7 +157,8 @@ class DistributedDataFrame(object):
         if fraction <= 0 or fraction > 1:
             raise ValueError('fraction: expected a number in the (0, 1] range')
 
-        return DistributedDataFrame(self._jddf.getViewHandler().getRandomSample(fraction, replacement, seed))
+        return DistributedDataFrame(self._jddf.getViewHandler().getRandomSample(fraction, replacement, seed),
+                                    self._gateway_client)
 
     def summary(self):
         """
@@ -222,15 +226,14 @@ class DistributedDataFrame(object):
         axis = axis.lower()
         if axis not in ['row', 'column']:
             raise ValueError('axis: only "row" or "column" is supported')
-        gateway = current_gateway()
 
         if axis == 'row':
-            by = gateway.jvm.io.ddf.etl.IHandleMissingData.Axis.ROW
+            by = self._gateway_client.jvm.io.ddf.etl.IHandleMissingData.Axis.ROW
         else:
-            by = gateway.jvm.io.ddf.etl.IHandleMissingData.Axis.COLUMN
+            by = self._gateway_client.jvm.io.ddf.etl.IHandleMissingData.Axis.COLUMN
 
         if not inplace:
-            return DistributedDataFrame(self._jddf.dropNA(by))
+            return DistributedDataFrame(self._jddf.dropNA(by), self._gateway_client)
 
         self._jddf.setMutable(inplace)
         self._jddf.dropNA(by)
@@ -276,27 +279,32 @@ class DistributedDataFrame(object):
                                  'the columns using by, by_x or by_y')
 
         if join_type == 'inner':
-            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.INNER
+            jjtype = self._gateway_client.jvm.io.ddf.etl.Types.JoinType.INNER
         elif join_type == 'left':
-            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.LEFT
+            jjtype = self._gateway_client.jvm.io.ddf.etl.Types.JoinType.LEFT
         elif join_type == 'right':
-            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.RIGHT
+            jjtype = self._gateway_client.jvm.io.ddf.etl.Types.JoinType.RIGHT
         elif join_type == 'full':
-            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.FULL
+            jjtype = self._gateway_client.jvm.io.ddf.etl.Types.JoinType.FULL
         else:
-            jjtype = current_gateway().jvm.io.ddf.etl.Types.JoinType.LEFTSEMI
+            jjtype = self._gateway_client.jvm.io.ddf.etl.Types.JoinType.LEFTSEMI
 
-        gc = current_gateway()._gateway_client
+        gc = self._gateway_client._gateway_client
         return DistributedDataFrame(self._jddf.join(other._jddf, jjtype,
                                                     util.to_java_list(by, gc),
                                                     util.to_java_list(by_left, gc),
-                                                    util.to_java_list(by_right, gc)))
+                                                    util.to_java_list(by_right, gc)), self._gateway_client)
 
     def aggregate(self, aggr_columns, by_columns):
         """
         Split the DistributedDataFrame into sub-sets
         by some columns and perform aggregation on some columns within each sub-set
+
+        :param aggr_columns:
+        :param by_columns:
+        :return:
         """
+        # TODO: implement this properly
         return self._jddf.aggregate(by_columns + "," + aggr_columns)
 
     def correlation(self, col1, col2):
@@ -307,6 +315,7 @@ class DistributedDataFrame(object):
         :param col2: a numeric column
         :return: a float
         """
+        # TODO: implement this properly
         return self._jddf.correlation(col1, col2)
 
     ###########################################################################

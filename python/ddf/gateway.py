@@ -10,7 +10,7 @@ from threading import Thread
 from conf import DDF_HOME, SCALA_VERSION
 
 
-_CURRENT_GATEWAY = None
+__gateway_server_port = None
 
 
 def pre_exec_func():
@@ -31,6 +31,7 @@ def list_jar_files(path):
 
 
 def start_gateway_server():
+
     classpath = compute_classpath(DDF_HOME)
 
     java_opts = os.getenv('JAVA_OPTS')
@@ -52,7 +53,7 @@ def start_gateway_server():
     command = ['java', '-classpath', classpath] + java_opts + ['py4j.GatewayServer', '--die-on-broken-pipe', '0']
 
     # launch GatewayServer in a new process
-    process = Popen(command, stdout=PIPE, stdin=PIPE, preexec_fn=None)
+    process = Popen(command, stdout=PIPE, stdin=PIPE, preexec_fn=pre_exec_func)
 
     # get the port of the GatewayServer
     port = int(process.stdout.readline())
@@ -69,18 +70,17 @@ def start_gateway_server():
                 sys.stderr.write(line)
 
     JavaOutputThread(process.stdout).start()
+    return port
+
+
+def new_gateway_client():
+    global __gateway_server_port
+
+    if __gateway_server_port is None:
+        __gateway_server_port = start_gateway_server()
 
     # connect to the gateway server
-    gateway = JavaGateway(GatewayClient(port=port), auto_convert=False)
+    gateway = JavaGateway(GatewayClient(port=__gateway_server_port), auto_convert=False)
     java_import(gateway.jvm, 'io.ddf.*')
     java_import(gateway.jvm, 'io.ddf.spark.*')
     return gateway
-
-
-def current_gateway():
-    global _CURRENT_GATEWAY
-    if _CURRENT_GATEWAY is None:
-        _CURRENT_GATEWAY = start_gateway_server()
-    return _CURRENT_GATEWAY
-
-
