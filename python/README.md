@@ -8,6 +8,7 @@ Assume that the DDF package is already successfully built. We need to install th
 
     $ cd <DDF_DIRECTORY>/python
     $ pip install -r requirements.txt
+    $ python setup.py develop
     
 Then we will need to set the `$DDF_HOME` environment variable:
 
