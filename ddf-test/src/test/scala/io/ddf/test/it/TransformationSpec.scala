@@ -27,7 +27,7 @@ import scala.collection.JavaConversions._
 
 trait TransformationSpec extends BaseSpec with Matchers {
 
-  feature("Transformation") {
+  ignore("Transformation") {
 
     scenario("transform native Rserve") {
       val relevantData: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
@@ -54,7 +54,7 @@ trait TransformationSpec extends BaseSpec with Matchers {
 
     //Transform scale min max and transform scale standard currently have functions in ddf core which currently do
     // not work if min and max are equal
-    ignore("transform scale min max") {
+    scenario("transform scale min max") {
       val relevantData: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
       val newddf0: DDF = relevantData.Transform.transformScaleMinMax
       val summaryArr: Array[Summary] = newddf0.getSummary
@@ -63,7 +63,7 @@ trait TransformationSpec extends BaseSpec with Matchers {
       summaryArr(0).max should be(1.0)
     }
 
-    ignore("transform scale standard") {
+    scenario("transform scale standard") {
       val relevantData: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
       val newDDF: DDF = relevantData.Transform.transformScaleStandard()
       newDDF.getNumRows should be(31)

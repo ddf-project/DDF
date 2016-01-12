@@ -64,7 +64,8 @@ with TransformationSpec with ViewSpec {
       val ddf2 = ddf1.copy()
       assert(ddf1.getNumColumns == ddf2.getNumColumns)
     }
-    scenario("name is not copied") {
+
+    ignore("name is not copied") {
       val ddf1 = loadMtCarsDDF()
       Array("cyl", "hp", "vs", "am", "gear", "carb").foreach {
         col => ddf1.getSchemaHandler.setAsFactor(col)

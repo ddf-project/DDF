@@ -25,7 +25,7 @@ import scala.collection.JavaConverters._
 
 trait BinningSpec extends BaseSpec with Matchers {
 
-  feature("Binning") {
+  ignore("Binning") {
     scenario("bin by equal interval") {
       val monthColumnLabel = "Month"
       val newDDF: DDF = loadAirlineDDF().binning(monthColumnLabel, "EQUALINTERVAL", 2, null, true, true)

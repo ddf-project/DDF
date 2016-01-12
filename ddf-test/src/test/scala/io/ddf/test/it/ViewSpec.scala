@@ -25,7 +25,7 @@ import org.scalatest.Matchers
 trait ViewSpec extends BaseSpec with Matchers {
 
   feature("View") {
-    scenario("project after remove columns ") {
+    ignore("project after remove columns ") {
       val ddf1 = loadAirlineDDF()
       val columns: java.util.List[String] = new java.util.ArrayList()
       columns.add("Year")

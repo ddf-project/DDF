@@ -84,7 +84,7 @@ trait MissingDataSpec extends BaseSpec with Matchers {
       annualDelay should be(282.0 +- 0.1)
     }
 
-    scenario("fill by dictionary") {
+    ignore("fill by dictionary") {
       val ddf = loadAirlineDDF()
       val ddf1: DDF = ddf.VIEWS.project(List("Year", "SecurityDelay", "LateAircraftDelay"))
       val dict: Map[String, String] = Map("Year" -> "2000", "SecurityDelay" -> "0", "LateAircraftDelay" -> "1")

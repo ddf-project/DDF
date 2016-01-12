@@ -26,7 +26,7 @@ import org.scalatest.Matchers
 
 trait JoinSpec extends BaseSpec with Matchers {
 
-  feature("Join") {
+  ignore("Join") {
     scenario("inner join tables") {
       val ddf: DDF = loadAirlineDDF()
       val ddf2: DDF = loadYearNamesDDF()
