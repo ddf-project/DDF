@@ -5,7 +5,7 @@
     <artifactId>ddf_examples_2.10</artifactId>
     <packaging>jar</packaging>
     <description>ddf_examples</description>
-    <version>1.4.7-SNAPSHOT</version>
+    <version>1.4.9-SNAPSHOT</version>
     <name>ddf_examples</name>
     <organization>
         <name>io.ddf</name>
@@ -18,7 +18,7 @@
     <parent>
         <groupId>io</groupId>
         <artifactId>ddf</artifactId>
-        <version>1.4.7-SNAPSHOT</version>
+        <version>1.4.9-SNAPSHOT</version>
     </parent>
     <build>
         <directory>${basedir}/target/scala-2.10</directory>
@@ -217,12 +217,12 @@
         <dependency>
             <groupId>io.ddf</groupId>
             <artifactId>ddf_spark_2.10</artifactId>
-            <version>1.4.7-SNAPSHOT</version>
+            <version>1.4.9-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.ddf</groupId>
             <artifactId>ddf_core_2.10</artifactId>
-            <version>1.4.7-SNAPSHOT</version>
+            <version>1.4.9-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -280,7 +280,7 @@
         <dependency>
             <groupId>net.sf</groupId>
             <artifactId>jsqlparser</artifactId>
-            <version>0.9.8.6</version>
+            <version>0.9.8.8</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -315,6 +315,12 @@
         </dependency>
     </dependencies>
     <repositories>
+        <repository>
+            <id>typesafereleases</id>
+            <name>typesafe-releases</name>
+            <url>http://repo.typesafe.com/typesafe/releases/</url>
+            <layout>default</layout>
+        </repository>
         <repository>
             <id>AdataoMvnreposSnapshots</id>
             <name>Adatao Mvnrepos Snapshots</name>
