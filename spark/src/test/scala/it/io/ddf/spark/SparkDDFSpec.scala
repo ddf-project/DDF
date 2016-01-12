@@ -16,13 +16,14 @@
  * limitations under the License.
  *
  */
-package io.ddf.test.it
+package it.io.ddf.spark
 
+import io.ddf.test.it._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class DDFSpec extends BaseSpec with StatisticsSpec with BinningSpec with AggregationSpec with
+class SparkDDFSpec extends BaseSpec with StatisticsSpec with BinningSpec with AggregationSpec with
 JoinSpec with MissingDataSpec with PersistenceSpec with SchemaSpec with SqlSpec
 with TransformationSpec with ViewSpec {
 
@@ -45,6 +46,7 @@ with TransformationSpec with ViewSpec {
           assert(ddf2.getSchemaHandler.getColumn(col).getOptionalFactor != null)
       }
     }
+
     scenario("all rows are copied") {
       val ddf1 = loadMtCarsDDF()
       Array("cyl", "hp", "vs", "am", "gear", "carb").foreach {

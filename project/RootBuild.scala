@@ -67,10 +67,10 @@ object RootBuild extends Build {
   // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, test_ddf)
   lazy val core = Project("core", file("core"), settings = coreSettings)
-  // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
+  lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (core)
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core)
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
-  lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (spark) dependsOn (core)
+
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend(Compile)
   lazy val publishLocalBoth = TaskKey[Unit]("publish-local", "publish local for m2 and ivy")
@@ -131,7 +131,8 @@ object RootBuild extends Build {
   )
 
   val test_dependencies = Seq(
-    "org.pegdown" % "pegdown" % "1.6.0" % "test"
+    "org.pegdown" % "pegdown" % "1.6.0",
+    "org.scalatest" % "scalatest_2.10" % "2.1.5"
   )
 
   /////// Common/Shared project settings ///////

@@ -18,7 +18,7 @@
  */
 package io.ddf.test.it
 
-import io.ddf.analytics.{NumericSimpleSummary, CategoricalSimpleSummary, AStatisticsSupporter}
+import io.ddf.analytics.{AStatisticsSupporter, CategoricalSimpleSummary, NumericSimpleSummary}
 import org.scalatest.Matchers
 import org.scalautils.TolerantNumerics
 

@@ -18,12 +18,11 @@
  */
 package io.ddf.test.it
 
-import io.ddf.{DDF, DDFManager}
-import io.ddf.datasource.{DataSourceDescriptor, JDBCDataSourceDescriptor, JDBCDataSourceCredentials, DataSourceURI}
+import com.google.common.base.Strings
+import io.ddf.datasource.{DataSourceDescriptor, DataSourceURI, JDBCDataSourceCredentials, JDBCDataSourceDescriptor}
 import io.ddf.misc.Config
 import io.ddf.util.ConfigHandler
-import com.google.common.base.Strings
-
+import io.ddf.{DDF, DDFManager}
 import org.scalatest.FeatureSpec
 
 import scala.reflect.runtime.{universe => ru}

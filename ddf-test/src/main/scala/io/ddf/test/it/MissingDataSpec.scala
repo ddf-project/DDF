@@ -19,7 +19,7 @@
 package io.ddf.test.it
 
 import io.ddf.DDF
-import io.ddf.etl.IHandleMissingData.{NAChecking, Axis}
+import io.ddf.etl.IHandleMissingData.{Axis, NAChecking}
 import io.ddf.exception.DDFException
 import io.ddf.types.AggregateTypes.AggregateFunction
 import org.scalatest.Matchers

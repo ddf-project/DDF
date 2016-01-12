@@ -21,6 +21,7 @@ package io.ddf.test.it
 import io.ddf.DDF
 import io.ddf.content.Schema.{Column, ColumnClass}
 import org.scalatest.Matchers
+
 import scala.collection.JavaConverters._
 
 trait BinningSpec extends BaseSpec with Matchers {

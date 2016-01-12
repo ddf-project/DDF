@@ -19,11 +19,12 @@
 package io.ddf.test.it
 
 import java.io.File
+
 import io.ddf.DDF
 import io.ddf.content.APersistenceHandler.PersistenceUri
+import org.scalatest.Matchers
 
 import scala.collection.JavaConverters._
-import org.scalatest.Matchers
 
 trait PersistenceSpec extends BaseSpec with Matchers {
 

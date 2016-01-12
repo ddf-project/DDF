@@ -20,6 +20,7 @@ package io.ddf.test.it
 
 import io.ddf.types.AggregateTypes.AggregateFunction
 import org.scalatest.Matchers
+
 import scala.collection.JavaConversions._
 
 trait AggregationSpec extends BaseSpec with Matchers {

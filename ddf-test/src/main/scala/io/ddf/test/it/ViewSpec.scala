@@ -19,7 +19,6 @@
 package io.ddf.test.it
 
 import io.ddf.DDF
-
 import org.scalatest.Matchers
 
 trait ViewSpec extends BaseSpec with Matchers {
