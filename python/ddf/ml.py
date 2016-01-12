@@ -15,4 +15,4 @@ def kmeans(data, centers=2, runs=5, max_iters=10):
     :return: an object of type KMeansModel
     """
     ml_obj = java_gateway.get_field(data._jddf, 'ML')
-    return KMeansModel(ml_obj.KMeans(centers, runs, max_iters), data.colnames)
+    return KMeansModel(ml_obj.KMeans(centers, runs, max_iters), data._gateway_client, data.colnames)

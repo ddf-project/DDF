@@ -289,11 +289,11 @@ class DistributedDataFrame(object):
         else:
             jjtype = self._gateway_client.jvm.io.ddf.etl.Types.JoinType.LEFTSEMI
 
-        gc = self._gateway_client._gateway_client
         return DistributedDataFrame(self._jddf.join(other._jddf, jjtype,
-                                                    util.to_java_list(by, gc),
-                                                    util.to_java_list(by_left, gc),
-                                                    util.to_java_list(by_right, gc)), self._gateway_client)
+                                                    util.to_java_list(by, self._gateway_client),
+                                                    util.to_java_list(by_left, self._gateway_client),
+                                                    util.to_java_list(by_right, self._gateway_client)),
+                                    self._gateway_client)
 
     def aggregate(self, aggr_columns, by_columns):
         """

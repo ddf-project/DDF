@@ -124,6 +124,20 @@ def parse_column(col_names, column):
     return validate_column_generic(col_names, column, False)
 
 
+def to_java_array(ls, java_type, gateway_client):
+    """
+    Convert python iterable into a java array
+    :param ls:
+    :param java_type:
+    :param gateway_client:
+    :return:
+    """
+    arr = gateway_client.new_array(java_type, len(ls))
+    for i in range(0, len(ls)):
+        arr[i] = ls[i]
+    return arr
+
+
 def to_java_list(ls, gateway_client):
     """
     Convert a python list into java list
@@ -131,7 +145,7 @@ def to_java_list(ls, gateway_client):
     :param gateway_client: gateway client object
     :return: java list
     """
-    return java_collections.ListConverter().convert([] if ls is None else ls, gateway_client)
+    return java_collections.ListConverter().convert([] if ls is None else ls, gateway_client._gateway_client)
 
 
 def parse_ddf_data(rows, colnames, coltypes):
