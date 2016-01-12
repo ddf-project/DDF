@@ -2,9 +2,7 @@ package io.ddf.spark;
 
 import io.ddf.DDF;
 import io.ddf.DDFManager;
-import io.ddf.TableNameReplacer;
-import io.ddf.content.Schema;
-import io.ddf.content.SqlResult;
+import io.ddf.SQLReformulator;
 import io.ddf.datasource.*;
 import io.ddf.exception.DDFException;
 import net.sf.jsqlparser.JSQLParserException;
@@ -15,15 +13,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.Arrays;
 
 
 /**
  * Created by jing on 6/30/15.
  */
-public class TableNameReplacerTests {
+public class SQLReformulatorTests {
 
 
     public static DDFManager manager;
@@ -31,7 +26,7 @@ public class TableNameReplacerTests {
 
     @Test
     public void testUnion() {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
         String sqlcmd = "select * from ddf://adatao/a union select * from " +
                 "ddf://adatao/b";
         try {
@@ -45,13 +40,13 @@ public class TableNameReplacerTests {
 
     @Test
     public void testAlias() {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
         String sqlcmd = "select T0.id from (select tmp.id from ddf://adatao/a" +
                 " " +
                 "tmp) T0";
         try {
             Statement statement = parser.parse(new StringReader(sqlcmd));
-            // statement = tableNameReplacer.run(statement);
+            // statement = SQLReformulator.run(statement);
             // System.out.println(statement.toString());
         } catch (JSQLParserException e) {
             e.printStackTrace();
@@ -62,7 +57,7 @@ public class TableNameReplacerTests {
     
     @Test
     public void testRealQuery() {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
         String sqlcmd = "SELECT from_unixtime(round(timestamp) - 7*3600, 'HH') hour,\n" +
                 "        count(1) count,\n" +
                 "        avg(observationnum_temp) avgTemp, \n" +
@@ -120,7 +115,7 @@ public class TableNameReplacerTests {
      */
     @Test
     public void testComplexQuery() throws  DDFException {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
         String sqlcmd =
                 "With p as " +
                 "(Select * from ddf://adatao/a) " +
@@ -139,7 +134,7 @@ public class TableNameReplacerTests {
             assert(false);
         }
         try {
-            // statement = tableNameReplacer.run(statement);
+            // statement = SQLReformulator.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -155,7 +150,7 @@ public class TableNameReplacerTests {
      */
     @Test
     public  void testFullURI() throws  DDFException {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
         String sqlcmd = "select SUM(ddf://adatao/a.b) from ddf://adatao/a group by ddf://adatao/a.a";
         Statement statement = null;
         try {
@@ -166,7 +161,7 @@ public class TableNameReplacerTests {
         }
 
         try {
-            // statement = tableNameReplacer.run(statement);
+            // statement = SQLReformulator.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -176,9 +171,9 @@ public class TableNameReplacerTests {
 
     public Statement testFullURISingle(String sqlcmd) throws Exception {
         Statement statement = parser.parse(new StringReader(sqlcmd));
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
         return null;
-        // return tableNameReplacer.run(statement);
+        // return SQLReformulator.run(statement);
     }
 
     @Test
@@ -246,8 +241,8 @@ public class TableNameReplacerTests {
      */
     @Test
     public void testNamespace() throws  DDFException {
-        TableNameReplacer tableNameReplacer  = new TableNameReplacer(manager);
-        // TableNameReplacer tableNameReplacer  = new TableNameReplacer
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
+        // SQLReformulator SQLReformulator  = new SQLReformulator
         //        (manager, "adatao");
 
         String sqlcmd = "select a.b from a";
@@ -259,7 +254,7 @@ public class TableNameReplacerTests {
             assert(false);
         }
         try {
-            // tableNameReplacer.run(statement);
+            // SQLReformulator.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -276,9 +271,9 @@ public class TableNameReplacerTests {
     @Test
     public void testList() throws  DDFException {
         String[] uris={"ddf://adatao/a", "ddf://adatao/b"};
-        // TableNameReplacer tableNameReplacer = new TableNameReplacer(manager,
+        // SQLReformulator SQLReformulator = new SQLReformulator(manager,
         //        Arrays.asList(uris));
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager,
+        SQLReformulator sqlReformulator = new SQLReformulator(manager,
                     null);
 
         String sqlcmd = "select {1}.a,{2}.b from {1}";
@@ -292,7 +287,7 @@ public class TableNameReplacerTests {
         }
 
         try {
-            // tableNameReplacer.run(statement);
+            // SQLReformulator.run(statement);
         } catch (Exception e) {
             e.printStackTrace();
             assert(false);
@@ -315,14 +310,14 @@ public class TableNameReplacerTests {
         };
 
 
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(this.manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(this.manager);
         String sqlcmd = "select %s(ddf://adatao/a.year) from ddf://adatao/a";
         String doubleSqlCmd = "select %s(ddf://adatao/a.year, ddf://adatao/a.rev) from ddf://adatao/a";
         for (String udfname : singleParamUDFs) {
             String newSqlCmd = String.format(sqlcmd, udfname);
             try {
                 Statement statement = parser.parse(new StringReader(newSqlCmd));
-                // statement = tableNameReplacer.run(statement);
+                // statement = SQLReformulator.run(statement);
                 assert (statement.toString().toLowerCase().equals(
                         String.format("select %s(tablename1.year) from tablename1", udfname)
                 ));
@@ -339,7 +334,7 @@ public class TableNameReplacerTests {
             String newSqlCmd = String.format(doubleSqlCmd, udfname);
             try {
                 Statement statement = parser.parse(new StringReader(newSqlCmd));
-                // statement = tableNameReplacer.run(statement);
+                // statement = SQLReformulator.run(statement);
                 assert (statement.toString().toLowerCase().equals(
                         String.format("select %s(tablename1.year, tablename1.rev) from tablename1",
                                 udfname)));
@@ -386,7 +381,7 @@ public class TableNameReplacerTests {
     public void BatchTestArithOps() {
         String[] arithOps = {"+", "-", "*", "/", "%", "&", "|", "^"};
         String sqlcmd = "select ddf://adatao/a.id %s ddf://adatao/a.id2 from ddf://adatao/a";
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(this.manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(this.manager);
         for (String arithOp : arithOps) {
             String newSqlCmd = String.format(sqlcmd, arithOp);
             Statement statement = null;
@@ -404,7 +399,7 @@ public class TableNameReplacerTests {
     public void BatchTestRelationalOps() {
         String[] relationalOps = {"=", "<=>", "<>", "!=", "<", "<=", ">", ">="};
         String sqlcmd = "select * from ddf://adatao/a where ddf://adatao/a.id %s ddf://adatao/a.id2";
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(this.manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(this.manager);
         for (String relationalOp : relationalOps) {
             String newSqlCmd = String.format(sqlcmd, relationalOp);
             try {
@@ -438,7 +433,7 @@ public class TableNameReplacerTests {
         try {
 
             Statement newStat = parser.parse(new StringReader(testSqlCmd));
-            // newStat = tableNameReplacer.run(newStat);
+            // newStat = SQLReformulator.run(newStat);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -447,7 +442,7 @@ public class TableNameReplacerTests {
 
     @Test
     public void testBlankQuotation() {
-        TableNameReplacer tableNameReplacer  = new TableNameReplacer(manager);
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
 
         String sqlcmd = "select value from a where value = \"\"";
         Statement statement = null;

@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  * This class is used to check every table name that appears in the statement and do corresponding replacement.
  * It extends the TableVisitor class and should override the visit function.
  */
-public class TableNameReplacer extends TableVisitor {
+public class SQLReformulator extends TableVisitor {
     // The URI regex representation.
     private Pattern mUriPattern = Pattern.compile("ddf:\\/\\/.*");
     // The index regex representation.
@@ -101,7 +101,7 @@ public class TableNameReplacer extends TableVisitor {
      * @Note The default uri regex matches "ddf://". So we don't specify the urigex, we will
      * have default one the match.
      */
-    public TableNameReplacer(DDFManager ddfManager) {
+    public SQLReformulator(DDFManager ddfManager) {
         this.mDDFManager = ddfManager;
     }
 
@@ -121,7 +121,7 @@ public class TableNameReplacer extends TableVisitor {
      *                  and {number} match fail, and namespace is specified, the tablename will be
      *                  converted to ddf://namespace/tablename automatically.
      */
-    public TableNameReplacer(DDFManager ddfManager, DataSourceDescriptor ds) {
+    public SQLReformulator(DDFManager ddfManager, DataSourceDescriptor ds) {
         this.mDDFManager = ddfManager;
         this.mDS = (SQLDataSourceDescriptor)ds;
     }
@@ -130,9 +130,7 @@ public class TableNameReplacer extends TableVisitor {
      * @brief Constructor
      * @param ddfManager
      */
-    public TableNameReplacer(DDFManager ddfManager,
-                             DataSourceDescriptor ds,
-                             String uriRegex) {
+    public SQLReformulator(DDFManager ddfManager, DataSourceDescriptor ds, String uriRegex) {
         this.mDDFManager = ddfManager;
         this.mDS = (SQLDataSourceDescriptor)ds;
         this.mUriPattern = Pattern.compile(uriRegex);

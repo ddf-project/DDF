@@ -5,7 +5,7 @@ package io.ddf.etl;
 
 
 import io.ddf.DDF;
-import io.ddf.TableNameReplacer;
+import io.ddf.SQLReformulator;
 import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.SqlResult;
@@ -96,14 +96,14 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
     return this.sqlHandle(command,
                           maxRows,
                           dataSource,
-                          new TableNameReplacer(this.getManager(), dataSource));
+                          new SQLReformulator(this.getManager(), dataSource));
   }
 
 
   public SqlResult sqlHandle(String sqlcmd,
                              Integer maxRows,
                              DataSourceDescriptor dataSource,
-                             TableNameReplacer tableNameReplacer) throws DDFException {
+                             SQLReformulator sqlReformulator) throws DDFException {
     // If the user specifies the datasource, we should directly send the sql
     // command to the sql engine.
     if (dataSource != null) {
@@ -137,10 +137,10 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         return this.showTables();
       } else if (statement instanceof  DescribeTable){
         return this.describeTable(((DescribeTable)statement).getName()
-                .getName(), tableNameReplacer.getNamespace());
+                .getName(), sqlReformulator.getNamespace());
       } else if (statement instanceof  Select) {
         // Standard SQL.
-          statement = tableNameReplacer.run(statement);
+          statement = sqlReformulator.run(statement);
           this.mLog.info("Reformulate SQL to " + statement.toString());
           return this.sql(statement.toString(), maxRows, dataSource);
       } else if (statement instanceof Drop) {
@@ -169,13 +169,13 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
                          schema,
                          dataSource,
                          dataFormat,
-                         new TableNameReplacer(this.getManager(), dataSource));
+                         new SQLReformulator(this.getManager(), dataSource));
   }
   public DDF sql2ddfHandle(String command,
                            Schema schema,
                            DataSourceDescriptor dataSource,
                            DataFormat dataFormat,
-                           TableNameReplacer tableNameReplacer) throws DDFException {
+                           SQLReformulator sqlReformulator) throws DDFException {
 
     if (dataSource != null) {
         if (dataSource instanceof JDBCDataSourceDescriptor) {
@@ -205,7 +205,7 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
       if (!(statement instanceof Select)) {
         throw  new DDFException("ERROR: Only select is allowed in this sql2ddf");
       } else {
-        statement = tableNameReplacer.run(statement);
+        statement = sqlReformulator.run(statement);
         this.mLog.info("Reformulate SQL to " + statement.toString());
         // TODO(fanj) optimization here;
         return this.sql2ddf(statement.toString(), schema, dataSource,
