@@ -31,6 +31,29 @@ class DDFManager(object):
             self._gateway_client.close()
             raise
 
+    def load_file(self, path, seperator=' '):
+        """
+        Load a csv file
+        :param path:
+        :param seperator:
+        :return:
+        """
+        return DistributedDataFrame(self._jdm.loadFile(path, seperator), self._gateway_client)
+
+    def load_jdbc(self, uri, username, password, table):
+        """
+        Load a table in JDBC
+        (Not tested)
+
+        :param uri:
+        :param username:
+        :param password:
+        :param table:
+        :return:
+        """
+        descriptor = self._gateway_client.jvm.io.ddf.datasource.JDBCDataSourceDescriptor(uri, username, password, table)
+        return DistributedDataFrame(self._jdm.load(descriptor), self._gateway_client)
+
     def list_ddfs(self):
         """
         List all the DDFs

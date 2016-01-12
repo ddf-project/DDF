@@ -54,8 +54,34 @@ class LinearRegressionModel(GeneralizedLinearModel):
     def __init__(self, jml_model, gateway_client, weights):
         super(LinearRegressionModel, self).__init__(jml_model, gateway_client, weights)
 
+    def summary(self, print_out=True):
+        s = 'Linear regression model:\n\n{}'.format(self.weights)
+        if print_out:
+            print s
+        else:
+            return s
+
+    def __repr__(self):
+        return 'LinearRegressionModel({} features)'.format(len(self.weights.columns))
+
+    def __str__(self):
+        return 'LinearRegressionModel({} features)'.format(len(self.weights.columns))
+
 
 class LogisticRegressionModel(GeneralizedLinearModel):
 
     def __init__(self, jml_model, gateway_client, weights):
         super(LogisticRegressionModel, self).__init__(jml_model, gateway_client, weights)
+
+    def summary(self, print_out=True):
+        s = 'Logistic regression model:\n\n{}'.format(self.weights)
+        if print_out:
+            print s
+        else:
+            return s
+
+    def __repr__(self):
+        return 'LogisticRegressionModel({} features)'.format(len(self.weights.columns))
+
+    def __str__(self):
+        return 'LogisticRegressionModel({} features)'.format(len(self.weights.columns))
