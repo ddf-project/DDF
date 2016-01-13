@@ -346,6 +346,12 @@ public abstract class DDF extends ALoggable //
         if (columnSet.contains(column.getName())) {
           throw new DDFException(String.format("Duplicated column name %s", column.getName()));
         } else {
+          Pattern p = Pattern.compile("^[a-zA-Z0-9_-]*$");
+          Matcher m = p.matcher(column.getName());
+          if(!m.find()) {
+            throw new DDFException(String.format("Invalid column name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
+                "and dash (\"-\") and underscore (\"_\")", column.getName()));
+          }
           columnSet.add(column.getName());
         }
       }
