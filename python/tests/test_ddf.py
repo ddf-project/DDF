@@ -90,5 +90,22 @@ class TestDDF(test_base.BaseTest):
     def testAggregate(self):
         self.assertIsInstance(self.mtcars.aggregate(['sum(mpg)', 'min(hp)'], ['vs', 'am']), pd.DataFrame)
 
+    def testSubset(self):
+        ddf = self.mtcars['mpg']
+        self.assertIsInstance(ddf, DistributedDataFrame)
+        self.assertEqual(ddf.ncol, 1)
+        self.assertEqual(ddf.nrow, self.mtcars.nrow)
+
+        ddf = self.mtcars[0]
+        self.assertIsInstance(ddf, DistributedDataFrame)
+        self.assertEqual(ddf.ncol, 1)
+        self.assertEqual(ddf.nrow, self.mtcars.nrow)
+        self.assertEqual(ddf.colnames[0], self.mtcars.colnames[0])
+
+        ddf = self.mtcars[['mpg', 2]]
+        self.assertIsInstance(ddf, DistributedDataFrame)
+        self.assertEqual(ddf.ncol, 2)
+        self.assertEqual(ddf.nrow, self.mtcars.nrow)
+
 if __name__ == '__main__':
     unittest.main()

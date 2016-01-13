@@ -43,6 +43,34 @@ class DistributedDataFrame(object):
     def __len__(self):
         return self.nrow
 
+    def __getitem__(self, item):
+        if not isinstance(item, (list, slice, int, basestring)):
+            raise ValueError('Only support sub-setting on columns')
+
+        col_names = self.colnames
+
+        if isinstance(item, (int, basestring)):
+            item = [item]
+        elif isinstance(item, slice):
+            item = range(*item.indices(len(col_names)))
+
+        assert isinstance(item, list)
+
+        projected_cols = []
+        for x in item:
+            if isinstance(x, int):
+                if x < 0 or x >= len(col_names):
+                    raise ValueError('Invalid column index: {}'.format(x))
+                projected_cols.append(col_names[x])
+            elif isinstance(x, basestring):
+                if x not in col_names:
+                    raise ValueError('Invalid column name: {}'.format(x))
+                projected_cols.append(x)
+
+        return DistributedDataFrame(self._jddf.getViewHandler().project(
+                util.to_java_array(projected_cols, self._gateway_client.jvm.String, self._gateway_client)),
+                self._gateway_client)
+
     ###########################################################################
 
     @property
