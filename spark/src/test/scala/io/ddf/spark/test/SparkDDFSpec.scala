@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package it.io.ddf.spark
+package io.ddf.spark.test
 
 import io.ddf.test.it._
 import org.junit.runner.RunWith
