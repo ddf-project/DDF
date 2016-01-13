@@ -20,7 +20,7 @@ print(ddf.summary())
 
 print(ddf.head(2))
 
-ddf.aggregate('sum(mpg), min(hp)', 'vs, am')
+print(ddf.aggregate(['sum(mpg)', 'min(hp)'], ['vs', 'am']))
 
 print(ddf.five_nums())
 

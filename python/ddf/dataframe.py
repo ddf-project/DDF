@@ -304,8 +304,27 @@ class DistributedDataFrame(object):
         :param by_columns: a list of grouping columns
         :return:
         """
+        col_names = self.colnames
+        col_types = self.coltypes
+        if isinstance(aggr_columns, basestring):
+            aggr_columns = [aggr_columns]
+        if isinstance(by_columns, basestring):
+            by_columns = [by_columns]
+        if (not isinstance(aggr_columns, list)) or (not isinstance(by_columns, list)) or \
+            len(aggr_columns) == 0 or len(by_columns) == 0:
+            raise ValueError('Invalid column names')
 
-        return self._jddf.aggregate(by_columns + "," + aggr_columns)
+        if not all([x in col_names for x in by_columns]):
+            raise ValueError('Invalid column names in by_columns')
+
+        res = dict(self._jddf.aggregate(','.join(by_columns) + "," + ','.join(aggr_columns)))
+        data = []
+        for k, v in res.iteritems():
+            data.append(k.split('\t') + list(v))
+        df = pd.DataFrame(data=data, columns=by_columns+aggr_columns)
+        for c in by_columns:
+            df[c] = df[c].astype(util.to_python_type(col_types[col_names.index(c)]))
+        return df
 
     def correlation(self, col1, col2):
         """

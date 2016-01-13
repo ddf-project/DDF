@@ -87,5 +87,8 @@ class TestDDF(test_base.BaseTest):
         self.assertRaises(ValueError, self.airlines.correlation, 'Diverted', 'DayOfWeek')
         self.assertRaises(ValueError, self.airlines.correlation, 'Diverted', 'stupid_column')
 
+    def testAggregate(self):
+        self.assertIsInstance(self.mtcars.aggregate(['sum(mpg)', 'min(hp)'], ['vs', 'am']), pd.DataFrame)
+
 if __name__ == '__main__':
     unittest.main()
