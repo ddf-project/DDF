@@ -43,7 +43,14 @@ public class SparkDDFSangDnTest {
 
         }
     }
-
+    @Test
+    public void sqlResultTest() throws DDFException {
+        SqlResult result = ddfManager.sql("select * from airline", dsName);
+        System.out.println("Schema :" +result.getSchema().toString());
+        for(String s : result.getRows()){
+            System.out.println(s);
+        }
+    }
     @Test
     public void showDDFBasicInfo() throws DDFException {
         DDF ddf = ddfManager.sql2ddf("select * from airline", dsName);

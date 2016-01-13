@@ -356,7 +356,7 @@ public class SparkDDFManager extends DDFManager {
         + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY '" + fieldSeparator + "'";
     sql(cmd, "SparkSQL");
     sql("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
-        "INTO TABLE " + tableName, "SparkSQL");
+        " " + tableName, "INTO TABLESparkSQL");
     return sql2ddf("SELECT * FROM " + tableName, "SparkSQL");
   }
 
