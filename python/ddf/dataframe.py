@@ -300,11 +300,11 @@ class DistributedDataFrame(object):
         Split the DistributedDataFrame into sub-sets
         by some columns and perform aggregation on some columns within each sub-set
 
-        :param aggr_columns:
-        :param by_columns:
+        :param aggr_columns: a list of columns to calculate summary statistics
+        :param by_columns: a list of grouping columns
         :return:
         """
-        # TODO: implement this properly
+
         return self._jddf.aggregate(by_columns + "," + aggr_columns)
 
     def correlation(self, col1, col2):
@@ -315,8 +315,13 @@ class DistributedDataFrame(object):
         :param col2: a numeric column
         :return: a float
         """
-        # TODO: implement this properly
-        return self._jddf.correlation(col1, col2)
+        col_names = self.colnames
+        col_types = self.coltypes
+        if col1 not in col_names or not util.is_numeric_ddf_type(col_types[col_names.index(col1)]):
+            raise ValueError('col1: expect a numeric column name')
+        if col2 not in col_names or not util.is_numeric_ddf_type(col_types[col_names.index(col2)]):
+            raise ValueError('col2: expect a numeric column name')
+        return float(self._jddf.correlation(col1, col2))
 
     ###########################################################################
 
@@ -336,3 +341,4 @@ class DistributedDataFrame(object):
             raise ValueError('Invalid column names of the data frame')
 
         return util.convert_column_types(df, self.coltypes, raise_on_error)
+

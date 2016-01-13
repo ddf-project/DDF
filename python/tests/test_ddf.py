@@ -81,5 +81,11 @@ class TestDDF(test_base.BaseTest):
         ddf2 = self.airlines.join(self.airlines, self.airlines.colnames[0])
         self.assertIsInstance(ddf2, DistributedDataFrame)
 
+    def testCorrelation(self):
+        self.assertIsInstance(self.mtcars.correlation('mpg', 'cyl'), float)
+        self.assertAlmostEqual(self.mtcars.correlation('mpg', 'mpg'), 1.0)
+        self.assertRaises(ValueError, self.airlines.correlation, 'Diverted', 'DayOfWeek')
+        self.assertRaises(ValueError, self.airlines.correlation, 'Diverted', 'stupid_column')
+
 if __name__ == '__main__':
     unittest.main()

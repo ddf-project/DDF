@@ -29,6 +29,18 @@ TYPE_MAPPING = {'integer': int,
                 }
 
 
+NUMERIC_DDF_TYPES = ['int', 'tinyint', 'smallint', 'bigint', 'integer', 'double', 'float', 'decimal']
+
+
+def is_numeric_ddf_type(t):
+    """
+    Check if column type t is a numeric type in DDF's set of types
+    :param t: column type
+    :return: True/False
+    """
+    return t.lower() in NUMERIC_DDF_TYPES
+
+
 def to_bool(x):
     """
     Try our best to make x into a boolean value
