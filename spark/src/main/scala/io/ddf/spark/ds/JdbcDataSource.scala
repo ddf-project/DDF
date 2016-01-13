@@ -15,15 +15,19 @@ class JdbcDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
   }
 
   override def loadDDF(user: User, options: util.Map[AnyRef, AnyRef]): DDF = {
-    if (!options.containsKey("table")) {
-      throw new DDFException("Option table is required to load from JDBC")
+    val query = if (options.containsKey("query")) {
+      options.get("query").toString
+    } else if (options.containsKey("table")) {
+      val table = options.get("table")
+      s"select * from $table"
+    } else {
+      throw new DDFException("Required either 'table' or 'query' option to load from JDBC")
     }
-    val table = options.get("table").toString
     val connectionUri = getConnectionUri(user, options)
     val hiveContext = manager.asInstanceOf[SparkDDFManager].getHiveContext
     val props = new Properties()
     props.putAll(options)
-    val df = hiveContext.read.jdbc(connectionUri, table, props)
+    val df = hiveContext.read.jdbc(connectionUri, query, props)
     SparkUtils.df2ddf(df, manager)
   }
 
