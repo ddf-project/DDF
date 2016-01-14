@@ -370,7 +370,8 @@ public class TableNameReplacer extends TableVisitor {
                     "if you use {number} as index, the number should begin from 1");
         }
         if (idx > identifierList.size()) {
-            throw new Exception(new ArrayIndexOutOfBoundsException());
+            throw new DDFException(String.format("Don't have enough ddfs in the list. The index is %d and the ddf " +
+                "number is %d", idx, identifierList.size()));
         } else {
             String identifier = identifierList.get(idx - 1);
 
