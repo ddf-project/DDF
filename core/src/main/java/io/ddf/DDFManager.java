@@ -653,4 +653,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   public abstract DDF createDDF(Map<Object, Object> options) throws DDFException;
+
+  public abstract String getSourceUri();
 }

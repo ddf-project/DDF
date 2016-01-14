@@ -309,11 +309,6 @@
             <version>1.7</version>
         </dependency>
         <dependency>
-            <groupId>org.hive.serde</groupId>
-            <artifactId>csv-serde</artifactId>
-            <version>0.9.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.7.2</version>

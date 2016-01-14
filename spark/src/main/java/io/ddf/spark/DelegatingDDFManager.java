@@ -57,6 +57,11 @@ public class DelegatingDDFManager extends DDFManager {
   }
 
   @Override
+  public String getSourceUri() {
+    return uri;
+  }
+
+  @Override
   public String getEngine() {
     return null;
   }

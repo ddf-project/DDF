@@ -313,11 +313,6 @@
             <artifactId>joda-convert</artifactId>
             <version>1.7</version>
         </dependency>
-        <dependency>
-            <groupId>org.hive.serde</groupId>
-            <artifactId>csv-serde</artifactId>
-            <version>0.9.1</version>
-        </dependency>
     </dependencies>
     <repositories>
         <repository>

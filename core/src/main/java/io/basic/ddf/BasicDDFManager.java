@@ -67,4 +67,9 @@ public class BasicDDFManager extends DDFManager {
   public DDF createDDF(Map<Object, Object> options) throws DDFException {
     throw new UnsupportedOperationException();
   }
+
+  @Override
+  public String getSourceUri() {
+    return "basic://";
+  }
 }

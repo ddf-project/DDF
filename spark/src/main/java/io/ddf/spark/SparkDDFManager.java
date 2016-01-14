@@ -389,6 +389,11 @@ public class SparkDDFManager extends DDFManager {
     return ds.loadDDF(currentUser, options);
   }
 
+  @Override
+  public String getSourceUri() {
+    return "spark://";
+  }
+
   /**
    * Given a String[] vector of data values along one column, try to infer what the data type should be.
    * <p/>
