@@ -3,13 +3,17 @@ package io.ddf.spark.ds
 import java.util
 
 import io.ddf.content.Schema
+import io.ddf.content.Schema.ColumnType
 import io.ddf.exception.DDFException
+import org.apache.spark.sql.types._
 
 import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+
 
 trait FileFormat
 
-case class CsvFileFormat(schema: Schema, delimiter: String, quote: String) extends FileFormat
+case class CsvFileFormat(schema: Option[StructType]) extends FileFormat
 
 case class JsonFileFormat(flatten: Boolean) extends FileFormat
 
@@ -36,14 +40,35 @@ object FileFormat {
 }
 
 object CsvFileFormat {
-  def apply(options: util.Map[AnyRef, AnyRef]): CsvFileFormat = {
-    if (!options.containsKey("schema")) {
-      throw new DDFException("CSV file format requires a schema option")
+
+  def toSparkType(typ: ColumnType): DataType = {
+    typ match {
+      case ColumnType.TINYINT => ByteType
+      case ColumnType.SMALLINT => ShortType
+      case ColumnType.INT => IntegerType
+      case ColumnType.BIGINT => LongType
+      case ColumnType.FLOAT => FloatType
+      case ColumnType.DOUBLE => DoubleType
+      case ColumnType.DECIMAL => DecimalType()
+      case ColumnType.STRING => StringType
+      case ColumnType.BOOLEAN => BooleanType
+      case ColumnType.TIMESTAMP => TimestampType
+      case ColumnType.DATE => DateType
+      case _ =>
+        throw new DDFException(s"csv data cannot contains type $typ")
     }
-    val schema = new Schema(options.get("schema").toString)
-    val delimiter = options.getOrElse("delimiter", ",").toString
-    val quote = options.getOrElse("quote", "\"").toString
-    new CsvFileFormat(schema, delimiter, quote)
+  }
+
+  def toSparkStructType(schema: Schema): StructType = {
+    val fields = schema.getColumns.map { col =>
+      StructField(col.getName, toSparkType(col.getType), nullable = true)
+    }
+    StructType(fields)
+  }
+
+  def apply(options: util.Map[AnyRef, AnyRef]): CsvFileFormat = {
+    val schema = options.asScala.get("schema") map { s => toSparkStructType(new Schema(s.toString)) }
+    new CsvFileFormat(schema)
   }
 }
 

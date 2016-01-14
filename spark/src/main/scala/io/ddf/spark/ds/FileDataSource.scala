@@ -26,17 +26,28 @@ import scala.util.{Success, Try}
 class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(uri, manager) {
 
   override def loadDDF(user: User, options: util.Map[AnyRef, AnyRef]): DDF = {
+    val optionsAsStrings = options.map { case (key, value) => (s"$key", s"$value") }
     val dataUri = getDataFilesUri(user, options)
     val format = FileFormat(options)
     val ddf = format match {
       case format: CsvFileFormat =>
-        val table = createTable(dataUri, format)
-        manager.sql2ddf(s"select * from $table", "spark")
+        sparkRead(dataUri) { (ctx, uri) =>
+          val reader = ctx.read
+            .format("com.databricks.spark.csv")
+            .option("parserLib", "univocity")
+            .options(optionsAsStrings)
+          if (format.schema.isDefined) {
+            reader.schema(format.schema.get)
+          } else {
+            reader.option("inferSchema", "true")
+          }
+          reader.load(uri)
+        }
       case format: JsonFileFormat =>
-        val ddf = sparkRead(dataUri) { (ctx, uri) => ctx.read.json(uri) }
+        val ddf = sparkRead(dataUri) { (ctx, uri) => ctx.read.options(optionsAsStrings).json(uri) }
         if (format.flatten) ddf.getFlattenedDDF else ddf
       case format: ParquetFileFormat =>
-        val ddf = sparkRead(dataUri) { (ctx, uri) => ctx.read.parquet(uri) }
+        val ddf = sparkRead(dataUri) { (ctx, uri) => ctx.read.options(optionsAsStrings).parquet(uri) }
         if (format.flatten) ddf.getFlattenedDDF else ddf
       case _ =>
         throw new DDFException(s"Unsupported file format: $format")
@@ -44,7 +55,9 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
 
     // try to set columns name if a schema option is passed
     if (options.containsKey("schema")) {
-      val maybeSchema = Try {new Schema(options.get("schema").toString)}
+      val maybeSchema = Try {
+        new Schema(options.get("schema").toString)
+      }
       maybeSchema match {
         case Success(schema) =>
           ddf.setColumnNames(schema.getColumnNames)
@@ -89,17 +102,6 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
     } else {
       s"$uri$path"
     }
-  }
-
-  protected def createTable(dataUri: String, format: CsvFileFormat): String = {
-    val tableName = UUID.randomUUID().toString.replace("-", "_")
-    val sqlCmd =
-      s"""CREATE EXTERNAL TABLE $tableName (${format.schema})
-          |   ROW FORMAT SERDE 'com.bizo.hive.serde.csv.CSVSerde'
-          |     WITH serdeproperties ('separatorChar' = '${format.delimiter}', 'quoteChar' = '${format.quote}')
-          | STORED AS TEXTFILE LOCATION '$dataUri'""".stripMargin.replaceAll("\n", " ")
-    manager.sql(sqlCmd, "spark")
-    tableName
   }
 }
 
