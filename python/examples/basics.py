@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from ddf import DDFManager, DDF_HOME
 
 dm = DDFManager('spark')
@@ -15,15 +16,15 @@ print('Columns: ' + ', '.join(ddf.colnames))
 print('Number of columns: {}'.format(ddf.cols))
 print('Number of rows: {}'.format(ddf.rows))
 
-ddf.summary()
+print(ddf.summary())
 
-ddf.head(10)
+print(ddf.head(2))
 
-ddf.aggregate('sum(mpg), min(hp)', 'vs, am')
+print(ddf.aggregate(['sum(mpg)', 'min(hp)'], ['vs', 'am']))
 
-ddf.five_nums()
+print(ddf.five_nums())
 
-ddf.sample(10)
+print(ddf.sample(3))
 
 dm.shutdown()
 

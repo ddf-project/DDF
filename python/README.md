@@ -8,6 +8,7 @@ Assume that the DDF package is already successfully built. We need to install th
 
     $ cd <DDF_DIRECTORY>/python
     $ pip install -r requirements.txt
+    $ python setup.py develop
     
 Then we will need to set the `$DDF_HOME` environment variable:
 
@@ -68,4 +69,4 @@ Now inside the Python interpreter, the DDF API is ready for usage:
 
     $ cd <YOUR_DDF_DIRECTORY>/python
     $ DDF_HOME=../ python examples/basics.py
-    $ DDF_HOME=../ python tests/manager.py
+    $ DDF_HOME=../ python tests/test_ddf.py
