@@ -67,6 +67,9 @@ object CsvFileFormat {
   }
 
   def apply(options: util.Map[AnyRef, AnyRef]): CsvFileFormat = {
+    if (!options.containsKey("schema")) {
+      throw new DDFException("schema param is required for csv format")
+    }
     val schema = options.asScala.get("schema") map { s => toSparkStructType(new Schema(s.toString)) }
     new CsvFileFormat(schema)
   }
