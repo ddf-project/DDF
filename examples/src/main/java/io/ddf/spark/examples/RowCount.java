@@ -27,7 +27,7 @@ public class RowCount {
   public static void main(String[] args) throws DDFException {
 
     DDFManager manager = DDFManager.get(DDFManager.EngineType.SPARK);
-    manager.sql("drop table if exists airline", "SparkSQL");
+    manager.sql("drop table if exists airline", false);
 
     manager.sql("create table airline (Year int,Month int,DayofMonth int,"
         + "DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,"
@@ -37,11 +37,11 @@ public class RowCount {
         + "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, "
         + "CancellationCode string, Diverted string, CarrierDelay int, "
         + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
-        + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", "SparkSQL");
+        + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", false);
 
-    manager.sql("load data local inpath 'resources/test/airline.csv' into table airline", "SparkSQL");
+    manager.sql("load data local inpath 'resources/test/airline.csv' into table airline", false);
 
-    DDF ddf = manager.sql2ddf("SELECT * FROM AIRLINE", "SparkSQL");
+    DDF ddf = manager.sql2ddf("SELECT * FROM AIRLINE", false);
 
     long nrow = ddf.getNumRows();
     int ncol = ddf.getNumColumns();

@@ -9,8 +9,8 @@ class ListDDFSuite extends ATestSuite {
   createTableAirline()
 
   test("test list ddf") {
-    val ddf1 = manager.sql2ddf("select * from mtcars", "SparkSQL")
-    val ddf2 = manager.sql2ddf("select * from airline", "SparkSQL")
+    val ddf1 = manager.sql2ddf("select * from mtcars", false)
+    val ddf2 = manager.sql2ddf("select * from airline", false)
     ddf1.getManager.setDDFName(ddf1, "mtcars")
     ddf2.getManager.setDDFName(ddf2, "airline")
     manager.addDDF(ddf2)

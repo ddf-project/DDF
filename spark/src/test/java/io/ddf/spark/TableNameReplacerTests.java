@@ -357,7 +357,7 @@ public class TableNameReplacerTests {
      */
     @Test
     public  void testLoading() throws  DDFException {
-        SQLDataSourceDescriptor sqlDataSourceDescriptor = new SQLDataSourceDescriptor(null, "SparkSQL", null, null, null);
+        SQLDataSourceDescriptor sqlDataSourceDescriptor = new SQLDataSourceDescriptor(null, false, null, null, null);
         manager.sql("drop table if exists airline", sqlDataSourceDescriptor);
 
         manager.sql("create table airline (Year int,Month int,DayofMonth int,"

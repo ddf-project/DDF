@@ -8,7 +8,7 @@ class CopyDDFSuite extends ATestSuite {
   createTableMtcars()
   createTableAirline()
   test("copy ddf") {
-    val ddf1 = manager.sql2ddf("select * from mtcars", "SparkSQL")
+    val ddf1 = manager.sql2ddf("select * from mtcars",  false)
     Array("cyl", "hp", "vs", "am", "gear", "carb").foreach {
       col => ddf1.getSchemaHandler.setAsFactor(col)
     }

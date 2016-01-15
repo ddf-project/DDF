@@ -86,7 +86,7 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
 
     var intervals = createIntervals(breaks, includeLowest, right)
 
-    var newddf = mDDF.getManager().sql2ddf(createTransformSqlCmd(column, intervals, includeLowest, right), this.getEngine)
+    var newddf = mDDF.getManager().sql2ddf(createTransformSqlCmd(column, intervals, includeLowest, right), false)
 
     //    mDDF.getManager().addDDF(newddf)
 

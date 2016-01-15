@@ -13,7 +13,7 @@ public class KMeansTest extends BaseTest {
   public void TestKMeans() throws DDFException {
     createTableAirline();
 
-    DDF ddf = manager.sql2ddf("select deptime, arrtime, distance, depdelay, arrdelay from airline", "SparkSQL");
+    DDF ddf = manager.sql2ddf("select deptime, arrtime, distance, depdelay, arrdelay from airline", false);
 
     KMeansModel kmeansModel = (KMeansModel) ddf.ML.KMeans(5, 5, 2, "random").getRawModel();
     Assert.assertEquals(5, kmeansModel.clusterCenters().length);

@@ -42,7 +42,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
     sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
 
-    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
+    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), false);
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
     return newddf;
   }
@@ -69,7 +69,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
     sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
 
-    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
+    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), false);
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
     return newddf;
 
@@ -136,7 +136,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   /**
    * Parse R transform expression to Hive equivalent
    *
-   * @param transformExpr : e.g: "foobar = arrtime - crsarrtime, speed = distance / airtime"
+   * @param RExps : e.g: "foobar = arrtime - crsarrtime, speed = distance / airtime"
    * @return "(arrtime - crsarrtime) as foobar, (distance / airtime) as speed
    */
 

@@ -14,7 +14,7 @@ public class MetricsTests {
   public void testConfusionMatrix() throws DDFException {
     DDFManager manager = DDFManager.get(DDFManager.EngineType.SPARK);
     try {
-      manager.sql("drop table if exists airline", "SparkSQL");
+      manager.sql("drop table if exists airline", false);
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -27,12 +27,12 @@ public class MetricsTests {
         + "Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, "
         + "CancellationCode string, Diverted string, CarrierDelay int, "
         + "WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) "
-        + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", "SparkSQL");
+        + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", false);
 
-    manager.sql("load data local inpath '../resources/test/airline.csv' into table airline", "SparkSQL");
+    manager.sql("load data local inpath '../resources/test/airline.csv' into table airline", false);
 
     DDF ddf = manager.sql2ddf("select " +
-        "distance, depdelay, if (arrdelay > 10.89, 1, 0) as delayed from airline", "SparkSQL");
+        "distance, depdelay, if (arrdelay > 10.89, 1, 0) as delayed from airline", false);
     Assert.assertEquals(3, ddf.getSummary().length);
     IModel logModel = ddf.ML.train("logisticRegressionWithSGD", 10, 0.1);
     long[][] cm = ddf.ML.getConfusionMatrix(logModel, 0.5);
