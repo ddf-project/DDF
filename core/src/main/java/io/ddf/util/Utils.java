@@ -22,6 +22,8 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //import java.io.*;
 
@@ -261,6 +263,12 @@ public class Utils {
     }
 
     return res;
+  }
+
+  public static boolean isAlphaNumeric(String str) {
+    Pattern p = Pattern.compile("^[a-zA-Z0-9_-]*$");
+    Matcher m = p.matcher(str);
+    return m.find();
   }
 
   public static class JsonSerDes {
