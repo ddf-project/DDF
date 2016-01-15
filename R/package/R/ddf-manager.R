@@ -99,15 +99,15 @@ setMethod("load_jdbc",
 #' 
 #' @param x a DDFManager object
 #' @param sql the query string
-#' @param data.source data source type
+#' @param queryOnDDF whether the query is on ddf, or on the original engine 
 #' @return an R data.frame
 #' @export
 setMethod("sql",
-          signature("DDFManager", "character"),
-          function(x, sql, data.source) {
+          signature("DDFManager", "character", "logical"),
+          function(x, sql, queryOnDDF) {
             sql <- str_trim(sql)
             jdm <- x@jdm
-            java.ret <- jdm$sql(sql, data.source)
+            java.ret <- jdm$sql(sql, queryOnDDF)
             if (!grepl("^create.+$", tolower(sql)) && !grepl("^load.+$", tolower(sql))) {
               parse.sql.result(java.ret)
             }
@@ -121,14 +121,14 @@ setMethod("sql",
 #' @return a DistributedDataFrame
 #' @export
 setMethod("sql2ddf",
-          signature("DDFManager", "character"),
-          function(x, sql, data.source) {
+          signature("DDFManager", "character", "logical"),
+          function(x, sql, queryOnDDF) {
             sql <- str_trim(sql)
             if (!(str_detect(sql, "^[Ss][Ee][Ll][Ee][Cc][Tt].*"))) {
               stop("Only support SELECT queries")
             }
             jdm <- x@jdm
-            new("DDF", jdm$sql2ddf(sql, data.source))
+            new("DDF", jdm$sql2ddf(sql, queryOnDDF))
           }
 )
 
