@@ -12,15 +12,15 @@ class MLlibIntegrationSuite extends ATestSuite {
     createTableAirlineWithNA()
     createTableAirline()
 
-    manager.sql("drop table if exists airline_delayed", "SparkSQL")
-    manager.sql("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline", "SparkSQL")
+    manager.sql("drop table if exists airline_delayed", false)
+    manager.sql("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline", false)
 
     //for glm
     val ddfTrain3 = manager.sql2ddf("select " +
-      "distance/1000, arrdelay/100, depdelay/100, delayed from airline_delayed", "SparkSQL")
+      "distance/1000, arrdelay/100, depdelay/100, delayed from airline_delayed", false)
 
     val ddfPredict2 = manager.sql2ddf("select " +
-      "distance, arrdelay, depdelay, delayed from airline_delayed", "SparkSQL")
+      "distance, arrdelay, depdelay, delayed from airline_delayed", false)
 
     val kmeansModel = ddfPredict2.ML.KMeans(5: java.lang.Integer, 5: java.lang.Integer, 10: java.lang.Integer, "random")
     val yPred = ddfPredict2.ML.applyModel(kmeansModel, false, true)
@@ -30,9 +30,9 @@ class MLlibIntegrationSuite extends ATestSuite {
 
   test("test LinearRegressionWithSGD") {
     val trainDDF = manager.sql2ddf("select " +
-      "distance/1000, arrdelay/100, depdelay/100, delayed from airline_delayed", "SparkSQL")
+      "distance/1000, arrdelay/100, depdelay/100, delayed from airline_delayed", false)
     val predictDDF = manager.sql2ddf("select " +
-      "distance, arrdelay, depdelay, delayed from airline_delayed", "SparkSQL")
+      "distance, arrdelay, depdelay, delayed from airline_delayed", false)
     val regressionModel = trainDDF.ML.train("linearRegressionWithSGD", 10: java.lang.Integer,
       0.1: java.lang.Double, 0.1: java.lang.Double)
     val yTrueYpred = predictDDF.ML.applyModel(regressionModel, true, true)
@@ -46,7 +46,7 @@ class MLlibIntegrationSuite extends ATestSuite {
   test("test LogicticRegressionWithSGD") {
     // numIterations = 10, stepSize = 0.1
     val trainDDF = manager.sql2ddf("select " +
-      "distance, depdelay, if (arrdelay > 10.89, 1, 0) as delayed from airline_delayed", "SparkSQL")
+      "distance, depdelay, if (arrdelay > 10.89, 1, 0) as delayed from airline_delayed", false)
     val logRegModel = trainDDF.ML.train("logisticRegressionWithSGD", 10: java.lang.Integer, 0.1: java.lang.Double)
     val yPred = trainDDF.ML.applyModel(logRegModel, false, true)
     println(yPred.asInstanceOf[SparkDDF].getNumRows())

@@ -101,9 +101,8 @@ public class SparkDataSourceManager extends DataSourceManager {
          String sqlCmd = "create external table " + hiveTableName + " (" + schemaStr  + ") "
          + serdesString + " STORED AS TEXTFILE LOCATION '"+ uri.toString() + "'";
 
-        this.mDDFManager.sql(sqlCmd, this.mDDFManager.getEngine());
-        DDF ddf = this.mDDFManager.sql2ddf(String.format("select * from %s", hiveTableName), this.mDDFManager
-            .getEngine());
+        this.mDDFManager.sql(sqlCmd, false);
+        DDF ddf = this.mDDFManager.sql2ddf(String.format("select * from %s", hiveTableName), false);
 
         ddf.setColumnNames(columnNames);
         return ddf;

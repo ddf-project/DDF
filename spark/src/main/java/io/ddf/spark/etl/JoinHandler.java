@@ -87,7 +87,7 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
 
     mLog.info("Join SQL command: " +joinSqlCommand);
     try {
-      DDF resultDDF = this.getManager().sql2ddf(joinSqlCommand, "SparkSQL");
+      DDF resultDDF = this.getManager().sql2ddf(joinSqlCommand, false);
       return resultDDF;
     } catch (Exception e) {
       e.printStackTrace();

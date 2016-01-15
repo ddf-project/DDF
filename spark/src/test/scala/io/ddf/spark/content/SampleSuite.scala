@@ -7,7 +7,7 @@ import scala.collection.JavaConversions._
 class SampleSuite extends ATestSuite {
   createTableMtcars()
   test("test sample with numrows") {
-    val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
+    val ddf = manager.sql2ddf("select * from mtcars", false)
     val sample = ddf.VIEWS.getRandomSample(10)
 
     assert(sample(0)(0).asInstanceOf[Double] != sample(1)(0).asInstanceOf[Double])
@@ -17,7 +17,7 @@ class SampleSuite extends ATestSuite {
   }
 
   test("test sample with percentage") {
-    val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
+    val ddf = manager.sql2ddf("select * from mtcars", false)
     val sample = ddf.VIEWS.getRandomSample(0.5, false, 1)
     //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
     println("sample: ")
@@ -26,7 +26,7 @@ class SampleSuite extends ATestSuite {
 
   test("test sample with percentage when percentage is invalid") {
     try {
-      val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
+      val ddf = manager.sql2ddf("select * from mtcars", false)
       val sample = ddf.VIEWS.getRandomSample(5.0, false, 1)
       //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
       println("sample: ")

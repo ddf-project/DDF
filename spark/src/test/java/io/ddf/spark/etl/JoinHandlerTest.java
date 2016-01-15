@@ -17,8 +17,8 @@ public class JoinHandlerTest extends BaseTest {
     createTableMtcars();
     createTableCarOwner();
 
-    left_ddf = manager.sql2ddf("select * from mtcars", "SparkSQL");
-    right_ddf = manager.sql2ddf("select * from carowner", "SparkSQL");
+    left_ddf = manager.sql2ddf("select * from mtcars", false);
+    right_ddf = manager.sql2ddf("select * from carowner", false);
   }
   
   @Test

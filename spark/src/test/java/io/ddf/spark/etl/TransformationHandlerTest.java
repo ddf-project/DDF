@@ -24,7 +24,7 @@ public class TransformationHandlerTest extends BaseTest {
   public void setUp() throws Exception {
     createTableAirline();
     ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, " +
-            "distance, arrdelay, depdelay from airline", "SparkSQL");
+            "distance, arrdelay, depdelay from airline", false);
   }
 
   @Test

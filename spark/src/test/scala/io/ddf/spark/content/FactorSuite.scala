@@ -11,7 +11,7 @@ class FactorSuite extends ATestSuite {
   createTableAirlineWithNA()
 
   test("test get factors on DDF with TablePartition") {
-    val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
+    val ddf = manager.sql2ddf("select * from mtcars", false)
     val schemaHandler = ddf.getSchemaHandler
     Array(7, 8, 9, 10).foreach {
       idx => schemaHandler.setAsFactor(idx)
@@ -32,7 +32,7 @@ class FactorSuite extends ATestSuite {
   }
 
   test("test get factor with long column") {
-    val ddf = manager.sql2ddf("select mpg, cast(cyl as bigint) as cyl from mtcars", "SparkSQL")
+    val ddf = manager.sql2ddf("select mpg, cast(cyl as bigint) as cyl from mtcars", false)
     ddf.getSchemaHandler.setAsFactor("cyl")
     ddf.getSchemaHandler.computeFactorLevelsAndLevelCounts()
     assert(ddf.getSchemaHandler.getColumn("cyl").getType == ColumnType.BIGINT)
@@ -43,7 +43,7 @@ class FactorSuite extends ATestSuite {
   }
 
   test("test set factor for string columns") {
-    val ddf = manager.sql2ddf("select * from airlineWithNA", "SparkSQL")
+    val ddf = manager.sql2ddf("select * from airlineWithNA", false)
     assert(ddf.getSchemaHandler.getColumn("Origin").getType == ColumnType.STRING)
     assert(ddf.getSchemaHandler.getColumn("Origin").getColumnClass == ColumnClass.CHARACTER)
     ddf.getSchemaHandler.setFactorLevelsForStringColumns(ddf.getSchemaHandler.getColumns.map{col => col.getName}.toArray)
@@ -55,7 +55,7 @@ class FactorSuite extends ATestSuite {
   }
 
   test("test get factors for DDF with RDD[Array[Object]]") {
-    val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
+    val ddf = manager.sql2ddf("select * from mtcars", false)
     //    ddf.getRepresentationHandler.remove(classOf[RDD[_]], classOf[TablePartition])
 
     val schemaHandler = ddf.getSchemaHandler
@@ -81,7 +81,7 @@ class FactorSuite extends ATestSuite {
   }
 
   test("test NA handling") {
-    val ddf = manager.sql2ddf("select * from airlineWithNA", "SparkSQL")
+    val ddf = manager.sql2ddf("select * from airlineWithNA", false)
     val schemaHandler = ddf.getSchemaHandler
 
     Array(0, 8, 16, 17, 24, 25).foreach {
@@ -112,7 +112,7 @@ class FactorSuite extends ATestSuite {
     assert(cols(5).getOptionalFactor.getLevelCounts.get("0") === 9.0)
     assert(cols(4).getOptionalFactor.getLevelCounts.get("3") === 1.0)
 
-    val ddf2 = manager.sql2ddf("select * from airlineWithNA", "SparkSQL")
+    val ddf2 = manager.sql2ddf("select * from airlineWithNA", false)
     //    ddf2.getRepresentationHandler.remove(classOf[RDD[_]], classOf[TablePartition])
 
     val schemaHandler2 = ddf2.getSchemaHandler

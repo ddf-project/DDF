@@ -374,9 +374,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.sql2ddf(command, null, null, null);
   }
 
-  public DDF sql2ddf(String command, String dataSource) throws DDFException {
+  public DDF sql2ddf(String command, Boolean queyOnDDF) throws DDFException {
     return this.sql2ddf(command,
-            new SQLDataSourceDescriptor(null, dataSource, null, null, null));
+            new SQLDataSourceDescriptor(null, queyOnDDF, null, null, null));
   }
 
   public DDF sql2ddf(String command, DataSourceDescriptor dataSource)
@@ -424,9 +424,9 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return this.sql(command, (Integer) null);
   }
 
-  public SqlResult sql(String command, String dataSource) throws DDFException {
+  public SqlResult sql(String command, Boolean queryOnDDF) throws DDFException {
     return this.sql(command,
-            new SQLDataSourceDescriptor(null, dataSource,null, null, null));
+            new SQLDataSourceDescriptor(null, queryOnDDF,null, null, null));
   }
 
   @Override

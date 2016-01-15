@@ -23,7 +23,7 @@ public class MissingDataHandlerTest extends BaseTest {
   public void setUp() throws Exception {
     createTableAirlineWithNA();
 
-    ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+    ddf = manager.sql2ddf("select * from airline", false);
   }
 
   @Test

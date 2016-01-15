@@ -102,14 +102,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         if (sqlDataSourceDescriptor == null) {
             throw  new DDFException("ERROR: Handling datasource");
         }
-        if (sqlDataSourceDescriptor.getDataSource() != null) {
-            switch (sqlDataSourceDescriptor.getDataSource()) {
-                case "SparkSQL":case "spark":case "Spark":
-                    return this.sql(sqlcmd, maxRows, dataSource);
-                default:
-                    //throw new DDFException("ERROR: Unrecognized datasource");
-                    return this.sql(sqlcmd, maxRows, dataSource);
-            }
+        if (sqlDataSourceDescriptor.getQueryOnDDF() != null
+        && sqlDataSourceDescriptor.getQueryOnDDF() == false) {
+                return this.sql(sqlcmd, maxRows, dataSource);
         }
     }
 
@@ -170,15 +165,9 @@ public abstract class ASqlHandler extends ADDFFunctionalGroupHandler implements 
         if (sqlDataSourceDescriptor == null) {
             throw  new DDFException("ERROR: Handling datasource");
         }
-        if (sqlDataSourceDescriptor.getDataSource() != null) {
-            switch (sqlDataSourceDescriptor.getDataSource()) {
-                case "SparkSQL":case "spark":case "Spark":
-                    return this.sql2ddf(command, schema, dataSource, dataFormat);
-                default:
-                    // throw new DDFException("ERROR: Unrecognized datasource:
-                    // " + dataSource);
-                    return this.sql2ddf(command, schema, dataSource, dataFormat);
-            }
+        if (sqlDataSourceDescriptor.getQueryOnDDF() != null
+        && sqlDataSourceDescriptor.getQueryOnDDF() == false) {
+            return this.sql2ddf(command, schema, dataSource, dataFormat);
         }
     }
 

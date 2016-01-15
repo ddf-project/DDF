@@ -30,22 +30,22 @@ class RepresentationHandlerSuite extends ATestSuite {
   }
 
   test("Can get RDD[LabeledPoint]") {
-    manager.sql("drop table if exists airline_delayed", "SparkSQL")
-    manager.sql("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline", "SparkSQL")
+    manager.sql("drop table if exists airline_delayed", false)
+    manager.sql("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline", false)
     val ddf = manager.sql2ddf("select " +
-      "distance/1000, arrdelay/100, depdelay/100, delayed from airline_delayed", "SparkSQL").asInstanceOf[SparkDDF]
+      "distance/1000, arrdelay/100, depdelay/100, delayed from airline_delayed", false).asInstanceOf[SparkDDF]
     val rddLabeledPoint = ddf.getRDD(classOf[LabeledPoint])
     assert(rddLabeledPoint != null)
     assert(rddLabeledPoint.count() === 301)
 
-    val ddf2 = manager.sql2ddf("select month, year, dayofmonth from airline_delayed", "SparkSQL").asInstanceOf[SparkDDF]
+    val ddf2 = manager.sql2ddf("select month, year, dayofmonth from airline_delayed", false).asInstanceOf[SparkDDF]
     val rddLabeledPoint2 = ddf2.getRDD(classOf[LabeledPoint])
     assert(rddLabeledPoint2 != null)
     assert(rddLabeledPoint2.count() === 295)
   }
 
   test("Can get RDD[Array[Double]] and RDD[Array[Object]]") {
-    val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
+    val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", false).asInstanceOf[SparkDDF]
     val rddArrObj = ddf.getRDD(classOf[Array[Object]])
 
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
@@ -57,7 +57,7 @@ class RepresentationHandlerSuite extends ATestSuite {
   }
 
   test("Can get RDD[Array[Object]] & RDD[LabeledPoint] from RDD[Array[Double]]") {
-    val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
+    val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", false).asInstanceOf[SparkDDF]
     val repHandler = ddf.getRepresentationHandler
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
     repHandler.remove(classOf[RDD[_]], classOf[Row])
@@ -74,7 +74,7 @@ class RepresentationHandlerSuite extends ATestSuite {
   }
 
   test("Has representation after creating it") {
-    val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
+    val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", false).asInstanceOf[SparkDDF]
     val repHandler = ddf.getRepresentationHandler
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
     val rddArrObj = ddf.getRDD(classOf[Array[Object]])
@@ -90,7 +90,7 @@ class RepresentationHandlerSuite extends ATestSuite {
   }
 
   test("Can handle null value") {
-    val ddf = manager.sql2ddf("select year, month, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
+    val ddf = manager.sql2ddf("select year, month, dayofmonth from airline", false).asInstanceOf[SparkDDF]
 
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
     val rddArrLP = ddf.getRDD(classOf[LabeledPoint])
@@ -107,7 +107,7 @@ class RepresentationHandlerSuite extends ATestSuite {
   }
 
   test("Can do sql queries after CrossValidation ") {
-    val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
+    val ddf = manager.sql2ddf("select * from airline", false).asInstanceOf[SparkDDF]
     for (split <- ddf.ML.CVKFold(5, 10)) {
       val train = split.getTrainSet.asInstanceOf[SparkDDF]
       val test = split.getTestSet.asInstanceOf[SparkDDF]
@@ -129,7 +129,7 @@ class RepresentationHandlerSuite extends ATestSuite {
 
   test("Can do sql queries after Transform Rserve") {
     createTableMtcars()
-    val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
+    val ddf = manager.sql2ddf("select * from mtcars", false)
     val newDDF = ddf.Transform.transformNativeRserve("z1 = mpg / cyl, " +
       "z2 = disp * 0.4251437075, " +
       "z3 = rpois(nrow(df.partition), 1000)")
