@@ -89,24 +89,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     ;
 
     public static EngineType fromString(String str) throws DDFException {
-      if (str.equalsIgnoreCase("spark")) {
-        return SPARK;
-      } else if (str.equalsIgnoreCase("jdbc")) {
-        return JDBC;
-      } else if (str.equalsIgnoreCase("sfdc")) {
-        return SFDC;
-      } else if (str.equalsIgnoreCase("postgres")) {
-        return POSTGRES;
-      } else if(str.equalsIgnoreCase("aws")) {
-        return AWS;
-      } else if(str.equalsIgnoreCase("redshift")) {
-        return REDSHIFT;
-      } else if(str.equalsIgnoreCase("basic")) {
-        return BASIC;
-      } else if (str.equalsIgnoreCase("flink")) {
-        return FLINK;
-      } else {
-        throw new DDFException("Engine type should be either spark, flink, jdbc, postgres, aws, redshift, basic");
+      try {
+        return EngineType.valueOf(str.toUpperCase());
+      } catch (RuntimeException e) {
+        throw new DDFException("Unknown engine type: " + str, e);
       }
     }
   }
@@ -228,6 +214,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
       throw new DDFException(e);
     }
+  }
+
+  public static DDFManager get(String engineType) throws DDFException {
+      return DDFManager.get(EngineType.fromString(engineType));
   }
 
   /**
