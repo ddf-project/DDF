@@ -23,7 +23,7 @@ object RootBuild extends Build {
   val SCALAC_JVM_VERSION = "jvm-1.6"
   val JAVAC_JVM_VERSION = "1.6"
   val theScalaVersion = "2.10.3"
-        val majorScalaVersion = theScalaVersion.split(".[0-9]+$")(0)
+  val majorScalaVersion = theScalaVersion.split(".[0-9]+$")(0)
   val targetDir = "target/scala-" + majorScalaVersion // to help mvn and sbt share the same target dir
 
   val rootOrganization = "io"
@@ -49,6 +49,9 @@ object RootBuild extends Build {
   val testProjectName = "ddf_test"
   val testVersion = rootVersion
 
+  val restProjectName = "ddf_rest"
+  val restVersion = rootVersion
+
 //  val sparkVersion = if(YARN_ENABLED) {
 //    rootVersion
 //  } else {
@@ -57,7 +60,6 @@ object RootBuild extends Build {
   val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + ".jar"
   val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + "-tests.jar"
   
-
   val examplesProjectName = projectName + "_examples"
   val examplesVersion = rootVersion
   val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
@@ -70,11 +72,11 @@ object RootBuild extends Build {
   lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (core)
   lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core)
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
+  lazy val rest = Project("rest", file("rest"), settings = restSettings) dependsOn(core)
 
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend(Compile)
   lazy val publishLocalBoth = TaskKey[Unit]("publish-local", "publish local for m2 and ivy")
-
 
   //////// Variables/flags ////////
 
@@ -526,6 +528,11 @@ object RootBuild extends Build {
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports"),
     parallelExecution in Test := false,
     publishArtifact in(Test, packageBin) := true
+  ) ++ assemblySettings ++ extraAssemblySettings
+
+  def restSettings = commonSettings ++ Seq(
+    name := restProjectName
+    // libraryDependencies ++= rest_dependencies,
   ) ++ assemblySettings ++ extraAssemblySettings
 
   def extraAssemblySettings() = Seq(test in assembly := {}) ++ Seq(
