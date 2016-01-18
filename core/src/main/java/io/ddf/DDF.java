@@ -46,6 +46,7 @@ import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
+import io.ddf.util.Utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -168,7 +169,7 @@ public abstract class DDF extends ALoggable //
   protected void initialize(DDFManager manager, Object data, Class<?>[]
           typeSpecs, String namespace, String name,
       Schema schema) throws DDFException {
-    this.validateSchema(schema);
+    Schema.validateSchema(schema);
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
     if (typeSpecs != null) {
@@ -339,24 +340,6 @@ public abstract class DDF extends ALoggable //
   }
 
   // ////// MetaData that deserves to be right here at the top level ////////
-  private void validateSchema(Schema schema) throws DDFException {
-    Set<String> columnSet = new HashSet<String>();
-    if(schema != null && schema.getColumns() != null) {
-      for (Column column : schema.getColumns()) {
-        if (columnSet.contains(column.getName())) {
-          throw new DDFException(String.format("Duplicated column name %s", column.getName()));
-        } else {
-          Pattern p = Pattern.compile("^[a-zA-Z0-9_-]*$");
-          Matcher m = p.matcher(column.getName());
-          if(!m.find()) {
-            throw new DDFException(String.format("Invalid column name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
-                "and dash (\"-\") and underscore (\"_\")", column.getName()));
-          }
-          columnSet.add(column.getName());
-        }
-      }
-    }
-  }
 
   public Schema getSchema() {
     return this.getSchemaHandler().getSchema();

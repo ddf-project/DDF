@@ -6,11 +6,14 @@ import com.google.common.collect.Lists;
 import com.google.gson.annotations.Expose;
 import io.ddf.Factor;
 import io.ddf.exception.DDFException;
+import io.ddf.util.Utils;
 
 import java.io.Serializable;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -71,6 +74,23 @@ public class Schema implements Serializable {
   private void initialize(String tableName, List<Column> columns) throws DDFException {
     this.setColumns(columns);
     this.mTableName = tableName;
+  }
+
+  public static void validateSchema(Schema schema) throws DDFException {
+    Set<String> columnSet = new HashSet<String>();
+    if(schema != null && schema.getColumns() != null) {
+      for (Column column : schema.getColumns()) {
+        if (columnSet.contains(column.getName())) {
+          throw new DDFException(String.format("Duplicated column name %s", column.getName()));
+        } else {
+          if(!Utils.isAlphaNumeric(column.getName())) {
+            throw new DDFException(String.format("Invalid column name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
+                "and dash (\"-\") and underscore (\"_\")", column.getName()));
+          }
+          columnSet.add(column.getName());
+        }
+      }
+    }
   }
 
   private List<Column> parseColumnList(String columnList) {
