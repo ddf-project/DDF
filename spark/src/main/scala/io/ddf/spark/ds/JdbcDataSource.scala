@@ -1,38 +1,40 @@
 package io.ddf.spark.ds
 
-import java.util
 import java.util.Properties
 
-import io.ddf.ds.{BaseDataSource, User, UsernamePasswordCredential}
+import io.ddf.ds.UsernamePasswordCredential
 import io.ddf.exception.{DDFException, UnauthenticatedDataSourceException}
 import io.ddf.spark.SparkDDFManager
 import io.ddf.spark.util.SparkUtils
 import io.ddf.{DDF, DDFManager}
+
+import scala.collection.JavaConversions._
 
 class JdbcDataSource(uri: String, manager: DDFManager) extends BaseDataSource(uri, manager) {
   if (!manager.isInstanceOf[SparkDDFManager]) {
     throw new DDFException(s"Loading of $uri is only supported with SparkDDFManager")
   }
 
-  override def loadDDF(user: User, options: util.Map[AnyRef, AnyRef]): DDF = {
+  override def loadDDF(options: Map[AnyRef, AnyRef]): DDF = {
     val query = if (options.containsKey("query")) {
-      options.get("query").toString
+      options.get("query").get.toString
     } else if (options.containsKey("table")) {
-      val table = options.get("table")
+      val table = options.get("table").get
       s"select * from $table"
     } else {
       throw new DDFException("Required either 'table' or 'query' option to load from JDBC")
     }
-    val connectionUri = getConnectionUri(user, options)
+    val connectionUri = getConnectionUri(options)
     val hiveContext = manager.asInstanceOf[SparkDDFManager].getHiveContext
     val props = new Properties()
-    props.putAll(options)
+    val optionsAsStrings = options.map { case (key, value) => (s"$key", s"$value") }
+    props.putAll(optionsAsStrings)
     val df = hiveContext.read.jdbc(connectionUri, query, props)
     SparkUtils.df2ddf(df, manager)
   }
 
-  def getConnectionUri(user: User, options: util.Map[AnyRef, AnyRef]) = {
-    val credential = Option(user.getCredential(uri))
+  def getConnectionUri(options: Map[AnyRef, AnyRef]) = {
+    val credential = options.get("credential")
     var url = credential match {
       case Some(credential: UsernamePasswordCredential) =>
         s"$uri?user=${credential.getUsername}&password=${credential.getPassword}"

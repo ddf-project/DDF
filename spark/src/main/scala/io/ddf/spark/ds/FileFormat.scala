@@ -1,14 +1,11 @@
 package io.ddf.spark.ds
 
-import java.util
-
 import io.ddf.content.Schema
 import io.ddf.content.Schema.ColumnType
 import io.ddf.exception.DDFException
 import org.apache.spark.sql.types._
 
 import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 
 
 trait FileFormat
@@ -27,10 +24,10 @@ object FileFormat {
     * @param options
     * @return a file format from options
     */
-  def apply(options: util.Map[AnyRef, AnyRef]): FileFormat = {
+  def apply(options: Map[AnyRef, AnyRef]): FileFormat = {
     val formatType = options.get("format")
-    if (formatType == null) throw new DDFException("Missing format option")
-    formatType.toString.toLowerCase match {
+    if (formatType.isEmpty) throw new DDFException("Missing format option")
+    formatType.get.toString.trim.toLowerCase match {
       case "csv" => CsvFileFormat(options)
       case "json" => JsonFileFormat(options)
       case "parquet" => ParquetFileFormat(options)
@@ -66,24 +63,24 @@ object CsvFileFormat {
     StructType(fields)
   }
 
-  def apply(options: util.Map[AnyRef, AnyRef]): CsvFileFormat = {
+  def apply(options: Map[AnyRef, AnyRef]): CsvFileFormat = {
     if (!options.containsKey("schema")) {
       throw new DDFException("schema param is required for csv format")
     }
-    val schema = options.asScala.get("schema") map { s => toSparkStructType(new Schema(s.toString)) }
+    val schema = options.get("schema") map { s => toSparkStructType(new Schema(s.toString)) }
     new CsvFileFormat(schema)
   }
 }
 
 object JsonFileFormat {
-  def apply(options: util.Map[AnyRef, AnyRef]): JsonFileFormat = {
+  def apply(options: Map[AnyRef, AnyRef]): JsonFileFormat = {
     val flatten = options.getOrElse("flatten", false).toString == "true"
     new JsonFileFormat(flatten)
   }
 }
 
 object ParquetFileFormat {
-  def apply(options: util.Map[AnyRef, AnyRef]): ParquetFileFormat = {
+  def apply(options: Map[AnyRef, AnyRef]): ParquetFileFormat = {
     val flatten = options.getOrElse("flatten", false).toString == "true"
     new ParquetFileFormat(flatten)
   }

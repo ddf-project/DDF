@@ -8,9 +8,8 @@ import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
-import io.ddf.ds.DataSource;
-import io.ddf.ds.User;
 import io.ddf.exception.DDFException;
+import io.ddf.spark.ds.DataSource;
 import io.ddf.spark.ds.FileDataSource;
 import io.ddf.spark.ds.JdbcDataSource;
 import io.ddf.spark.ds.S3DataSource;
@@ -374,7 +373,7 @@ public class SparkDDFManager extends DDFManager {
   public DDF createDDF(Map<Object, Object> options) throws DDFException {
     Preconditions.checkArgument(options.containsKey("sourceUri"),
         "SparkDDFManager need sourceUri param in options");
-    User currentUser = User.getCurrentUser();
+
     String uri = options.get("sourceUri").toString();
     DataSource ds;
     if (uri.startsWith("s3:")) {
@@ -386,7 +385,7 @@ public class SparkDDFManager extends DDFManager {
     } else {
       throw new DDFException("Unsupported datasource " + uri);
     }
-    return ds.loadDDF(currentUser, options);
+    return ds.loadDDF(options);
   }
 
   @Override

@@ -1,10 +1,7 @@
 package io.ddf.spark.ds
 
-import java.util
-import java.util.UUID
-
 import io.ddf.content.Schema
-import io.ddf.ds.{BaseDataSource, User, UsernamePasswordCredential}
+import io.ddf.ds.UsernamePasswordCredential
 import io.ddf.exception.{DDFException, UnauthenticatedDataSourceException}
 import io.ddf.spark.SparkDDFManager
 import io.ddf.spark.util.SparkUtils
@@ -25,9 +22,9 @@ import scala.util.{Success, Try}
   */
 class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(uri, manager) {
 
-  override def loadDDF(user: User, options: util.Map[AnyRef, AnyRef]): DDF = {
+  override def loadDDF(options: Map[AnyRef, AnyRef]): DDF = {
     val optionsAsStrings = options.map { case (key, value) => (s"$key", s"$value") }
-    val dataUri = getDataFilesUri(user, options)
+    val dataUri = getDataFilesUri(options)
     val format = FileFormat(options)
     val ddf = format match {
       case format: CsvFileFormat =>
@@ -54,13 +51,13 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
     }
 
     // try to set columns name if a schema option is passed
-    if (options.containsKey("schema")) {
+    options.get("schema") foreach { schema =>
       val maybeSchema = Try {
-        new Schema(options.get("schema").toString)
+        new Schema(schema.toString)
       }
       maybeSchema match {
-        case Success(schema) =>
-          ddf.setColumnNames(schema.getColumnNames)
+        case Success(s) =>
+          ddf.setColumnNames(s.getColumnNames)
         case _ => // do nothing
       }
     }
@@ -90,11 +87,10 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
     * An option named "path" will be used as the path to source files.
     * It will be appended after the data source URI to become URI of source files.
     *
-    * @param user the current user
     * @param options loading options
     * @return full URI of source files
     */
-  protected def getDataFilesUri(user: User, options: util.Map[AnyRef, AnyRef]): String = {
+  protected def getDataFilesUri(options: Map[AnyRef, AnyRef]): String = {
     val path = options.getOrElse("path", "").toString
     if (uri == "hdfs://" || uri == "file://") {
       // special uri for local hdfs
@@ -113,12 +109,12 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
   */
 class S3DataSource(uri: String, manager: DDFManager) extends FileDataSource(uri, manager) {
 
-  override def getDataFilesUri(user: User, options: util.Map[AnyRef, AnyRef]): String = {
+  override def getDataFilesUri(options: Map[AnyRef, AnyRef]): String = {
     uri match {
       case S3DataSource.URI_PATTERN(bucket) =>
         val path = options.getOrElse("path", "").toString
         val absolutePath = if (path.startsWith("/")) path else s"/$path"
-        val credential = Option(user.getCredential(uri))
+        val credential = options.get("credential")
         credential match {
           case Some(credential: UsernamePasswordCredential) =>
             val username = credential.getUsername

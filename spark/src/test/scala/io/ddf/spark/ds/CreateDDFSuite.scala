@@ -1,6 +1,6 @@
 package io.ddf.spark.ds
 
-import io.ddf.ds.{User, UsernamePasswordCredential}
+import io.ddf.ds.UsernamePasswordCredential
 import io.ddf.exception.UnauthenticatedDataSourceException
 import io.ddf.spark.{ATestSuite, DelegatingDDFManager}
 import org.scalatest.Matchers
@@ -22,7 +22,7 @@ class CreateDDFSuite extends ATestSuite with Matchers {
 
   val crimes_schema =
     """ID int, CaseNumber string, Date string, Block string, IUCR string, PrimaryType string,
-      | Description string, LocationDescription string, Arrest int, Domestic int, Beat int,
+      | Description string, LocationDescription string, Arrest boolean, Domestic boolean, Beat int,
       | District int, Ward int, CommunityArea int, FBICode string, XCoordinate int,
       | YCoordinate int, Year int, UpdatedOn string, Latitude double, Longitude double,
       | Location string
@@ -54,19 +54,7 @@ class CreateDDFSuite extends ATestSuite with Matchers {
       None
   }
 
-  override protected def beforeEach(): Unit = {
-    val user = new User("foo")
-    User.setCurrentUser(user)
-    getCredentialFromConfig("s3.access", "s3.secret") map {
-      user.addCredential(s3SourceUri, _)
-    }
-    getCredentialFromConfig("mysql.user", "mysql.pwd") map {
-      user.addCredential(mysqlSourceUri, _)
-    }
-  }
-
   test("create ddf without credential") {
-    User.getCurrentUser.removeCredential(s3SourceUri)
     val options = Map[AnyRef, AnyRef](
       "path" -> "/test/csv/noheader/",
       "format" -> "csv",
@@ -81,7 +69,8 @@ class CreateDDFSuite extends ATestSuite with Matchers {
     val options = Map[AnyRef, AnyRef](
       "path" -> "/test/csv/noheader/",
       "format" -> "csv",
-      "schema" -> crimes_schema
+      "schema" -> crimes_schema,
+      "credential" -> s3Credential.get
     )
     val ddf = s3Manager.createDDF(options)
 
@@ -95,7 +84,8 @@ class CreateDDFSuite extends ATestSuite with Matchers {
       "path" -> "/test/tsv/noheader/",
       "format" -> "csv",
       "schema" -> result_schema,
-      "delimiter" -> "\t"
+      "delimiter" -> "\t",
+      "credential" -> s3Credential.get
     )
     val ddf = s3Manager.createDDF(options)
 
@@ -108,7 +98,8 @@ class CreateDDFSuite extends ATestSuite with Matchers {
     val options = Map[AnyRef, AnyRef](
       "path" -> "/test/json/noheader/",
       "format" -> "json",
-      "schema" -> sleep_schema
+      "schema" -> sleep_schema,
+      "credential" -> s3Credential.get
     )
     val ddf = s3Manager.createDDF(options)
 
@@ -130,7 +121,8 @@ class CreateDDFSuite extends ATestSuite with Matchers {
 
   when(mysqlCredential.isDefined) test "create DDF from MySQL" in {
     val options = Map[AnyRef, AnyRef](
-      "table" -> "crimes_small_case_sensitive"
+      "table" -> "crimes_small_case_sensitive",
+      "credential" -> mysqlCredential.get
     )
     val ddf = mysqlManager.createDDF(options)
 
@@ -143,7 +135,8 @@ class CreateDDFSuite extends ATestSuite with Matchers {
     val options = Map[AnyRef, AnyRef](
       "path" -> s"$current_dir/resources/test/airline",
       "format" -> "csv",
-      "schema" -> airline_schema
+      "schema" -> airline_schema,
+      "nullValue" -> "NA"
     )
     val ddf = localManager.createDDF(options)
 
@@ -156,7 +149,8 @@ class CreateDDFSuite extends ATestSuite with Matchers {
     val options = Map[AnyRef, AnyRef](
       "path" -> s"$current_dir/resources/test/airline",
       "format" -> "csv",
-      "schema" -> airline_schema
+      "schema" -> airline_schema,
+      "nullValue" -> "NA"
     )
     val ddf = hdfsManager.createDDF(options)
 
