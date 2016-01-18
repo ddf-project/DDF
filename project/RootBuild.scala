@@ -67,7 +67,7 @@ object RootBuild extends Build {
 
 
   // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, test_ddf)
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, test_ddf, rest)
   lazy val core = Project("core", file("core"), settings = coreSettings)
   lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (core)
   lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core)
@@ -132,6 +132,10 @@ object RootBuild extends Build {
     "com.google.protobuf" % "protobuf-java" % "2.5.0"
   )
 
+  val rest_dependencies = Seq(
+    "com.sun.jersey" % "jersey-client" % "1.9"
+  )
+
   val test_dependencies = Seq(
     "org.pegdown" % "pegdown" % "1.6.0",
     "org.scalatest" % "scalatest_2.10" % "2.1.5"
@@ -168,7 +172,8 @@ object RootBuild extends Build {
       "Adatao Mvnrepos Releases" at "https://raw.github.com/adatao/mvnrepos/master/releases",
       "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
       "Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/",
-      "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+      "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
+      "Java.net Snapshot Repository for Maven" at "https://maven.java.net/content/repositories/snapshots/"
     ),
 
 
@@ -245,7 +250,6 @@ object RootBuild extends Build {
     dependencyOverrides += "com.sun.jersey" % "jersey-json" % "1.9",
     dependencyOverrides += "com.sun.jersey" % "jersey-server" % "1.9",
     dependencyOverrides += "org.scalamacros" % "quasiquotes_2.10" % "2.0.0",
-    dependencyOverrides += "commons-httpclient" % "commons-httpclient" % "3.1",
     dependencyOverrides += "org.apache.avro" % "avro-mapred" % "1.7.6",
     dependencyOverrides += "commons-logging" % "commons-logging" % "1.1.3",
     dependencyOverrides += "net.java.dev.jets3t" % "jets3t" % "0.7.1",
@@ -531,8 +535,8 @@ object RootBuild extends Build {
   ) ++ assemblySettings ++ extraAssemblySettings
 
   def restSettings = commonSettings ++ Seq(
-    name := restProjectName
-    // libraryDependencies ++= rest_dependencies,
+    name := restProjectName,
+    libraryDependencies ++= rest_dependencies
   ) ++ assemblySettings ++ extraAssemblySettings
 
   def extraAssemblySettings() = Seq(test in assembly := {}) ++ Seq(

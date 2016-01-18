@@ -8,14 +8,21 @@ import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.exception.DDFException;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 class RestDDFManager extends DDFManager {
 
     // Temp storage handler
     // Rest Client
+    Client client = ClientBuilder.newClient();
 
-    public DDF newDDF(String restUri) throws DDFException {
+    public RestDDF newDDF(String restUri) throws DDFException {
         return new RestDDF(restUri);
     }
 
@@ -26,7 +33,16 @@ class RestDDFManager extends DDFManager {
      * @throws DDFException
      */
     public String getData(RestDDF restDDF) throws DDFException {
-        return null;
+        WebTarget target = client.target(restDDF.getRestUri());
+        Invocation.Builder request = target.request();
+        request.accept(MediaType.APPLICATION_JSON_TYPE);
+        Response response = request.get();
+        if (response.getStatus() != 200) {
+
+        } else {
+            System.out.println(response.getEntity());
+        }
+        return response.getEntity().toString();
     }
 
 
