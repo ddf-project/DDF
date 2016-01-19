@@ -9,6 +9,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -110,10 +111,12 @@ public class BasicDDFTests {
   }
 
   @Test(expected =  DDFException.class)
-  public void testInvalidColumnName() throws DDFException {
+  public void testDuplicatedColumnInSetColumnNames() throws DDFException {
 
-    String columns = "row Int, \n\tprice double, \n\t lotsize int, \n\t bedrooms int,\n\tbathrms int, !@#asd Int";
+    String columns = "row Int, \n\tprice double, \n\t lotsize int, \n\t bedrooms int,\n\tbathrms int, row1 Int";
     Schema schema = new Schema(null, columns);
     Schema.validateSchema(schema);
+    List<String> columnNames = Arrays.asList("row", "price", "lotsize", "bedrooms", "bathrms", "row");
+    schema.setColumnNames(columnNames);
   }
 }
