@@ -104,7 +104,7 @@ setMethod("load_jdbc",
 #' @export
 setMethod("sql",
           signature("DDFManager", "character", "logical"),
-          function(x, sql, queryOnDDF) {
+          function(x, sql, queryOnDDF=TRUE) {
             sql <- str_trim(sql)
             jdm <- x@jdm
             java.ret <- jdm$sql(sql, queryOnDDF)
@@ -122,7 +122,7 @@ setMethod("sql",
 #' @export
 setMethod("sql2ddf",
           signature("DDFManager", "character", "logical"),
-          function(x, sql, queryOnDDF) {
+          function(x, sql, queryOnDDF=TRUE) {
             sql <- str_trim(sql)
             if (!(str_detect(sql, "^[Ss][Ee][Ll][Ee][Cc][Tt].*"))) {
               stop("Only support SELECT queries")
