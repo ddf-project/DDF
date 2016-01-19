@@ -77,19 +77,27 @@ public class Schema implements Serializable {
   }
 
   public static void validateSchema(Schema schema) throws DDFException {
-    Set<String> columnSet = new HashSet<String>();
     if(schema != null && schema.getColumns() != null) {
-      for (Column column : schema.getColumns()) {
-        if (columnSet.contains(column.getName())) {
-          throw new DDFException(String.format("Duplicated column name %s", column.getName()));
+      validateColumnNames(schema.getColumnNames());
+    }
+  }
+
+  private static void validateColumnNames(List<String> names) throws DDFException {
+    Set<String> columnSet = new HashSet<String>();
+    if(names != null) {
+      for(String name: names) {
+        if(columnSet.contains(name)) {
+          throw new DDFException(String.format("Duplicated column name %s", name));
         } else {
-          if(!Utils.isAlphaNumeric(column.getName())) {
+          if(!Utils.isAlphaNumeric(name)) {
             throw new DDFException(String.format("Invalid column name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
-                "and dash (\"-\") and underscore (\"_\")", column.getName()));
+                "and dash (\"-\") and underscore (\"_\")", name));
           }
-          columnSet.add(column.getName());
+          columnSet.add(name);
         }
       }
+    } else {
+      throw new DDFException("names is null");
     }
   }
 
@@ -142,7 +150,8 @@ public class Schema implements Serializable {
     return columnNames;
   }
 
-  public void setColumnNames(List<String> names) {
+  public void setColumnNames(List<String> names) throws DDFException {
+    validateColumnNames(names);
     int length = names.size() < mColumns.size() ? names.size() : mColumns
         .size();
     for (int i = 0; i < length; i++) {
