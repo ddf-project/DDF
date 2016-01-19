@@ -9,7 +9,6 @@ import io.ddf.{DDF, DDFManager}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.hive.HiveContext
 
-import scala.collection.JavaConversions._
 import scala.util.{Success, Try}
 
 
@@ -17,7 +16,9 @@ import scala.util.{Success, Try}
   * Data source to load files from local or hdfs file system
   *
   * @param uri URI of the data source,
-  *            should be"file://" for local file system and "hdfs://namenode" for HDFS
+  *            should be "file:;" for local file system and "hdfs://namenode" for HDFS.
+  *            "hdfs:;" can be used for the local HDFS file system if running on YARN.
+  *
   * @param manager the DDF manager for this source
   */
 class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(uri, manager) {
@@ -92,7 +93,7 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
     */
   protected def getDataFilesUri(options: Map[AnyRef, AnyRef]): String = {
     val path = options.getOrElse("path", "").toString
-    if (uri == "hdfs://" || uri == "file://") {
+    if (uri == "hdfs:;" || uri == "file:;") {
       // special uri for local hdfs
       path
     } else {

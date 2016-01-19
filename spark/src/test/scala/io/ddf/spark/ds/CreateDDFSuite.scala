@@ -14,8 +14,7 @@ class CreateDDFSuite extends ATestSuite with Matchers {
   val mysqlSourceUri = getConfig("mysql.source.uri").getOrElse("jdbc:mysql://ci.adatao.com:3306/testdata")
   val mysqlManager = new DelegatingDDFManager(manager, mysqlSourceUri)
 
-  val localManager = new DelegatingDDFManager(manager, "file://")
-  val hdfsManager = new DelegatingDDFManager(manager, "hdfs://")
+  val hdfsManager = new DelegatingDDFManager(manager, "hdfs:;")
 
   val s3Credential = getCredentialFromConfig("s3.access", "s3.secret")
   val mysqlCredential = getCredentialFromConfig("mysql.user", "mysql.pwd")
@@ -116,7 +115,7 @@ class CreateDDFSuite extends ATestSuite with Matchers {
       "path" -> s"$current_dir/resources/test/sleep.parquet",
       "format" -> "parquet"
     )
-    val ddf = localManager.createDDF(options)
+    val ddf = hdfsManager.createDDF(options)
     assert(ddf.getNumColumns == 5)
     assert(ddf.getNumRows == 10000)
     assert(ddf.getColumnName(0) == "deep_sleep_minutes")
@@ -141,7 +140,7 @@ class CreateDDFSuite extends ATestSuite with Matchers {
       "delimiter" -> " ",
       "schema" -> mtcars_schema
     )
-    val ddf = localManager.createDDF(options)
+    val ddf = hdfsManager.createDDF(options)
 
     assert(ddf.getNumColumns == 11)
     assert(ddf.getNumRows == 32)
