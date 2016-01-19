@@ -1,14 +1,9 @@
 package io.ddf.s3;
 
+import com.google.common.base.Strings;
 import io.ddf.DDF;
-import io.ddf.DDFManager;
-import io.ddf.content.Schema;
-import io.ddf.content.SqlResult;
 import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jing on 12/2/15.
@@ -16,15 +11,20 @@ import java.util.List;
 public class S3DDF extends DDF {
     // Whether this ddf has header.
     private Boolean mHasHeader = false;
+
     // It's a directory or file.
     private Boolean mIsDir;
+
     // The format of this s3ddf. If it's a folder, we requires that all the files in the folder should have the same
     // format, otherwise the dataformat will be set to the dataformat of the first file under this folder.
     private DataFormat mDataFormat;
+
     // Schema String.
     private String mSchemaString;
+
     // Bucket.
     private String mBucket;
+
     // Path after bucket.
     private String mKey;
 
@@ -32,29 +32,27 @@ public class S3DDF extends DDF {
      * S3DDF is the ddf for s3. It point to a single S3DDFManager, and every S3DDF is a unqiue mapping to a s3 uri.
      * The schema should store the s3 uri as tablename.
      */
-
     public S3DDF(S3DDFManager manager, String path, String schema) throws DDFException {
         super(manager, null, null, null, null, null);
         mSchemaString = schema;
         this.getBucketAndPath(path);
-        checkStatus();
+        initialize();
     }
 
     public S3DDF(S3DDFManager manager, String path) throws DDFException {
         super(manager, null, null, null, null, null);
         this.getBucketAndPath(path);
-        checkStatus();
+        initialize();
     }
 
-    public S3DDF(S3DDFManager manager, String bucket, String pathNoBucket, String schema) throws DDFException {
+    public S3DDF(S3DDFManager manager, String bucket, String key, String schema) throws DDFException {
         super(manager, null, null, null, null, null);
         mBucket = bucket;
-        mKey = pathNoBucket;
+        mKey = key;
         mSchemaString = schema;
-        checkStatus();
+        initialize();
     }
-
-
+    
     /**
      * @brief Get the bucket and path out of a given uri.
      * @param path
@@ -66,7 +64,14 @@ public class S3DDF extends DDF {
         mKey = path.substring(firstSlash + 1);
     }
 
-    public void checkStatus() throws DDFException {
+    private void initialize() throws DDFException {
+        // Check key and path
+        if (Strings.isNullOrEmpty(mBucket)) {
+            throw new DDFException("The bucket of s3ddf is null");
+        }
+        if (Strings.isNullOrEmpty(mKey)) {
+            throw new DDFException("The key of s3ddf is null");
+        }
         // Check directory or file.
         S3DDFManager s3DDFManager = (S3DDFManager)this.getManager();
         mIsDir = s3DDFManager.isDir(this);

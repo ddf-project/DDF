@@ -2,16 +2,13 @@ package io.ddf.s3;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
-
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 
 import io.ddf.DDF;
 import io.ddf.DDFManager;
-
 import io.ddf.datasource.DataFormat;
-import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.exception.DDFException;
@@ -26,30 +23,35 @@ import java.util.UUID;
 /**
  * Created by jing on 12/2/15.
  */
-
 public class S3DDFManager extends DDFManager {
     // Descriptor.
     private S3DataSourceCredentials mCredential;
+
     // Amazon client connection.
     private AmazonS3 mConn;
-    // Upper limit for content preview.
-    final int K_LIMIT = 1000;
 
+    // Upper limit for content preview.
+    private static final int K_LIMIT = 1000;
 
     // TODO: Remove Engine Type
     public S3DDFManager(S3DataSourceDescriptor s3dsd, EngineType engineType) throws DDFException {
-
-        mCredential = (S3DataSourceCredentials)s3dsd.getDataSourceCredentials();
-        AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
-        mConn = new AmazonS3Client(credentials);
+        this((S3DataSourceCredentials)s3dsd.getDataSourceCredentials(), engineType);
     }
-
 
     public S3DDFManager(S3DataSourceCredentials s3Credentials, EngineType engineType) throws DDFException {
         mCredential = s3Credentials;
         AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
         mConn = new AmazonS3Client(credentials);
     }
+
+    public S3DDFManager(S3DataSourceDescriptor s3dsd) throws DDFException {
+        this((S3DataSourceCredentials)s3dsd.getDataSourceCredentials());
+    }
+
+    public S3DDFManager(S3DataSourceCredentials s3Credentials) throws DDFException {
+        this(s3Credentials, EngineType.S3);
+    }
+
     /**
      * @brief To check whether the s3 file already contains header.
      * @param s3DDF The uri of the s3 file (single file).
@@ -70,7 +72,7 @@ public class S3DDFManager extends DDFManager {
         List<String> keys = this.listFiles(s3DDF.getBucket(), s3Object.getKey());
         for (String key : keys) {
             if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
-                throw new DDFException("This folder contains subfolder, please recheck.");
+                throw new DDFException("This folder contains subfolder, S3 DDF does not support nested folders");
             }
         }
         return s3Object.getKey().endsWith("/");

@@ -132,8 +132,7 @@ object RootBuild extends Build {
     "com.google.protobuf" % "protobuf-java" % "2.5.0"
   )
   val s3_dependencies = Seq(
-	"amazon.aws" % "redshift" % "1.1.7.1007",
-	"com.amazonaws" % "aws-java-sdk" % "1.10.8"
+    "com.amazonaws" % "aws-java-sdk" % "1.10.8"
   )
   /////// Common/Shared project settings ///////
 
