@@ -58,7 +58,7 @@ object SparkUtils {
     val cols: ArrayList[Column] = Lists.newArrayList();
     for(field <- schema.fields) {
       val colType = spark2DDFType(field.dataType)
-      val colName = field.name
+      val colName = field.name.trim
       cols.add(new Column(colName, colType))
     }
     new Schema(null, cols)
