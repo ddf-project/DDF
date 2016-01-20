@@ -209,7 +209,7 @@ object RootBuild extends Build {
     publishMavenStyle in MavenCompile := true,
     publishLocal in MavenCompile <<= publishTask(publishLocalConfiguration in MavenCompile, deliverLocal),
     publishLocalBoth <<= Seq(publishLocal in MavenCompile, publishLocal).dependOn,
-
+    publishArtifact in (Compile, packageDoc) := false,
 
     dependencyOverrides += "commons-lang" % "commons-lang" % "2.6",
     dependencyOverrides += "it.unimi.dsi" % "fastutil" % "6.4.4",
@@ -527,7 +527,7 @@ object RootBuild extends Build {
 
   def s3Settings = commonSettings ++ Seq(
     name := s3ProjectName,
-    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch spark/" + targetDir + "/*timestamp") },
+    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch s3/" + targetDir + "/*timestamp") },
     testOptions in Test += Tests.Argument("-oI"),
     libraryDependencies ++= s3_dependencies
   ) ++ assemblySettings ++ extraAssemblySettings
