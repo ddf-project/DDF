@@ -3,6 +3,8 @@ package io.ddf2;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.handlers.IPersistentHandler;
 
+import java.util.Map;
+
 
 /**
  * Each DDFManager have an unique UUID

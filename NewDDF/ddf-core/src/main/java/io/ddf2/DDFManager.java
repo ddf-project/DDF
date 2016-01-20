@@ -64,15 +64,6 @@ public abstract class DDFManager implements IDDFManager {
 	}
 
 
-
-	 
-	/**
-	 * @see io.ddf2.IDDFManager#getDDFMetaData()
-	 */
-	public IDDFMetaData getDDFMetaData() {
-		return ddfMetaData;
-	}
-	 
 	/**
 	 * @see io.ddf2.IDDFManager#getPersistentHandler()
 	 */
@@ -80,8 +71,9 @@ public abstract class DDFManager implements IDDFManager {
 		return persistentHandler;
 	}
 
-
-
-
+	@Override
+	public IDDFMetaData getDDFMetaData() {
+		return ddfMetaData;
+	}
 }
  

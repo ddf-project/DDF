@@ -165,8 +165,8 @@ public class Schema implements ISchema {
          *                    example. SchemaBuilder.add("username string, age int, birthdate date")
          * @return Schema
          */
-        public T build(String multiNameAndTpe) throws SchemaException {
-            this.add(multiNameAndTpe);
+        public T build(String multiNameAndType) throws SchemaException {
+            this.add(multiNameAndType);
             return build();
         }
 

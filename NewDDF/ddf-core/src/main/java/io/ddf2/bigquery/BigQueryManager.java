@@ -1,9 +1,7 @@
 package io.ddf2.bigquery;
 
-import io.ddf2.DDFException;
-import io.ddf2.DDFManager;
-import io.ddf2.IDDF;
-import io.ddf2.ISqlResult;
+import com.google.api.services.bigquery.Bigquery;
+import io.ddf2.*;
 import io.ddf2.datasource.IDataSource;
 
 import java.util.Map;
@@ -12,6 +10,7 @@ import java.util.Map;
  * Created by sangdn on 1/18/16.
  */
 public final class BigQueryManager extends DDFManager {
+
 
     protected BigQueryManager(Map mapProperties) throws DDFException {
         super(mapProperties);
@@ -35,6 +34,8 @@ public final class BigQueryManager extends DDFManager {
 
     @Override
     public ISqlResult sql(String query) {
-        return null;
+        Bigquery bigquery = BigQueryUtils.newInstance();
+        bigquery.jobs().query()
+
     }
 }

@@ -37,10 +37,21 @@ public class BigQueryUtils {
                 .setApplicationName(appName).build();
     }
 
-    public static GoogleCredential makeCredential(String clientId, String secrect, String refreshToken) {
+    /**
+     *
+     * @return BigQuery from current user setting on BigQueryContext.
+     */
+    public static Bigquery newInstance(){
+        return newInstance((String)BigQueryContext.getProperty(BigQueryContext.KEY_APP_NAME),
+                            (String) BigQueryContext.getProperty(BigQueryContext.KEY_CLIENT_ID),
+                            (String) BigQueryContext.getProperty(BigQueryContext.KEY_CLIENT_SECRET),
+                            (String) BigQueryContext.getProperty(BigQueryContext.KEY_REFRESH_TOKEN));
+    }
+
+    public static GoogleCredential makeCredential(String clientId, String secret, String refreshToken) {
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = new JacksonFactory();
-        GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(clientId, secrect)
+        GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(clientId, secret)
                 .setTransport(transport).setJsonFactory(jsonFactory).build();
         credential.setRefreshToken(refreshToken);
 
