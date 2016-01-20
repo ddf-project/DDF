@@ -8,8 +8,22 @@ public abstract class AGloballyAddressable implements IGloballyAddressable {
 
   protected UUID uuid =  UUID.randomUUID();
 
+  protected String name = null;
+
+  public void setUUID(UUID uuid) {
+    this.uuid = uuid;
+  }
+
   public UUID getUUID() {
     return this.uuid;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return this.name;
   }
 
   public static String getUri(IGloballyAddressable obj) {

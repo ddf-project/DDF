@@ -9,6 +9,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -103,15 +104,19 @@ public class BasicDDFTests {
   }
   @Test(expected = DDFException.class)
   public void testDuplicatedColumn() throws DDFException {
-    List<Object[]> list = new ArrayList<Object[]>();
-    list.add(new Object[] { "Last", "Nguyen" });
-    list.add(new Object[] { "First", "Christopher" });
-    String namespace = "random"; // use default
-    String name = this.getClass().getSimpleName();
-    
+
     String columns = "row Int, \n\tprice double, \n\t lotsize int, \n\t bedrooms int,\n\tbathrms int, row Int";
     Schema schema = new Schema(null, columns);
-    DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[]
-        .class, namespace, name, schema);
+    Schema.validateSchema(schema);
+  }
+
+  @Test(expected =  DDFException.class)
+  public void testDuplicatedColumnInSetColumnNames() throws DDFException {
+
+    String columns = "row Int, \n\tprice double, \n\t lotsize int, \n\t bedrooms int,\n\tbathrms int, row1 Int";
+    Schema schema = new Schema(null, columns);
+    Schema.validateSchema(schema);
+    List<String> columnNames = Arrays.asList("row", "price", "lotsize", "bedrooms", "bathrms", "row");
+    schema.setColumnNames(columnNames);
   }
 }

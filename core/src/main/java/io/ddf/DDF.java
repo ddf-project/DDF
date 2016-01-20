@@ -46,6 +46,7 @@ import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
 import io.ddf.util.ISupportPhantomReference;
 import io.ddf.util.PhantomReference;
+import io.ddf.util.Utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -168,7 +169,7 @@ public abstract class DDF extends ALoggable //
   protected void initialize(DDFManager manager, Object data, Class<?>[]
           typeSpecs, String namespace, String name,
       Schema schema) throws DDFException {
-    this.validateSchema(schema);
+    Schema.validateSchema(schema);
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
     if (typeSpecs != null) {
@@ -264,7 +265,8 @@ public abstract class DDF extends ALoggable //
   /**
    * @param name the DDF name to set
    */
-  protected void setName(String name) throws DDFException {
+  @Override
+  public void setName(String name) throws DDFException {
     if(name != null) validateName(name);
 
     this.mName = name;
@@ -301,7 +303,7 @@ public abstract class DDF extends ALoggable //
 
   public UUID getUUID() {return uuid;}
 
-  protected void setUUID(UUID uuid) {this.uuid = uuid;}
+  public void setUUID(UUID uuid) {this.uuid = uuid;}
 
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
@@ -338,18 +340,6 @@ public abstract class DDF extends ALoggable //
   }
 
   // ////// MetaData that deserves to be right here at the top level ////////
-  private void validateSchema(Schema schema) throws DDFException {
-    Set<String> columnSet = new HashSet<String>();
-    if(schema != null && schema.getColumns() != null) {
-      for (Column column : schema.getColumns()) {
-        if (columnSet.contains(column.getName())) {
-          throw new DDFException(String.format("Duplicated column name %s", column.getName()));
-        } else {
-          columnSet.add(column.getName());
-        }
-      }
-    }
-  }
 
   public Schema getSchema() {
     return this.getSchemaHandler().getSchema();
@@ -367,7 +357,7 @@ public abstract class DDF extends ALoggable //
     return this.getSchema().getColumnNames();
   }
 
-  public void setColumnNames(List<String> columnNames) {this.getSchema().setColumnNames(columnNames);}
+  public void setColumnNames(List<String> columnNames) throws DDFException {this.getSchema().setColumnNames(columnNames);}
 
 
   public long getNumRows() throws DDFException {

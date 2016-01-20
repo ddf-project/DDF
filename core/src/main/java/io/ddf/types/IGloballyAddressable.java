@@ -12,11 +12,15 @@ public interface IGloballyAddressable {
 
   UUID getUUID();
 
+  void setUUID(UUID uuid);
+
   String getNamespace();
 
   void setNamespace(String namespace);
 
   String getName();
+
+  void setName(String name) throws DDFException;
 
   String getUri();
 

@@ -10,7 +10,7 @@ import io.ddf.content.Schema
 import io.ddf.spark.{SparkDDFManager, SparkDDF}
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.rdd.RDD
-
+import scala.collection.JavaConversions._
 /**
  * RDD-based ViewHandler
  *
@@ -91,7 +91,12 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
         (classOf[DataFrame]), manager.getNamespace,
         null, schema)
       mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-      sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)
+      this.getDDF.getSchemaHandler.getColumns.foreach{
+        col => if(col.getOptionalFactor != null) {
+          sampleDDF.getSchemaHandler.setAsFactor(col.getName)
+        }
+      }
+
       sampleDDF
     }
   }

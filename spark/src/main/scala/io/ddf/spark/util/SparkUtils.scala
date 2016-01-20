@@ -43,7 +43,7 @@ object SparkUtils {
       .setAppName(jobName)
       .setJars(jars)
       .setExecutorEnv(environment.asScala.toSeq)
-    conf.set("spark.kryo.registrator", System.getProperty("spark.kryo.registrator", "io.spark.content.KryoRegistrator"))
+    conf.set("spark.kryo.registrator", System.getProperty("spark.kryo.registrator", "io.ddf.spark.content.KryoRegistrator"))
   }
 
   def createSparkContext(master: String, jobName: String, sparkHome: String, jars: Array[String],

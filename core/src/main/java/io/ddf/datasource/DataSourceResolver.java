@@ -42,12 +42,16 @@ public class DataSourceResolver {
   }
 
   public static S3DataSourceDescriptor resolveS3(Map<String, String> options) throws DDFException {
+    if (LOG.isInfoEnabled()) {
+      Map<String, String> sourceOptions = new HashMap<>(options);
+      sourceOptions.put("awsSecretKey", "<redacted>");
+      LOG.info("Loading from S3 with options: {}", sourceOptions);
+    }
+
     String uri = options.get("uri");
     String awsKeyID = getOrDefault(options,"awsKeyID", "");
     String awsSecretKey = getOrDefault(options,"awsSecretKey", "");
-    options.put("awsSecretKey", "<redacted>");
     String schema = options.get("schema");
-    LOG.info("Loading from S3 with options: {}", options);
     // TODO format null?
     DataFormat format = DataFormat.fromInt(Integer.parseInt(options.get("dataFormat")));
     if (options.get("serde") != null) {
@@ -81,13 +85,17 @@ public class DataSourceResolver {
   }
 
   public static JDBCDataSourceDescriptor resolveJDBC(Map<String, String> options) throws DDFException {
+    if (LOG.isInfoEnabled()) {
+      Map<String, String> sourceOptions = new HashMap<>(options);
+      sourceOptions.put("password", "<redacted>");
+      LOG.info("Loading from S3 with options: {}", sourceOptions);
+    }
+
     String uri = options.get("uri");
     String username = options.get("username");
     String password = options.get("password");
-    options.put("password", "<redacted>");
     // String dbTable = options.get("dbTable");
     String dbTable = getOrDefault(options, "dbTable", null);
-    LOG.info("Loading from JDBC with options: {}", options);
     try {
       return new JDBCDataSourceDescriptor(uri, username, password, dbTable);
     } catch (URISyntaxException e) {

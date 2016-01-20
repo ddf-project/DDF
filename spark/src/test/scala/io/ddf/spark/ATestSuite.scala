@@ -32,6 +32,15 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
     }
   }
 
+  def createTableText8Sample () {
+    manager.sql("set shark.test.data.path=../resources", "SparkSQL")
+    manager.sql("drop table if exists text8sample", "SparkSQL")
+    manager.sql("create table text8sample (v1 string)" +
+       " row format delimited fields terminated by ','", "SparkSQL")
+    manager.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/text8_small' " +
+       "INTO TABLE text8sample", "SparkSQL")
+  }
+  
   def createTableMtcars() {
     manager.sql("set shark.test.data.path=../resources", "SparkSQL")
     manager.sql("drop table if exists mtcars", "SparkSQL")

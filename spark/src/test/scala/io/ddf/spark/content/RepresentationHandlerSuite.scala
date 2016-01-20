@@ -141,4 +141,13 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(ddf1.getNumRows == 32)
     assert(ddf1 != null)
   }
+  
+  test("Can get RDD(Array[String])") {
+    createTableText8Sample 
+    val ddf = manager.sql2ddf("select * from text8sample","SparkSQL")
+    val doc = ddf.asInstanceOf[SparkDDF].getRDD(classOf[Array[String]])
+    val repHandler = ddf.getRepresentationHandler
+    assert(doc != null)        
+    assert(repHandler.has(classOf[RDD[_]], classOf[Array[String]]))
+  }
 }

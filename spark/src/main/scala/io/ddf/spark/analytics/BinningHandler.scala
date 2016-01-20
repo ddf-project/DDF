@@ -196,10 +196,15 @@ class BinningHandler(mDDF: DDF) extends ABinningHandler(mDDF) with IHandleBinnin
    */
   def getQuantiles(colName: String, pArray: Array[Double]): Array[Double] = {
     var cmd = ""
-    pArray.foreach(x ⇒ cmd = cmd + x.toString + ",")
+    var value_extract = ""
+    pArray.view.zipWithIndex.foreach({case (x, i) => {
+      cmd = cmd + x.toString + ","
+      value_extract = value_extract + s"ps[$i],"
+    }})
     cmd = cmd.take(cmd.length - 1)
-    cmd = String.format("min(%s), percentile_approx(%s, array(%s)), max(%s)", colName, colName, cmd, colName)
-    mDDF.sql("SELECT " + cmd + " FROM @this", "").getRows.get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t").
+    value_extract = value_extract.take(value_extract.length - 1)
+    cmd = String.format("min(%s) as minval, percentile_approx(%s, array(%s)) as ps, max(%s) as maxval", colName, colName, cmd, colName)
+    mDDF.sql("SELECT minval," + value_extract + ", maxval FROM (SELECT " + cmd + " FROM @this) quantiles", "").getRows.get(0).replaceAll("\\[|\\]| ", "").replaceAll(",", "\t").split("\t").
       map(x ⇒ x.toDouble)
   }
 

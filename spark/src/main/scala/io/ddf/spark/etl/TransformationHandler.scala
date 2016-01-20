@@ -8,9 +8,7 @@ import scala.collection.JavaConverters._
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.JavaConversions.seqAsJavaList
 
-import org.apache.spark.SparkContext.rddToPairRDDFunctions
 import org.apache.spark.rdd.RDD
-import org.apache.spark.storage.StorageLevel
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.REXPDouble
 import org.rosuda.REngine.REXPInteger
@@ -115,7 +113,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     }
 
     // convert R-processed DF partitions back to BigR DataFrame
-    val columnArr = TransformationHandler.RDataFrameToColumnList(rReduced)
+    val columnArr = TransformationHandler.RDataFrameToColumnListMR(rReduced)
 
 
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList);
@@ -128,7 +126,10 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
   }
 
   override def transformNativeRserve(transformExpression: String): DDF = {
+    transformNativeRserve(Array(transformExpression))
+  }
 
+  override def transformNativeRserve(transformExpressions: Array[String]): DDF = {
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
 
     // process each DF partition in R
@@ -144,7 +145,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
           val dfvarname = "df.partition"
           rconn.assign(dfvarname, partdf)
 
-          val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpression)
+          val expr = String.format("%s <- transform(%s, %s)", dfvarname, dfvarname, transformExpressions.mkString(","))
 
           // mLog.info(">>>>>>>>>>>>.expr=" + expr.toString())
 
@@ -167,8 +168,14 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
         }
     }
 
+    // new columns from the expressions
+    // Notice that the users can enter expression without the new column name
+    // Thus the extracted column name is not correct in these cases
+    val newCols = transformExpressions.map(_.split("=")(0))
+
     // convert R-processed data partitions back to RDD[Array[Object]]
-    val columnArr = TransformationHandler.RDataFrameToColumnList(rMapped)
+    val columnArr = TransformationHandler.RDataFrameToColumnList(rMapped, mDDF.getSchema.getColumns, newCols)
+
 
     val newSchema = new Schema(mDDF.getSchemaHandler.newTableName(), columnArr.toList);
 
@@ -189,10 +196,13 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
    * @param sourceColumns names of the source columns
    * @return
    */
-  override def transformPython(transformFunctions: Array[String], destColumns: Array[String],
+  override def transformPython(transformFunctions: Array[String], functionNames: Array[String],
+                               destColumns: Array[String],
                                sourceColumns: Array[Array[String]]): DDF = {
 
-    if (transformFunctions.length != destColumns.length || transformFunctions.length != sourceColumns.length ||
+    if (transformFunctions.length != destColumns.length ||
+      transformFunctions.length != functionNames.length ||
+      transformFunctions.length != sourceColumns.length ||
       transformFunctions.length <= 0) {
       throw new IllegalArgumentException("Lists of destination columns," +
         " source columns and transform functions must have the same length")
@@ -221,23 +231,21 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
           // hence casting is needed in the python code later.
           // Moreover loops will become awkward because __iter__ doesn't work with array.array
           interpreter.set("transform_codes", transformFunctions)
+          interpreter.set("function_names", functionNames)
           interpreter.set("src_cols", sourceColumns)
           interpreter.set("dest_cols", destColumns)
           interpreter.set("df_part", partdf)
 
           interpreter.exec(
             """
-              |import marshal, types, base64
+              |import base64
               |
-              |def load_code(code_string):
-              |  code = marshal.loads(base64.urlsafe_b64decode(code_string))
-              |  return types.FunctionType(code, globals(), "transformation_function")
+              |funcs = [base64.urlsafe_b64decode(str(x)) for x in transform_codes]
               |
-              |funcs = [load_code(str(x)) for x in transform_codes]
-              |
-              |for f, dest, src in zip(funcs, [x for x in dest_cols], [y for y in src_cols]):
+              |for f, f_name, dest, src in zip(funcs, function_names, dest_cols, src_cols):
+              |  exec(f)
               |  data_src = tuple(df_part[str(c)] for c in src)
-              |  df_part[str(dest)] = [f(*args) for args in zip(*data_src)]
+              |  df_part[str(dest)] = [eval('{}(*args)'.format(str(f_name))) for args in zip(*data_src)]
               |
             """.stripMargin
           )
@@ -285,10 +293,11 @@ object TransformationHandler {
     rconn.eval("paste(capture.output(print(" + expr + ")), collapse='\\n')").asString()
   }
 
-  def RDataFrameToColumnList(rdd: RDD[REXP]): Array[Column] = {
+  def RDataFrameToColumnListMR(rdd: RDD[REXP]): Array[Column] = {
     val firstdf = rdd.first()
     val names = firstdf.getAttribute("names").asStrings()
     val columns = new Array[Column](firstdf.length)
+
     for (j ← 0 until firstdf.length()) {
       val ddfType = firstdf.asList().at(j) match {
         case v: REXPDouble ⇒ "DOUBLE"
@@ -299,6 +308,37 @@ object TransformationHandler {
       columns(j) = new Column(names(j), ddfType)
     }
     columns
+  }
+
+  def RDataFrameToColumnList(rdd: RDD[REXP], orgColumns: List[Column], newColumns: Array[String]): Array[Column] = {
+    val firstdf = rdd.first()
+    val names = firstdf.getAttribute("names").asStrings()
+    val columns = new Array[Column](firstdf.length)
+
+    val orgColumnNames = orgColumns.asScala.map(_.getName).toSet
+
+    val orgColumnTypes = orgColumns.asScala.map(c => (c.getName, c.getType)).toMap
+
+    for (j ← 0 until firstdf.length()) {
+      val ddfType = firstdf.asList().at(j) match {
+        case v: REXPDouble ⇒
+          if (!orgColumnNames.contains(names(j)) || newColumns.toSet.contains(names(j))) {
+            "DOUBLE"
+          }
+          else {
+            // BigInt columns are converted to Double ones in R data.frame
+            // So if they are not mutated by expressions, we need to set their types
+            // correctly on the resulted DDF
+            orgColumnTypes(names(j)).toString
+          }
+        case v: REXPInteger ⇒ "INT"
+        case v: REXPString ⇒ "STRING"
+        case _ ⇒ throw new DDFException("Only support atomic vectors of type int|double|string!")
+      }
+      columns(j) = new Column(names(j), ddfType)
+    }
+    columns
+
   }
 
   /**
@@ -319,14 +359,30 @@ object TransformationHandler {
     for (i <- 0 until keys.size()) {
       val k = keys.get(i).asInstanceOf[String]
 
-      val ddfType = dct.get(k).asInstanceOf[PyList].get(0) match {
-        case v: Integer => "INT"
-        case v: java.lang.Double => "DOUBLE"
-        case v: java.lang.Float => "DOUBLE"
-        case v: java.lang.String => "STRING"
-        case x => throw new DDFException("Only support atomic vectors of type int|float|string")
+      val dataCol = dct.get(k).asInstanceOf[PyList]
+      var ddfColType = ""
+      var j = 0
+      while (j < dataCol.size() && ddfColType.length == 0) {
+        val dataElem = Option(dataCol.get(j))
+        if (dataElem.isDefined) {
+          ddfColType = dataElem.get match {
+            case v: Integer => "INT"
+            case v: java.lang.Double => "DOUBLE"
+            case v: java.lang.Float => "DOUBLE"
+            case v: java.lang.String => "STRING"
+            case v: java.lang.Boolean => "BOOLEAN"
+            case x =>
+              throw new DDFException(s"Only support atomic vectors of type int|float|string|boolean, " +
+                  s"got type ${x.getClass.getCanonicalName}")
+          }
+        }
+        j += 1
       }
-      columns(i) = new Column(k, ddfType)
+      if (ddfColType.length == 0) {
+        // still can't guess, god helps us
+        ddfColType = "STRING"
+      }
+      columns(i) = new Column(k, ddfColType)
     }
     columns
   }

@@ -66,9 +66,6 @@ public class MLSupporter extends io.ddf.ml.MLSupporter implements Serializable {
       } else if (paramInfo.paramMatches(Rating.class)) {
         rdd = (RDD<Rating>) this.getDDF().getRepresentationHandler().get(RDD.class, Rating.class);
       }
-      //      else if (paramInfo.paramMatches(TablePartition.class)) {
-      //        rdd = (RDD<TablePartition>) this.getDDF().getRepresentationHandler().get(RDD.class, TablePartition.class);
-      //      }
       else if (paramInfo.paramMatches(Object.class)) {
         rdd = (RDD<Object[]>) this.getDDF().getRepresentationHandler().get(RDD.class, Object[].class);
       }

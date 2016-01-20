@@ -1,5 +1,4 @@
 import _root_.sbt.Keys._
-import _root_.sbt.Keys._
 import sbt._
 import sbt.Classpaths.publishTask
 import Keys._
@@ -30,7 +29,7 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-  val rootVersion = "1.4.7-SNAPSHOT"
+  val rootVersion = "1.4.9-SNAPSHOT"
   //val rootVersion = if(YARN_ENABLED) {
   //  "1.2-adatao"
   //} else {
@@ -49,6 +48,9 @@ object RootBuild extends Build {
 
   val s3ProjectName = "ddf_s3"
   val s3Version = rootVersion
+  
+  val testProjectName = "ddf_test"
+  val testVersion = rootVersion
 
 //  val sparkVersion = if(YARN_ENABLED) {
 //    rootVersion
@@ -66,10 +68,10 @@ object RootBuild extends Build {
 
 
   // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, s3, examples)
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, s3, examples, test_ddf)
   lazy val core = Project("core", file("core"), settings = coreSettings)
-  // lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core) 
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (core, s3) 
+  lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (core)
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core, s3)
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
   lazy val s3 = Project("s3", file("s3"), settings = s3Settings) dependsOn (core)
   // A configuration to set an alternative publishLocalConfiguration
@@ -116,7 +118,7 @@ object RootBuild extends Build {
     "commons-configuration" % "commons-configuration" % "1.6",
     "com.google.code.gson"% "gson" % "2.2.2",
     "com.novocode" % "junit-interface" % "0.10" % "test",
-    "net.sf" % "jsqlparser" % "0.9.8.5",
+    "net.sf" % "jsqlparser" % "0.9.8.8",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
@@ -131,11 +133,17 @@ object RootBuild extends Build {
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
     "com.google.protobuf" % "protobuf-java" % "2.5.0"
   )
+  
   val s3_dependencies = Seq(
     "com.amazonaws" % "aws-java-sdk" % "1.10.8"
   )
-  /////// Common/Shared project settings ///////
 
+  val test_dependencies = Seq(
+    "org.pegdown" % "pegdown" % "1.6.0",
+    "org.scalatest" % "scalatest_2.10" % "2.1.5"
+  )
+
+  /////// Common/Shared project settings ///////
   def commonSettings = Defaults.defaultSettings ++ Seq(
     organization := projectOrganization,
     version := rootVersion,
@@ -183,7 +191,7 @@ object RootBuild extends Build {
       "com.novocode" % "junit-interface" % "0.10" % "test",	
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
       "com.googlecode.matrix-toolkits-java" % "mtj" % "0.9.14",
-      "net.sf" % "jsqlparser" % "0.9.8.5", 
+      "net.sf" % "jsqlparser" % "0.9.8.8", 
       "commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
       "mysql" % "mysql-connector-java" % "5.1.25",
@@ -444,7 +452,6 @@ object RootBuild extends Build {
   /////// Individual project settings //////
   def rootSettings = commonSettings ++ Seq(publish := {})
 
-
   def coreSettings = commonSettings ++ Seq(
     name := coreProjectName,
     //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
@@ -525,6 +532,17 @@ object RootBuild extends Build {
     libraryDependencies ++= s3_dependencies
   ) ++ assemblySettings ++ extraAssemblySettings
   
+  def testSettings = commonSettings ++ Seq(
+    name := testProjectName,
+    libraryDependencies ++= test_dependencies,
+    scalacOptions := Seq("-unchecked", "-optimize", "-deprecation"),
+    parallelExecution in ThisBuild := false,
+    fork in Test := true,
+    testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports"),
+    parallelExecution in Test := false,
+    publishArtifact in(Test, packageBin) := true
+  ) ++ assemblySettings ++ extraAssemblySettings
+
   def extraAssemblySettings() = Seq(test in assembly := {}) ++ Seq(
     mergeStrategy in assembly := {
       case m if m.toLowerCase.endsWith("manifest.mf") => MergeStrategy.discard

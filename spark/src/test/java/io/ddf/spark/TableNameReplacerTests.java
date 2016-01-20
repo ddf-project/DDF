@@ -445,27 +445,25 @@ public class TableNameReplacerTests {
         }
     }
 
-    // static Logger LOG;
+    @Test
+    public void testBlankQuotation() {
+        TableNameReplacer tableNameReplacer  = new TableNameReplacer(manager);
+
+        String sqlcmd = "select value from a where value = \"\"";
+        Statement statement = null;
+        try {
+            statement = parser.parse(new StringReader(sqlcmd));
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+            assert(false);
+        }
+    }
+
 
     @BeforeClass
     public static void startServer() throws Exception {
         Thread.sleep(1000);
-        // LOG = LoggerFactory.getLogger(BaseTest.class);
-        // manager = DDFManager.get("spark");
-        /*
-        manager = DDFManager.get("jdbc", new JDBCDataSourceDescriptor(new
-                DataSourceURI("jdbc:mysql://localhost/testdb"), new
-                JDBCDataSourceDescriptor.JDBCDataSourceCredentials("pauser",
-                "papwd"), null));
-        DataSourceDescriptor ds = manager.getDataSourceDescriptor();
-        if (ds instanceof
-                JDBCDataSourceDescriptor) {
-            System.out.println("hello");
-        }
-        DDF ret = manager.sql2ddf("select * from testtable", "jdbc");*/
-        // Add 2 test ddfs.
         manager = DDFManager.get(DDFManager.EngineType.SPARK);
-
         parser = new CCJSqlParserManager();
     }
 
