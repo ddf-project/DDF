@@ -390,7 +390,7 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public String getSourceUri() {
-    return "spark://";
+    return "spark:;";
   }
 
   /**
