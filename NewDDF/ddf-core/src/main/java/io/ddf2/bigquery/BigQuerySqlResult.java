@@ -1,10 +1,7 @@
 package io.ddf2.bigquery;
 
 import com.google.api.client.util.Data;
-import com.google.api.services.bigquery.model.GetQueryResultsResponse;
-import com.google.api.services.bigquery.model.TableFieldSchema;
-import com.google.api.services.bigquery.model.TableRow;
-import com.google.api.services.bigquery.model.TableSchema;
+import com.google.api.services.bigquery.model.*;
 import io.ddf2.IDDFType;
 import io.ddf2.ISqlResult;
 import io.ddf2.datasource.schema.ISchema;
@@ -24,16 +21,16 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class BigQuerySqlResult implements ISqlResult{
-    protected GetQueryResultsResponse bqResultResponse;
+    protected QueryResponse queryResponse;
     protected ISchema schema;
     protected Iterator<TableRow> rowIterator;
     protected TableRow row;
 
 
-    public BigQuerySqlResult(GetQueryResultsResponse bqResultsResponse){
-        this.bqResultResponse = bqResultsResponse;
-        schema = convert(bqResultsResponse.getSchema());
-        rowIterator = bqResultsResponse.getRows().iterator();
+    public BigQuerySqlResult(QueryResponse queryResponse){
+        this.queryResponse = queryResponse;
+        schema = convert(queryResponse.getSchema());
+        rowIterator = queryResponse.getRows().iterator();
 
 
     }
@@ -52,7 +49,7 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public void first() {
-        rowIterator = bqResultResponse.getRows().iterator();
+        rowIterator = queryResponse.getRows().iterator();
     }
 
     @Override
@@ -306,7 +303,7 @@ public class BigQuerySqlResult implements ISqlResult{
      */
     @Override
     public void close() throws Exception {
-        bqResultResponse = null;
+        queryResponse = null;
         schema = null;
     }
 }

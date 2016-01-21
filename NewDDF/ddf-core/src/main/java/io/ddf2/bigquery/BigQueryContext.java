@@ -13,5 +13,6 @@ public class BigQueryContext extends DDFContext {
     public static final String KEY_CLIENT_SECRET= "CLIENT-SECRET";
     public static final String KEY_REFRESH_TOKEN = "REFRESH-TOKEN";
     public static final String KEY_APP_NAME= "APP-NAME";
-    
+    public static final String KEY_PROJECT_ID= "PROJECT-ID";
+
 }

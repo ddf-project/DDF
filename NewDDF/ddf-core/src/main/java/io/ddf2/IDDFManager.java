@@ -3,6 +3,7 @@ package io.ddf2;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.handlers.IPersistentHandler;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 
@@ -21,6 +22,6 @@ public interface IDDFManager {
 	public IDDFMetaData getDDFMetaData();
 	public IPersistentHandler getPersistentHandler();
 	public String getDDFManagerId();
-	public ISqlResult sql(String query);
+	public ISqlResult sql(String query) throws SQLException;
 }
  

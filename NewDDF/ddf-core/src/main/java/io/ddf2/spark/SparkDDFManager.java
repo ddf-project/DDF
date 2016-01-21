@@ -2,6 +2,8 @@ package io.ddf2.spark;
 
 import io.ddf2.*;
 import io.ddf2.datasource.IDataSource;
+import io.ddf2.handlers.IPersistentHandler;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
@@ -16,8 +18,7 @@ public class SparkDDFManager extends DDFManager {
     protected SparkContext sparkContext;
     protected HiveContext hiveContext;
 
-    protected static AtomicInteger instanceCounter;
-    protected final String ddfManagerId;
+
 
     public static final String KEY_SPARK_CONF = "SPARK-CONFIG";
     public static final String KEY_SPARK_CONTEXT = "SPARK-CONTEXT";
@@ -27,9 +28,7 @@ public class SparkDDFManager extends DDFManager {
 
     protected SparkDDFManager(Map options) {
         super(options);
-        instanceCounter = new AtomicInteger();
-        int instanceCount = instanceCounter.incrementAndGet();
-        ddfManagerId = "SparkDDFManager_" + instanceCount;
+
         /* Init Spark */
 
         if (mapProperties.containsKey(KEY_SPARK_CONTEXT)) {
@@ -41,7 +40,7 @@ public class SparkDDFManager extends DDFManager {
             }
             if (sparkConf == null) {
                 sparkConf = new SparkConf();
-                sparkConf.setAppName(ddfManagerId);
+                sparkConf.setAppName("SparkDDFManager");
                 sparkConf.setMaster("local");
             }
             sparkContext = new SparkContext(sparkConf);
@@ -64,8 +63,6 @@ public class SparkDDFManager extends DDFManager {
             }
         }
 
-        /*Init SparkDDFMetaData */
-        this.ddfMetaData = new SparkDDFMetadata(hiveContext);
         /*Init Properties to pass to SparkDDF*/
         mapProperties.put(SparkDDF.PROPERTY_HIVE_CONTEXT,this.hiveContext);
         mapProperties.put(SparkDDF.PROPERTY_SPARK_CONTEXT,this.sparkContext);
@@ -73,23 +70,19 @@ public class SparkDDFManager extends DDFManager {
     }
 
     @Override
-    public IDDF newDDF(String name, IDataSource ds) throws DDFException {
+    protected IDDF _newDDF(String name, IDataSource ds) throws DDFException {
         return newDDF(name, ds, mapProperties);
     }
 
-    /**
-     * @param ds
-     * @see IDDFManager#newDDF(IDataSource)
-     */
     @Override
-    public IDDF newDDF(IDataSource ds) throws DDFException {
-        return newDDF(generateDDFName(), ds, mapProperties);
+    protected IPersistentHandler _getPersistentHanlder() {
+        throw new NotImplementedException("Not Implement Yet");
     }
 
-
     @Override
-    public String getDDFManagerId() {
-        return ddfManagerId;
+    protected IDDFMetaData _getDDFMetaData() {
+
+        return new SparkDDFMetadata(hiveContext);
     }
 
     @Override
@@ -106,8 +99,5 @@ public class SparkDDFManager extends DDFManager {
                 .build();
     }
 
-    protected synchronized String generateDDFName() {
-        return String.format("ddf_%d_%ld_%d", instanceCounter.get(), System.currentTimeMillis(), System.nanoTime() % 10);
-    }
 }
  

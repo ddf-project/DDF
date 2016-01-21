@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.handlers.IPersistentHandler;
@@ -14,11 +15,17 @@ public abstract class DDFManager implements IDDFManager {
 	protected IDDFMetaData ddfMetaData;
 	protected IPersistentHandler persistentHandler;
 	protected final Map mapProperties;
+
+	protected final static AtomicInteger ddfCounter = new AtomicInteger();
+	protected final static AtomicInteger ddfManagerCounter = new AtomicInteger();
+	protected final String ddfManagerId;
 	protected DDFManager(Map mapProperties){
 		this.mapProperties = new HashMap<>();
 		if(mapProperties != null && mapProperties.size()>0){
 			this.mapProperties.putAll(mapProperties);
 		}
+		ddfManagerId = "DDFManager_" + ddfManagerCounter.incrementAndGet();
+
 	}
 
 	/*
@@ -64,16 +71,50 @@ public abstract class DDFManager implements IDDFManager {
 	}
 
 
+	@Override
+	public final IDDF newDDF(IDataSource ds) throws DDFException {
+		return newDDF(generateDDFName(), ds);
+	}
+
+	@Override
+	public final IDDF newDDF(String name, IDataSource ds) throws DDFException {
+		return _newDDF(name, ds);
+	}
+
+
+	protected abstract IDDF _newDDF(String name, IDataSource ds) throws DDFException;
+
+	@Override
+	public final String getDDFManagerId(){
+		return ddfManagerId;
+	}
+
 	/**
 	 * @see io.ddf2.IDDFManager#getPersistentHandler()
 	 */
 	public IPersistentHandler getPersistentHandler() {
+		if(persistentHandler== null){
+			synchronized (persistentHandler){
+				if(persistentHandler== null) persistentHandler= _getPersistentHanlder();
+			}
+		}
 		return persistentHandler;
 	}
+	protected abstract IPersistentHandler _getPersistentHanlder();
 
 	@Override
 	public IDDFMetaData getDDFMetaData() {
+		if(ddfMetaData == null){
+			synchronized (ddfMetaData){
+				if(ddfMetaData == null) ddfMetaData = _getDDFMetaData();
+			}
+		}
 		return ddfMetaData;
+	}
+
+	protected abstract IDDFMetaData _getDDFMetaData();
+	protected synchronized String generateDDFName() {
+		return String.format("ddf_%d_%ld_%d", ddfCounter.get(), System.currentTimeMillis(), System.nanoTime() % 10);
 	}
 }
  
