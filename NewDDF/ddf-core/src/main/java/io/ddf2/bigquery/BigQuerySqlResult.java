@@ -1,7 +1,9 @@
 package io.ddf2.bigquery;
 
+import com.google.api.client.util.Data;
 import com.google.api.services.bigquery.model.GetQueryResultsResponse;
 import com.google.api.services.bigquery.model.TableFieldSchema;
+import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
 import io.ddf2.IDDFType;
 import io.ddf2.ISqlResult;
@@ -11,51 +13,66 @@ import io.ddf2.datasource.schema.Schema;
 import java.io.Closeable;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sangdn on 1/20/16.
+ *
  */
 public class BigQuerySqlResult implements ISqlResult{
     protected GetQueryResultsResponse bqResultResponse;
     protected ISchema schema;
+    protected Iterator<TableRow> rowIterator;
+    protected TableRow row;
+
+
     public BigQuerySqlResult(GetQueryResultsResponse bqResultsResponse){
         this.bqResultResponse = bqResultsResponse;
         schema = convert(bqResultsResponse.getSchema());
+        rowIterator = bqResultsResponse.getRows().iterator();
+
+
     }
     protected ISchema convert(TableSchema tableSchema){
         List<TableFieldSchema> fields = tableSchema.getFields();
         Schema.SchemaBuilder builder = Schema.builder();
         for(TableFieldSchema field: fields){
-            builder.add(field.getName(),field.getType());
+            builder.add(field.getName(),BigQueryUtils.convertToJavaType(field.getType()));
         }
-
+        return builder.build();
     }
     @Override
     public ISchema getSchema() {
-
-        return null;
+        return schema;
     }
 
     @Override
     public void first() {
-
+        rowIterator = bqResultResponse.getRows().iterator();
     }
 
     @Override
     public boolean next() {
+        if(rowIterator.hasNext()){
+            row = rowIterator.next();
+            return true;
+        }
         return false;
     }
 
     @Override
     public Object getRaw() {
-        return null;
+        return row;
     }
 
     @Override
     public Object get(int index) {
-        return null;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? null : v;
     }
 
     @Override
@@ -65,7 +82,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public Object get(int index, Object defaultValue) {
-        return null;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? defaultValue: v;
     }
 
     @Override
@@ -75,7 +93,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public int getInt(int index) {
-        return 0;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? 0 : Integer.parseInt(String.valueOf(v));
     }
 
     @Override
@@ -85,7 +104,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public int getInt(int index, int defaultValue) {
-        return 0;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? defaultValue : Integer.parseInt(String.valueOf(v));
     }
 
     @Override
@@ -95,7 +115,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public Boolean getBoolean(int index) {
-        return null;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? false : Boolean.parseBoolean(String.valueOf(v));
     }
 
     @Override
@@ -105,7 +126,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public Boolean getBoolean(int index, Boolean defaultValue) {
-        return null;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? defaultValue: Boolean.parseBoolean(String.valueOf(v));
     }
 
     @Override
@@ -115,7 +137,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public long getLong(int index) {
-        return 0;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? 0 : Long.parseLong(String.valueOf(v));
     }
 
     @Override
@@ -125,7 +148,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public long getLong(int index, long defaultValue) {
-        return 0;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? defaultValue : Long.parseLong(String.valueOf(v));
     }
 
     @Override
@@ -135,7 +159,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public double getDouble(int index) {
-        return 0;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? 0.0D : Double.parseDouble(String.valueOf(v));
     }
 
     @Override
@@ -144,8 +169,9 @@ public class BigQuerySqlResult implements ISqlResult{
     }
 
     @Override
-    public long getDouble(int index, long defaultValue) {
-        return 0;
+    public double getDouble(int index, double defaultValue) {
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? defaultValue: Double.parseDouble(String.valueOf(v));
     }
 
     @Override
@@ -155,7 +181,15 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public Date getDate(int index) throws ParseException {
-        return null;
+
+            Object v=row.getF().get(index).getV();
+            try{
+                long timeInMicro = Long.parseLong(String.valueOf(v));
+                return new Date(TimeUnit.MICROSECONDS.toMillis(timeInMicro));
+            }catch(NumberFormatException nfe){
+                SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS");
+                return sdf.parse(String.valueOf(v));
+            }
     }
 
     @Override
@@ -165,7 +199,18 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public Date getDate(int index, Date defaultValue) {
-        return null;
+        Object v=row.getF().get(index).getV();
+        try{
+            long timeInMicro = Long.parseLong(String.valueOf(v));
+            return new Date(TimeUnit.MICROSECONDS.toMillis(timeInMicro));
+        }catch(NumberFormatException nfe){
+            SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS");
+            try {
+                return sdf.parse(String.valueOf(v));
+            } catch (ParseException e) {
+                return defaultValue;
+            }
+        }
     }
 
     @Override
@@ -175,7 +220,7 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public String getString(int index) {
-        return null;
+        return String.valueOf(row.getF().get(index).getV());
     }
 
     @Override
@@ -185,7 +230,8 @@ public class BigQuerySqlResult implements ISqlResult{
 
     @Override
     public String getString(int index, String defaultValue) {
-        return null;
+        Object v=row.getF().get(index).getV();
+        return Data.isNull(v) ? defaultValue : String.valueOf(v);
     }
 
     @Override
@@ -260,6 +306,7 @@ public class BigQuerySqlResult implements ISqlResult{
      */
     @Override
     public void close() throws Exception {
-
+        bqResultResponse = null;
+        schema = null;
     }
 }

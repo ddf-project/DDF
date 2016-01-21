@@ -30,7 +30,7 @@ public interface ISqlResult extends AutoCloseable {
 	public long getLong(String name, long defaultValue);
 	public double getDouble(int index);
 	public double getDouble(String name);
-	public long getDouble(int index, long defaultValue);
+	public double getDouble(int index, double defaultValue);
 	public double getDouble(String name, double defaultValue);
 	public Date getDate(int index) throws ParseException;
 	public Date getDate(String name);
