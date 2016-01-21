@@ -75,9 +75,11 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
     try {
       String sqlcmd = "SELECT COUNT(*) FROM {1}";
       List<String> rs = this.getManager().sql(sqlcmd,
-              new SQLDataSourceDescriptor(sqlcmd, null, null, null, this
-                      .getDDF().getUUID().toString())).getRows();
+          new SQLDataSourceDescriptor(sqlcmd, null, null, null, this
+              .getDDF().getUUID().toString())).getRows();
       return Long.parseLong(rs.get(0));
+    } catch (DDFException e) {
+      throw e;
     } catch (Exception e) {
       throw new DDFException("Error getting NRow", e);
     }

@@ -10,6 +10,7 @@ import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -60,5 +61,15 @@ public class BasicDDFManager extends DDFManager {
   @Override
   public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
     return null;
+  }
+
+  @Override
+  public DDF createDDF(Map<Object, Object> options) throws DDFException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String getSourceUri() {
+    return "basic://";
   }
 }

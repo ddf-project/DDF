@@ -385,8 +385,10 @@ public abstract class DDF extends ALoggable //
       sqlCommand = sqlCommand.replace("@this", "{1}");
       sqlCommand = String.format(sqlCommand, "{1}");
       SQLDataSourceDescriptor sqlDS = new SQLDataSourceDescriptor(sqlCommand,
-              null, null,null, this.getUUID().toString());
+          null, null, null, this.getUUID().toString());
       return this.getManager().sql(sqlCommand, null, sqlDS);
+    } catch (DDFException e) {
+      throw e;
     } catch (Exception e) {
       throw new DDFException(String.format(errorMessage, this.getTableName()), e);
     }

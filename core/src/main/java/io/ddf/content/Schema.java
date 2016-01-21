@@ -1,7 +1,10 @@
 package io.ddf.content;
 
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.Expose;
 import io.ddf.Factor;
@@ -196,6 +199,17 @@ public class Schema implements Serializable {
     }
 
     return -1;
+  }
+
+  @Override
+  public String toString() {
+    Iterable<String> columnSpecs = Iterables.transform(getColumns(), new Function<Column, String>() {
+      @Override
+      public String apply(Column column) {
+        return column.getName() + " " + column.getType();
+      }
+    });
+    return Joiner.on(",").join(columnSpecs);
   }
 
   /*

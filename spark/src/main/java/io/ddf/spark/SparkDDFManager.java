@@ -1,16 +1,18 @@
 package io.ddf.spark;
 
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
-import io.ddf.DDFManager.EngineType;
 import io.ddf.datasource.DataSourceDescriptor;
-import io.ddf.datasource.JDBCDataSourceCredentials;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.exception.DDFException;
-import io.ddf.spark.content.SchemaHandler;
+import io.ddf.spark.ds.DataSource;
+import io.ddf.spark.ds.FileDataSource;
+import io.ddf.spark.ds.JdbcDataSource;
+import io.ddf.spark.ds.S3DataSource;
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
 import io.ddf.spark.etl.DateUDF;
@@ -20,9 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
@@ -368,6 +367,30 @@ public class SparkDDFManager extends DDFManager {
   @Override
   public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
     return this.mDDFCache.getDDF(uuid);
+  }
+
+  @Override
+  public DDF createDDF(Map<Object, Object> options) throws DDFException {
+    Preconditions.checkArgument(options.containsKey("sourceUri"),
+        "SparkDDFManager need sourceUri param in options");
+
+    String uri = options.get("sourceUri").toString();
+    DataSource ds;
+    if (uri.startsWith("s3:")) {
+      ds = new S3DataSource(uri, this);
+    } else if (uri.startsWith("hdfs:") || uri.startsWith("file:")) {
+      ds = new FileDataSource(uri, this);
+    } else if (uri.startsWith("jdbc:")) {
+      ds = new JdbcDataSource(uri, this);
+    } else {
+      throw new DDFException("Unsupported datasource " + uri);
+    }
+    return ds.loadDDF(options);
+  }
+
+  @Override
+  public String getSourceUri() {
+    return "spark:;";
   }
 
   /**

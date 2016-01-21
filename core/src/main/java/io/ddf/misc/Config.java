@@ -45,6 +45,11 @@ public class Config {
     return getConfigHandler().getValue(section, key);
   }
 
+  public static String getValueOrElseDefault(String section, String key, String defaultValue) {
+    String value = getValue(section, key);
+    return value == null ? defaultValue : value;
+  }
+
 
   /**
    * If the named section does not have the value, then try the same key from the "global" section
