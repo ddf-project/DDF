@@ -103,10 +103,12 @@ setMethod("load_jdbc",
 #' @return an R data.frame
 #' @export
 setMethod("sql",
-          signature("DDFManager", "character", "logical"),
+          signature("DDFManager", "character"),
           function(x, sql, queryOnDDF=TRUE) {
             sql <- str_trim(sql)
             jdm <- x@jdm
+            # Get a proper Java Boolean object
+            queryOnDDF <- new( J("java.lang.Boolean"), queryOnDDF)
             java.ret <- jdm$sql(sql, queryOnDDF)
             if (!grepl("^create.+$", tolower(sql)) && !grepl("^load.+$", tolower(sql))) {
               parse.sql.result(java.ret)
@@ -121,13 +123,15 @@ setMethod("sql",
 #' @return a DistributedDataFrame
 #' @export
 setMethod("sql2ddf",
-          signature("DDFManager", "character", "logical"),
+          signature("DDFManager", "character"),
           function(x, sql, queryOnDDF=TRUE) {
             sql <- str_trim(sql)
             if (!(str_detect(sql, "^[Ss][Ee][Ll][Ee][Cc][Tt].*"))) {
               stop("Only support SELECT queries")
             }
             jdm <- x@jdm
+            # Get a proper Java Boolean object
+            queryOnDDF <- new( J("java.lang.Boolean"), queryOnDDF)
             new("DDF", jdm$sql2ddf(sql, queryOnDDF))
           }
 )

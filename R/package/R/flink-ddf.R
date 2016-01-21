@@ -27,7 +27,7 @@ setMethod("load_jdbc",
 )
 
 setMethod("sql2ddf",
-          signature("FlinkDDFManager", "character", "logical"),
+          signature("FlinkDDFManager", "character"),
           function(x, sql, queryOnDDF) {
             ddf <- callNextMethod(x, sql, queryOnDDF)
             FlinkDDF(ddf@jddf)

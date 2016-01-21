@@ -5,6 +5,7 @@ con <- dbConnect(MySQL(),
                  password = 'papwd',
                  host = 'localhost',
                  dbname='test')
+dbRemoveTable(conn=con, name = 'mtcars')
 dbWriteTable(conn = con, name = 'mtcars', value = mtcars, row.names=F)
 
 write.table(mtcars, "/tmp/mtcars", row.names=F, col.names=F)
