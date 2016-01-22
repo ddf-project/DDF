@@ -140,7 +140,7 @@ public class SparkSqlResult implements ISqlResult {
     }
 
     @Override
-    public long getDouble(int index, long defaultValue) {
+    public double getDouble(int index, double defaultValue) {
         return 0;
     }
 

@@ -1,6 +1,7 @@
 package io.ddf2.spark;
 
 import io.ddf2.*;
+import io.ddf2.DDF;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.PrepareDataSourceException;
@@ -12,6 +13,7 @@ import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
 
 
+import java.lang.Override;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,40 +34,19 @@ public class SparkDDF extends DDF {
         super(dataSource);
 
     }
-
-    /**
-     * @see DDF#build(Map)
-     * @param options required to contains JavaSparkContext
-     */
     @Override
-    protected void build(Map options) throws PrepareDataSourceException {
-
-        sparkContext = (SparkContext)options.get(PROPERTY_SPARK_CONTEXT);
+    protected void _initWithProperties(Map mapDDFProperties) {
+        sparkContext = (SparkContext)mapDDFProperties.get(PROPERTY_SPARK_CONTEXT);
         if(sparkContext == null) throw new RuntimeException("SparkDDF required to have SparkContext On DdfProperties");
 
-        hiveContext = (HiveContext)options.get(PROPERTY_HIVE_CONTEXT);
+        hiveContext = (HiveContext)mapDDFProperties.get(PROPERTY_HIVE_CONTEXT);
         if(hiveContext == null) throw new RuntimeException("SparkDDF required to have HiveContext On DdfProperties");
 
-
-        this.mapDDFProperties = options;
-        //all support datasource preparer
+    }
+    @Override
+    protected void _initDSPreparer() {
         mapDataSourcePreparer = new HashMap<>();
         mapDataSourcePreparer.put(LocalFileDataSource.class,new LocalFilePreparer(hiveContext));
-        resolveDataSource();
-    }
-
-    /**
-     *
-     */
-    private void resolveDataSource() throws PrepareDataSourceException {
-        IDataSourcePreparer preparer = null;
-        try {
-            preparer = getDataSourcePreparer();
-        } catch (UnsupportedDataSourceException e) {
-            e.printStackTrace();
-            throw new PrepareDataSourceException("Not find DataSourcePreparer For " + dataSource.getClass().getSimpleName());
-        }
-        this.dataSource = preparer.prepare(name, dataSource);
     }
 
 
@@ -81,20 +62,15 @@ public class SparkDDF extends DDF {
     }
 
     @Override
+    public IDDF sql2ddf(String sql) throws DDFException {
+        return ddfManager.newDDF(new SqlDataSource(sql));
+    }
+
+
+    @Override
     protected long _getNumRows() {
         return 0;
     }
-
-    @Override
-    protected IDataSourcePreparer getDataSourcePreparer() throws UnsupportedDataSourceException {
-        if(mapDataSourcePreparer.containsKey(dataSource.getClass())){
-            return mapDataSourcePreparer.get(dataSource.getClass());
-        }else{
-            throw new UnsupportedDataSourceException(dataSource);
-        }
-    }
-
-
 
 
 

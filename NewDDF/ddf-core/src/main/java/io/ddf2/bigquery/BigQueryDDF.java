@@ -4,8 +4,10 @@ import io.ddf2.*;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.PrepareDataSourceException;
+import io.ddf2.datasource.SqlDataSource;
 import org.apache.commons.lang.NotImplementedException;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -13,17 +15,34 @@ import java.util.Map;
  */
 public class BigQueryDDF extends DDF {
 
+    protected String projectId;
+    protected String query;
     protected BigQueryDDF(IDataSource dataSource) {
         super(dataSource);
     }
 
-    /**
-     * Finally build DDF. Called from builder.
+    /***
+     * DDFManager will pass ddfProperties to concreted DDF thanks to our contraction.
      *
-     * @param mapDDFProperties is a contract between concrete DDFManager & concrete DDF
+     * @param mapDDFProperties
      */
     @Override
-    protected void build(Map mapDDFProperties) throws PrepareDataSourceException, UnsupportedDataSourceException {
+    protected void _initWithProperties(Map mapDDFProperties) {
+        // Not using any property from BigQueryDDFManager
+    }
+
+    /***
+     * Init @mapDataSourcePreparer.
+     * Add all supported DataSource to @mapDataSourcePreparer
+     */
+    @Override
+    protected void _initDSPreparer() {
+        mapDataSourcePreparer = new HashMap<>();
+        mapDataSourcePreparer.put(BQDataSource.class,BQDataSourcePreparer)
+    }
+
+
+    protected void resolveDataSource() throws PrepareDataSourceException{
 
     }
 
@@ -34,6 +53,12 @@ public class BigQueryDDF extends DDF {
     @Override
     public ISqlResult sql(String sql) {
         return null;
+    }
+
+    @Override
+    public IDDF sql2ddf(String sql) throws DDFException {
+        BQDataSource bqDataSource = new BQDataSource(projectId,sql);
+        return ddfManager.newDDF(bqDataSource);
     }
 
     @Override

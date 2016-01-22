@@ -5,6 +5,7 @@ import com.google.api.services.bigquery.model.QueryRequest;
 import com.google.api.services.bigquery.model.QueryResponse;
 import io.ddf2.*;
 import io.ddf2.datasource.IDataSource;
+import io.ddf2.handlers.IPersistentHandler;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -22,9 +23,22 @@ public final class BigQueryManager extends DDFManager {
 
     @Override
     public IDDF _newDDF(String name, IDataSource ds) throws DDFException {
+        return BigQueryDDF.builder(ds)
+                .setName(name)
+                .putProperty(mapProperties)
+                .setDDFManager(this)
+                .build();
+    }
+
+    @Override
+    protected IPersistentHandler _getPersistentHanlder() {
         return null;
     }
 
+    @Override
+    protected IDDFMetaData _getDDFMetaData() {
+        return null;
+    }
 
 
     @Override
