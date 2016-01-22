@@ -102,8 +102,17 @@ sbt (bin/sbt) clean compile publishLocal
 ```
 mvn test
 ```
+Note: DataLoadTesting requires the following mysql configurations (If you don't want to configure mysql, please disable or ignore this test):
+```
+database: localhost:3306/test
+username: pauser
+password: papwd
+create table commands:
+mysql> create table mtcars(mpg double, cyl int, disp double, hp int, drat double, wt double, qsec double, vs int, am int, gear int, carb int);
+mysql> load data infile 'Path_To_DDF/DDF/resources/test/mtcars' into table mtcars fields terminated by ' ';
+```
 
-Or if you want to run test for individual modules,
+If you want to run test for individual modules,
 ```
 $ (cd core ; mvn test)
 $ (cd spark ; mvn test)
