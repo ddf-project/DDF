@@ -1,9 +1,11 @@
 package io.ddf.spark.ds
 
+import java.sql.{Connection, DriverManager, SQLException, SQLFeatureNotSupportedException}
 import java.util.Properties
 
-import io.ddf.ds.UsernamePasswordCredential
-import io.ddf.exception.{DDFException, UnauthenticatedDataSourceException}
+import io.ddf.ds.{DataSourceCredential, UsernamePasswordCredential}
+import io.ddf.exception.{DDFException, InvalidDataSourceCredentialException, UnauthenticatedDataSourceException}
+import io.ddf.misc.Config
 import io.ddf.spark.SparkDDFManager
 import io.ddf.spark.util.SparkUtils
 import io.ddf.{DDF, DDFManager}
@@ -11,6 +13,9 @@ import io.ddf.{DDF, DDFManager}
 import scala.collection.JavaConversions._
 
 class JdbcDataSource(uri: String, manager: DDFManager) extends BaseDataSource(uri, manager) {
+
+  val connectionValidateTimeout = Config.getValueOrElseDefault("Spark", "jdbcConnectionValidateTimeout", "10").toInt
+
   if (!manager.isInstanceOf[SparkDDFManager]) {
     throw new DDFException(s"Loading of $uri is only supported with SparkDDFManager")
   }
@@ -49,4 +54,38 @@ class JdbcDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
     url
   }
 
+  override def validateCredential(credential: DataSourceCredential): Unit = {
+    val options = Map[AnyRef, AnyRef]("credential" -> credential)
+    val uri = getConnectionUri(options)
+    // XXX this try finally block is too Java-ish
+    var conn: Connection = null
+    try {
+      conn = DriverManager.getConnection(uri)
+      conn.isValid(connectionValidateTimeout)
+    } catch {
+      // XXX clumsy check and rethrow logic
+      case e: SQLFeatureNotSupportedException =>
+        // not all driver support isValid method
+        // we will accept that the credential is valid if we can get connection
+      case e: SQLException =>
+        if (JdbcDataSource.isInvalidCredentialError(e)) {
+          throw new InvalidDataSourceCredentialException(e.getMessage)
+        }
+        throw e
+      case e => throw e
+    } finally {
+      if (conn != null) {
+        conn.close()
+      }
+    }
+  }
+}
+
+object JdbcDataSource {
+  private def isInvalidCredentialError(exception: SQLException): Boolean = {
+    val msg = exception.getMessage.toLowerCase
+    val accessDenied = msg.contains("access denied")
+    val authFailed = msg.contains("authentication failed")
+    accessDenied || authFailed
+  }
 }

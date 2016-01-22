@@ -1,7 +1,7 @@
 package io.ddf.spark.ds
 
 import io.ddf.content.Schema
-import io.ddf.ds.UsernamePasswordCredential
+import io.ddf.ds.{DataSourceCredential, UsernamePasswordCredential}
 import io.ddf.exception.{DDFException, UnauthenticatedDataSourceException}
 import io.ddf.spark.SparkDDFManager
 import io.ddf.spark.util.SparkUtils
@@ -18,7 +18,6 @@ import scala.util.{Success, Try}
   * @param uri URI of the data source,
   *            should be "file:;" for local file system and "hdfs://namenode" for HDFS.
   *            "hdfs:;" can be used for the local HDFS file system if running on YARN.
-  *
   * @param manager the DDF manager for this source
   */
 class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(uri, manager) {
@@ -100,6 +99,10 @@ class FileDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
       s"$uri$path"
     }
   }
+
+  override def validateCredential(credential: DataSourceCredential): Unit = {
+    // do nothing
+  }
 }
 
 /**
@@ -132,6 +135,9 @@ class S3DataSource(uri: String, manager: DDFManager) extends FileDataSource(uri,
     }
   }
 
+  override def validateCredential(credential: DataSourceCredential): Unit = {
+    // XXX TODO implement S3 credential check here
+  }
 }
 
 object S3DataSource {
