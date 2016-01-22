@@ -147,8 +147,13 @@ Summary[] summary = table.getSummary();
 // Do transform
 table = table.transform("dist= distance/2");
 table.sql("select * from @this", "Get error");
-
 ```
+JDBC and Flink are also supported under 
+```
+https://github.com/ddf-project/ddf-jdbc
+https://github.com/ddf-project/ddf-flink
+```
+
 JDBC
 ```
 // Start JDBC DDFManager
