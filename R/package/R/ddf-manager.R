@@ -110,7 +110,8 @@ setMethod("sql",
             # Get a proper Java Boolean object
             queryOnDDF <- new( J("java.lang.Boolean"), queryOnDDF)
             java.ret <- jdm$sql(sql, queryOnDDF)
-            if (!grepl("^create.+$", tolower(sql)) && !grepl("^load.+$", tolower(sql))) {
+            if (!grepl("^create.+$", tolower(sql)) && !grepl("^load.+$", tolower(sql)) 
+                && !grepl("^drop.+$", tolower(sql)) && !grepl("^set+$", tolower(sql))) {
               parse.sql.result(java.ret)
             }
           }
