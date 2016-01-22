@@ -1,7 +1,7 @@
 package io.ddf.spark.ds
 
 import io.ddf.ds.UsernamePasswordCredential
-import io.ddf.exception.UnauthenticatedDataSourceException
+import io.ddf.exception.{InvalidDataSourceCredentialException, UnauthenticatedDataSourceException}
 import io.ddf.spark.{ATestSuite, DelegatingDDFManager}
 import org.scalatest.Matchers
 
@@ -64,6 +64,13 @@ class CreateDDFSuite extends ATestSuite with Matchers {
     )
     a[UnauthenticatedDataSourceException] should be thrownBy {
       s3Manager.createDDF(options)
+    }
+  }
+
+  test("invalid credential used") {
+    val invalidCredential = new UsernamePasswordCredential("foo", "bar")
+    a[InvalidDataSourceCredentialException] should be thrownBy {
+      mysqlManager.validateCredential(invalidCredential)
     }
   }
 

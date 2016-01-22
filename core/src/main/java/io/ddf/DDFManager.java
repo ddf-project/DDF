@@ -28,6 +28,7 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.DataSourceManager;
 import io.ddf.datasource.SQLDataSourceDescriptor;
+import io.ddf.ds.DataSourceCredential;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
@@ -653,6 +654,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   public abstract DDF createDDF(Map<Object, Object> options) throws DDFException;
+
+  public abstract void validateCredential(DataSourceCredential credential) throws DDFException;
 
   public abstract String getSourceUri();
 }

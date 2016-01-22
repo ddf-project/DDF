@@ -2,7 +2,12 @@ package io.ddf.spark;
 
 import io.ddf.DDF;
 import io.ddf.DDFManager;
+import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
+import io.ddf.spark.ds.DataSource;
+import io.ddf.spark.ds.FileDataSource;
+import io.ddf.spark.ds.JdbcDataSource;
+import io.ddf.spark.ds.S3DataSource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,10 +22,20 @@ public class DelegatingDDFManager extends DDFManager {
 
   private final DDFManager manager;
   private final String uri;
+  private final DataSource dataSource;
 
-  public DelegatingDDFManager(DDFManager manager, String uri) {
+  public DelegatingDDFManager(DDFManager manager, String uri) throws DDFException {
     this.uri = uri;
     this.manager = manager;
+    if (uri.startsWith("s3:")) {
+      dataSource = new S3DataSource(uri, manager);
+    } else if (uri.startsWith("hdfs:") || uri.startsWith("file:")) {
+      dataSource = new FileDataSource(uri, manager);
+    } else if (uri.startsWith("jdbc:")) {
+      dataSource = new JdbcDataSource(uri, manager);
+    } else {
+      throw new DDFException("Unsupported datasource " + uri);
+    }
   }
 
   @Override
@@ -53,7 +68,13 @@ public class DelegatingDDFManager extends DDFManager {
     // clone the options so that we can add our new field for source uri
     options = new HashMap<>(options);
     options.put("sourceUri", uri);
+    options.put("dataSource", dataSource);
     return manager.createDDF(options);
+  }
+
+  @Override
+  public void validateCredential(DataSourceCredential credential) throws DDFException {
+    dataSource.validateCredential(credential);
   }
 
   @Override

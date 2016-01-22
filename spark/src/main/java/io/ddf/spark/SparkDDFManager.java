@@ -8,11 +8,9 @@ import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
+import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.ds.DataSource;
-import io.ddf.spark.ds.FileDataSource;
-import io.ddf.spark.ds.JdbcDataSource;
-import io.ddf.spark.ds.S3DataSource;
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
 import io.ddf.spark.etl.DateUDF;
@@ -371,21 +369,20 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public DDF createDDF(Map<Object, Object> options) throws DDFException {
-    Preconditions.checkArgument(options.containsKey("sourceUri"),
-        "SparkDDFManager need sourceUri param in options");
+    Preconditions.checkArgument(options.containsKey("dataSource"),
+        "SparkDDFManager need dataSource param in options");
 
-    String uri = options.get("sourceUri").toString();
-    DataSource ds;
-    if (uri.startsWith("s3:")) {
-      ds = new S3DataSource(uri, this);
-    } else if (uri.startsWith("hdfs:") || uri.startsWith("file:")) {
-      ds = new FileDataSource(uri, this);
-    } else if (uri.startsWith("jdbc:")) {
-      ds = new JdbcDataSource(uri, this);
-    } else {
-      throw new DDFException("Unsupported datasource " + uri);
-    }
+    Object dsObject = options.get("dataSource");
+    Preconditions.checkArgument(dsObject instanceof DataSource,
+        "dataSource option is not of DataSource type");
+
+    DataSource ds = (DataSource) dsObject;
     return ds.loadDDF(options);
+  }
+
+  @Override
+  public void validateCredential(DataSourceCredential credential) throws DDFException {
+    // no credential needed for spark, do nothing here
   }
 
   @Override
