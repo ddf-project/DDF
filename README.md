@@ -127,16 +127,16 @@ Run Examples
 bin/run-example io.ddf.spark.examples.RowCount 
 ```
 Interactive Programming with DDF Shell
-```
-Enter ddf java shell using:
-bin/ddf-shell
 
-and type in the following command
+
+Enter ddf java shell using:
+```
+bin/ddf-shell
 ```
 Spark
 ```
 // Start spark DDFManager
-DDFManager sparkDDFManager = DDFManager.get(DDFManager.EngineType.SPARK);
+DDFManager sparkDDFManager = DDFManager.get("spark");
 // Load table into spark
 sparkDDFManager.sql("create table airline (Year int,Month int,DayofMonth int, DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int, TailNum string, ActualElapsedTime int, CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string, Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", Boolean.False);
 sparkDDFManager.sql("load data local inpath './resources/airlineWithNA.csv' into table airline", Boolean.False);
@@ -154,11 +154,11 @@ JDBC
 // Start JDBC DDFManager
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 // Please fill in the correct type, url, username and password here
-// Current included engine types include DDFManager.EngineType.REDSHIFT (for redshift), DDFManager.EngineType.POSTGRES (for postgres), DDFManager.EngineType.J// DBC (for mysql etc.). And configurations should be added in ddf-conf/ddf.ini.
+// Current included engine types include "redshift" (for redshift), "postgres" (for postgres), "jdbc" (for mysql etc.). And configurations should be added in ddf-conf/ddf.ini.
 // For exmaple: 
-DDFManager jdbcDDFManager = DDFManager.get(DDFManager.EngineType.REDSHIFT, new JDBCDataSourceDescriptor("jdbc:redshift://redshift.c3f0ktst.us-east1.redshift.amazonaws.com:5439/mydb", "myusername", "mypwd", null));
+DDFManager jdbcDDFManager = DDFManager.get("redshift", new JDBCDataSourceDescriptor("jdbc:redshift://redshift.c3tst.us-east1.redshift.amazonaws.com:5439/mydb", "myusername", "mypwd", null));
 // Create a ddf
-DDF redshiftDDF = jdbcDDFManager.sql2ddf("select * from links", "redshift");
+DDF redshiftDDF = jdbcDDFManager.sql2ddf("select * from links", Boolean.False);
 // Copy ddf to spark
 DDF copiedDDF = sparkDDFManager.copyFrom(redshiftDDF, "copiedDDF");
 sparkDDFManager.sql("select * from copiedDDF");
@@ -169,10 +169,10 @@ Flink
 // Start Flink DDFManager
 DDFManager flinkDDFManager = DDFManager.get("flink");
 // Create a ddf
-flinkManager.sql("CREATE TABLE flight (Year int,Month int,DayofMonth int, DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int, TailNum string, ActualElapsedTime int,CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string, Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int)", "flink");
-flinkManager.sql("load './resources/airlineWithNA.csv' delimited by ',' into flight", "flink");
+flinkManager.sql("CREATE TABLE flight (Year int,Month int,DayofMonth int, DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int, TailNum string, ActualElapsedTime int,CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string, Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int)", Boolean.False);
+flinkManager.sql("load './resources/airlineWithNA.csv' delimited by ',' into flight", Boolean.False);
 // run query
-DDF flinkTable = flinkManager.sql2ddf("select * from flight", "flink");
+DDF flinkTable = flinkManager.sql2ddf("select * from flight", Boolean.False);
 System.out.println(flinkTable.getNumRows());
 ```
 ### Note
