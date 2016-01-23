@@ -5,6 +5,7 @@ import java.util
 import java.util.{Map => JMap}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonFactory}
 import com.google.common.base.Strings
+import io.ddf.{DDFManager, DDF}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.Row
@@ -296,5 +297,18 @@ object SparkUtils {
       case "datetype" => DateType
       case x => throw new DDFException(s"Type not support $x")
     }
+  }
+
+  /**
+    * Create a new DDF from a Spark DataFrame.
+    *
+    * @param dataFrame the Spark DataFrame
+    * @param manager the DDFManager to create the new DDF
+    * @return a new DDF
+    */
+  def df2ddf(dataFrame: DataFrame, manager: DDFManager): DDF = {
+    val df = SparkUtils.getDataFrameWithValidColnames(dataFrame)
+    val schema = SparkUtils.schemaFromDataFrame(df)
+    manager.newDDF(manager, df, Array(classOf[DataFrame]), null, null, schema)
   }
 }

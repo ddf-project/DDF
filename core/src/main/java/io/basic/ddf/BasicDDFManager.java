@@ -7,9 +7,11 @@ package io.basic.ddf;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
+import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -66,4 +68,19 @@ public class BasicDDFManager extends DDFManager {
   public DDF copyFrom(DDF fromDDF) throws DDFException {
     throw new DDFException(new UnsupportedOperationException());
   }
+
+  @Override
+  public void validateCredential(DataSourceCredential credential) throws DDFException {
+    // do nothing
+  }
+
+  @Override
+  public String getSourceUri() {
+    return "basic://";
+  }
 }
+
+ @Override
+  public DDF createDDF(Map<Object, Object> options) throws DDFException {
+    throw new UnsupportedOperationException();
+  }

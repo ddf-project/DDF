@@ -1,13 +1,15 @@
 package io.ddf.spark;
 
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
-import io.ddf.datasource.*;
+import io.ddf.datasource.DataSourceDescriptor;
+import io.ddf.datasource.JDBCDataSourceDescriptor;
+import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
-import io.ddf.s3.S3DDF;
 import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
@@ -20,9 +22,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.hive.HiveContext;
 import scala.Function1;
 
@@ -423,6 +423,29 @@ public class SparkDDFManager extends DDFManager {
   @Override
   public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
     return this.mDDFCache.getDDF(uuid);
+  }
+
+  @Override
+  public DDF createDDF(Map<Object, Object> options) throws DDFException {
+    Preconditions.checkArgument(options.containsKey("dataSource"),
+        "SparkDDFManager need dataSource param in options");
+
+    Object dsObject = options.get("dataSource");
+    Preconditions.checkArgument(dsObject instanceof DataSource,
+        "dataSource option is not of DataSource type");
+
+    DataSource ds = (DataSource) dsObject;
+    return ds.loadDDF(options);
+  }
+
+  @Override
+  public void validateCredential(DataSourceCredential credential) throws DDFException {
+    // no credential needed for spark, do nothing here
+  }
+
+  @Override
+  public String getSourceUri() {
+    return "spark:;";
   }
 
   /**

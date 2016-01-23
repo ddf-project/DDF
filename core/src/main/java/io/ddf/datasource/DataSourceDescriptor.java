@@ -3,6 +3,7 @@ package io.ddf.datasource;
 
 import io.ddf.DDF;
 import io.ddf.DDFManager;
+import io.ddf.exception.DDFException;
 
 /**
  */
@@ -59,5 +60,5 @@ abstract public class DataSourceDescriptor {
     return this.mFileFormat;
   }
 
-  public abstract DDF load(DDFManager manager);
+  public abstract DDF load(DDFManager manager) throws DDFException;
 }
