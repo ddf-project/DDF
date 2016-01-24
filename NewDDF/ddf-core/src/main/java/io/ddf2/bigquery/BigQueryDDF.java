@@ -85,9 +85,11 @@ public class BigQueryDDF extends DDF {
             }
 
             @Override
-            protected BigQueryDDF newInstance(String ds) {
-                //Todo: ThreadLocal to implement this feature
-                throw new NotImplementedException("Not Implement Yet");
+            protected BigQueryDDF newInstance(String query) {
+                return newInstance(BQDataSource.builder()
+                                                .setProjectId((String) BigQueryContext.getProperty(BigQueryContext.KEY_PROJECT_ID))
+                                                .setQuery(query)
+                                                .build());
             }
 
             @Override
