@@ -1,5 +1,6 @@
 package io.ddf2.bigquery;
 
+import io.ddf2.datasource.DataSource;
 import io.ddf2.datasource.SqlDataSource;
 
 /**
@@ -8,20 +9,40 @@ import io.ddf2.datasource.SqlDataSource;
  * + sqlQuery : sql query to execute in BigQuery
  * + projectId: required param from BigQuery library.
  */
-public class BQDataSource extends SqlDataSource {
+public class BQDataSource extends DataSource {
     protected String projectId;
-    public BQDataSource(String sqlQuery) {
-        this((String)BigQueryContext.getProperty(BigQueryContext.KEY_PROJECT_ID),sqlQuery);
-    }
-    public BQDataSource(String projectId,String sqlQuery){
-        super(sqlQuery);
-        this.projectId = projectId;
+    protected String query;
+
+
+    protected BQDataSource() {
     }
 
     public String getProjectId() {
         return projectId;
     }
 
+    public String getQuery() {
+        return query;
+    }
 
+    public static Builder<BQDataSource> builder() {
+        return new Builder<BQDataSource>() {
+            @Override
+            protected BQDataSource newInstance() {
+                return new BQDataSource();
+            }
+        };
+    }
+
+    public static abstract class Builder<T extends BQDataSource> extends DataSource.Builder<T> {
+        public Builder<T> setProjectId(String projectId) {
+            this.datasource.projectId = projectId;
+            return this;
+        }
+        public Builder<T> setQuery(String query){
+            this.datasource.query = query;
+            return this;
+        }
+    }
 
 }

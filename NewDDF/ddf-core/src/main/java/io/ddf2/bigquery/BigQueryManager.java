@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by sangdn on 1/18/16.
+ * @see io.ddf2.IDDFManager
  */
 public final class BigQueryManager extends DDFManager {
     protected BigQueryManager(Map mapProperties) throws DDFException {

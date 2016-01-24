@@ -1,6 +1,8 @@
 package io.ddf2.bigquery;
 
+import com.google.api.services.bigquery.Bigquery;
 import io.ddf2.*;
+import io.ddf2.bigquery.preparer.BigQueryPreparer;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.PrepareDataSourceException;
@@ -17,8 +19,10 @@ public class BigQueryDDF extends DDF {
 
     protected String projectId;
     protected String query;
+    protected Bigquery bigquery;
     protected BigQueryDDF(IDataSource dataSource) {
         super(dataSource);
+        bigquery = BigQueryUtils.newInstance();
     }
 
     /***
@@ -38,7 +42,7 @@ public class BigQueryDDF extends DDF {
     @Override
     protected void _initDSPreparer() {
         mapDataSourcePreparer = new HashMap<>();
-        mapDataSourcePreparer.put(BQDataSource.class,BQDataSourcePreparer)
+        mapDataSourcePreparer.put(BQDataSource.class,new BigQueryPreparer(bigquery));
     }
 
 
@@ -57,7 +61,7 @@ public class BigQueryDDF extends DDF {
 
     @Override
     public IDDF sql2ddf(String sql) throws DDFException {
-        BQDataSource bqDataSource = new BQDataSource(projectId,sql);
+        BQDataSource bqDataSource = BQDataSource.builder().setProjectId(projectId).setQuery(sql).build();
         return ddfManager.newDDF(bqDataSource);
     }
 
@@ -66,14 +70,7 @@ public class BigQueryDDF extends DDF {
         return 0;
     }
 
-    /**
-     * @return
-     * @see IDataSourcePreparer
-     */
-    @Override
-    protected IDataSourcePreparer getDataSourcePreparer() throws UnsupportedDataSourceException {
-        return null;
-    }
+
 
     protected abstract static class BigQueryDDFBuilder<T extends BigQueryDDF> extends DDFBuilder<T> {
         public BigQueryDDFBuilder(IDataSource dataSource) {

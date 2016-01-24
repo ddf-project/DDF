@@ -1,4 +1,5 @@
 package io.ddf2.bigquery;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -7,6 +8,10 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.bigquery.Bigquery;
 import com.google.api.services.bigquery.BigqueryScopes;
+import com.google.api.services.bigquery.model.TableFieldSchema;
+import com.google.api.services.bigquery.model.TableSchema;
+import io.ddf2.datasource.schema.ISchema;
+import io.ddf2.datasource.schema.Schema;
 
 import java.util.List;
 
@@ -16,14 +21,13 @@ import java.util.List;
 public class BigQueryUtils {
 
     /***
-     *
-     * @param appName: Application Name to submit to Google Bigquery Service
-     * @param clientId: ClientId to connect to Google BigQuery Service
+     * @param appName:      Application Name to submit to Google Bigquery Service
+     * @param clientId:     ClientId to connect to Google BigQuery Service
      * @param clientSecret: Client Secret
      * @param refreshToken: Refresh Token
      * @return
      */
-    public static Bigquery newInstance(String appName,String clientId,String clientSecret,String refreshToken){
+    public static Bigquery newInstance(String appName, String clientId, String clientSecret, String refreshToken) {
 
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = new JacksonFactory();
@@ -41,10 +45,9 @@ public class BigQueryUtils {
     }
 
     /**
-     *
      * @return BigQuery from current user setting on BigQueryContext.
      */
-    public static Bigquery newInstance(){
+    public static Bigquery newInstance() {
         return newInstance((String) BigQueryContext.getProperty(BigQueryContext.KEY_APP_NAME),
                 (String) BigQueryContext.getProperty(BigQueryContext.KEY_CLIENT_ID),
                 (String) BigQueryContext.getProperty(BigQueryContext.KEY_CLIENT_SECRET),
@@ -67,19 +70,37 @@ public class BigQueryUtils {
 
     /**
      * ref: https://cloud.google.com/bigquery/preparing-data-for-bigquery?hl=en#datatypes
+     *
      * @param type
      * @return
      */
-    public static Class convertToJavaType(String type){
+    public static Class convertToJavaType(String type) {
         type = type.toLowerCase();
-        switch (type){
-            case "string": return String.class;
-            case "integer": return Long.class;
-            case "float": return Double.class;
-            case "boolean": return Boolean.class;
-            case "record": return List.class;
-            case "timestamp": return DateTime.class;
-            default:return Object.class;
+        switch (type) {
+            case "string":
+                return String.class;
+            case "integer":
+                return Long.class;
+            case "float":
+                return Double.class;
+            case "boolean":
+                return Boolean.class;
+            case "record":
+                return List.class;
+            case "timestamp":
+                return DateTime.class;
+            default:
+                return Object.class;
         }
+    }
+
+
+    public static ISchema convertToDDFSchema(TableSchema tableSchema) {
+        List<TableFieldSchema> fields = tableSchema.getFields();
+        Schema.SchemaBuilder builder = Schema.builder();
+        for (TableFieldSchema field : fields) {
+            builder.add(field.getName(), BigQueryUtils.convertToJavaType(field.getType()));
+        }
+        return builder.build();
     }
 }

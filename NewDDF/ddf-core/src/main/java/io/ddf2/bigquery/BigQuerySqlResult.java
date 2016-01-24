@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sangdn on 1/20/16.
- *
+ * @see io.ddf2.ISqlResult
  */
 public class BigQuerySqlResult implements ISqlResult{
     protected QueryResponse queryResponse;
@@ -29,19 +29,12 @@ public class BigQuerySqlResult implements ISqlResult{
 
     public BigQuerySqlResult(QueryResponse queryResponse){
         this.queryResponse = queryResponse;
-        schema = convert(queryResponse.getSchema());
+        schema = BigQueryUtils.convertToDDFSchema(queryResponse.getSchema());
         rowIterator = queryResponse.getRows().iterator();
 
 
     }
-    protected ISchema convert(TableSchema tableSchema){
-        List<TableFieldSchema> fields = tableSchema.getFields();
-        Schema.SchemaBuilder builder = Schema.builder();
-        for(TableFieldSchema field: fields){
-            builder.add(field.getName(),BigQueryUtils.convertToJavaType(field.getType()));
-        }
-        return builder.build();
-    }
+
     @Override
     public ISchema getSchema() {
         return schema;

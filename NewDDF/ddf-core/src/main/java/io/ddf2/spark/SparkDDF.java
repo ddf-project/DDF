@@ -63,7 +63,7 @@ public class SparkDDF extends DDF {
 
     @Override
     public IDDF sql2ddf(String sql) throws DDFException {
-        return ddfManager.newDDF(new SqlDataSource(sql));
+        return ddfManager.newDDF(SqlDataSource.builder().setQuery(sql).build());
     }
 
 
@@ -88,8 +88,9 @@ public class SparkDDF extends DDF {
             }
 
             @Override
-            protected SparkDDF newInstance(String ds) {
-                return newInstance(new SqlDataSource(ds));
+            protected SparkDDF newInstance(String query) {
+                SqlDataSource ds = SqlDataSource.builder().setQuery(query).build();
+                return newInstance(ds);
             }
 
             @Override

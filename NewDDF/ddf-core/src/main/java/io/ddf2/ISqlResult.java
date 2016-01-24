@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
 
+/**
+ * ISqlResult is root-interface for any sqlresult return from DDF
+ */
 public interface ISqlResult extends AutoCloseable {
  
 	public ISchema getSchema();

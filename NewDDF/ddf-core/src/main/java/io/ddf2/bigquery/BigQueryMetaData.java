@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Created by sangdn on 1/21/16.
+ * @see io.ddf2.IDDFMetaData
  */
 public class BigQueryMetaData implements IDDFMetaData {
     @Override
