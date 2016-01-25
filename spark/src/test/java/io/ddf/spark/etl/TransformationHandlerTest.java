@@ -10,7 +10,6 @@ import io.ddf.etl.TransformationHandler;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.BaseTest;
 import org.junit.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +19,7 @@ public class TransformationHandlerTest extends BaseTest {
 
   @Before
   public void setUp() throws Exception {
+    
     createTableAirline();
     createTableAirlineBigInt();
     ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, " +
@@ -33,7 +33,7 @@ public class TransformationHandlerTest extends BaseTest {
     System.out.println("newname " + newddf.getName());
     List<String> res = ddf.VIEWS.head(10);
 
-    //Assert.assertFalse(ddf.getName().equals(newddf.getName()));
+    // Assert.assertFalse(ddf.getName().equals(newddf.getName()));
     Assert.assertNotNull(newddf);
     Assert.assertEquals("newcol", newddf.getColumnName(8));
     Assert.assertEquals(10, res.size());
@@ -79,6 +79,34 @@ public class TransformationHandlerTest extends BaseTest {
     DDF newddf1 = ddf.Transform.transformScaleStandard();
     Assert.assertEquals(31, newddf1.getNumRows());
     Assert.assertEquals(8, newddf1.getSummary().length);
+  }
+
+  @Test
+  public void testFlattenArrayTypeColumn() throws DDFException {
+
+    ddf.setMutable(false);
+    
+    // flatten ArrayType column with numeric elements
+    DDF ddfWithArrayTypeColumn = ddf.Transform.transformUDF("arrCol = array(1.234, 5.678, 9.123)");
+    DDF flattened_ddf = ddfWithArrayTypeColumn.Transform.flattenArrayTypeColumn("arrCol");
+
+    Assert.assertEquals(12, flattened_ddf.getNumColumns());
+    Assert.assertEquals("arrCol", flattened_ddf.getColumnName(8));
+    Assert.assertEquals("arrCol_c0", flattened_ddf.getColumnName(9));
+
+    String element = flattened_ddf.VIEWS.project("arrCol_c2").VIEWS.head(1).get(0);
+    Assert.assertEquals(9.123, Double.parseDouble(element), 1e-5);
+
+    // flatten ArrayType column with string elements
+    DDF ddfWithArrayTypeColumnStr = ddf.Transform.transformUDF("arrColStr = array('day', 'month', 'year')");
+    DDF flattened_ddf_str = ddfWithArrayTypeColumnStr.Transform.flattenArrayTypeColumn("arrColStr");
+
+    Assert.assertEquals(12, flattened_ddf_str.getNumColumns());
+    Assert.assertEquals("arrColStr", flattened_ddf_str.getColumnName(8));
+    Assert.assertEquals("arrColStr_c0", flattened_ddf_str.getColumnName(9));
+
+    String elementStr = flattened_ddf_str.VIEWS.project("arrColStr_c1").VIEWS.head(1).get(0);
+    Assert.assertEquals("month", elementStr);
   }
 
   @Ignore
@@ -174,20 +202,21 @@ public class TransformationHandlerTest extends BaseTest {
 
     List<String> lcols = Lists.newArrayList("distance", "arrtime", "deptime");
     String s0 = "new_col = if(arrdelay=15,1,0)";
-    List<String> s1 = new ArrayList<String> ();
+    List<String> s1 = new ArrayList<String>();
     s1.add("new_col = if(arrdelay=15,1,0)");
     s1.add("v ~ (arrtime-deptime)");
     s1.add("distance/(arrtime-deptime)");
     String s2 = "arr_delayed=if(arrdelay=\"yes\",1,0)";
     String s3 = "origin_sfo = case origin when \'SFO\' then 1 else 0 end ";
     System.out.println(">>> TransformationHandler.RToSqlUdf(s1) = " + TransformationHandler.RToSqlUdf(s1));
-    //>>> TransformationHandler.RToSqlUdf(s1) = if(arrdelay=15,1,0) as new_col,(arrtime-deptime) as v,distance/(arrtime-deptime)");
+    // >>> TransformationHandler.RToSqlUdf(s1) = if(arrdelay=15,1,0) as new_col,(arrtime-deptime) as
+    // v,distance/(arrtime-deptime)");
     Assert.assertEquals("if(arrdelay=15,1,0) as new_col,(arrtime-deptime) as v,distance/(arrtime-deptime)",
         TransformationHandler.RToSqlUdf(s1));
     Assert.assertEquals("if(arrdelay=\"yes\",1,0) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
     System.out.println(">>> TransformationHandler.RToSqlUdf(s3): " + TransformationHandler.RToSqlUdf(s3));
-        Assert.assertEquals("case origin when \'SFO\' then 1 else 0 end as origin_sfo",
-            TransformationHandler.RToSqlUdf(s3));
+    Assert
+        .assertEquals("case origin when \'SFO\' then 1 else 0 end as origin_sfo", TransformationHandler.RToSqlUdf(s3));
     DDF ddf2 = ddf.Transform.transformUDF(s1, lcols);
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(6, ddf2.getNumColumns());
@@ -202,17 +231,17 @@ public class TransformationHandlerTest extends BaseTest {
         TransformationHandler.RToSqlUdf("dt=regexp_extract('hh:mm:ss', '.*\\\\+([^+])+', 1)"));
   }
 
-  @Test(expected=RuntimeException.class)
+  @Test(expected = RuntimeException.class)
   public void testConflictingColumnDefinitions() throws DDFException {
     ddf.setMutable(true);
     List<String> cols = Lists.newArrayList("distance");
     ddf.Transform.transformUDF("distance=100", cols);
   }
 
-  @Test(expected=RuntimeException.class)
+  @Test(expected = RuntimeException.class)
   public void testConflictingColumnDefinitions2() throws DDFException {
     ddf.setMutable(true);
-    List<String> s = new ArrayList<String> ();
+    List<String> s = new ArrayList<String>();
     s.add("distance=100");
     s.add("distance");
     ddf.Transform.transformUDF(s);
