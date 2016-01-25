@@ -79,26 +79,31 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
   }
 
   override def getRandomSample(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
-    if (fraction > 1 || fraction < 0) {
-      throw new IllegalArgumentException("Sampling fraction must be from 0 to 1")
-    } else {
-      val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-      val sample_df = df.sample(withReplacement, fraction, seed)
-      val schema = SchemaHandler.getSchemaFromDataFrame(sample_df)
-      schema.setTableName(mDDF.getSchemaHandler.newTableName())
-      val manager = this.getManager
-      val sampleDDF = manager.newDDF(manager, sample_df, Array
-        (classOf[DataFrame]), manager.getNamespace,
-        null, schema)
-      mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-      this.getDDF.getSchemaHandler.getColumns.foreach{
-        col => if(col.getOptionalFactor != null) {
-          sampleDDF.getSchemaHandler.setAsFactor(col.getName)
-        }
-      }
-
-      sampleDDF
+    if (!withReplacement && (fraction > 1 || fraction < 0)) {
+      throw new IllegalArgumentException("Sampling fraction must be from 0 to 1 for sampling without replacement")
     }
+
+    if (withReplacement && (fraction < 0)) {
+      throw new IllegalArgumentException("Sampling fraction must be larger or equal to 0 for sampling with replacement")
+    }
+
+    val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    val sample_df = df.sample(withReplacement, fraction, seed)
+    val schema = SchemaHandler.getSchemaFromDataFrame(sample_df)
+    schema.setTableName(mDDF.getSchemaHandler.newTableName())
+    val manager = this.getManager
+    val sampleDDF = manager.newDDF(manager, sample_df, Array
+    (classOf[DataFrame]), manager.getNamespace,
+      null, schema)
+    mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
+    this.getDDF.getSchemaHandler.getColumns.foreach{
+      col => if(col.getOptionalFactor != null) {
+        sampleDDF.getSchemaHandler.setAsFactor(col.getName)
+      }
+    }
+
+    sampleDDF
+
   }
 }
 

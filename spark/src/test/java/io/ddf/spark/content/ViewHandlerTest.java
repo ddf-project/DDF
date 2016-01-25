@@ -82,4 +82,22 @@ public class ViewHandlerTest extends BaseTest{
     DDF ddf2 = ddf.VIEWS.subset(columns, grep);
     Assert.assertEquals(2, ddf2.getNumRows());
   }
+
+  @Test
+  public void testOversampling() throws DDFException {
+    createTableAirline();
+
+    DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+
+    DDF ddf2 = ddf.VIEWS.getRandomSample(2.0, true, 123);
+
+    Assert.assertTrue(ddf2.getNumRows() > ddf.getNumRows());
+
+    try {
+      ddf2 = ddf.VIEWS.getRandomSample(2.0, false, 123);
+      Assert.fail("Should not be able to oversampling without replacement");
+    } catch (IllegalArgumentException e) {
+      Assert.assertTrue(e.getMessage().contains("Sampling fraction must be from 0 to 1 for sampling without replacement"));
+    }
+  }
 }
