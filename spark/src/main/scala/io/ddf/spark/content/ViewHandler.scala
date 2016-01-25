@@ -51,8 +51,6 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     this.get(columns, ViewFormat.withName(format))
   }
 
-  val MAX_SAMPLE_SIZE = 1000000;
-
   override  def getRandomSampleByNum(numSamples: Int, withReplacement: Boolean,
     seed:
   Int): DDF = {
@@ -60,8 +58,8 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
   }
 
   override def getRandomSample(numSamples: Int, withReplacement: Boolean, seed: Int): java.util.List[Array[Object]] = {
-    if (numSamples > MAX_SAMPLE_SIZE) {
-      throw new IllegalArgumentException("Number of samples is currently limited to %d".format(MAX_SAMPLE_SIZE))
+    if (numSamples < 0) {
+      throw new IllegalArgumentException("Number of samples must be larger than or equal to 0");
     } else {
       if(mDDF.getRepresentationHandler.has(classOf[RDD[_]], classOf[Array[Object]])) {
         val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
@@ -80,11 +78,11 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
 
   override def getRandomSample(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
     if (!withReplacement && (fraction > 1 || fraction < 0)) {
-      throw new IllegalArgumentException("Sampling fraction must be from 0 to 1 for sampling without replacement")
+      throw new IllegalArgumentException("Sampling fraction must be from 0 to 1 in sampling without replacement")
     }
 
     if (withReplacement && (fraction < 0)) {
-      throw new IllegalArgumentException("Sampling fraction must be larger or equal to 0 for sampling with replacement")
+      throw new IllegalArgumentException("Sampling fraction must be larger or equal to 0 in sampling with replacement")
     }
 
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
