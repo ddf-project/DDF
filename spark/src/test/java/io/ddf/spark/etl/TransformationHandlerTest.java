@@ -29,8 +29,8 @@ public class TransformationHandlerTest extends BaseTest {
   @Test
   public void testTransformNativeRserve() throws DDFException {
     DDF newddf = ddf.Transform.transformNativeRserve("newcol = deptime / arrtime");
-    System.out.println("name " + ddf.getName());
-    System.out.println("newname " + newddf.getName());
+    LOG.info("name " + ddf.getName());
+    LOG.info("newname " + newddf.getName());
     List<String> res = ddf.VIEWS.head(10);
 
     // Assert.assertFalse(ddf.getName().equals(newddf.getName()));
@@ -116,8 +116,8 @@ public class TransformationHandlerTest extends BaseTest {
     String mapFuncDef = "function(part) { keyval(key=part$year, val=part$month) }";
     String reduceFuncDef = "function(key, vv) { keyval.row(key=key, val=sum(vv)) }";
     DDF newddf = ddf.Transform.transformMapReduceNative(mapFuncDef, reduceFuncDef);
-    System.out.println("name " + ddf.getName());
-    System.out.println("newname " + newddf.getName());
+    LOG.info("name " + ddf.getName());
+    LOG.info("newname " + newddf.getName());
     Assert.assertNotNull(newddf);
     Assert.assertTrue(newddf.getColumnName(0).equals("key"));
     Assert.assertTrue(newddf.getColumnName(1).equals("val"));
@@ -134,8 +134,8 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertTrue(ddf.getSchema() != null);
 
 
-    System.out.println(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
-    System.out.println(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
+    LOG.info(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
+    LOG.info(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
 
     Assert.assertTrue(ddf.getColumn("year").getColumnClass() == Schema.ColumnClass.FACTOR);
     Assert.assertTrue(ddf.getColumn("month").getColumnClass() == Schema.ColumnClass.FACTOR);
@@ -149,15 +149,15 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
 
 
-    System.out.println(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
-    System.out.println(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
+    LOG.info(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
+    LOG.info(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
 
     Assert.assertTrue(ddf.getColumn("year").getColumnClass() == Schema.ColumnClass.FACTOR);
     Assert.assertTrue(ddf.getColumn("month").getColumnClass() == Schema.ColumnClass.FACTOR);
 
     Assert.assertTrue(ddf.getColumn("year").getOptionalFactor().getLevels().size() > 0);
     Assert.assertTrue(ddf.getColumn("month").getOptionalFactor().getLevels().size() > 0);
-    System.out.println(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
+    LOG.info(">>>>>>>>>>>>> " + ddf.getSchema().getColumns());
   }
 
   @Test
@@ -208,13 +208,13 @@ public class TransformationHandlerTest extends BaseTest {
     s1.add("distance/(arrtime-deptime)");
     String s2 = "arr_delayed=if(arrdelay=\"yes\",1,0)";
     String s3 = "origin_sfo = case origin when \'SFO\' then 1 else 0 end ";
-    System.out.println(">>> TransformationHandler.RToSqlUdf(s1) = " + TransformationHandler.RToSqlUdf(s1));
+    LOG.info(">>> TransformationHandler.RToSqlUdf(s1) = " + TransformationHandler.RToSqlUdf(s1));
     // >>> TransformationHandler.RToSqlUdf(s1) = if(arrdelay=15,1,0) as new_col,(arrtime-deptime) as
     // v,distance/(arrtime-deptime)");
     Assert.assertEquals("if(arrdelay=15,1,0) as new_col,(arrtime-deptime) as v,distance/(arrtime-deptime)",
         TransformationHandler.RToSqlUdf(s1));
     Assert.assertEquals("if(arrdelay=\"yes\",1,0) as arr_delayed", TransformationHandler.RToSqlUdf(s2));
-    System.out.println(">>> TransformationHandler.RToSqlUdf(s3): " + TransformationHandler.RToSqlUdf(s3));
+    LOG.info(">>> TransformationHandler.RToSqlUdf(s3): " + TransformationHandler.RToSqlUdf(s3));
     Assert
         .assertEquals("case origin when \'SFO\' then 1 else 0 end as origin_sfo", TransformationHandler.RToSqlUdf(s3));
     DDF ddf2 = ddf.Transform.transformUDF(s1, lcols);
