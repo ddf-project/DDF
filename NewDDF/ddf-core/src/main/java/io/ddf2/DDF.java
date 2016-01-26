@@ -48,35 +48,44 @@ public abstract class DDF implements IDDF {
     /**
      * Finally build DDF. Called from builder.
      * It's template pattern
-     * - intitProperties
-     * - initDataSourcePreparer
-     * - resolveDataSource
+     * + intitProperties
+     * + initDataSourcePreparer
+     * # resolveDataSource
+     * + build()
      *
      * @param mapDDFProperties is a contract between concrete DDFManager & concrete DDF
      */
     protected final void build(Map mapDDFProperties) throws PrepareDataSourceException, UnsupportedDataSourceException {
         this.mapDDFProperties = mapDDFProperties;
-        _initWithProperties(this.mapDDFProperties);
-        _initDSPreparer();
+        beforeBuild(this.mapDDFProperties);
+        initDSPreparer();
 
         IDataSourcePreparer preparer = mapDataSourcePreparer.get(dataSource.getClass());
         if (preparer == null)
             throw new UnsupportedDataSourceException(dataSource);
         this.dataSource = preparer.prepare(this.name,dataSource);
-
+        endBuild();
     }
+
+
 
     /***
      * DDFManager will pass ddfProperties to concreted DDF thanks to our contraction.
+     * A Concrete-DDF would override this function to init it self before build.
      * @param mapDDFProperties
      */
-    protected abstract void _initWithProperties(Map mapDDFProperties);
+    protected void beforeBuild(Map mapDDFProperties){}
 
+    /**
+     * An reserve-function for concrete DDF to hook to build progress.
+     */
+    protected void endBuild(){};
     /***
      * Init @mapDataSourcePreparer.
      * Add all supported DataSource to @mapDataSourcePreparer
+     * A DataSourcePreparer will help to prepare a concrete datasource for DDF.
      */
-    protected abstract void _initDSPreparer();
+    protected abstract void initDSPreparer();
 
 
     /**

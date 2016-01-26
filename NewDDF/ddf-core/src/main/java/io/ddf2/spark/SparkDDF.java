@@ -35,7 +35,7 @@ public class SparkDDF extends DDF {
 
     }
     @Override
-    protected void _initWithProperties(Map mapDDFProperties) {
+    protected void beforeBuild(Map mapDDFProperties) {
         sparkContext = (SparkContext)mapDDFProperties.get(PROPERTY_SPARK_CONTEXT);
         if(sparkContext == null) throw new RuntimeException("SparkDDF required to have SparkContext On DdfProperties");
 
@@ -44,7 +44,7 @@ public class SparkDDF extends DDF {
 
     }
     @Override
-    protected void _initDSPreparer() {
+    protected void initDSPreparer() {
         mapDataSourcePreparer = new HashMap<>();
         mapDataSourcePreparer.put(LocalFileDataSource.class,new LocalFilePreparer(hiveContext));
     }

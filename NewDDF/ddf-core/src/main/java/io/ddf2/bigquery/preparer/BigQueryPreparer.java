@@ -18,7 +18,7 @@ import java.io.IOException;
  * Created by sangdn on 1/22/16.
  * BigQueryPreparer will prepare for BigQueryDDF
  * 1/ Create VIEW from BigQueryDataSource
- * 2/ Parse respones to get Schema
+ * 2/ Parse respone to get Schema
  * 3/ Required:
  */
 public class BigQueryPreparer implements IDataSourcePreparer {
@@ -50,6 +50,7 @@ public class BigQueryPreparer implements IDataSourcePreparer {
             Table tblResponse = bigquery.tables().insert(datasource.getProjectId(), TMP_VIEW_DATASET_ID, table).execute();
 
             return BQDataSource.builder().setProjectId(((BQDataSource) dataSource).getProjectId())
+                    .setNumRows(tblResponse.getNumRows().longValue())
                     .setCreatedTime(tblResponse.getCreationTime())
                     .setSchema(BigQueryUtils.convertToDDFSchema(tblResponse.getSchema()))
                     .build();

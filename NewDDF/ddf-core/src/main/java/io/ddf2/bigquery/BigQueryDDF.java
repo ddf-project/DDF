@@ -25,29 +25,26 @@ public class BigQueryDDF extends DDF {
         bigquery = BigQueryUtils.newInstance();
     }
 
-    /***
-     * DDFManager will pass ddfProperties to concreted DDF thanks to our contraction.
-     *
-     * @param mapDDFProperties
-     */
-    @Override
-    protected void _initWithProperties(Map mapDDFProperties) {
-        // Not using any property from BigQueryDDFManager
-    }
+
 
     /***
      * Init @mapDataSourcePreparer.
      * Add all supported DataSource to @mapDataSourcePreparer
      */
     @Override
-    protected void _initDSPreparer() {
+    protected void initDSPreparer() {
         mapDataSourcePreparer = new HashMap<>();
         mapDataSourcePreparer.put(BQDataSource.class,new BigQueryPreparer(bigquery));
     }
 
-
-    protected void resolveDataSource() throws PrepareDataSourceException{
-
+    /**
+     * An reserve-function for concrete DDF to hook to build progress.
+     */
+    @Override
+    protected void endBuild() {
+        if(this.dataSource instanceof BQDataSource){
+            this.numRows = ((BQDataSource)dataSource).getNumRows();
+        }
     }
 
     /**
@@ -67,7 +64,7 @@ public class BigQueryDDF extends DDF {
 
     @Override
     protected long _getNumRows() {
-        return 0;
+        return numRows;
     }
 
 
