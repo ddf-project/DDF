@@ -14,6 +14,8 @@ public class BQDataSource extends DataSource {
     protected String query;
     /* tricky to store num hit rows of this BQDataSource at first time its executed*/
     protected long numRows;
+    /* datasetId which datasource stored on projectId */
+    protected String datasetId;
 
     protected BQDataSource() {
         numRows = Long.MIN_VALUE;
@@ -21,6 +23,9 @@ public class BQDataSource extends DataSource {
 
     public String getProjectId() {
         return projectId;
+    }
+    public String getDatasetId() {
+        return datasetId;
     }
 
     public String getQuery() {
@@ -30,6 +35,7 @@ public class BQDataSource extends DataSource {
     public long getNumRows(){
         return numRows;
     }
+
 
     public static Builder<BQDataSource> builder() {
         return new Builder<BQDataSource>() {
@@ -51,6 +57,10 @@ public class BQDataSource extends DataSource {
         }
         public Builder<T> setNumRows(long numRows){
             this.datasource.numRows = numRows;
+            return this;
+        }
+        public Builder<T> setDatasetId(String datasetId){
+            this.datasource.datasetId = datasetId;
             return this;
         }
     }

@@ -24,6 +24,7 @@ public class BigQueryDDF extends DDF {
     protected String projectId;
     protected String query;
     protected Bigquery bigquery;
+    protected String datasetId;
     protected BigQueryDDF(IDataSource dataSource) {
         super(dataSource);
         bigquery = BigQueryUtils.newInstance();
@@ -48,6 +49,9 @@ public class BigQueryDDF extends DDF {
     protected void endBuild() {
         if(this.dataSource instanceof BQDataSource){
             this.numRows = ((BQDataSource)dataSource).getNumRows();
+            this.projectId = ((BQDataSource) dataSource).getProjectId();
+            this.query = ((BQDataSource)dataSource).getQuery();
+            this.datasetId = ((BQDataSource)dataSource).getDatasetId();
         }
     }
 
@@ -88,6 +92,13 @@ public class BigQueryDDF extends DDF {
     }
 
 
+    /**
+     * @see IDDF#getDDFName()
+     */
+    @Override
+    public String getDDFName() {
+        return datasetId + "." + name;
+    }
 
     protected abstract static class BigQueryDDFBuilder<T extends BigQueryDDF> extends DDFBuilder<T> {
         public BigQueryDDFBuilder(IDataSource dataSource) {

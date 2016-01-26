@@ -149,7 +149,7 @@ public abstract class DDFManager implements IDDFManager {
 
 	protected abstract IDDFMetaData _getDDFMetaData();
 	protected synchronized String generateDDFName() {
-		return String.format("ddf_%d_%ld_%d", ddfCounter.get(), System.currentTimeMillis(), System.nanoTime() % 10);
+		return String.format("ddf_%d_%d_%d", ddfCounter.get(), System.currentTimeMillis(), System.nanoTime() % 10);
 	}
 }
  

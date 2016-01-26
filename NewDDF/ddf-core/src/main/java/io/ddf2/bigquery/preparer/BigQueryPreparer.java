@@ -55,6 +55,7 @@ public class BigQueryPreparer implements IDataSourcePreparer {
 
             return BQDataSource.builder().setProjectId(((BQDataSource) dataSource).getProjectId())
                     .setNumRows(tblResponse.getNumRows().longValue())
+                    .setDatasetId(TMP_VIEW_DATASET_ID)
                     .setCreatedTime(tblResponse.getCreationTime())
                     .setSchema(BigQueryUtils.convertToDDFSchema(tblResponse.getSchema()))
                     .build();
