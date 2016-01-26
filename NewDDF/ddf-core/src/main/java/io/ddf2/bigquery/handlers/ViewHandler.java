@@ -10,10 +10,13 @@ import io.ddf2.handlers.IViewHandler;
 import java.util.List;
 
 public class ViewHandler implements IViewHandler{
-
+    protected IDDF ddf;
+    public ViewHandler(IDDF ddf){
+        this.ddf = ddf;
+    }
     @Override
     public IDDF getDDF() {
-        return null;
+        return ddf;
     }
 
     /**
