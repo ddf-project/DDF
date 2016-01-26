@@ -22,6 +22,9 @@ public interface IDDFManager {
 	public IDDFMetaData getDDFMetaData();
 	public IPersistentHandler getPersistentHandler();
 	public String getDDFManagerId();
-	public ISqlResult sql(String query) throws SQLException;
+	public ISqlResult sql(String query) throws DDFException;
+	public ISqlResult sql(String query, Map<String, String> options);
+	public DDF sql2ddf(String query) throws DDFException;
+	public DDF sql2ddf(String query, Map<String, String> options);
 }
  

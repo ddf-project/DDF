@@ -4,6 +4,8 @@ import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.schema.ISchema;
 import io.ddf2.handlers.*;
 
+import java.util.Map;
+
 
 /**
  * a DDF have an unique Name, schema & datasource.
@@ -24,7 +26,12 @@ public interface IDDF {
     public int getNumColumn();
 
     public ISqlResult sql(String sql);
+
+    public ISqlResult sql(String sql, Map<String, String> options);
+
     public IDDF sql2ddf(String sql) throws DDFException;
+
+    public IDDF sql2ddf(String sql, Map<String, String> options);
 
     public long getNumRows();
 
