@@ -4,6 +4,7 @@ import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.schema.ISchema;
 import io.ddf2.handlers.*;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 
@@ -25,13 +26,13 @@ public interface IDDF {
 
     public int getNumColumn();
 
-    public ISqlResult sql(String sql);
+    public ISqlResult sql(String sql) throws SQLException;
 
-    public ISqlResult sql(String sql, Map<String, String> options);
+    public ISqlResult sql(String sql, Map<String, String> options) throws SQLException;
 
     public IDDF sql2ddf(String sql) throws DDFException;
 
-    public IDDF sql2ddf(String sql, Map<String, String> options);
+    public IDDF sql2ddf(String sql, Map<String, String> options) throws DDFException;
 
     public long getNumRows();
 

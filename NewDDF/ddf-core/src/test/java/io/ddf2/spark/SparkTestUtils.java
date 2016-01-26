@@ -25,6 +25,8 @@ public class SparkTestUtils extends TestUtils {
         sparkConf.setAppName("SparkTest");
         sparkConf.setMaster("local");
         sparkConf.set(" spark.driver.allowMultipleContexts", "true");
+        sparkConf.set("spark.driver.port","7070");
+        sparkConf.set("spark.driver.host","0.0.0.0");
 
         sparkContext = new SparkContext(sparkConf);
         hiveContext = new HiveContext(sparkContext);

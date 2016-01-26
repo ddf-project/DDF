@@ -12,18 +12,30 @@ import io.ddf2.datasource.SqlDataSource;
 public class BQDataSource extends DataSource {
     protected String projectId;
     protected String query;
-
+    /* tricky to store num hit rows of this BQDataSource at first time its executed*/
+    protected long numRows;
+    /* datasetId which datasource stored on projectId */
+    protected String datasetId;
 
     protected BQDataSource() {
+        numRows = Long.MIN_VALUE;
     }
 
     public String getProjectId() {
         return projectId;
     }
+    public String getDatasetId() {
+        return datasetId;
+    }
 
     public String getQuery() {
         return query;
     }
+
+    public long getNumRows(){
+        return numRows;
+    }
+
 
     public static Builder<BQDataSource> builder() {
         return new Builder<BQDataSource>() {
@@ -41,6 +53,14 @@ public class BQDataSource extends DataSource {
         }
         public Builder<T> setQuery(String query){
             this.datasource.query = query;
+            return this;
+        }
+        public Builder<T> setNumRows(long numRows){
+            this.datasource.numRows = numRows;
+            return this;
+        }
+        public Builder<T> setDatasetId(String datasetId){
+            this.datasource.datasetId = datasetId;
             return this;
         }
     }

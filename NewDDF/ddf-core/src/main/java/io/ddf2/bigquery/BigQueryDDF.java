@@ -1,6 +1,8 @@
 package io.ddf2.bigquery;
 
 import com.google.api.services.bigquery.Bigquery;
+import com.google.api.services.bigquery.model.QueryRequest;
+import com.google.api.services.bigquery.model.QueryResponse;
 import io.ddf2.*;
 import io.ddf2.bigquery.preparer.BigQueryPreparer;
 import io.ddf2.datasource.IDataSource;
@@ -9,6 +11,8 @@ import io.ddf2.datasource.PrepareDataSourceException;
 import io.ddf2.datasource.SqlDataSource;
 import org.apache.commons.lang.NotImplementedException;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,34 +24,35 @@ public class BigQueryDDF extends DDF {
     protected String projectId;
     protected String query;
     protected Bigquery bigquery;
+    protected String datasetId;
     protected BigQueryDDF(IDataSource dataSource) {
         super(dataSource);
         bigquery = BigQueryUtils.newInstance();
     }
 
-    /***
-     * DDFManager will pass ddfProperties to concreted DDF thanks to our contraction.
-     *
-     * @param mapDDFProperties
-     */
-    @Override
-    protected void _initWithProperties(Map mapDDFProperties) {
-        // Not using any property from BigQueryDDFManager
-    }
+
 
     /***
      * Init @mapDataSourcePreparer.
      * Add all supported DataSource to @mapDataSourcePreparer
      */
     @Override
-    protected void _initDSPreparer() {
+    protected void initDSPreparer() {
         mapDataSourcePreparer = new HashMap<>();
         mapDataSourcePreparer.put(BQDataSource.class,new BigQueryPreparer(bigquery));
     }
 
-
-    protected void resolveDataSource() throws PrepareDataSourceException{
-
+    /**
+     * An reserve-function for concrete DDF to hook to build progress.
+     */
+    @Override
+    protected void endBuild() {
+        if(this.dataSource instanceof BQDataSource){
+            this.numRows = ((BQDataSource)dataSource).getNumRows();
+            this.projectId = ((BQDataSource) dataSource).getProjectId();
+            this.query = ((BQDataSource)dataSource).getQuery();
+            this.datasetId = ((BQDataSource)dataSource).getDatasetId();
+        }
     }
 
     /**
@@ -55,8 +60,24 @@ public class BigQueryDDF extends DDF {
      * @see IDDF#sql(String)
      */
     @Override
-    public ISqlResult sql(String sql) {
-        return null;
+    public ISqlResult sql(String sql) throws SQLException {
+        try {
+            QueryResponse queryResponse = bigquery.jobs().query(projectId, new QueryRequest().setQuery(sql)).execute();
+            return new BigQuerySqlResult(queryResponse);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SQLException("Unable to excute bigquery msg:" + e.getMessage());
+        }
+    }
+
+    @Override
+    public ISqlResult sql(String sql, Map<String, String> options) throws SQLException {
+        return sql(sql);
+    }
+
+    @Override
+    public IDDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
+        return sql2ddf(sql);
     }
 
     @Override
@@ -67,10 +88,17 @@ public class BigQueryDDF extends DDF {
 
     @Override
     protected long _getNumRows() {
-        return 0;
+        return numRows;
     }
 
 
+    /**
+     * @see IDDF#getDDFName()
+     */
+    @Override
+    public String getDDFName() {
+        return datasetId + "." + name;
+    }
 
     protected abstract static class BigQueryDDFBuilder<T extends BigQueryDDF> extends DDFBuilder<T> {
         public BigQueryDDFBuilder(IDataSource dataSource) {

@@ -2,22 +2,23 @@ package io.ddf2.handlers;
 
 import io.ddf2.DDF;
 import io.ddf2.DDFException;
+import io.ddf2.IDDF;
 
 import java.util.List;
 
 public interface ITransformHandler extends IDDFHandler{
-    public DDF transformScaleMinMax() throws DDFException;
+    public IDDF transformScaleMinMax() throws DDFException;
 
-    public DDF transformScaleStandard() throws DDFException;
+    public IDDF transformScaleStandard() throws DDFException;
 
-    public DDF transformNativeRserve(String transformExpression);
+    public IDDF transformNativeRserve(String transformExpression);
 
-    public DDF transformNativeRserve(String[] transformExpression);
+    public IDDF transformNativeRserve(String[] transformExpression);
 
-    public DDF transformPython(String[] transformFunctions, String[] functionNames,
+    public IDDF transformPython(String[] transformFunctions, String[] functionNames,
                                String[] destColumns, String[][] sourceColumns);
 
-    public DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine);
+    public IDDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine);
 
     /**
      * Create new columns or overwrite existing ones
@@ -27,10 +28,10 @@ public interface ITransformHandler extends IDDFHandler{
      * @return
      * @throws DDFException
      */
-    public DDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException;
+    public IDDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException;
 
-    public DDF flattenDDF(String[] columns) throws DDFException;
+    public IDDF flattenDDF(String[] columns) throws DDFException;
 
-    public DDF flattenDDF() throws DDFException;
+    public IDDF flattenDDF() throws DDFException;
 }
  

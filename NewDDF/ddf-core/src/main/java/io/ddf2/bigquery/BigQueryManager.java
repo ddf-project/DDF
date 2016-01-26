@@ -53,4 +53,11 @@ public final class BigQueryManager extends DDFManager {
             throw new SQLException("couldn't execute sql exception msg:" + e.getMessage());
         }
     }
+
+    @Override
+    public ISqlResult sql(String query, Map<String, String> options) throws SQLException {
+        return sql(query);
+    }
+
+
 }

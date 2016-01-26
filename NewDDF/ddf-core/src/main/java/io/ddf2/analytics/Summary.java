@@ -2,7 +2,7 @@ package io.ddf2.analytics;
 
 
 import com.google.common.base.Joiner;
-import io.ddf2.util.Utils;
+import io.ddf2.Utils;
 
 import java.io.Serializable;
 
@@ -155,8 +155,8 @@ public class Summary implements Serializable {
   public String toString() {
     Joiner joiner = Joiner.on("");
     return joiner.join("mean:", Utils.roundUp(mean()), " stdev:",
-        Utils.roundUp(stdev()), " var:", Utils.roundUp(variance()), " cNA:",
-        mNACount, " count:", mCount, " min:", Utils.roundUp(min()), " max:",
-        Utils.roundUp(max()));
+            Utils.roundUp(stdev()), " var:", Utils.roundUp(variance()), " cNA:",
+            mNACount, " count:", mCount, " min:", Utils.roundUp(min()), " max:",
+            Utils.roundUp(max()));
   }
 }

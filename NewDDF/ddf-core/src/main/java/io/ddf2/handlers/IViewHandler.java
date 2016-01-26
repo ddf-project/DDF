@@ -2,6 +2,7 @@ package io.ddf2.handlers;
 
 import io.ddf2.DDF;
 import io.ddf2.DDFException;
+import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
 
 import java.io.Serializable;
@@ -15,25 +16,25 @@ public interface IViewHandler extends IDDFHandler {
      */
     public ISqlResult getRandomSample(int numSamples, boolean withReplacement, int seed);
 
-    public DDF getRandomSampleByNum(int numSamples, boolean withReplacement, int seed);
+    public IDDF getRandomSampleByNum(int numSamples, boolean withReplacement, int seed);
 
-    public DDF getRandomSample(double percent, boolean withReplacement, int seed);
+    public IDDF getRandomSample(double percent, boolean withReplacement, int seed);
 
     public ISqlResult head(int numRows) throws DDFException;
 
     public ISqlResult top(int numRows, String orderCols, String mode) throws DDFException;
 
-    public DDF project(String... columnNames) throws DDFException;
+    public IDDF project(String... columnNames) throws DDFException;
 
-    public DDF project(List<String> columnNames) throws DDFException;
+    public IDDF project(List<String> columnNames) throws DDFException;
 
-    public DDF subset(List<Column> columnExpr, Expression filter) throws DDFException;
+    public IDDF subset(List<Column> columnExpr, Expression filter) throws DDFException;
 
-    public DDF removeColumn(String columnName) throws DDFException;
+    public IDDF removeColumn(String columnName) throws DDFException;
 
-    public DDF removeColumns(String... columnNames) throws DDFException;
+    public IDDF removeColumns(String... columnNames) throws DDFException;
 
-    public DDF removeColumns(List<String> columnNames) throws DDFException;
+    public IDDF removeColumns(List<String> columnNames) throws DDFException;
 
 
     /**

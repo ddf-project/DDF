@@ -2,6 +2,8 @@ package io.ddf2.datasource;
 
 import io.ddf2.datasource.schema.ISchema;
 
+import java.util.Map;
+
 /**
  * Created by sangdn on 12/30/15.
  */
