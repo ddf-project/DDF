@@ -1,5 +1,7 @@
 package io.ddf2.datasource.schema;
 
+import io.ddf2.DDFException;
+
 import javax.annotation.concurrent.NotThreadSafe;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -14,11 +16,12 @@ import java.util.*;
 public class Schema implements ISchema {
 
 
-    protected Set<String> colNames;
+    // TODO: Actually do we have to keep column names? These can be get by scanning columns?
+    protected List<String> colNames;
     protected List<IColumn> columns;
 
     public Schema() {
-        colNames = new HashSet<>();
+        colNames = new ArrayList<>();
         columns = new ArrayList<>();
 
     }
@@ -41,10 +44,34 @@ public class Schema implements ISchema {
         return columns;
     }
 
+    @Override
+    public IColumn getColumn(String columnName) throws DDFException {
+        for (IColumn col : this.getColumns()) {
+            if (col.getName().equalsIgnoreCase(columnName)) {
+                return col;
+            }
+        }
+        throw new DDFException(String.format("No column with column name: %s", columnName));
+    }
+
+    @Override
+    public List<String> getColumnNames() {
+        return this.colNames;
+    }
+
+    @Override
+    public String getColumnName(int index) {
+        return this.getColumns().get(index).getName();
+    }
+
+    @Override
+    public int getColumnIndex(String columnName) throws DDFException {
+        return this.getColumnNames().indexOf(columnName);
+    }
+
     public void append(IColumn column) {
         if (colNames.add(column.getName()))
             columns.add(column);
-
     }
 
     public void remove(int index) {
