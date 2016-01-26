@@ -21,8 +21,7 @@ public interface IDDFManager {
 	public IDDF newDDF(IDataSource ds) throws DDFException;
 	public IDDF newDDF(String query) throws DDFException;
 	public IDDF newDDF(String name,String query) throws DDFException;
-	public IDDF newDDF(String query, Map<String, String> options);
-	public IDDF newDDF(String name,String query, Map<String, String> options);
+
 	public IDDFMetaData getDDFMetaData();
 	public IPersistentHandler getPersistentHandler();
 	public String getDDFManagerId();

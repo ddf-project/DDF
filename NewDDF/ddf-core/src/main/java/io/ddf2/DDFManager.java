@@ -2,12 +2,16 @@ package io.ddf2;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.ddf2.bigquery.BQDataSource;
+import io.ddf2.bigquery.BigQueryContext;
 import io.ddf2.datasource.IDataSource;
+import io.ddf2.datasource.SqlDataSource;
 import io.ddf2.handlers.IPersistentHandler;
 
 public abstract class DDFManager implements IDDFManager {
@@ -66,7 +70,13 @@ public abstract class DDFManager implements IDDFManager {
 		throw new RuntimeException("Not Implement Yet");
 	}
 
-	public static DDF getDDF(String uuid) {
+	/**
+	 * Get an instance of DDF by DDFName.
+	 * @param ddfName
+	 * @return
+	 * @throws DDFException if not exist ddfName
+	 */
+	public static IDDF getDDF(String ddfName) throws DDFException {
 		throw new RuntimeException("Not Implement Yet");
 	}
 
@@ -76,6 +86,19 @@ public abstract class DDFManager implements IDDFManager {
 		return newDDF(generateDDFName(), ds);
 	}
 
+
+	@Override
+	public IDDF newDDF(String name, String query) throws DDFException {
+		return newDDF(name, BQDataSource.builder().setProjectId(BigQueryContext.getProjectId()).setQuery(query).build());
+	}
+
+
+
+	@Override
+	public IDDF newDDF(String query) throws DDFException {
+		return newDDF(generateDDFName(),query);
+	}
+
 	@Override
 	public final IDDF newDDF(String name, IDataSource ds) throws DDFException {
 		return _newDDF(name, ds);
@@ -83,6 +106,18 @@ public abstract class DDFManager implements IDDFManager {
 
 
 	protected abstract IDDF _newDDF(String name, IDataSource ds) throws DDFException;
+
+
+	@Override
+	public ISqlResult sql(String query) throws SQLException {
+		return null;
+	}
+
+	@Override
+	public ISqlResult sql(String query, Map<String, String> options) throws SQLException {
+		return null;
+	}
+
 
 	@Override
 	public final String getDDFManagerId(){

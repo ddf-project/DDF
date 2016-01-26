@@ -43,6 +43,7 @@ public class SparkDDFManager extends DDFManager {
                 sparkConf = new SparkConf();
                 sparkConf.setAppName("SparkDDFManager");
                 sparkConf.setMaster("local");
+
             }
             sparkContext = new SparkContext(sparkConf);
         }
@@ -81,16 +82,6 @@ public class SparkDDFManager extends DDFManager {
 
     @Override
     public IDDF newDDF(String name, String query) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public IDDF newDDF(String query, Map<String, String> options) {
-        return null;
-    }
-
-    @Override
-    public IDDF newDDF(String name, String query, Map<String, String> options) {
         return null;
     }
 

@@ -32,26 +32,6 @@ public final class BigQueryManager extends DDFManager {
     }
 
     @Override
-    public IDDF newDDF(String name, String query) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public IDDF newDDF(String query) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public IDDF newDDF(String query, Map<String, String> options) {
-        return null;
-    }
-
-    @Override
-    public IDDF newDDF(String name, String query, Map<String, String> options) {
-        return null;
-    }
-
-    @Override
     protected IPersistentHandler _getPersistentHanlder() {
         return null;
     }

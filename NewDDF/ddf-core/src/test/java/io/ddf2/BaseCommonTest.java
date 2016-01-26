@@ -4,6 +4,8 @@ import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.schema.ISchema;
 import utils.TestUtils;
 
+import java.sql.SQLException;
+
 /**
  * Created by sangdn on 1/8/16.
  * BaseCommonTest will help to test all concrete engine.
@@ -17,7 +19,7 @@ public class BaseCommonTest {
      * @param dataSource : Concrete datasource to test, required contains data
      * @throws DDFException
      */
-    public static void TestSql(IDDFManager manager,IDataSource dataSource) throws DDFException {
+    public static void TestSql(IDDFManager manager,IDataSource dataSource) throws DDFException, SQLException {
 
         System.out.println("BaseCommonTest::TestSql Begin Test");
         String ddfName = TestUtils.genString();
