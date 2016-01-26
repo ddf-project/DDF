@@ -1,6 +1,8 @@
 package io.ddf2.bigquery;
 
 import com.google.api.services.bigquery.Bigquery;
+import com.google.api.services.bigquery.model.QueryRequest;
+import com.google.api.services.bigquery.model.QueryResponse;
 import io.ddf2.*;
 import io.ddf2.bigquery.preparer.BigQueryPreparer;
 import io.ddf2.datasource.IDataSource;
@@ -9,6 +11,8 @@ import io.ddf2.datasource.PrepareDataSourceException;
 import io.ddf2.datasource.SqlDataSource;
 import org.apache.commons.lang.NotImplementedException;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,8 +56,24 @@ public class BigQueryDDF extends DDF {
      * @see IDDF#sql(String)
      */
     @Override
-    public ISqlResult sql(String sql) {
-        return null;
+    public ISqlResult sql(String sql) throws SQLException {
+        try {
+            QueryResponse queryResponse = bigquery.jobs().query(projectId, new QueryRequest().setQuery(sql)).execute();
+            return new BigQuerySqlResult(queryResponse);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SQLException("Unable to excute bigquery msg:" + e.getMessage());
+        }
+    }
+
+    @Override
+    public ISqlResult sql(String sql, Map<String, String> options) throws SQLException {
+        return sql(sql);
+    }
+
+    @Override
+    public IDDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
+        return sql2ddf(sql);
     }
 
     @Override

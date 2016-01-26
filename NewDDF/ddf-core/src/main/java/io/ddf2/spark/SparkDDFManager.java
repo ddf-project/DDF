@@ -9,6 +9,7 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,6 +74,26 @@ public class SparkDDFManager extends DDFManager {
     protected IDDF _newDDF(String name, IDataSource ds) throws DDFException {
         return newDDF(name, ds, mapProperties);
     }
+    @Override
+    public IDDF newDDF(String query) throws DDFException {
+        return null;
+    }
+
+    @Override
+    public IDDF newDDF(String name, String query) throws DDFException {
+        return null;
+    }
+
+    @Override
+    public IDDF newDDF(String query, Map<String, String> options) {
+        return null;
+    }
+
+    @Override
+    public IDDF newDDF(String name, String query, Map<String, String> options) {
+        return null;
+    }
+
 
     @Override
     protected IPersistentHandler _getPersistentHanlder() {
@@ -85,10 +106,17 @@ public class SparkDDFManager extends DDFManager {
         return new SparkDDFMetadata(hiveContext);
     }
 
+
+
     @Override
     public ISqlResult sql(String query) {
         DataFrame dataFrame = hiveContext.sql(query);
         return SparkUtils.dataFrameToSqlResult(dataFrame);
+    }
+
+    @Override
+    public ISqlResult sql(String query, Map<String, String> options) throws SQLException {
+        return null;
     }
 
 

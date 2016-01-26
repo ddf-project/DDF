@@ -6,6 +6,7 @@ import io.ddf2.datasource.PrepareDataSourceException;
 import io.ddf2.datasource.schema.ISchema;
 import io.ddf2.handlers.*;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -119,7 +120,7 @@ public abstract class DDF implements IDDF {
     /**
      * @see io.ddf2.IDDF#sql(java.lang.String)
      */
-    public abstract ISqlResult sql(String sql);
+    public abstract ISqlResult sql(String sql) throws SQLException;
 
     /**
      * @see io.ddf2.IDDF#getNumRows()

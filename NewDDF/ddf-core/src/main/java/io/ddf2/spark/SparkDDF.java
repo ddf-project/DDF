@@ -2,6 +2,9 @@ package io.ddf2.spark;
 
 import io.ddf2.*;
 import io.ddf2.DDF;
+import io.ddf2.DDFException;
+import io.ddf2.IDDF;
+import io.ddf2.ISqlResult;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.PrepareDataSourceException;
@@ -14,6 +17,8 @@ import org.apache.spark.sql.hive.HiveContext;
 
 
 import java.lang.Override;
+import java.lang.String;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,6 +71,15 @@ public class SparkDDF extends DDF {
         return ddfManager.newDDF(SqlDataSource.builder().setQuery(sql).build());
     }
 
+    @Override
+    public IDDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
+        return null;
+    }
+
+    @Override
+    public ISqlResult sql(String sql, Map<String, String> options) throws SQLException {
+        return null;
+    }
 
     @Override
     protected long _getNumRows() {
