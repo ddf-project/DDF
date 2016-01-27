@@ -13,6 +13,7 @@ write.table(mtcars, "/tmp/mtcars", row.names=F, col.names=F)
 # DDF part
 library(ddf)
 dm <- DDFManager("spark")
+
 # First way to import data
 sql(dm, 'set hive.metastore.warehouse.dir=/tmp/hive/warehouse', FALSE)
 sql(dm, "drop table if exists mtcars", FALSE)
@@ -46,9 +47,6 @@ aggregate(ddf, agg.cols="sum(mpg), min(hp)", by="vs, am")
 fivenum(ddf)
 
 sample(ddf, 10L)
-
-# join
-ddf2 <- merge(ddf, ddf, by="hp", type="inner")
 
 # Kmeans
 newddf <- ddf[,c("mpg","wt")] 
