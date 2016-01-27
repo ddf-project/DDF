@@ -37,8 +37,6 @@ public interface IViewHandler extends IDDFHandler {
     public IDDF removeColumns(List<String> columnNames) throws DDFException;
 
 
-
-
     /**
      * Base class for any Expression node in the AST, could be either an Operator or a Value
      */

@@ -1,6 +1,7 @@
 package io.ddf2.handlers;
 
 import io.ddf2.DDFException;
+import io.ddf2.analytics.FiveNumSummary;
 import io.ddf2.analytics.SimpleSummary;
 import io.ddf2.analytics.Summary;
 
@@ -12,10 +13,9 @@ public interface IStatisticHandler extends IDDFHandler {
     //get min/max for numeric columns, list of distinct values for categorical columns
     public SimpleSummary[] getSimpleSummary() throws DDFException;
 
-    // TODO (FiveNumSummary is removed in master?)
-    // public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException;
+    public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException;
 
-    // public Double[] getVectorQuantiles(Double[] percentiles) throws DDFException;
+    public Double[] getVectorQuantiles(Double[] percentiles) throws DDFException;
 
     public Double[] getVectorQuantiles(String columnName, Double[] percentiles) throws DDFException;
 
