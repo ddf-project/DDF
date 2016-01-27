@@ -7,7 +7,7 @@ package io.ddf2.analytics;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import io.ddf2.DDFException;
-import io.ddf2.util.Utils;
+import io.ddf2.Utils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
