@@ -10,6 +10,7 @@ import io.ddf2.handlers.IPersistentHandler;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -17,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see io.ddf2.IDDFManager
  */
 public final class BigQueryManager extends DDFManager {
+
+
     protected BigQueryManager(Map mapProperties) throws DDFException {
         super(mapProperties);
 
