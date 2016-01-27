@@ -13,6 +13,7 @@ public interface IBinningHandler extends IDDFHandler{
                        boolean right) throws DDFException;
 
     public List<HistogramBin> getVectorHistogram(String column, int numBins) throws DDFException;
+
     public List<HistogramBin> getVectorApproxHistogram(String column, int numBins) throws DDFException;
  
 }
