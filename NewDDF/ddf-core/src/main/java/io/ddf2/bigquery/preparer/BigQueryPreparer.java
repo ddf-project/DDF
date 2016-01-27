@@ -24,12 +24,29 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class BigQueryPreparer implements IDataSourcePreparer {
     protected Bigquery bigquery;
     public static final String TMP_VIEW_DATASET_ID = "tmp_view_ddf";
+    //ToDo: Move isFirstTime & hasTmpDataset to ThreadLocal
+    public static final AtomicBoolean isFirstTime = new AtomicBoolean(true);
+    public static final AtomicBoolean hasTmpDataSet = new AtomicBoolean(false);
+    public BigQueryPreparer(Bigquery bigquery) {
+        this.bigquery = bigquery;
+        removeOldView();
 
 
-    public BigQueryPreparer(Bigquery bigquerry) {
-        this.bigquery = bigquerry;
+    }
 
-
+    private void removeOldView() {
+        try{
+            if(isFirstTime.get()==true){
+                synchronized (isFirstTime){
+                    if (isFirstTime.get()==true){
+                        bigquery.datasets().delete(BigQueryContext.getProjectId(), TMP_VIEW_DATASET_ID).execute();
+                        isFirstTime.set(false);
+                    }
+                }
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -66,26 +83,39 @@ public class BigQueryPreparer implements IDataSourcePreparer {
         }
     }
 
+    /**
+     * Ensure TempViewDataSet has created on current projectId
+     * @throws IOException
+     * @throws PrepareDataSourceException
+     */
     private void ensureTmpViewDataSet() throws IOException, PrepareDataSourceException {
-        boolean isFound = false;
-        DatasetList list = bigquery.datasets().list(BigQueryContext.getProjectId()).execute();
-        for (DatasetList.Datasets ds :list.getDatasets()){
-            String datasetId = ds.getDatasetReference().getDatasetId();
-            if(datasetId.equals(TMP_VIEW_DATASET_ID)){
-                isFound = true; break;
+        if(hasTmpDataSet.get() == false){
+            synchronized (hasTmpDataSet){
+                if(hasTmpDataSet.get()==false){
+                    Boolean isFound  = false;
+                    DatasetList list = bigquery.datasets().list(BigQueryContext.getProjectId()).execute();
+                    for (DatasetList.Datasets ds :list.getDatasets()){
+                        String datasetId = ds.getDatasetReference().getDatasetId();
+                        if(datasetId.equals(TMP_VIEW_DATASET_ID)){
+                            isFound = true; break;
+                        }
+                    }
+                    if(isFound == false){
+                        DatasetReference ref = new DatasetReference();
+                        ref.setDatasetId(TMP_VIEW_DATASET_ID);
+                        Dataset dataset = new Dataset();
+                        dataset.setDatasetReference(ref);
+                        dataset = bigquery.datasets()
+                                .insert(BigQueryContext.getProjectId(),dataset).execute();
+                        if(dataset == null || dataset.getDatasetReference().getDatasetId().equals(TMP_VIEW_DATASET_ID) == false){
+                            throw new PrepareDataSourceException("Couldn't Create Temprory Dataset to store View");
+                        }
+                    }
+                    hasTmpDataSet.set(true);
+                }
             }
         }
-        if(isFound == false){
-            DatasetReference ref = new DatasetReference();
-            ref.setDatasetId(TMP_VIEW_DATASET_ID);
-            Dataset dataset = new Dataset();
-            dataset.setDatasetReference(ref);
-            dataset = bigquery.datasets()
-                    .insert(BigQueryContext.getProjectId(),dataset).execute();
-            if(dataset == null || dataset.getDatasetReference().getDatasetId().equals(TMP_VIEW_DATASET_ID) == false){
-                throw new PrepareDataSourceException("Couldn't Create Temprory Dataset to store View");
-            }
-        }
+
 
     }
 }
