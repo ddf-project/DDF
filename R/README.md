@@ -48,3 +48,8 @@ Collate:
     'spark-ddf.R'
     'utils.R'
     'zzz.R'
+
+Note
+-------------------
+If you run R under sudo, then you should try to set all the environment variables in bin/set-env.sh for sudo users.
+
