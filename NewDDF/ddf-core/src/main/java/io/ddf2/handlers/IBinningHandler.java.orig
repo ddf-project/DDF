@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface IBinningHandler extends IDDFHandler {
 
+<<<<<<< HEAD
+    @Deprecated
+=======
     /**
      * Compute factor of columns using histogram.
      * @param column The column name.
@@ -19,6 +22,7 @@ public interface IBinningHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
+>>>>>>> bd86f8c467db36bec4806d8152677d41c285f701
     public IDDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
                         boolean right) throws DDFException;
 
@@ -64,6 +68,17 @@ public interface IBinningHandler extends IDDFHandler {
         }
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Compute a histogram of the data using numBins buckets evenly spaced between the minimum and maximum.
+     * @param column Column name.
+     * @param numBins Num of buckets.
+     * @return
+     * @throws DDFException
+     */
+    public List<HistogramBin> getVectorHistogram(String column, int numBins) throws DDFException;
+>>>>>>> bd86f8c467db36bec4806d8152677d41c285f701
 
 }
  
