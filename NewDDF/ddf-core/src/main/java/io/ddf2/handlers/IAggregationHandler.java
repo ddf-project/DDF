@@ -14,43 +14,54 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ToDo: @jing plz add document for interface & expose api
+ */
 public interface IAggregationHandler extends IDDFHandler {
     /**
      * Compute corrlelation between 2 numeric columns.
+     *
      * @param columnA The column name.
      * @param columnB The column name.
      * @return
      * @throws DDFException
      */
-    public double computeCorrelation(String columnA, String columnB) throws DDFException;
+    double computeCorrelation(String columnA, String columnB) throws DDFException;
 
-    @Deprecated
-    public AggregateTypes.AggregationResult aggregate(List<AggregateField> fields) throws DDFException;
 
     /**
-     *  Do aggregated
-     *  eg: ddf.aggregate("year, month, avg(depdelay), stddev(arrdelay)")
+     * Do aggregated
+     * eg: ddf.aggregate("year, month, avg(depdelay), stddev(arrdelay)")
      *
-     * @param aggregate
+     * @param query contain group by column & query function
+     * @return Aggregation Result
+     * @throws DDFException
+     */
+    AggregationResult aggregate(String query) throws DDFException;
+
+    IDDF aggregate(List<String> columns, List<String> functions) throws DDFException;
+
+    double aggregate(String column, AggregateFunction function) throws DDFException;
+
+    /**
+     * this function need to called after aggregate so we shouldn't use it.
+     * use Aggregation with groupedColumns instead @see aggregate
+     *
+     * @param aggregateFunctions
      * @return
      * @throws DDFException
      */
-    public AggregationResult aggregate(String aggregate) throws DDFException;
+    @Deprecated
+    IDDF agg(List<String> aggregateFunctions) throws DDFException;
 
     @Deprecated
-    public AggregationResult xtabs(List<AggregateField> fields) throws DDFException;
-    public AggregationResult xtabs(String fields) throws DDFException;
+    IDDF aggregate(List<String> groupedColumns);
 
 
-    public IDDF groupBy(List<String> groupedColumns, List<String> aggregateFunctions) throws DDFException;
+    @Deprecated
+    AggregationResult xtabs(List<AggregateField> fields) throws DDFException;
 
-    public double aggregateOnColumn(AggregateFunction function, String col) throws DDFException;
-
-    public IDDF agg(List<String> aggregateFunctions) throws DDFException;
-
-    public IDDF groupBy(List<String> groupedColumns);
-
-
+    AggregationResult xtabs(String fields) throws DDFException;
 
 
 

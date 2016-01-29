@@ -20,7 +20,7 @@ public class BinningHandler implements io.ddf2.handlers.IBinningHandler {
     }
 
     @Override
-    public List<HistogramBin> getVectorHistogram(String column, int numBins) throws DDFException {
+    public List<HistogramBin> getHistogram(String column, int numBin) throws DDFException {
         return null;
     }
 

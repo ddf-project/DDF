@@ -26,7 +26,7 @@ public class AggregationHandler implements io.ddf2.handlers.IAggregationHandler{
     }
 
     @Override
-    public AggregateTypes.AggregationResult aggregate(String aggregate) throws DDFException {
+    public AggregateTypes.AggregationResult aggregate(String query) throws DDFException {
         return null;
     }
 
@@ -36,7 +36,7 @@ public class AggregationHandler implements io.ddf2.handlers.IAggregationHandler{
     }
 
     @Override
-    public IDDF groupBy(List<String> groupedColumns, List<String> aggregateFunctions) throws DDFException {
+    public IDDF aggregate(List<String> columns, List<String> functions) throws DDFException {
         return null;
     }
 
@@ -51,7 +51,7 @@ public class AggregationHandler implements io.ddf2.handlers.IAggregationHandler{
     }
 
     @Override
-    public IDDF groupBy(List<String> groupedColumns) {
+    public IDDF aggregate(List<String> groupedColumns) {
         return null;
     }
 }

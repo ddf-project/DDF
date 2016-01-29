@@ -10,6 +10,21 @@
 
 
     <dependencies>
+        <!-- DDF CORE -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12-beta-3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- SPARK -->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
@@ -31,12 +46,6 @@
             <version>1.2.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12-beta-3</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- GOOGLE BIG QUERY -->
         <dependency>

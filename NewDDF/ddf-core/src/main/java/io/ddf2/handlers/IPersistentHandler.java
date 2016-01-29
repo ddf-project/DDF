@@ -9,6 +9,7 @@ public interface IPersistentHandler {
 	public boolean remove(String ddfName);
 	 
 	public IDDF restore(String ddfName);
-	 
+
+	public long getLastPersistTime(String ddfName);
 }
  
