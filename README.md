@@ -102,8 +102,17 @@ sbt (bin/sbt) clean compile publishLocal
 ```
 mvn test
 ```
+Note: DataLoadTesting requires the following mysql configurations (If you don't want to configure mysql, please disable or ignore this test):
+```
+database: localhost:3306/test
+username: pauser
+password: papwd
+create table commands:
+mysql> create table mtcars(mpg double, cyl int, disp double, hp int, drat double, wt double, qsec double, vs int, am int, gear int, carb int);
+mysql> load data infile 'Path_To_DDF/DDF/resources/test/mtcars' into table mtcars fields terminated by ' ';
+```
 
-Or if you want to run test for individual modules,
+If you want to run test for individual modules,
 ```
 $ (cd core ; mvn test)
 $ (cd spark ; mvn test)
@@ -112,4 +121,67 @@ $ (cd spark ; mvn test)
 Or if you are more familar with the sbt tool,
 ```
 sbt (bin/sbt) test
-``` 
+```
+Run Examples
+```
+bin/run-example io.ddf.spark.examples.RowCount 
+```
+Interactive Programming with DDF Shell
+
+
+Enter ddf java shell using:
+```
+bin/ddf-shell
+```
+Spark
+```
+// Start spark DDFManager
+DDFManager sparkDDFManager = DDFManager.get("spark");
+// Load table into spark
+sparkDDFManager.sql("create table airline (Year int,Month int,DayofMonth int, DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int, TailNum string, ActualElapsedTime int, CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string, Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", Boolean.False);
+sparkDDFManager.sql("load data local inpath './resources/airlineWithNA.csv' into table airline", Boolean.False);
+// Create a ddf
+DDF table = sparkDDFManager.sql2ddf("select * from airline", Boolean.False);
+// GetSummary
+Summary[] summary = table.getSummary();
+// Do transform
+table = table.transform("dist= distance/2");
+table.sql("select * from @this", "Get error");
+```
+JDBC and Flink are also supported under 
+```
+https://github.com/ddf-project/ddf-jdbc
+https://github.com/ddf-project/ddf-flink
+```
+
+JDBC
+```
+// Start JDBC DDFManager
+import io.ddf.datasource.JDBCDataSourceDescriptor;
+// Please fill in the correct type, url, username and password here
+// Current included engine types include "redshift" (for redshift), "postgres" (for postgres), "jdbc" (for mysql etc.). And configurations should be added in ddf-conf/ddf.ini.
+// For exmaple: 
+DDFManager jdbcDDFManager = DDFManager.get("redshift", new JDBCDataSourceDescriptor("jdbc:redshift://redshift.c3tst.us-east1.redshift.amazonaws.com:5439/mydb", "myusername", "mypwd", null));
+// Create a ddf
+DDF redshiftDDF = jdbcDDFManager.sql2ddf("select * from links", Boolean.False);
+// Copy ddf to spark
+DDF copiedDDF = sparkDDFManager.copyFrom(redshiftDDF, "copiedDDF");
+sparkDDFManager.sql("select * from copiedDDF");
+
+```
+Flink
+```
+// Start Flink DDFManager
+DDFManager flinkDDFManager = DDFManager.get("flink");
+// Create a ddf
+flinkManager.sql("CREATE TABLE flight (Year int,Month int,DayofMonth int, DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int, TailNum string, ActualElapsedTime int,CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string, Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int)", Boolean.False);
+flinkManager.sql("load './resources/airlineWithNA.csv' delimited by ',' into flight", Boolean.False);
+// run query
+DDF flinkTable = flinkManager.sql2ddf("select * from flight", Boolean.False);
+System.out.println(flinkTable.getNumRows());
+```
+### Note
+For JDBC, you should copy the corresponding jdbc driver under ./lib/
+
+
+ 

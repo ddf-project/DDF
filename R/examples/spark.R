@@ -5,6 +5,7 @@ con <- dbConnect(MySQL(),
                  password = 'papwd',
                  host = 'localhost',
                  dbname='test')
+dbRemoveTable(conn=con, name = 'mtcars')
 dbWriteTable(conn = con, name = 'mtcars', value = mtcars, row.names=F)
 
 write.table(mtcars, "/tmp/mtcars", row.names=F, col.names=F)
@@ -12,13 +13,14 @@ write.table(mtcars, "/tmp/mtcars", row.names=F, col.names=F)
 # DDF part
 library(ddf)
 dm <- DDFManager("spark")
-# First way to import data
-sql(dm, 'set hive.metastore.warehouse.dir=/tmp/hive/warehouse', data.source="SparkSQL")
-sql(dm, "drop table if exists mtcars", data.source="SparkSQL")
-sql(dm, "CREATE TABLE mtcars (mpg double, cyl int, disp double, hp int, drat double, wt double, qesc double, vs int, am int, gear int, carb string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '", data.source="SparkSQL")
-sql(dm, "LOAD DATA LOCAL INPATH '/tmp/mtcars' INTO TABLE mtcars", data.source="SparkSQL")
 
-ddf <- sql2ddf(dm, "select * from mtcars", data.source="SparkSQL")
+# First way to import data
+sql(dm, 'set hive.metastore.warehouse.dir=/tmp/hive/warehouse', FALSE)
+sql(dm, "drop table if exists mtcars", FALSE)
+sql(dm, "CREATE TABLE mtcars (mpg double, cyl int, disp double, hp int, drat double, wt double, qesc double, vs int, am int, gear int, carb string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '", FALSE)
+sql(dm, "LOAD DATA LOCAL INPATH '/tmp/mtcars' INTO TABLE mtcars", FALSE)
+
+ddf <- sql2ddf(dm, "select * from mtcars", FALSE)
 
 # Second way, from file directly
 ddf <- load_file(dm, "/tmp/mtcars")
@@ -45,9 +47,6 @@ aggregate(ddf, agg.cols="sum(mpg), min(hp)", by="vs, am")
 fivenum(ddf)
 
 sample(ddf, 10L)
-
-# join
-ddf2 <- merge(ddf, ddf, by="hp", type="inner")
 
 # Kmeans
 newddf <- ddf[,c("mpg","wt")] 

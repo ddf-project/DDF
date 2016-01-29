@@ -99,16 +99,19 @@ setMethod("load_jdbc",
 #' 
 #' @param x a DDFManager object
 #' @param sql the query string
-#' @param data.source data source type
+#' @param queryOnDDF whether the query is on ddf, or on the original engine 
 #' @return an R data.frame
 #' @export
 setMethod("sql",
           signature("DDFManager", "character"),
-          function(x, sql, data.source) {
+          function(x, sql, queryOnDDF=TRUE) {
             sql <- str_trim(sql)
             jdm <- x@jdm
-            java.ret <- jdm$sql(sql, data.source)
-            if (!grepl("^create.+$", tolower(sql)) && !grepl("^load.+$", tolower(sql))) {
+            # Get a proper Java Boolean object
+            queryOnDDF <- new( J("java.lang.Boolean"), queryOnDDF)
+            java.ret <- jdm$sql(sql, queryOnDDF)
+            if (!grepl("^create.+$", tolower(sql)) && !grepl("^load.+$", tolower(sql)) 
+                && !grepl("^drop.+$", tolower(sql)) && !grepl("^set+$", tolower(sql))) {
               parse.sql.result(java.ret)
             }
           }
@@ -122,13 +125,15 @@ setMethod("sql",
 #' @export
 setMethod("sql2ddf",
           signature("DDFManager", "character"),
-          function(x, sql, data.source) {
+          function(x, sql, queryOnDDF=TRUE) {
             sql <- str_trim(sql)
             if (!(str_detect(sql, "^[Ss][Ee][Ll][Ee][Cc][Tt].*"))) {
               stop("Only support SELECT queries")
             }
             jdm <- x@jdm
-            new("DDF", jdm$sql2ddf(sql, data.source))
+            # Get a proper Java Boolean object
+            queryOnDDF <- new( J("java.lang.Boolean"), queryOnDDF)
+            new("DDF", jdm$sql2ddf(sql, queryOnDDF))
           }
 )
 

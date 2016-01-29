@@ -4,14 +4,14 @@ from ddf import DDFManager, DDF_HOME, ml
 
 dm = DDFManager("flink")
 
-dm.sql('DROP TABLE IF EXISTS mtcars')
+dm.sql('DROP TABLE IF EXISTS mtcars', False)
 dm.sql("CREATE TABLE mtcars (mpg double, cyl int, disp double, hp int, drat double, wt double, "
-       "qesc double, vs int, am int, gear int, carb string)", data_source="flink")
+       "qesc double, vs int, am int, gear int, carb string)", False)
 
-dm.sql("LOAD {}/resources/test/mtcars delimited by ' ' INTO mtcars".format(DDF_HOME), data_source="flink")
+dm.sql("LOAD {}/resources/test/mtcars delimited by ' ' INTO mtcars".format(DDF_HOME), False)
 
-dm.sql("select count(*) from mtcars", data_source="flink")
-ddf = dm.sql2ddf("select * from mtcars", data_source="flink")
+dm.sql("select count(*) from mtcars", False)
+ddf = dm.sql2ddf("select * from mtcars", False)
 
 print('Columns: ' + ', '.join(ddf.colnames))
 

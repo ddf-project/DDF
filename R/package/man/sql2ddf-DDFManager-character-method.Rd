@@ -5,7 +5,7 @@
 \alias{sql2ddf,DDFManager,character-method}
 \title{Execute a HiveQL and return a DistributedDataFrame}
 \usage{
-\S4method{sql2ddf}{DDFManager,character}(x, sql, data.source)
+\S4method{sql2ddf}{DDFManager,character}(x, sql, queryOnDDF = TRUE)
 }
 \arguments{
 \item{x}{a DDFManager object}

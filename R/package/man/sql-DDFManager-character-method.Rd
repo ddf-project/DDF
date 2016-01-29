@@ -5,14 +5,14 @@
 \alias{sql,DDFManager,character-method}
 \title{Execute a SQL and return an R data.frame}
 \usage{
-\S4method{sql}{DDFManager,character}(x, sql, data.source)
+\S4method{sql}{DDFManager,character}(x, sql, queryOnDDF = TRUE)
 }
 \arguments{
 \item{x}{a DDFManager object}
 
 \item{sql}{the query string}
 
-\item{data.source}{data source type}
+\item{queryOnDDF}{whether the query is on ddf, or on the original engine}
 }
 \value{
 an R data.frame

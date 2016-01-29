@@ -80,30 +80,30 @@ class DDFManager(object):
         """
         self._jdm.setDDFName(ddf._jddf, name)
 
-    def sql(self, command, data_source='spark'):
+    def sql(self, command, query_on_ddf=True):
         """
         Execute a sql command and return a list of strings
         :param command: the sql command to run
-        :param data_source: data source
+        :param query_on_ddf: whether the query is on ddf or on the origianl engine
         """
         command = command.strip()
-        res = self._jdm.sql(command, data_source)
+        res = self._jdm.sql(command, query_on_ddf)
         if not (command.lower().startswith('create') or command.lower().startswith('load')):
             return util.parse_sql_result(res)
         return res
 
-    def sql2ddf(self, command, data_source='spark'):
+    def sql2ddf(self, command, query_on_ddf=True):
         """
         Create a DistributedDataFrame from an sql command.
         :param command: the sql command to run
-        :param data_source: data source
+        :param query_on_ddf: whether the query is on ddf or on the origianl engine
         :return: a DDF
         """
         command = command.strip()
         if not command.lower().startswith('select'):
             raise ValueError('Only SELECT query is supported')
 
-        return DistributedDataFrame(self._jdm.sql2ddf(command, data_source), self._gateway_client)
+        return DistributedDataFrame(self._jdm.sql2ddf(command, query_on_ddf), self._gateway_client)
 
     def shutdown(self):
         """
