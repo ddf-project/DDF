@@ -24,9 +24,6 @@ public class BinningHandler implements io.ddf2.handlers.IBinningHandler {
         return null;
     }
 
-    @Override
-    public List<HistogramBin> getVectorApproxHistogram(String column, int numBins) throws DDFException {
-        return null;
-    }
+
 }
  

@@ -26,6 +26,11 @@ public class AggregationHandler implements io.ddf2.handlers.IAggregationHandler{
     }
 
     @Override
+    public AggregateTypes.AggregationResult aggregate(String aggregate) throws DDFException {
+        return null;
+    }
+
+    @Override
     public AggregateTypes.AggregationResult xtabs(List<AggregateTypes.AggregateField> fields) throws DDFException {
         return null;
     }
