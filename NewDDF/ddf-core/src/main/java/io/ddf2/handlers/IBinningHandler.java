@@ -10,7 +10,7 @@ public interface IBinningHandler extends IDDFHandler {
     /**
      * Compute factor of columns using histogram.
      * @param column The column name.
-     * @param binningType Currently support: "EQUALINTERVAL" "EQUAlFREQ" "custom" // TODO: change to enum
+     * @param binningType Currently support: "EQUALINTERVAL" "EQUAlFREQ" "custom"
      * @param numBins Num of factors. For factors, set numBins to 0.
      * @param breaks The list of break points, for example [2, 4, 6, 8]. Set this param to null if binningType is not
      *               custom.
@@ -19,23 +19,57 @@ public interface IBinningHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
+    @Deprecated
     public IDDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
                         boolean right) throws DDFException;
 
-
+    /**
+     * Compute factor using histogram by defining break points.
+     * @param column The column name.
+     * @param breaks The break points.
+     * @param includeLowest Whether to include the lowest value.
+     * @param right Whether to include the right value.
+     * @return
+     * @throws DDFException
+     */
     public IDDF binningCustom(String column,double[] breaks, boolean includeLowest,boolean right) throws DDFException;
 
-    public IDDF binningEq(String column,int numBin, boolean includeLowest,boolean right) throws DDFException;
+    /**
+     * Compute factor using histogram by equal intervals.
+     * @param column The column name.
+     * @param numBins The number of buckets.
+     * @param includeLowest Whether to include the lowest value.
+     * @param right Whether to include the right value.
+     * @return
+     * @throws DDFException
+     */
+    public IDDF binningEq(String column,int numBins, boolean includeLowest,boolean right) throws DDFException;
 
-    public IDDF binningEqFreq(String column,int numBin, boolean includeLowest,boolean right) throws DDFException;
+    /**
+     * Compute factor using histogram by equal frequency.
+     * @param column The column name.
+     * @param numBins The number of buckets.
+     * @param includeLowest Whether to include the lowest value.
+     * @param right Whether to include the right value.
+     * @return
+     * @throws DDFException
+     */
+    public IDDF binningEqFreq(String column,int numBins, boolean includeLowest,boolean right) throws DDFException;
 
-    public List<HistogramBin> getHistogram(String column, int numBin) throws DDFException;
-
-
+    /**
+     * Compute histogram of the column using numBins buckets, evenly spaced between the minimum and maximum value.
+     * @param column The column name.
+     * @param numBins Number of buckets.
+     * @return
+     * @throws DDFException
+     */
+    public List<HistogramBin> getHistogram(String column, int numBins) throws DDFException;
 
     public class HistogramBin {
-        private double center; // Bin center
-        private double weight; // Bin weight
+        // Bin center
+        private double center;
+        // Bin weight
+        private double weight;
 
         public HistogramBin(double center,double weight){
             this.center = center;
@@ -49,6 +83,7 @@ public interface IBinningHandler extends IDDFHandler {
             return weight;
         }
     }
+
     @Deprecated
     public enum BinningType {
         CUSTOM, EQUAlFREQ, EQUALINTERVAL;
@@ -63,7 +98,6 @@ public interface IBinningHandler extends IDDFHandler {
             return null;
         }
     }
-
 
 }
  

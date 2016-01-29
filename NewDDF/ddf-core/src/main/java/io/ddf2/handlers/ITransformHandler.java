@@ -1,6 +1,5 @@
 package io.ddf2.handlers;
 
-import io.ddf2.DDF;
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 

@@ -30,7 +30,7 @@ public interface IAggregationHandler extends IDDFHandler {
 
 
     /**
-     * Do aggregated
+     * Do aggregation.
      * eg: ddf.aggregate("year, month, avg(depdelay), stddev(arrdelay)")
      *
      * @param query contain group by column & query function
@@ -39,13 +39,30 @@ public interface IAggregationHandler extends IDDFHandler {
      */
     AggregationResult aggregate(String query) throws DDFException;
 
-    IDDF aggregate(List<String> columns, List<String> functions) throws DDFException;
+    /**
+     * Do aggregation.
+     * e.g.: [AggregationField(year), AggregationField(max(depdelay))]. Then the aggregation equals to
+     * "select year, max(depdelay) from ddf group by year".
+     *
+     * @param fields The fields to select and group by on.
+     * @return
+     * @throws DDFException
+     */
+    @Deprecated
+    AggregationResult aggregate(List<AggregateField> fields) throws DDFException;
 
+    /**
+     * Do aggregation on a single column.
+     * @param column The column name.
+     * @param function The function on this column, e.g. "max(columnName)"
+     * @return
+     * @throws DDFException
+     */
     double aggregate(String column, AggregateFunction function) throws DDFException;
 
     /**
-     * this function need to called after aggregate so we shouldn't use it.
-     * use Aggregation with groupedColumns instead @see aggregate
+     * this function need to called after groupby so we shouldn't use it.
+     * use Aggregation with groupedColumns instead @see groupBy
      *
      * @param aggregateFunctions
      * @return
@@ -54,16 +71,33 @@ public interface IAggregationHandler extends IDDFHandler {
     @Deprecated
     IDDF agg(List<String> aggregateFunctions) throws DDFException;
 
+    /**
+     * Set columns to group by.
+     * @param groupedColumns The columns to group by.
+     * @return
+     */
     @Deprecated
-    IDDF aggregate(List<String> groupedColumns);
+    IDDF groupBy(List<String> groupedColumns);
 
+    /**
+     * Do aggregation.
+     * @param columns The columns used to do group by.
+     * @param functions The functions that will be used in select statement, e.g. "avg(depdealy)".
+     * @return
+     * @throws DDFException
+     */
+    IDDF groupBy(List<String> columns, List<String> functions) throws DDFException;
 
+    /**
+     * Create a contingency table (optionally a sparse matrix) from cross-classifying factors.
+     * @param fields
+     * @return
+     * @throws DDFException
+     */
     @Deprecated
     AggregationResult xtabs(List<AggregateField> fields) throws DDFException;
 
     AggregationResult xtabs(String fields) throws DDFException;
-
-
 
     public static class AggregationResult extends HashMap<String, double[]> {
 
@@ -94,7 +128,6 @@ public interface IAggregationHandler extends IDDFHandler {
         }
 
     }
-
 
     /**
      * Represents a field in the aggregation statement "SELECT a, b, SUM(c), MIN(c), MAX(d), COUNT(*) GROUP BY a, b"
