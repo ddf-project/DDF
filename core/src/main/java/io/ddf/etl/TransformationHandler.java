@@ -7,10 +7,10 @@ import io.ddf.DDF;
 import io.ddf.analytics.Summary;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
+import io.ddf.content.Schema.ColumnType;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
-
 import java.util.*;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
@@ -106,8 +106,37 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return flattenDDF(null);
   }
 
-  public DDF transformUDF(String RExprs, List<String> columns)
-          throws DDFException {
+
+  public DDF flattenArrayTypeColumn(String colName) throws DDFException {
+    StringBuffer newCols = new StringBuffer();
+    Column arrCol = this.getDDF().getColumn(colName);
+    if (arrCol.getType() != ColumnType.ARRAY) {
+      throw new DDFException("Column to be flattened must be an array");
+    }
+    String arrSizeStr = this
+        .getDDF()
+        .sql(String.format("SELECT size(%s) FROM @this LIMIT 1", colName),
+            "Unable to fetch the first value of the requested column").getRows().get(0);
+
+    int arrSize = Integer.parseInt(arrSizeStr);
+    for (int i = 0; i < arrSize; i++) {
+
+      newCols.append(String.format(" %s[%d] as %s_c%d,", colName, i, colName, i));
+    }
+
+    newCols.setLength(newCols.length() - 1);
+    String sqlCmd = String.format("SELECT *, %s FROM @this", newCols.toString());
+    DDF newddf = this.getDDF().sql2ddf(sqlCmd);
+
+    if (this.getDDF().isMutable()) {
+      return this.getDDF().updateInplace(newddf);
+    } else {
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
+      return newddf;
+    }
+  }
+
+  public DDF transformUDF(String RExprs, List<String> columns) throws DDFException {
     List<String> expressions = Arrays.asList(RExprs);
     return this.transformUDF(expressions, columns);
   }
@@ -119,12 +148,10 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
   public DDF transformUDF(List<String> RExps, List<String> columns) throws DDFException {
     String sqlCmd = String.format("SELECT %s FROM %s",
-        RToSqlUdf(RExps, columns, this.getDDF().getSchema().getColumns()),
-        "{1}");
+        RToSqlUdf(RExps, columns, this.getDDF().getSchema().getColumns()), "{1}");
 
-    DDF newddf = this.getManager().sql2ddf(sqlCmd, new
-            SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF()
-            .getUUID().toString()));
+    DDF newddf = this.getManager().sql2ddf(sqlCmd,
+        new SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF().getUUID().toString()));
 
     if (this.getDDF().isMutable()) {
       return this.getDDF().updateInplace(newddf);
@@ -141,7 +168,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   /**
    * Parse R transform expression to Hive equivalent
    *
-   * @param transformExpr : e.g: "foobar = arrtime - crsarrtime, speed = distance / airtime"
+   * @param transformExpr
+   *          : e.g: "foobar = arrtime - crsarrtime, speed = distance / airtime"
    * @return "(arrtime - crsarrtime) as foobar, (distance / airtime) as speed
    */
 
@@ -157,8 +185,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
           udfs.add(c.getName());
         }
       }
-    }
-    else {
+    } else {
       for (String c : selectedColumns) {
         udfs.add(c);
       }
@@ -166,30 +193,25 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     Set<String> newColsInRExp = new HashSet<String>();
     for (String str : RExps) {
-      int index = str.indexOf("=") >  str.indexOf("~")
-          ? str.indexOf("=")
-          : str.indexOf("~");
+      int index = str.indexOf("=") > str.indexOf("~") ? str.indexOf("=") : str.indexOf("~");
       String[] udf = new String[2];
       if (index == -1) {
         udf[0] = str;
       } else {
-        udf[0] = str.substring(0,index);
+        udf[0] = str.substring(0, index);
         udf[1] = str.substring(index + 1);
       }
 
       // String[] udf = str.split("[=~](?![^()]*+\\))");
-      String newCol = (index != -1) ?
-        udf[0].trim().replaceAll("\\W", "") :
-        udf[0].trim();
+      String newCol = (index != -1) ? udf[0].trim().replaceAll("\\W", "") : udf[0].trim();
       if (newColsInRExp.contains(newCol)) {
         throw new RuntimeException(String.format(dupColExp, newCol));
       }
       String newDef = (index != -1) ? udf[1].trim() : null;
       if (!udfs.contains(newCol)) {
         udfs.add(newCol);
-      }
-      else if (!updateOnConflict) {
-        throw new RuntimeException(String.format(dupColExp,newCol));
+      } else if (!updateOnConflict) {
+        throw new RuntimeException(String.format(dupColExp, newCol));
       }
 
       if (newDef != null && !newDef.isEmpty()) {
@@ -200,9 +222,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     String selectStr = "";
     for (String udf : udfs) {
-      String exp = newColToDef.containsKey(udf) ?
-        String.format("%s as %s", newColToDef.get(udf), udf) :
-        String.format("%s", udf);
+      String exp = newColToDef.containsKey(udf) ? String.format("%s as %s", newColToDef.get(udf), udf) : String.format(
+          "%s", udf);
       selectStr += (exp + ",");
     }
 
