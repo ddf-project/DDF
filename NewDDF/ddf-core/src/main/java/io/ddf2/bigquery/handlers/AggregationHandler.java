@@ -2,7 +2,6 @@ package io.ddf2.bigquery.handlers;
 
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
-import io.ddf2.analytics.AggregateTypes;
 
 import java.util.List;
 
