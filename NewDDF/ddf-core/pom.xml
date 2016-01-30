@@ -10,7 +10,7 @@
 
 
     <dependencies>
-        <!-- DDF CORE -->
+        <!-- DDF CORE  -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
