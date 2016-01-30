@@ -11,30 +11,106 @@ import java.util.List;
 
 public interface IViewHandler extends IDDFHandler {
     /**
-     * @param numSamples
-     * @return a new DDF containing `numSamples` rows selected randomly from our owner DDF.
+     * Sample from ddf.
+     * @param numSamples number of samples.
+     * @param withReplacement Can elements be sampled multiple times.
+     * @return Sql results containing `numSamples` rows selected randomly from our owner DDF.
+     * //TODO Should we keep seed here
      */
-    public ISqlResult getRandomSample(int numSamples, boolean withReplacement, int seed);
+    ISqlResult getRandomSample(int numSamples, boolean withReplacement, int seed);
 
-    public IDDF getRandomSampleByNum(int numSamples, boolean withReplacement, int seed);
+    /**
+     * Sample from ddf.
+     * @param numSamples number of samples.
+     * @param withReplacement Can elements be sampled multiple times.
+     * @return DDF containing `numSamples` rows selected randomly from our owner DDF.
+     */
+    IDDF getRandomSampleByNum(int numSamples, boolean withReplacement, int seed);
 
-    public IDDF getRandomSample(double percent, boolean withReplacement, int seed);
+    /**
+     * Sample from ddf.
+     * @param percent Percentage of samples.
+     * @param withReplacement Can elements be sampled multiple times.
+     * @return DDF containing `numSamples` rows selected randomly from our owner DDF.
+     */
+    IDDF getRandomSample(double percent, boolean withReplacement, int seed);
 
-    public ISqlResult head(int numRows) throws DDFException;
+    /**
+     * Preview the content of ddf.
+     * @param numRows Number of rows needed.
+     * @return Sql result
+     * @throws DDFException
+     */
+    ISqlResult head(int numRows) throws DDFException;
 
-    public ISqlResult top(int numRows, String orderCols, String mode) throws DDFException;
+    /**
+     * Select top x rows from ddf.
+     * @param numRows Number of rows.
+     * @param orderByCols The columns to order by.
+     * @param isDesc Whether sort the content desc.
+     * @return
+     * @throws DDFException
+     */
+    ISqlResult top(int numRows, String orderByCols, boolean isDesc) throws DDFException;
 
-    public IDDF project(String... columnNames) throws DDFException;
+    /**
+     * Project the content of ddf.
+     * @param columnNames The columns that should be projected.
+     * @return
+     * @throws DDFException
+     */
+    IDDF project(String... columnNames) throws DDFException;
 
-    public IDDF project(List<String> columnNames) throws DDFException;
+    /**
+     * Project the content of ddf.
+     * @param columnNames The columns that should be projected.
+     * @return
+     * @throws DDFException
+     */
+    IDDF project(List<String> columnNames) throws DDFException;
 
-    public IDDF subset(List<Column> columnExpr, Expression filter) throws DDFException;
+    /**
+     * Subset on ddf.
+     * @param columnExpr Column expression.
+     * @param filter Where clause.
+     * @return
+     * @throws DDFException
+     */
+    @Deprecated
+    IDDF subset(List<Column> columnExpr, Expression filter) throws DDFException;
 
-    public IDDF removeColumn(String columnName) throws DDFException;
+    /**
+     * Subset on ddf.
+     * @param columnExpr Column expression.
+     * @param filter Where clause.
+     * @return
+     * @throws DDFException
+     */
+    IDDF subset(List<String> columnExpr, String filter) throws DDFException;
 
-    public IDDF removeColumns(String... columnNames) throws DDFException;
+    /**
+     * Remove single column from ddf.
+     * @param columnName The column to remove.
+     * @return
+     * @throws DDFException
+     */
+    IDDF removeColumn(String columnName) throws DDFException;
 
-    public IDDF removeColumns(List<String> columnNames) throws DDFException;
+    /**
+     * Remove columns from ddf.
+     * @param columnNames The columns to remove.
+     * @return
+     * @throws DDFException
+     */
+    IDDF removeColumns(String... columnNames) throws DDFException;
+
+    /**
+     * Remove columns from ddf.
+     * @param columnNames The columns to remove.
+     * @return
+     * @throws DDFException
+     */
+    IDDF removeColumns(List<String> columnNames) throws DDFException;
 
 
     /**
