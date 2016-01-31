@@ -1,4 +1,4 @@
-package io.ddf2.bigquery.handlers;
+package io.ddf2.handlers.impl;
 
 
 import io.ddf2.IDDF;
