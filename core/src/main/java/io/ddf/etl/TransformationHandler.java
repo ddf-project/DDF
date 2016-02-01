@@ -136,17 +136,17 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     }
   }
 
-  public DDF transformUDF(String RExprs, List<String> columns) throws DDFException {
+  public synchronized DDF transformUDF(String RExprs, List<String> columns) throws DDFException {
     List<String> expressions = Arrays.asList(RExprs);
     return this.transformUDF(expressions, columns);
   }
 
-  public DDF transformUDF(String RExp) throws DDFException {
+  public synchronized DDF transformUDF(String RExp) throws DDFException {
     List<String> expressions = Arrays.asList(RExp);
     return this.transformUDF(expressions);
   }
 
-  public DDF transformUDF(List<String> RExps, List<String> columns) throws DDFException {
+  public synchronized DDF transformUDF(List<String> RExps, List<String> columns) throws DDFException {
     String sqlCmd = String.format("SELECT %s FROM %s",
         RToSqlUdf(RExps, columns, this.getDDF().getSchema().getColumns()), "{1}");
 
@@ -161,7 +161,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     }
   }
 
-  public DDF transformUDF(List<String> RExps) throws DDFException {
+  public synchronized DDF transformUDF(List<String> RExps) throws DDFException {
     return transformUDF(RExps, null);
   }
 
