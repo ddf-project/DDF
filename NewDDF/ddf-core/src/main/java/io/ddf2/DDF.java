@@ -120,7 +120,7 @@ public abstract class DDF implements IDDF {
     /**
      * @see io.ddf2.IDDF#sql(java.lang.String)
      */
-    public abstract ISqlResult sql(String sql) throws SQLException;
+    public abstract ISqlResult sql(String sql) throws DDFException;
 
     /**
      * @see io.ddf2.IDDF#getNumRows()

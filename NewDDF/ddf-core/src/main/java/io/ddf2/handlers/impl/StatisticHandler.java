@@ -10,6 +10,10 @@ import io.ddf2.handlers.IStatisticHandler;
 import java.util.List;
 
 public class StatisticHandler implements IStatisticHandler{
+    protected IDDF associatedDDF;
+    public StatisticHandler(IDDF associatedDDF){
+        this.associatedDDF = associatedDDF;
+    }
     @Override
     public Summary[] getSummary() throws DDFException {
         return new Summary[0];
@@ -62,7 +66,7 @@ public class StatisticHandler implements IStatisticHandler{
 
     @Override
     public IDDF getDDF() {
-        return null;
+        return associatedDDF;
     }
 }
 

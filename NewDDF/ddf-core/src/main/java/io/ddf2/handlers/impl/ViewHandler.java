@@ -10,6 +10,10 @@ import io.ddf2.handlers.IViewHandler;
 import java.util.List;
 
 public class ViewHandler implements IViewHandler{
+    protected IDDF associatedDDF;
+    public ViewHandler(IDDF associatedDDF){
+        this.associatedDDF = associatedDDF;
+    }
     @Override
     public ISqlResult getRandomSample(int numSamples, boolean withReplacement, int seed) {
         return null;
@@ -72,7 +76,7 @@ public class ViewHandler implements IViewHandler{
 
     @Override
     public IDDF getDDF() {
-        return null;
+        return associatedDDF;
     }
 }
 

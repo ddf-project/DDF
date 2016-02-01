@@ -8,6 +8,10 @@ import io.ddf2.handlers.ITransformHandler;
 import java.util.List;
 
 public class TransformHandler implements ITransformHandler{
+    protected IDDF associatedDDF;
+    public TransformHandler(IDDF associatedDDF){
+        this.associatedDDF = associatedDDF;
+    }
     @Override
     public IDDF transformScaleMinMax() throws DDFException {
         return null;
@@ -55,7 +59,7 @@ public class TransformHandler implements ITransformHandler{
 
     @Override
     public IDDF getDDF() {
-        return null;
+        return associatedDDF;
     }
 }
 

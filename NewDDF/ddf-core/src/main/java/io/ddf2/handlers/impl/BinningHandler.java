@@ -8,6 +8,10 @@ import io.ddf2.handlers.IBinningHandler;
 import java.util.List;
 
 public class BinningHandler implements io.ddf2.handlers.IBinningHandler {
+    protected IDDF associatedDDF;
+    public BinningHandler(IDDF associatedDDF){
+        this.associatedDDF = associatedDDF;
+    }
     @Override
     public IDDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
         return null;
@@ -35,7 +39,7 @@ public class BinningHandler implements io.ddf2.handlers.IBinningHandler {
 
     @Override
     public IDDF getDDF() {
-        return null;
+        return associatedDDF;
     }
 }
 

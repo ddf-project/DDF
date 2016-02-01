@@ -77,7 +77,7 @@ public class SparkDDF extends DDF {
     }
 
     @Override
-    public ISqlResult sql(String sql, Map<String, String> options) throws SQLException {
+    public ISqlResult sql(String sql, Map<String, String> options) throws DDFException {
         return null;
     }
 

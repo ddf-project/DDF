@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ToDo: @jing plz add document for interface & expose api
+ *
  */
 public interface IAggregationHandler extends IDDFHandler {
     /**
@@ -103,6 +103,11 @@ public interface IAggregationHandler extends IDDFHandler {
 
         private static final long serialVersionUID = -7809562958792876728L;
 
+        protected AggregationResult(){}
+        //ToDo: @Jing implement Aggregation Result
+        public AggregationResult(ISqlResult sqlResult,int numUnaggregatedFields){
+
+        }
 
         public static AggregationResult newInstance(List<String> sqlResult, int numUnaggregatedFields) {
 

@@ -26,9 +26,9 @@ public interface IDDF {
 
     public int getNumColumn();
 
-    public ISqlResult sql(String sql) throws SQLException;
+    public ISqlResult sql(String sql) throws DDFException;
 
-    public ISqlResult sql(String sql, Map<String, String> options) throws SQLException;
+    public ISqlResult sql(String sql, Map<String, String> options) throws DDFException;
 
     public IDDF sql2ddf(String sql) throws DDFException;
 

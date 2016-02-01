@@ -62,18 +62,18 @@ public class BigQueryDDF extends DDF {
      * @see IDDF#sql(String)
      */
     @Override
-    public ISqlResult sql(String sql) throws SQLException {
+    public ISqlResult sql(String sql) throws DDFException {
         try {
             QueryResponse queryResponse = bigquery.jobs().query(projectId, new QueryRequest().setQuery(sql)).execute();
             return new BigQuerySqlResult(queryResponse);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new SQLException("Unable to excute bigquery msg:" + e.getMessage());
+            throw new DDFException("Unable to excute bigquery sql:" +sql + " msg:" + e.getMessage());
         }
     }
 
     @Override
-    public ISqlResult sql(String sql, Map<String, String> options) throws SQLException {
+    public ISqlResult sql(String sql, Map<String, String> options) throws DDFException{
         return sql(sql);
     }
 

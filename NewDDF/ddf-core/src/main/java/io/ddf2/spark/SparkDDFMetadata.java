@@ -3,10 +3,13 @@ package io.ddf2.spark;
 import io.ddf2.IDDFMetaData;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.ddf2.ISqlResult;
 import io.ddf2.datasource.schema.ISchema;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
 
@@ -19,11 +22,11 @@ public class SparkDDFMetadata implements IDDFMetaData {
 	/**
 	 * @see io.ddf2.IDDFMetaData#getAllDDFNames()
 	 */
-	public List<String> getAllDDFNames() {
+	public Set<String> getAllDDFNames() {
 
 		DataFrame df = hiveContext.sql("show tables");
 		ISqlResult sqlResult = SparkUtils.dataFrameToSqlResult(df);
-		List<String> ddfNames  = new ArrayList<>();
+		Set<String> ddfNames  = new HashSet<>();
 		while(sqlResult.next()){
 			ddfNames.add(sqlResult.getString(0));
 		}
@@ -33,7 +36,7 @@ public class SparkDDFMetadata implements IDDFMetaData {
 	/**
 	 * @see io.ddf2.IDDFMetaData#getAllDDFNameWithSchema()
 	 */
-	public List getAllDDFNameWithSchema() {
+	public Set<Pair<String,ISchema>>getAllDDFNameWithSchema() {
 		return null;
 	}
 	 
@@ -48,7 +51,7 @@ public class SparkDDFMetadata implements IDDFMetaData {
 	 * @see io.ddf2.IDDFMetaData#dropAllDDF()
 	 */
 	public int dropAllDDF() {
-		List<String> ddfNames = getAllDDFNames();
+		Set<String> ddfNames = getAllDDFNames();
 		ddfNames.forEach(ddfName -> dropDDF(ddfName));
 		return ddfNames.size();
 
