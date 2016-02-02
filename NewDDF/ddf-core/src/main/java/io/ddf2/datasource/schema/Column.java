@@ -1,6 +1,7 @@
 package io.ddf2.datasource.schema;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.text.DecimalFormat;
 
 /**
  * Created by sangdn on 1/4/16.
@@ -31,6 +32,20 @@ public class Column implements IColumn {
     @Override
     public IFactor getFactor() {
         return factor;
+    }
+
+    @Override
+    public boolean isNumeric() {
+        if (dataType.equals(Byte.class)
+                || dataType.equals(Short.class)
+                || dataType.equals(Integer.class)
+                || dataType.equals(Long.class)
+                || dataType.equals(Float.class)
+                || dataType.equals(Double.class)
+                || dataType.equals(java.math.BigDecimal.class)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
