@@ -1,8 +1,11 @@
 package io.ddf2.handlers;
 
+import com.google.common.base.Joiner;
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
+import io.ddf2.Utils;
 
+import java.io.Serializable;
 import java.util.List;
 
 public interface ITransformHandler extends IDDFHandler{
@@ -59,5 +62,8 @@ public interface ITransformHandler extends IDDFHandler{
      * @throws DDFException
      */
     IDDF flattenDDF() throws DDFException;
+
+
+
 }
  

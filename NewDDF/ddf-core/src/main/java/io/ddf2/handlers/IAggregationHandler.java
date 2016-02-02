@@ -60,24 +60,24 @@ public interface IAggregationHandler extends IDDFHandler {
      */
     double aggregate(String column, AggregateFunction function) throws DDFException;
 
-    /**
-     * this function need to called after groupby so we shouldn't use it.
-     * use Aggregation with groupedColumns instead @see groupBy
-     *
-     * @param aggregateFunctions
-     * @return
-     * @throws DDFException
-     */
-    @Deprecated
-    IDDF agg(List<String> aggregateFunctions) throws DDFException;
-
-    /**
-     * Set columns to group by.
-     * @param groupedColumns The columns to group by.
-     * @return
-     */
-    @Deprecated
-    IDDF groupBy(List<String> groupedColumns);
+//    /**
+//     * this function need to called after groupby so we shouldn't use it.
+//     * use Aggregation with groupedColumns instead @see groupBy
+//     *
+//     * @param aggregateFunctions
+//     * @return
+//     * @throws DDFException
+//     */
+//    @Deprecated
+//    IDDF agg(List<String> aggregateFunctions) throws DDFException;
+//
+//    /**
+//     * Set columns to group by.
+//     * @param groupedColumns The columns to group by.
+//     * @return
+//     */
+//    @Deprecated
+//    IDDF groupBy(List<String> groupedColumns);
 
     /**
      * Do aggregation.
@@ -104,6 +104,9 @@ public interface IAggregationHandler extends IDDFHandler {
         private static final long serialVersionUID = -7809562958792876728L;
 
         protected AggregationResult(){}
+        public AggregationResult(ISqlResult sqlResult){
+
+        }
         //ToDo: @Jing implement Aggregation Result
         public AggregationResult(ISqlResult sqlResult,int numUnaggregatedFields){
 

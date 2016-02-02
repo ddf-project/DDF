@@ -4,7 +4,6 @@ import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 import io.ddf2.analytics.FiveNumSummary;
 import io.ddf2.analytics.SimpleSummary;
-import io.ddf2.analytics.Summary;
 import io.ddf2.handlers.IStatisticHandler;
 
 import java.util.List;
