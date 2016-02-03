@@ -56,7 +56,7 @@ public class SparkFileResolver implements ISchemaResolver {
 
     protected ISchema resolveTextFileFormat(LocalFileDataSource LocalFileDataSource) {
         CSVFile textFile = (CSVFile) LocalFileDataSource.getFileFormat();
-        String sampleFile = LocalFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
+        String sampleFile = LocalFileDataSource.getPaths().get(0);
         boolean containHeader = textFile.firstRowIsHeader();
 
         DataFrame load = hiveContext.read()

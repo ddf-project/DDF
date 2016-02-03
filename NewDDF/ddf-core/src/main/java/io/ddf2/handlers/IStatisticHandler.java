@@ -5,7 +5,6 @@ import io.ddf2.DDFException;
 import io.ddf2.Utils;
 import io.ddf2.analytics.FiveNumSummary;
 import io.ddf2.analytics.SimpleSummary;
-import io.ddf2.analytics.Summary;
 
 import java.io.Serializable;
 import java.util.List;
@@ -39,7 +38,7 @@ public interface IStatisticHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    double[] getQuantiles(String columnName, Double[] percentiles) throws DDFException;
+    Double[] getQuantiles(String columnName, Double[] percentiles) throws DDFException;
 
     /**
      * Get variance for the column data.
@@ -47,7 +46,7 @@ public interface IStatisticHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    double[] getVariance(String columnName) throws DDFException;
+    Double[] getVariance(String columnName) throws DDFException;
 
     /**
      * Get mean value for the column name.
@@ -55,7 +54,7 @@ public interface IStatisticHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    double getMean(String columnName) throws DDFException;
+    Double getMean(String columnName) throws DDFException;
 
     /**
      * Get correlation between the two columns.
@@ -64,7 +63,7 @@ public interface IStatisticHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    double getCor(String xColumnName, String yColumnName) throws DDFException;
+    Double getCor(String xColumnName, String yColumnName) throws DDFException;
 
     /**
      * Get covariance between the two columns.
@@ -73,7 +72,7 @@ public interface IStatisticHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    double getCovariance(String xColumnName, String yColumnName) throws DDFException;
+    Double getCovariance(String xColumnName, String yColumnName) throws DDFException;
 
     /**
      * Get min value for the column.
@@ -81,7 +80,7 @@ public interface IStatisticHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    double getMin(String columnName) throws DDFException;
+    Double getMin(String columnName) throws DDFException;
 
     /**
      * Get max value for the column.
@@ -89,7 +88,7 @@ public interface IStatisticHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    double getMax(String columnName) throws DDFException;
+    Double getMax(String columnName) throws DDFException;
 
 
     /**
