@@ -23,19 +23,13 @@ public abstract class StatisticHandler implements IStatisticHandler {
 
     //Todo: @Jing check whether we could implement getSumary here. because it's using sql command.
     @Override
-    public Summary[] getSummary() throws DDFException {
-        return new Summary[0];
-    }
+    public abstract Summary[] getSummary() throws DDFException ;
 
     @Override
-    public SimpleSummary[] getSimpleSummary() throws DDFException {
-        return new SimpleSummary[0];
-    }
+    public abstract SimpleSummary[] getSimpleSummary() throws DDFException ;
 
     @Override
-    public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException {
-        return new FiveNumSummary[0];
-    }
+    public abstract FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException ;
 
     @Override
     public Double[] getQuantiles(String columnName, Double[] percentiles) throws DDFException {
