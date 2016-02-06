@@ -39,6 +39,7 @@ public class TransformHandler implements ITransformHandler{
 //        DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
 //        newddf.getMetaDataHandler().copyFactor(this.getDDF());
 //        return newddf;
+        return null;
     }
 
     @Override

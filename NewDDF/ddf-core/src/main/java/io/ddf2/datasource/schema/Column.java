@@ -1,6 +1,9 @@
 package io.ddf2.datasource.schema;
 
+import io.ddf2.handlers.IViewHandler;
+
 import javax.annotation.concurrent.ThreadSafe;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 /**
@@ -36,16 +39,21 @@ public class Column implements IColumn {
 
     @Override
     public boolean isNumeric() {
-        if (dataType.equals(Byte.class)
-                || dataType.equals(Short.class)
-                || dataType.equals(Integer.class)
-                || dataType.equals(Long.class)
-                || dataType.equals(Float.class)
-                || dataType.equals(Double.class)
-                || dataType.equals(java.math.BigDecimal.class)) {
-            return true;
-        }
-        return false;
+        return isIntegral() || isFractional();
+    }
+    @Override
+    public boolean isFractional() {
+        return dataType.equals(Float.class) ||
+                dataType.equals(Double.class) ||
+                dataType.equals(BigDecimal.class);
+    }
+
+    @Override
+    public boolean isIntegral() {
+        return dataType.equals(Byte.class) ||
+                dataType.equals(Short.class) ||
+                dataType.equals(Integer.class) ||
+                dataType.equals(Long.class);
     }
 
     @Override

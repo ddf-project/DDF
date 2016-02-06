@@ -5,5 +5,8 @@ public interface IColumn {
 	Class getType();
 	IFactor getFactor();
 	boolean isNumeric();
+	boolean isIntegral();
+	boolean isFractional();
 }
- 
+
+

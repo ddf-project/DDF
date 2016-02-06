@@ -76,6 +76,11 @@ public class SparkDDFMetadata implements IDDFMetaData {
 		}
 
 	}
-	 
+
+	@Override
+	public long getCreationTime(String ddfName) {
+		return 0;
+	}
+
 }
  
