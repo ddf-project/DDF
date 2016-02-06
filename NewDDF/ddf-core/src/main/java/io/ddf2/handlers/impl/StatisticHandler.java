@@ -5,6 +5,7 @@ import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
 import io.ddf2.analytics.FiveNumSummary;
 import io.ddf2.analytics.SimpleSummary;
+import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IStatisticHandler;
 import org.apache.commons.lang.StringUtils;
 
@@ -17,19 +18,16 @@ public abstract class StatisticHandler implements IStatisticHandler {
         this.ddf = ddf;
     }
 
-    protected abstract boolean isIntegral(Class type);
-
-    protected abstract boolean isFractional(Class type);
 
     //Todo: @Jing check whether we could implement getSumary here. because it's using sql command.
     @Override
-    public abstract Summary[] getSummary() throws DDFException ;
+    public abstract Summary[] getSummary() throws DDFException;
 
     @Override
-    public abstract SimpleSummary[] getSimpleSummary() throws DDFException ;
+    public abstract SimpleSummary[] getSimpleSummary() throws DDFException;
 
     @Override
-    public abstract FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException ;
+    public abstract FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException;
 
     @Override
     public Double[] getQuantiles(String columnName, Double[] percentiles) throws DDFException {
@@ -42,13 +40,13 @@ public abstract class StatisticHandler implements IStatisticHandler {
         setPercentiles.remove(1.0);
         List<Double> listPercentiles = new ArrayList(setPercentiles);
         List<String> sqlSelect = new ArrayList<String>();
-        Class columnType = ddf.getSchema().getColumn(columnName).getType();
 
 
         if (listPercentiles.size() > 0) {
-            if (isIntegral(columnType)) {
+            IColumn column = ddf.getSchema().getColumn(columnName);
+            if (column.isIntegral()) {
                 sqlSelect.add(String.format("percentile(%s,array(%s))", columnName, StringUtils.join(listPercentiles, ",")));
-            } else if (isFractional(columnType)) {
+            } else if (column.isFractional()) {
                 sqlSelect.add(String.format("percentile_approx(%s,array(%s))", columnName, StringUtils.join(listPercentiles, ",")));
             } else {
                 throw new DDFException("Only support numeric vectors!!!");
@@ -58,7 +56,7 @@ public abstract class StatisticHandler implements IStatisticHandler {
         if (hasOne) sqlSelect.add("max(" + columnName + ")");
 
 
-        String sqlCmd=String.format("SELECT %s FROM %s",StringUtils.join(sqlSelect, ","), ddf.getDDFName()) ;
+        String sqlCmd = String.format("SELECT %s FROM %s", StringUtils.join(sqlSelect, ","), ddf.getDDFName());
 
         ISqlResult sqlResult = ddf.sql(sqlCmd);
 
