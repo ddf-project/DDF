@@ -16,6 +16,7 @@
 package io.ddf;
 
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import io.ddf.content.APersistenceHandler.PersistenceUri;
 import io.ddf.content.IHandlePersistence.IPersistible;
@@ -27,6 +28,7 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.DataSourceManager;
 import io.ddf.datasource.SQLDataSourceDescriptor;
+import io.ddf.ds.DataSourceCredential;
 import io.ddf.etl.IHandleSqlLike;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ALoggable;
@@ -277,6 +279,26 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       return manager;
     } catch (Exception e) {
 
+      throw new DDFException(e);
+    }
+  }
+
+  public static DDFManager get(EngineType engineType, String uri) throws DDFException {
+    Preconditions.checkArgument(engineType != null, "Engine type cannot be null");
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(uri), "Source uri cannot be null or empty");
+
+    String className = Config.getValue(engineType.name(), ConfigConstant.FIELD_DDF_MANAGER);
+    if (Strings.isNullOrEmpty(className)) {
+      throw new DDFException("Error creating DDFManager, no class configured for engine " + engineType.name());
+    }
+
+    try {
+      Class<?> clazz = Class.forName(className);
+      if (!DDFManager.class.isAssignableFrom(clazz)) {
+        throw new DDFException("DDF manager class must extend from io.ddf.DDFManager");
+      }
+      return (DDFManager) clazz.getDeclaredConstructor(EngineType.class, String.class).newInstance(engineType, uri);
+    } catch (Exception e) {
       throw new DDFException(e);
     }
   }
@@ -630,4 +652,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public DDF load(DataSourceDescriptor ds) throws DDFException {
     return (new DataSourceManager()).load(ds, this);
   }
+
+  public abstract DDF createDDF(Map<Object, Object> options) throws DDFException;
+
+  public abstract void validateCredential(DataSourceCredential credential) throws DDFException;
+
+  public abstract String getSourceUri();
 }

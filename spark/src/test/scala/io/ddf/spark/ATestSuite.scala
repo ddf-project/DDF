@@ -2,19 +2,16 @@
 package io.ddf.spark
 
 
-import org.scalatest.FunSuite
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.scalatest.BeforeAndAfterEach
+import io.ddf.DDFManager
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.BeforeAndAfterAll
-import io.ddf.DDFManager
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite}
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
- * This makes a Logger LOG variable available to the test suite.
- * Also makes beforeEach/afterEach as well as beforeAll/afterAll behaviors available.
- */
+  * This makes a Logger LOG variable available to the test suite.
+  * Also makes beforeEach/afterEach as well as beforeAll/afterAll behaviors available.
+  */
 @RunWith(classOf[JUnitRunner])
 abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
   val LOG: Logger = LoggerFactory.getLogger(this.getClass())
@@ -30,6 +27,50 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
       val m = p10(n - 1).toDouble
       math.round(x * m) / m
     }
+  }
+
+  def createTableText8Sample () {
+    manager.sql("set shark.test.data.path=../resources", "SparkSQL")
+    manager.sql("drop table if exists text8sample", "SparkSQL")
+    manager.sql("create table text8sample (v1 string)" +
+       " row format delimited fields terminated by ','", "SparkSQL")
+    manager.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/text8_small' " +
+       "INTO TABLE text8sample", "SparkSQL")
+  }
+  
+  /**
+    * Get config value from system property or environment variable.
+    *
+    * @param key
+    * @return
+    */
+  protected def getConfig(key: String): Option[String] = {
+    val sysEnvName = key.toUpperCase().replace(".", "_")
+    sys.props.get(key).orElse(sys.env.get(sysEnvName))
+  }
+
+  /**
+    * This enable the "when <condition> test <name> in {func}" syntax
+    * to test the function only when some condition is true.
+    */
+  def when(condition: Boolean): When = new When(condition)
+
+  protected class When(condition: Boolean) {
+    def test(testName: String): Test = new Test(condition, testName)
+
+    protected class Test(condition: Boolean, testName: String) {
+      def in(testFun: => Unit) = {
+        if (condition)
+          ATestSuite.this.test(testName) {
+            testFun
+          }
+        else
+          ignore(testName) {
+            testFun
+          }
+      }
+    }
+
   }
 
   def createTableMtcars() {
@@ -122,8 +163,8 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
 }
 
 /**
- * This logs the begin/end of each test with timestamps and test #
- */
+  * This logs the begin/end of each test with timestamps and test #
+  */
 abstract class ATimedTestSuite extends ATestSuite {
   private lazy val testNameArray: Array[String] = testNames.toArray
   private var testNumber: Int = 0

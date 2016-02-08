@@ -32,7 +32,7 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   this.addConvertFunction(RDD_ARR_DOUBLE, RDD_ARR_OBJECT, new ArrayDouble2ArrayObject(this.mDDF))
   this.addConvertFunction(RDD_ARR_DOUBLE, RDD_LABELED_POINT, new ArrayDouble2LabeledPoint(this.mDDF))
   this.addConvertFunction(RDD_ARR_OBJECT, RDD_ARR_DOUBLE, new ArrayObject2ArrayDouble(this.mDDF))
-
+  this.addConvertFunction(RDD_ROW, RDD_ARR_STRING, new RDDRow2ArrayString(this.mDDF))
   this.addConvertFunction(RDD_REXP, RDD_ARR_OBJECT, new REXP2ArrayObject(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_ARR_OBJECT, new RDDRow2ArrayObject(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_ARR_DOUBLE, new RDDRow2ArrayDouble(this.mDDF))
@@ -123,6 +123,7 @@ object RepresentationHandler {
    */
   val RDD_ARR_DOUBLE = new Representation(classOf[RDD[_]], classOf[Array[Double]])
   val RDD_ARR_OBJECT = new Representation(classOf[RDD[_]], classOf[Array[Object]])
+  val RDD_ARR_STRING = new Representation(classOf[RDD[_]], classOf[Array[String]])
   val RDD_LABELED_POINT = new Representation(classOf[RDD[_]], classOf[LabeledPoint])
   val RDD_MATRIX_VECTOR = new Representation(classOf[RDD[_]], classOf[TupleMatrixVector])
   val RDD_REXP = new Representation(classOf[RDD[_]], classOf[REXP])

@@ -237,12 +237,11 @@ public class SQLReformulator extends TableVisitor {
         if (matcher.matches()) {
             // The first situation.
             this.handleDDFURI(name, table);
-
-        } else if (this.mDS.getUriList() != null || this.mDS.getUuidList() != null) {
+        } else if (this.mDS != null && (this.mDS.getUriList() != null || this.mDS.getUuidList() != null)) {
             // The third situation.
             this.handleIndex(name, this.mDS.getUriList() == null ? this.mDS
                     .getUuidList() : this.mDS.getUriList(), table);
-        } else if (this.mDS.getNamespace() != null) {
+        } else if (this.mDS != null && this.mDS.getNamespace() != null) {
             // The second situation.
             String uri  = "ddf://" + this.mDS.getNamespace() + "/" + name;
             this.handleDDFURI(uri, table);
@@ -368,7 +367,8 @@ public class SQLReformulator extends TableVisitor {
                     "if you use {number} as index, the number should begin from 1");
         }
         if (idx > identifierList.size()) {
-            throw new Exception(new ArrayIndexOutOfBoundsException());
+            throw new DDFException(String.format("Don't have enough ddfs in the list. The index is %d and the ddf " +
+                "number is %d", idx, identifierList.size()));
         } else {
             String identifier = identifierList.get(idx - 1);
 

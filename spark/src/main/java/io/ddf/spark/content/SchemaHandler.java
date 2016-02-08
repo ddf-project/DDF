@@ -48,7 +48,7 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
   }
 
   @Override
-  public void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
+  public synchronized void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
     for (int i = 0; i < xCols.length; i++) {
       Column c = this.getColumn(xCols[i]);
       //System.out.println("column name: " + c.getName() + ", type: " + c.getType().name());
@@ -59,7 +59,7 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
   }
 
   @Override
-  public void computeFactorLevelsAndLevelCounts() throws DDFException {
+  public synchronized void computeFactorLevelsAndLevelCounts() throws DDFException {
     List<Integer> columnIndexes = new ArrayList<Integer>();
     List<Schema.ColumnType> columnTypes = new ArrayList<Schema.ColumnType>();
 

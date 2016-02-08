@@ -11,7 +11,7 @@
 	<artifactId>ddf</artifactId>
 	<packaging>pom</packaging>
 	<description>Distributed DataFrame</description>
-	<version>1.4.8-SNAPSHOT</version>
+	<version>1.4.11-SNAPSHOT</version>
 	<name>ddf</name>
 	<organization>
 		<name>io.ddf</name>
@@ -61,6 +61,7 @@
 	  	<module>core</module>
 	  	<module>spark</module>
 	  	<module>examples</module>
+		<module>ddf-test</module>
 	</modules>
 
 	<dependencies>
@@ -173,6 +174,20 @@
 	              </execution>
 	            </executions>
 	          </plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<check></check>
+					<instrumentation>
+						<excludes>
+							<exclude>io/ddf/test/it/**/*.class</exclude>
+						</excludes>
+					</instrumentation>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

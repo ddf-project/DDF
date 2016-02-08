@@ -153,15 +153,23 @@ public class DDFCoordinator extends ALoggable {
    * @throws DDFException
    */
   public DDF getDDF(UUID uuid) throws DDFException {
-    for (Map.Entry<UUID, DDFManager> entry : mEngineUUID2DDFManager.entrySet()) {
-      DDFManager ddfmanager = entry.getValue();
-      try {
-        DDF ddf = ddfmanager.getDDF(uuid);
-        return ddf;
-      } catch (DDFException e) {
+    DDFManager manager = mDDFUUID2DDFManager.get(uuid);
 
+    // if we know the manager of given DDF then use it to get the DDF
+    if (manager != null) {
+      return manager.getDDF(uuid);
+    }
+
+    // otherwise, try to find it in all known DDFManagers
+    for (Map.Entry<UUID, DDFManager> entry: mEngineUUID2DDFManager.entrySet()) {
+      manager = entry.getValue();
+      try {
+        return manager.getDDF(uuid);
+      } catch (DDFException ignored) {
+        // this is not the right manager for given DDF id
       }
     }
+
     throw new DDFException("Can't find ddf with uuid: " + uuid.toString());
   }
 
@@ -169,17 +177,16 @@ public class DDFCoordinator extends ALoggable {
     for (Map.Entry<UUID, DDFManager> entry : mEngineUUID2DDFManager.entrySet()) {
       DDFManager manager = entry.getValue();
       try {
-        DDF ddf = manager.getDDFByURI(uri);
-        return ddf;
+        return manager.getDDFByURI(uri);
       } catch (Exception e) {
         try {
-          DDF ddf = manager.getOrRestoreDDFUri(uri);
-          return ddf;
-        } catch (Exception e2) {
-
+          return manager.getOrRestoreDDFUri(uri);
+        } catch (Exception ignored) {
+          // this is not the right manager for given DDF id
         }
       }
     }
+
     throw new DDFException("Can't find ddf with uri: " + uri);
   }
 

@@ -1,16 +1,22 @@
 package io.ddf.content;
 
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.Expose;
 import io.ddf.Factor;
 import io.ddf.exception.DDFException;
+import io.ddf.util.Utils;
 
 import java.io.Serializable;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -73,6 +79,31 @@ public class Schema implements Serializable {
     this.mTableName = tableName;
   }
 
+  public static void validateSchema(Schema schema) throws DDFException {
+    if(schema != null && schema.getColumns() != null) {
+      validateColumnNames(schema.getColumnNames());
+    }
+  }
+
+  private static void validateColumnNames(List<String> names) throws DDFException {
+    Set<String> columnSet = new HashSet<String>();
+    if(names != null) {
+      for(String name: names) {
+        if(columnSet.contains(name)) {
+          throw new DDFException(String.format("Duplicated column name %s", name));
+        } else {
+          if(!Utils.isAlphaNumeric(name)) {
+            throw new DDFException(String.format("Invalid column name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
+                "and dash (\"-\") and underscore (\"_\")", name));
+          }
+          columnSet.add(name);
+        }
+      }
+    } else {
+      throw new DDFException("names is null");
+    }
+  }
+
   private List<Column> parseColumnList(String columnList) {
     if (Strings.isNullOrEmpty(columnList))
       return null;
@@ -122,7 +153,8 @@ public class Schema implements Serializable {
     return columnNames;
   }
 
-  public void setColumnNames(List<String> names) {
+  public void setColumnNames(List<String> names) throws DDFException {
+    validateColumnNames(names);
     int length = names.size() < mColumns.size() ? names.size() : mColumns
         .size();
     for (int i = 0; i < length; i++) {
@@ -167,6 +199,17 @@ public class Schema implements Serializable {
     }
 
     return -1;
+  }
+
+  @Override
+  public String toString() {
+    Iterable<String> columnSpecs = Iterables.transform(getColumns(), new Function<Column, String>() {
+      @Override
+      public String apply(Column column) {
+        return column.getName() + " " + column.getType();
+      }
+    });
+    return Joiner.on(",").join(columnSpecs);
   }
 
   /*
