@@ -4,7 +4,9 @@ package io.ddf;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
+import javafx.util.Pair;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.describe.DescribeTable;
@@ -21,9 +23,9 @@ import java.util.regex.Pattern;
 /**
  * Created by jing on 6/25/15.
  * This class is used to check every table name that appears in the statement and do corresponding replacement.
- * It extends the TableVisitor class and should override the visit function.
+ * It extends the ASTVisitor class and should override the visit function.
  */
-public class SQLReformulator extends TableVisitor {
+public class SQLReformulator extends ASTVisitor {
     // The URI regex representation.
     private Pattern mUriPattern = Pattern.compile("ddf:\\/\\/.*");
     // The index regex representation.
@@ -47,6 +49,12 @@ public class SQLReformulator extends TableVisitor {
     private Boolean mHasLocalTbl = false;
     // Whether the query contains remote table.
     private Boolean mHasRemoteTbl = false;
+
+    // The escape character for different engines.
+    private final Map<DDFManager.EngineType, Pair<Character, Character>> escapeChars
+        = new HashMap<DDFManager.EngineType, Pair<Character, Character>>()
+    {{put(DDFManager.EngineType.REDSHIFT, new Pair<>('`','`'));
+        put(DDFManager.EngineType.SPARK, new Pair<>('`', '`'));}};
 
     // The information needed for a ddf.
     class DDFInfo {
@@ -203,7 +211,34 @@ public class SQLReformulator extends TableVisitor {
         return statement;
     }
 
+    private Column escapeColumn(Column column) throws Exception {
+        assert column != null && column.getColumnName() != null;
+        String colName = column.getColumnName();
+        DDFManager.EngineType engineType = this.mDDFManager.getEngineType();
+        if (!this.escapeChars.containsKey(engineType)) {
+            return column;
+        }
+        Pair<Character, Character> escapeChars = this.escapeChars.get(engineType);
+        String lChar = escapeChars.getKey().toString();
+        String rChar = escapeChars.getValue().toString();
+        if (colName.startsWith(lChar) && colName.endsWith(rChar)) {
+            return column;
+        }
+        column.setColumnName(String.format("%s%s%s", lChar, colName, rChar ));
+        return column;
+    }
 
+
+    @Override
+    public void visit(Column column) throws Exception {
+        // Map ddf name -> table name
+        if (column.getTable() != null) {
+            column.getTable().accept(this);
+        }
+
+        // Escape column name
+        Column escapedColumn = this.escapeColumn(column);
+    }
 
     /**
      * @brief Override the visit function. The function takes care of 3 kinds of situation:
@@ -217,6 +252,7 @@ public class SQLReformulator extends TableVisitor {
      * combined. For example, select {1}.a from ddf://adatao/ddfA, ddfList={"ddf://adatao/ddfB"}.
      * @param table The table that is visiting.
      */
+    @Override
     public void visit(Table table) throws Exception {
         if (null == table || null == table.getName()) return;
         String name = table.getName();

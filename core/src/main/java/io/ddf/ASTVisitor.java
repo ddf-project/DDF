@@ -5,8 +5,6 @@ import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.SetStatement;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.StatementVisitor;
@@ -33,11 +31,11 @@ import java.util.List;
 
 /**
  * Created by jing on 6/29/15.
- * This class is used to visit all the table that appear in the SQL statement.
+ * This class is used to visit the ast nodes that appear in the SQL statement.
  * By overriding the visit function, we can do different operations on the
- * table.
+ * table, column.
  */
-public class TableVisitor
+public abstract class ASTVisitor
         implements SelectVisitor, FromItemVisitor, ExpressionVisitor,
         ItemsListVisitor, OrderByVisitor, SelectItemVisitor, StatementVisitor, ClusterByVisitor {
 
@@ -64,15 +62,6 @@ public class TableVisitor
         }
         // TODO: Add more type support here.
     }
-
-
-
-
-    /**
-     * @brief This function should be overridden according to user case.
-     * @param table The table that is visiting.
-     */
-    public void visit(Table table) throws  Exception {}
 
     /**
      * @brief The following functions override functions of the interfaces.
@@ -219,12 +208,6 @@ public class TableVisitor
         between.getLeftExpression().accept(this);
         between.getBetweenExpressionStart().accept(this);
         between.getBetweenExpressionEnd().accept(this);
-    }
-
-    public void visit(Column tableColumn) throws Exception {
-        if (tableColumn.getTable() != null) {
-            tableColumn.getTable().accept(this);
-        }
     }
 
     public void visit(Division division) throws Exception {

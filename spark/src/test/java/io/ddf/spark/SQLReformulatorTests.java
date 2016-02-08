@@ -454,6 +454,20 @@ public class SQLReformulatorTests {
         }
     }
 
+    @Test
+    public void testEscape() {
+        SQLReformulator sqlReformulator = new SQLReformulator(manager);
+        String sqlcmd = "select group from t";
+        try {
+            Statement statement = parser.parse(new StringReader(sqlcmd));
+            statement = sqlReformulator.run(statement);
+            System.out.println(statement);
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @BeforeClass
     public static void startServer() throws Exception {
