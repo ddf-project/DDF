@@ -15,17 +15,17 @@ public class ViewHandler implements IViewHandler{
         this.associatedDDF = associatedDDF;
     }
     @Override
-    public ISqlResult getRandomSample(int numSamples, boolean withReplacement, int seed) {
+    public ISqlResult getRandomSample(int numSamples, boolean withReplacement) {
         return null;
     }
 
     @Override
-    public IDDF getRandomSampleByNum(int numSamples, boolean withReplacement, int seed) {
+    public IDDF getRandomSampleByNum(int numSamples, boolean withReplacement) {
         return null;
     }
 
     @Override
-    public IDDF getRandomSample(double percent, boolean withReplacement, int seed) {
+    public IDDF getRandomSample(double percent, boolean withReplacement) {
         return null;
     }
 
