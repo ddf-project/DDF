@@ -31,7 +31,8 @@ public class ViewHandler implements IViewHandler{
 
     @Override
     public ISqlResult head(int numRows) throws DDFException {
-        return null;
+        String sqlCmd=String.format("SELECT * FROM %s LIMIT %d",associatedDDF.getDDFName(),numRows);
+        return associatedDDF.sql(sqlCmd);
     }
 
     @Override
