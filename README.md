@@ -138,10 +138,10 @@ Spark
 // Start spark DDFManager
 DDFManager sparkDDFManager = DDFManager.get("spark");
 // Load table into spark
-sparkDDFManager.sql("create table airline (Year int,Month int,DayofMonth int, DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int, TailNum string, ActualElapsedTime int, CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string, Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", Boolean.False);
-sparkDDFManager.sql("load data local inpath './resources/airlineWithNA.csv' into table airline", Boolean.False);
+sparkDDFManager.sql("create table airline (Year int,Month int,DayofMonth int, DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int, TailNum string, ActualElapsedTime int, CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string, Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", Boolean.FALSE);
+sparkDDFManager.sql("load data local inpath './resources/airlineWithNA.csv' into table airline", Boolean.FALSE);
 // Create a ddf
-DDF table = sparkDDFManager.sql2ddf("select * from airline", Boolean.False);
+DDF table = sparkDDFManager.sql2ddf("select * from airline", Boolean.FALSE);
 // GetSummary
 Summary[] summary = table.getSummary();
 // Do transform
@@ -163,7 +163,7 @@ import io.ddf.datasource.JDBCDataSourceDescriptor;
 // For exmaple: 
 DDFManager jdbcDDFManager = DDFManager.get("redshift", new JDBCDataSourceDescriptor("jdbc:redshift://redshift.c3tst.us-east1.redshift.amazonaws.com:5439/mydb", "myusername", "mypwd", null));
 // Create a ddf
-DDF redshiftDDF = jdbcDDFManager.sql2ddf("select * from links", Boolean.False);
+DDF redshiftDDF = jdbcDDFManager.sql2ddf("select * from links", Boolean.FALSE);
 // Copy ddf to spark
 DDF copiedDDF = sparkDDFManager.copyFrom(redshiftDDF, "copiedDDF");
 sparkDDFManager.sql("select * from copiedDDF");
@@ -175,9 +175,9 @@ Flink
 DDFManager flinkDDFManager = DDFManager.get("flink");
 // Create a ddf
 flinkManager.sql("CREATE TABLE flight (Year int,Month int,DayofMonth int, DayOfWeek int,DepTime int,CRSDepTime int,ArrTime int,CRSArrTime int,UniqueCarrier string, FlightNum int, TailNum string, ActualElapsedTime int,CRSElapsedTime int, AirTime int, ArrDelay int, DepDelay int, Origin string, Dest string, Distance int, TaxiIn int, TaxiOut int, Cancelled int, CancellationCode string, Diverted string, CarrierDelay int, WeatherDelay int, NASDelay int, SecurityDelay int, LateAircraftDelay int)", Boolean.False);
-flinkManager.sql("load './resources/airlineWithNA.csv' delimited by ',' into flight", Boolean.False);
+flinkManager.sql("load './resources/airlineWithNA.csv' delimited by ',' into flight", Boolean.FALSE);
 // run query
-DDF flinkTable = flinkManager.sql2ddf("select * from flight", Boolean.False);
+DDF flinkTable = flinkManager.sql2ddf("select * from flight", Boolean.FALSE);
 System.out.println(flinkTable.getNumRows());
 ```
 ### Note
