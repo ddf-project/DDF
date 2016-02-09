@@ -7,14 +7,9 @@ import io.ddf2.analytics.CategoricalSimpleSummary;
 import io.ddf2.analytics.FiveNumSummary;
 import io.ddf2.analytics.NumericSimpleSummary;
 import io.ddf2.analytics.SimpleSummary;
-<<<<<<< HEAD
-import io.ddf2.datasource.schema.Column;
-=======
->>>>>>> fe2110902336fbc686854e44212cd4da36cefea4
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IStatisticHandler;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -56,21 +51,27 @@ public abstract class StatisticHandler implements IStatisticHandler {
             selectFields.add(String.format("min(%s), max(%s)", column.getName(), column.getName()));
         }
 
-        String sqlcmd = String.format("SELECT %s FROM %s", StringUtils.join(selectFields, ", "), this.getDDF().getDDFName());
+        String sqlcmd = String.format("SELECT %s FROM %s", StringUtils.join(selectFields, ", "),
+            this.getDDF().getDDFName());
+        int index = 0;
         ISqlResult sqlResult = this.getDDF().sql(sqlcmd);
         if (sqlResult.next()) {
             for (IColumn column: numericCols) {
                 NumericSimpleSummary summary = new NumericSimpleSummary();
                 summary.setColumnName(column.getName());
-                // NULL value
-                //if (sqlResult.getDouble()) {
-
-                //}
+                Double dbl = sqlResult.getDouble(index);
+                summary.setMin(dbl == null ? Double.NaN : dbl);
+                dbl = sqlResult.getDouble(index + 1);
+                summary.setMax(dbl == null ? Double.NaN : dbl);
+                simpleSummaries.add(summary);
+                // Skip to next column.
+                index += 2;
             }
         }
-
-
+        return simpleSummaries.toArray(new SimpleSummary[simpleSummaries.size()]);
     }
+
+    protected abstract String getFiveNumQuery(String columnName);
 
     @Override
     public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException {
@@ -79,10 +80,43 @@ public abstract class StatisticHandler implements IStatisticHandler {
         FiveNumSummary[] fiveNumSummaries = new FiveNumSummary[columnNames.size()];
         List<String> numericCols = new ArrayList<String>();
         for (String columnName  : columnNames) {
-            if (this.getDDF().getSchema())
+            if (this.getDDF().getSchema().getColumn(columnName).isNumeric()) {
+                numericCols.add(columnName);
+            }
         }
-        return new FiveNumSummary[0];
+        String[] rs = null;
+        if (numericCols.size() > 0) {
+            List<String> queries = new ArrayList<String>();
+            for (String columnName : columnNames) {
+                String query = getFiveNumQuery(columnName);
+                if (query != null && query.length() > 0) {
+                    queries.add(query);
+                }
+            }
+            String sqlcmd = String.format("SELECT %s FROM %%s", StringUtils.join(queries.toArray(new String[0]), ", "));
+            // a fivenumsummary of an Int/Long column is in the format "[min, max, 1st_quantile, median, 3rd_quantile]"
+            // each value can be a NULL
+            // a fivenumsummary of an Double/Float column is in the format "min \t max \t[1st_quantile, median, 3rd_quantile]"
+            // or "min \t max \t null"s
+            ISqlResult sqlResult = this.getDDF().sql(sqlcmd);
+            // What's here.
+            int k = 0;
+            for (int i = 0; i < columnNames.size(); ++i) {
+                if (!this.getDDF().getSchema().getColumn(columnNames.get(i)).isNumeric()) {
+                    fiveNumSummaries[i] = new FiveNumSummary(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+                } else {
+                    fiveNumSummaries[i] = new FiveNumSummary(sqlResult.getDouble(5 * k),
+                        sqlResult.getDouble(5 * k + 1),
+                        sqlResult.getDouble(5 * k + 2),
+                        sqlResult.getDouble(5 * k + 3),
+                        sqlResult.getDouble(5 * k + 4));
+                    ++k;
+                }
+            }
+        }
+        return fiveNumSummaries;
     }
+
 
     @Override
     public Double[] getQuantiles(String columnName, Double[] percentiles) throws DDFException {
@@ -197,7 +231,8 @@ public abstract class StatisticHandler implements IStatisticHandler {
     private List<IColumn> getCategoricalColumns() {
         List<IColumn> columns = new ArrayList<IColumn>();
         for(IColumn column: this.getDDF().getSchema().getColumns()) {
-            if(column.getType() == Schema.ColumnClass.FACTOR) {
+            // TODO: how to check factor
+            if(column.getFactor() != null) {
                 columns.add(column);
             }
         }

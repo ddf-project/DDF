@@ -5,7 +5,6 @@ import com.google.api.services.bigquery.model.*;
 import io.ddf2.IDDFType;
 import io.ddf2.ISqlResult;
 import io.ddf2.datasource.schema.ISchema;
-import io.ddf2.datasource.schema.Schema;
 
 import java.io.Closeable;
 import java.sql.SQLException;
@@ -13,7 +12,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -82,24 +80,24 @@ public class BigQuerySqlResult implements ISqlResult{
     }
 
     @Override
-    public int getInt(int index) {
+    public Integer getInt(int index) {
         Object v=row.getF().get(index).getV();
         return Data.isNull(v) ? 0 : Integer.parseInt(String.valueOf(v));
     }
 
     @Override
-    public int getInt(String name) {
+    public Integer getInt(String name) {
         return 0;
     }
 
     @Override
-    public int getInt(int index, int defaultValue) {
+    public Integer getInt(int index, int defaultValue) {
         Object v=row.getF().get(index).getV();
         return Data.isNull(v) ? defaultValue : Integer.parseInt(String.valueOf(v));
     }
 
     @Override
-    public int getInt(String name, int defaultValue) {
+    public Integer getInt(String name, int defaultValue) {
         return 0;
     }
 
@@ -126,47 +124,47 @@ public class BigQuerySqlResult implements ISqlResult{
     }
 
     @Override
-    public long getLong(int index) {
+    public Long getLong(int index) {
         Object v=row.getF().get(index).getV();
         return Data.isNull(v) ? 0 : Long.parseLong(String.valueOf(v));
     }
 
     @Override
-    public long getLong(String name) {
-        return 0;
+    public Long getLong(String name) {
+        return 0L;
     }
 
     @Override
-    public long getLong(int index, long defaultValue) {
+    public Long getLong(int index, long defaultValue) {
         Object v=row.getF().get(index).getV();
         return Data.isNull(v) ? defaultValue : Long.parseLong(String.valueOf(v));
     }
 
     @Override
-    public long getLong(String name, long defaultValue) {
-        return 0;
+    public Long getLong(String name, long defaultValue) {
+        return 0L;
     }
 
     @Override
-    public double getDouble(int index) {
+    public Double getDouble(int index) {
         Object v=row.getF().get(index).getV();
         return Data.isNull(v) ? 0.0D : Double.parseDouble(String.valueOf(v));
     }
 
     @Override
-    public double getDouble(String name) {
-        return 0;
+    public Double getDouble(String name) {
+        return 0d;
     }
 
     @Override
-    public double getDouble(int index, double defaultValue) {
+    public Double getDouble(int index, double defaultValue) {
         Object v=row.getF().get(index).getV();
         return Data.isNull(v) ? defaultValue: Double.parseDouble(String.valueOf(v));
     }
 
     @Override
-    public double getDouble(String name, double defaultValue) {
-        return 0;
+    public Double getDouble(String name, double defaultValue) {
+        return 0d;
     }
 
     @Override

@@ -70,22 +70,22 @@ public class SparkSqlResult implements ISqlResult {
     }
 
     @Override
-    public int getInt(int index) {
+    public Integer getInt(int index) {
         return row.getInt(index);
     }
 
     @Override
-    public int getInt(String name) {
+    public Integer getInt(String name) {
         return 0;
     }
 
     @Override
-    public int getInt(int index, int defaultValue) {
+    public Integer getInt(int index, int defaultValue) {
         return 0;
     }
 
     @Override
-    public int getInt(String name, int defaultValue) {
+    public Integer getInt(String name, int defaultValue) {
         return 0;
     }
 
@@ -110,43 +110,43 @@ public class SparkSqlResult implements ISqlResult {
     }
 
     @Override
-    public long getLong(int index) {
+    public Long getLong(int index) {
         return row.getLong(index);
     }
 
     @Override
-    public long getLong(String name) {
-        return 0;
+    public Long getLong(String name) {
+        return 0L;
     }
 
     @Override
-    public long getLong(int index, long defaultValue) {
-        return 0;
+    public Long getLong(int index, long defaultValue) {
+        return 0L;
     }
 
     @Override
-    public long getLong(String name, long defaultValue) {
-        return 0;
+    public Long getLong(String name, long defaultValue) {
+        return 0L;
     }
 
     @Override
-    public double getDouble(int index) {
+    public Double getDouble(int index) {
         return row.getDouble(index);
     }
 
     @Override
-    public double getDouble(String name) {
-        return 0;
+    public Double getDouble(String name) {
+        return 0d;
     }
 
     @Override
-    public double getDouble(int index, double defaultValue) {
-        return 0;
+    public Double getDouble(int index, double defaultValue) {
+        return 0d;
     }
 
     @Override
-    public double getDouble(String name, double defaultValue) {
-        return 0;
+    public Double getDouble(String name, double defaultValue) {
+        return 0d;
     }
 
     @Override
