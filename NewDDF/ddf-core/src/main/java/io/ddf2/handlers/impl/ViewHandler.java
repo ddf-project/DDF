@@ -1,52 +1,68 @@
 package io.ddf2.handlers.impl;
 
-import io.ddf2.DDF;
+import com.google.common.base.Joiner;
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
-import io.ddf2.handlers.IDDFHandler;
+import io.ddf2.Utils;
 import io.ddf2.handlers.IViewHandler;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ViewHandler implements IViewHandler{
-    protected IDDF associatedDDF;
-    public ViewHandler(IDDF associatedDDF){
-        this.associatedDDF = associatedDDF;
+    protected IDDF ddf;
+    public ViewHandler(IDDF ddf){
+        this.ddf = ddf;
     }
     @Override
-    public ISqlResult getRandomSample(int numSamples, boolean withReplacement, int seed) {
-        return null;
+    public ISqlResult getRandomSample(int numSamples, boolean withReplacement) throws DDFException {
+        return ddf.sql(buildRandomSampleSql(numSamples,withReplacement));
     }
 
+    /**
+     * Sample from ddf.
+     *
+     * @param numSamples      number of samples.
+     * @param withReplacement Can elements be sampled multiple times.
+     * @return DDF containing `numSamples` rows selected randomly from our owner DDF.
+     */
     @Override
-    public IDDF getRandomSampleByNum(int numSamples, boolean withReplacement, int seed) {
-        return null;
+    public IDDF getRandomSample2(int numSamples, boolean withReplacement) throws DDFException {
+        return ddf.sql2ddf(buildRandomSampleSql(numSamples, withReplacement));
     }
 
+
     @Override
-    public IDDF getRandomSample(double percent, boolean withReplacement, int seed) {
-        return null;
+    public IDDF getRandomSample(double percent, boolean withReplacement) throws DDFException {
+        return ddf.sql2ddf(buildRandomSampleSql(percent, withReplacement));
     }
+
+
 
     @Override
     public ISqlResult head(int numRows) throws DDFException {
-        return null;
+        String sqlCmd=String.format("SELECT * FROM %s LIMIT %d", ddf.getDDFName(),numRows);
+        return ddf.sql(sqlCmd);
     }
 
     @Override
     public ISqlResult top(int numRows, String orderByCols, boolean isDesc) throws DDFException {
-        return null;
+        String sorted = isDesc ? "DESC" : "ASC";
+        String sqlCmd =String.format("SELECT * FROM %s order by %s %s", orderByCols, sorted);
+        return ddf.sql(sqlCmd);
     }
 
     @Override
     public IDDF project(String... columnNames) throws DDFException {
-        return null;
+        return project(Arrays.asList(columnNames));
     }
 
     @Override
     public IDDF project(List<String> columnNames) throws DDFException {
-        return null;
+        String selectedColumns = Joiner.on(",").join(columnNames);
+        return ddf.sql2ddf(String.format("SELECT %s FROM %s", selectedColumns));
     }
 
     @Override
@@ -76,7 +92,38 @@ public class ViewHandler implements IViewHandler{
 
     @Override
     public IDDF getDDF() {
-        return associatedDDF;
+        return ddf;
+    }
+
+    /**
+     * Simple solution by using select * from limit rand(),num
+     * Each concrete class should override this method.
+     * @param numSamples total row
+     * @param withReplacement allow row to be duplicated
+     * @return sampleSql
+     */
+    protected String buildRandomSampleSql(int numSamples,boolean withReplacement){
+        assert numSamples > 0;
+        long numRows = ddf.getNumRows();
+        String sampleSql;
+        if(numRows < numSamples){
+            sampleSql="select * from " + ddf.getDDFName() + " limit " + numSamples;
+        }else{
+            long bound = numRows - numSamples;
+            long pivot = ThreadLocalRandom.current().nextLong(0, bound);
+            sampleSql = "select * from " + ddf.getDDFName() + " limit " + pivot + "," + numSamples;
+        }
+        return sampleSql;
+    }
+    /**
+     * @param percent of total row range from: (0.0-1.0)
+     * @param withReplacement allow row to be duplicated
+     * @return sampleSql
+     */
+    protected String buildRandomSampleSql(double percent,boolean withReplacement){
+        assert percent > 0 && percent < 1;
+        long numRows = Math.round(ddf.getNumRows() * percent);
+        return buildRandomSampleSql(numRows,withReplacement);
     }
 }
 

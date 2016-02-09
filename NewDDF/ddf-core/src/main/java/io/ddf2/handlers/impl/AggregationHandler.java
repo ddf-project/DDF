@@ -129,14 +129,10 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
      * @see this.isNummeric(Class) for more information.
      */
     private void assertNumericType(String columnA) throws DDFException {
-        Class type = getDDF().getSchema().getColumn(columnA).getType();
-        if (isNummeric(type) == false) {
-            throw new DDFException(columnA + " must numberic datatype, current datatype is " + type.toString());
+        if (associatedDDF.getSchema().getColumn(columnA).isNumeric() == false) {
+            throw new DDFException(columnA + " must numberic datatype");
         }
     }
-
-    protected abstract boolean isNummeric(Class type);
-
     /**
      * Convert aggregation string to sql string. For example, "newCol = valA * 2" should be converted to "valA * 2 as new Col".
      * @param sql The string expression for aggregation, for example "valA * 2" or "newCol = valA * 2".
@@ -157,7 +153,7 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
     }
     /**
      * Converts from a SQL String specs like "a, b, SUM(c), MIN(c)" into an array of SQL {@link AggregateField}s. This
-     * is useful for constructing arguments to the {@link aggregate} function.
+     * is useful for constructing arguments to the aggregate function.
      *
      * @param sqlFieldSpecs
      * @return null if sqlFieldSpecs is null or empty

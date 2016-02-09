@@ -15,9 +15,9 @@ public interface IViewHandler extends IDDFHandler {
      * @param numSamples number of samples.
      * @param withReplacement Can elements be sampled multiple times.
      * @return Sql results containing `numSamples` rows selected randomly from our owner DDF.
-     * //TODO Should we keep seed here
-     */
-    ISqlResult getRandomSample(int numSamples, boolean withReplacement, int seed);
+     *
+     * */
+    ISqlResult getRandomSample(int numSamples, boolean withReplacement) throws DDFException;
 
     /**
      * Sample from ddf.
@@ -25,7 +25,7 @@ public interface IViewHandler extends IDDFHandler {
      * @param withReplacement Can elements be sampled multiple times.
      * @return DDF containing `numSamples` rows selected randomly from our owner DDF.
      */
-    IDDF getRandomSampleByNum(int numSamples, boolean withReplacement, int seed);
+    IDDF getRandomSample2(int numSamples, boolean withReplacement) throws DDFException;
 
     /**
      * Sample from ddf.
@@ -33,7 +33,7 @@ public interface IViewHandler extends IDDFHandler {
      * @param withReplacement Can elements be sampled multiple times.
      * @return DDF containing `numSamples` rows selected randomly from our owner DDF.
      */
-    IDDF getRandomSample(double percent, boolean withReplacement, int seed);
+    IDDF getRandomSample(double percent, boolean withReplacement) throws DDFException;
 
     /**
      * Preview the content of ddf.
