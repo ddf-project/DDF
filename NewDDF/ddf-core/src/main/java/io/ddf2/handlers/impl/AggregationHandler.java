@@ -46,17 +46,13 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
     @Override
     public AggregationResult aggregate(String query) throws DDFException {
         assertAggregationQuery(query);
-        String sqlCmd = "SELECT " + query + " from " + associatedDDF.getDDFName();
+        String sqlCmd = String.format("SELECT %s FROM %s", query, associatedDDF.getDDFName());
         ISqlResult sqlResult = associatedDDF.sql(sqlCmd);
         return new AggregationResult(sqlResult);
     }
 
-
-
     @Override
     public AggregationResult aggregate(List<AggregateField> fields) throws DDFException {
-
-
         String sqlCmd = AggregateField.toSql(fields, associatedDDF.getDDFName());
         int numUnaggregatedFields = 0;
 
@@ -71,7 +67,7 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
 
     @Override
     public double aggregate(String column, AggregateFunction function) throws DDFException {
-        String sqlCommand = String.format("SELECT %s from %s", function.toString(column), associatedDDF.getDDFName());
+        String sqlCommand = String.format("SELECT %s FROM %s", function.toString(column), associatedDDF.getDDFName());
         ISqlResult sql = associatedDDF.sql(sqlCommand);
         if(sql.next()){
             return sql.getDouble(0);
@@ -142,8 +138,8 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
     protected abstract boolean isNummeric(Class type);
 
     /**
-     * //ToDo: @Jing add sql example here for ussage.
-     * @param sql
+     * Convert aggregation string to sql string. For example, "newCol = valA * 2" should be converted to "valA * 2 as new Col".
+     * @param sql The string expression for aggregation, for example "valA * 2" or "newCol = valA * 2".
      * @return
      */
     @Deprecated

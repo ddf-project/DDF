@@ -3,10 +3,15 @@ package io.ddf2.handlers.impl;
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
+import io.ddf2.analytics.CategoricalSimpleSummary;
 import io.ddf2.analytics.FiveNumSummary;
+import io.ddf2.analytics.NumericSimpleSummary;
 import io.ddf2.analytics.SimpleSummary;
+import io.ddf2.datasource.schema.Column;
+import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IStatisticHandler;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -17,23 +22,62 @@ public abstract class StatisticHandler implements IStatisticHandler {
         this.ddf = ddf;
     }
 
+    // TODO (sang): Why these 2 functions are put in statisticHandler? I think it's for column types and should be in IColumn?
     protected abstract boolean isIntegral(Class type);
 
     protected abstract boolean isFractional(Class type);
 
-    //Todo: @Jing check whether we could implement getSumary here. because it's using sql command.
-    @Override
-    public Summary[] getSummary() throws DDFException {
-        return new Summary[0];
-    }
-
     @Override
     public SimpleSummary[] getSimpleSummary() throws DDFException {
-        return new SimpleSummary[0];
+        List<IColumn> categoricalColumns = this.getCategoricalColumns();
+        List<SimpleSummary> simpleSummaries = new ArrayList<>();
+        for (IColumn column: categoricalColumns) {
+            String sqlcmd = String.format("SELECT DISTINCT(%s) FROM %s WHERE %s IS NOT NULL",
+                    column.getName(),
+                    this.getDDF().getDDFName(),
+                    column.getName());
+            ISqlResult sqlResult = this.getDDF().sql(sqlcmd);
+            List<String> values = new ArrayList<>();
+            while (sqlResult.next()) {
+                values.add(sqlResult.get(0).toString());
+            }
+            CategoricalSimpleSummary summary = new CategoricalSimpleSummary();
+            summary.setValues(values);
+            summary.setColumnName(column.getName());
+            simpleSummaries.add(summary);
+        }
+
+        List<IColumn> numericCols = this.getNumericColumns();
+        List<String> selectFields = new ArrayList<>();
+        for (IColumn column: numericCols) {
+            selectFields.add(String.format("min(%s), max(%s)", column.getName(), column.getName()));
+        }
+
+        String sqlcmd = String.format("SELECT %s FROM %s", StringUtils.join(selectFields, ", "), this.getDDF().getDDFName());
+        ISqlResult sqlResult = this.getDDF().sql(sqlcmd);
+        if (sqlResult.next()) {
+            for (IColumn column: numericCols) {
+                NumericSimpleSummary summary = new NumericSimpleSummary();
+                summary.setColumnName(column.getName());
+                // NULL value
+                //if (sqlResult.getDouble()) {
+
+                //}
+            }
+        }
+
+
     }
 
     @Override
     public FiveNumSummary[] getFiveNumSummary(List<String> columnNames) throws DDFException {
+        // This use sql, should be fine.
+        assert columnNames != null && columnNames.size() > 0;
+        FiveNumSummary[] fiveNumSummaries = new FiveNumSummary[columnNames.size()];
+        List<String> numericCols = new ArrayList<String>();
+        for (String columnName  : columnNames) {
+            if (this.getDDF().getSchema())
+        }
         return new FiveNumSummary[0];
     }
 
@@ -145,6 +189,26 @@ public abstract class StatisticHandler implements IStatisticHandler {
     @Override
     public IDDF getDDF() {
         return ddf;
+    }
+
+    private List<IColumn> getCategoricalColumns() {
+        List<IColumn> columns = new ArrayList<IColumn>();
+        for(IColumn column: this.getDDF().getSchema().getColumns()) {
+            if(column.getType() == Schema.ColumnClass.FACTOR) {
+                columns.add(column);
+            }
+        }
+        return columns;
+    }
+
+    private List<IColumn> getNumericColumns() {
+        List<IColumn> columns = new ArrayList<IColumn>();
+        for(IColumn column: this.getDDF().getSchema().getColumns()) {
+           if (column.isNumeric()) {
+               columns.add(column);
+           }
+        }
+        return columns;
     }
 }
 
