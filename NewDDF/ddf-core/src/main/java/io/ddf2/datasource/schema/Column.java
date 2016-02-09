@@ -1,10 +1,7 @@
 package io.ddf2.datasource.schema;
 
-import io.ddf2.handlers.IViewHandler;
-
 import javax.annotation.concurrent.ThreadSafe;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 
 /**
  * Created by sangdn on 1/4/16.
@@ -13,7 +10,7 @@ import java.text.DecimalFormat;
 public class Column implements IColumn {
     protected String colName;
     protected Class dataType;
-    protected IFactor factor;
+    protected Factor factor;
     public Column(String colName, Class dataType){
         this.colName = colName;
         this.dataType = dataType;
@@ -33,7 +30,7 @@ public class Column implements IColumn {
     }
 
     @Override
-    public IFactor getFactor() {
+    public Factor getFactor() {
         return factor;
     }
 

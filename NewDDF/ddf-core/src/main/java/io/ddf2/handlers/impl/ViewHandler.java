@@ -4,7 +4,8 @@ import com.google.common.base.Joiner;
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
-import io.ddf2.Utils;
+import io.ddf2.datasource.schema.Factor;
+import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IViewHandler;
 
 import java.util.Arrays;
@@ -62,7 +63,17 @@ public class ViewHandler implements IViewHandler{
     @Override
     public IDDF project(List<String> columnNames) throws DDFException {
         String selectedColumns = Joiner.on(",").join(columnNames);
-        return ddf.sql2ddf(String.format("SELECT %s FROM %s", selectedColumns));
+        IDDF projectedDDF =  ddf.sql2ddf(String.format("SELECT %s FROM %s", selectedColumns));
+        // Copy the factor
+        for (IColumn column : this.getDDF().getSchema().getColumns()) {
+            if (projectedDDF.getSchema().getColumn(column.getName()) != null) {
+                Factor factor = column.getFactor();
+                if (factor != null) {
+                    // TODO: copy factor here
+                }
+            }
+        }
+        return projectedDDF;
     }
 
     @Override
