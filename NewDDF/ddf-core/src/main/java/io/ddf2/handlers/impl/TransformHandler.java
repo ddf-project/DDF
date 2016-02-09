@@ -16,8 +16,8 @@ public class TransformHandler implements ITransformHandler{
     }
     @Override
     public IDDF transformScaleMinMax() throws DDFException {
-//        IStatisticHandler.Summary[] summaryArr = associatedDDF.getStatisticHandler().getSummary();
-//        List<IColumn> columns = this.getDDF().getSchema().getColumns();
+//        IStatisticHandler.Summary[] summaryArr = ddf.getStatisticHandler().getSummary();
+//        List<IColumn> columns = this.getRandomSample2().getSchema().getColumns();
 //
 //        // Compose a transformation query
 //        StringBuffer sqlCmdBuffer = new StringBuffer("SELECT ");
@@ -34,10 +34,10 @@ public class TransformHandler implements ITransformHandler{
 //            sqlCmdBuffer.append(",");
 //        }
 //        sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
-//        sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
+//        sqlCmdBuffer.append("FROM ").append(this.getRandomSample2().getTableName());
 //
 //        DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
-//        newddf.getMetaDataHandler().copyFactor(this.getDDF());
+//        newddf.getMetaDataHandler().copyFactor(this.getRandomSample2());
 //        return newddf;
         return null;
     }
