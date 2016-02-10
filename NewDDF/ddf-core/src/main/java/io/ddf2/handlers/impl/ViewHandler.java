@@ -1,6 +1,8 @@
 package io.ddf2.handlers.impl;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
@@ -8,6 +10,7 @@ import io.ddf2.datasource.schema.Factor;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IViewHandler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -76,14 +79,44 @@ public class ViewHandler implements IViewHandler{
         return projectedDDF;
     }
 
-    @Override
-    public IDDF subset(List<Column> columnExpr, Expression filter) throws DDFException {
-        return null;
+    private void updateColumnName(Expression expression) throws DDFException {
+        if (expression == null) return;
+        if (expression instanceof Column) {
+            Column column = (Column) expression;
+            if (column.getName() == null) {
+                Integer i = column.getIndex();
+                if (i != null) {
+                    column.setName(this.getDDF().getSchema().getColumnName(i));
+                }
+            }
+            return;
+        } else if (expression instanceof Operator){
+            Expression[] exps = ((Operator) expression).getOperands();
+            for (Expression exp : exps) {
+                updateColumnName(exp);
+            }
+        }
     }
 
     @Override
-    public IDDF subset(List<String> columnExpr, String filter) throws DDFException {
-        return null;
+    public IDDF subset(List<Column> columnExprs, Expression filter) throws DDFException {
+        this.updateColumnName(filter);
+        List<String> columnStrs = new ArrayList<>();
+        for (Column column : columnExprs) {
+            this.updateColumnName(column);
+            columnStrs.add(column.getName());
+        }
+        return this.subset(columnStrs, filter.toSql());
+    }
+
+    @Override
+    public IDDF subset(List<String> columnExprs, String filter) throws DDFException {
+        String sqlcmd = String.format("SELECT %s FROM %s", Joiner.on(", ").join(columnExprs),
+            this.getDDF().getDDFName());
+        if (!Strings.isNullOrEmpty(filter)) {
+            sqlcmd = String.format("%s WHERE %s", sqlcmd, filter);
+        }
+        return this.getDDF().sql2ddf(sqlcmd);
     }
 
     @Override

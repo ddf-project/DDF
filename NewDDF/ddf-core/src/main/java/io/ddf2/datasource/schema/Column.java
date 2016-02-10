@@ -11,10 +11,12 @@ public class Column implements IColumn {
     protected String colName;
     protected Class dataType;
     protected Factor factor;
+
     public Column(String colName, Class dataType){
         this.colName = colName;
         this.dataType = dataType;
     }
+
     public Column(String colName, Class dataType,IFactor factor){
         this.colName = colName;
         this.dataType = dataType;
