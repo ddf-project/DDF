@@ -2,7 +2,6 @@ package io.ddf2.handlers.impl;
 
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
-import io.ddf2.datasource.schema.Column;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IStatisticHandler;
 import io.ddf2.handlers.ITransformHandler;

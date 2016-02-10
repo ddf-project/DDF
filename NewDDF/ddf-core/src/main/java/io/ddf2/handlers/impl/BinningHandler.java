@@ -31,26 +31,6 @@ public abstract class BinningHandler implements io.ddf2.handlers.IBinningHandler
     }
 
     @Override
-    public IDDF binningCustom(String column, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public IDDF binningEq(String column, int numBins, boolean includeLowest, boolean right) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public IDDF binningEqFreq(String column, int numBins, boolean includeLowest, boolean right) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public List<HistogramBin> getHistogram(String column, int numBins) throws DDFException {
-        return null;
-    }
-
-    @Override
     public IDDF getDDF() {
         return associatedDDF;
     }
