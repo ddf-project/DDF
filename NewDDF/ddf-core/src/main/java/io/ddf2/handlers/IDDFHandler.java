@@ -7,6 +7,7 @@ public interface IDDFHandler {
      * Every Handler have its associate ddf
      * @return Associated DDF
      */
+
     IDDF getDDF();
 }
  
