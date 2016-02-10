@@ -12,6 +12,7 @@ import io.ddf2.handlers.IViewHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -121,17 +122,30 @@ public class ViewHandler implements IViewHandler{
 
     @Override
     public IDDF removeColumn(String columnName) throws DDFException {
-        return null;
+        assert !Strings.isNullOrEmpty(columnName);
+        return this.removeColumns(Collections.singletonList(columnName));
     }
 
     @Override
     public IDDF removeColumns(String... columnNames) throws DDFException {
-        return null;
+        assert columnNames != null && columnNames.length > 0;
+        return this.removeColumns(Arrays.asList(columnNames));
     }
 
     @Override
     public IDDF removeColumns(List<String> columnNames) throws DDFException {
-        return null;
+        assert columnNames != null && !columnNames.isEmpty();
+        List<String> curColNames = this.getDDF().getSchema().getColumnNames();
+        List<String> remainCols = new ArrayList<>(curColNames);
+        for (String columnName : columnNames) {
+            if (!curColNames.contains(columnName)) {
+                throw new DDFException(String.format("Column name : %s doesn't exist in current ddf", columnName));
+            }
+            remainCols.remove(columnName);
+        }
+        IDDF ddf = this.project(remainCols);
+        // TODO: updateInPlace and copyFactor
+        return ddf;
     }
 
     @Override
