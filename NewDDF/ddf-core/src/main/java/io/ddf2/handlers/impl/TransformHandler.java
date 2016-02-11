@@ -58,7 +58,7 @@ public class TransformHandler implements ITransformHandler{
         return newddf;
     }
 
-    protected String buildTransformScaleField(String transformType, IStatisticHandler.Summary summary, String columnName) {
+    protected String buildTransformScaleField(String transformType, IStatisticHandler.Summary summary, String columnName) throws DDFException {
         assert Arrays.asList("minmax", "standard").contains(transformType.toLowerCase());
         if (transformType.equalsIgnoreCase("minmax")) {
             return String.format("((%s - %s) / %s) AS %s", columnName, summary.min(), summary.max() - summary.min(),
@@ -67,6 +67,7 @@ public class TransformHandler implements ITransformHandler{
             return String.format("((%s - %s) / %s) AS %s", columnName, summary.mean(), summary.stdev() - summary.mean(),
                 columnName);
         }
+        throw new DDFException("Unsupported transform operation");
     }
 
     @Override
