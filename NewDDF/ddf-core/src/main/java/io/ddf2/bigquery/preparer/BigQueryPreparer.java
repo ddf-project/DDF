@@ -66,7 +66,8 @@ public class BigQueryPreparer implements IDataSourcePreparer {
             ViewDefinition viewDefinition = new ViewDefinition();
             viewDefinition.setQuery(datasource.getQuery());
             table.setView(viewDefinition);
-//            table.setExpirationTime(TimeUnit.DAYS.toMillis(1));
+            long expirationTime = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1);
+            table.setExpirationTime(expirationTime);
 
             Table tblResponse = bigquery.tables().insert(datasource.getProjectId(), TMP_VIEW_DATASET_ID, table).execute();
 
