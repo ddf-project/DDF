@@ -18,6 +18,22 @@ public interface ISchema {
 	public String getColumnName(int index) throws DDFException;
 
 	public int getColumnIndex(String columnName) throws DDFException;
+
+	void computeFactorLevelsAndLevelCounts() throws DDFException;
+
+	void setFactorLevelsForStringColumns(String[] xCols) throws DDFException;
+
+	Factor<?> setAsFactor(String columnName) throws DDFException;
+
+	Factor<?> setAsFactor(int columnIndex) throws DDFException;
+
+	void unsetAsFactor(String columnName);
+
+	void unsetAsFactor(int columnIndex);
+
+	void setFactorLevels(String columnName, Factor<?> factor) throws DDFException;
+
+	public void generateDummyCoding() throws NumberFormatException, DDFException;
 	 
 }
  

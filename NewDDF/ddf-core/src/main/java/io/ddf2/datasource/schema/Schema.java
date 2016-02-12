@@ -2,6 +2,8 @@ package io.ddf2.datasource.schema;
 
 import io.ddf2.DDFException;
 
+import org.apache.http.annotation.NotThreadSafe;
+
 import javax.annotation.concurrent.NotThreadSafe;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -67,6 +69,46 @@ public class Schema implements ISchema {
     @Override
     public int getColumnIndex(String columnName) throws DDFException {
         return this.getColumnNames().indexOf(columnName);
+    }
+
+    @Override
+    public void computeFactorLevelsAndLevelCounts() throws DDFException {
+
+    }
+
+    @Override
+    public void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
+
+    }
+
+    @Override
+    public Factor<?> setAsFactor(String columnName) throws DDFException {
+        return null;
+    }
+
+    @Override
+    public Factor<?> setAsFactor(int columnIndex) throws DDFException {
+        return null;
+    }
+
+    @Override
+    public void unsetAsFactor(String columnName) {
+
+    }
+
+    @Override
+    public void unsetAsFactor(int columnIndex) {
+
+    }
+
+    @Override
+    public void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
+
+    }
+
+    @Override
+    public void generateDummyCoding() throws NumberFormatException, DDFException {
+
     }
 
     public void append(IColumn column) {
