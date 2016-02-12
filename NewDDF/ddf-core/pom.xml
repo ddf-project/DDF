@@ -9,8 +9,7 @@
     <version>0.1</version>
 
 
-   
- <dependencies>
+    <dependencies>
         <!-- DDF CORE -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -74,6 +73,16 @@
             <artifactId>gson</artifactId>
             <version>2.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.7.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -83,13 +92,13 @@
                 <configuration>
                     <!--<skipTests>false</skipTests>-->
                     <!--<excludes>-->
-                        <!--<exclude>**/*$*.java</exclude>-->
+                    <!--<exclude>**/*$*.java</exclude>-->
                     <!--</excludes>-->
                     <!--<systemProperties>-->
-                        <!--<property>-->
-                            <!--<name>-Dlog4j.configuration</name>-->
-                            <!--<value>file:src/test/resources/cfg/log4j.xml</value>-->
-                        <!--</property>-->
+                    <!--<property>-->
+                    <!--<name>-Dlog4j.configuration</name>-->
+                    <!--<value>file:src/test/resources/cfg/log4j.xml</value>-->
+                    <!--</property>-->
                     <!--</systemProperties>-->
                     <additionalClasspathElements>
                         <additionalClasspathElement>${basedir}/src/test/resources/</additionalClasspathElement>

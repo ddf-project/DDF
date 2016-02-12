@@ -129,7 +129,7 @@ public abstract class DDFManager implements IDDFManager {
 	 */
 	public IPersistentHandler getPersistentHandler() {
 		if(persistentHandler== null){
-			synchronized (persistentHandler){
+			synchronized (DDFManager.class){
 				if(persistentHandler== null) persistentHandler= _getPersistentHanlder();
 			}
 		}
@@ -140,7 +140,7 @@ public abstract class DDFManager implements IDDFManager {
 	@Override
 	public IDDFMetaData getDDFMetaData() {
 		if(ddfMetaData == null){
-			synchronized (ddfMetaData){
+			synchronized (DDFManager.class){
 				if(ddfMetaData == null) ddfMetaData = _getDDFMetaData();
 			}
 		}

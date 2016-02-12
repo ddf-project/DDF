@@ -6,6 +6,7 @@ import utils.TestUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by sangdn on 1/6/16.
@@ -40,7 +41,7 @@ public class IDDFMetaDataTest {
         }
         //TEST getAllDDFName
         assert ddfMetaData.getNumDDF() == ddfName4Test.length;
-        List<String> allDDFNames = ddfMetaData.getAllDDFNames();
+        Set<String> allDDFNames = ddfMetaData.getAllDDFNames();
         assert Arrays.equals(allDDFNames.toArray(new String[0]),ddfName4Test);
 
         ddfMetaData.dropDDF(ddfName4Test[0]);

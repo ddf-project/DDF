@@ -7,4 +7,4 @@ package io.ddf2.datasource.schema;
 //ToDo: @jing fill out IFactor api & document
 public interface IFactor extends Cloneable{
 
-}
+}                                               

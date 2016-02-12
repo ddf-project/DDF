@@ -4,6 +4,7 @@ import org.apache.spark.sql.types.DecimalType;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Created by sangdn on 12/30/15.
@@ -14,7 +15,7 @@ public class DummyTest {
 //        testTypeParser();
 //        listHiveDataType();
 //            getSysPro();
-        printClassPath();
+//        printClassPath();
     }
 
     public static final void testTernaryOperator(){

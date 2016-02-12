@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class SparkDDF extends DDF {
 
-    protected Map<Class,IDataSourcePreparer> mapDataSourcePreparer;
+
     protected SparkContext sparkContext;
     protected HiveContext hiveContext;
 
