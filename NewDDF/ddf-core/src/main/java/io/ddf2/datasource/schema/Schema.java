@@ -4,7 +4,6 @@ import io.ddf2.DDFException;
 
 import org.apache.http.annotation.NotThreadSafe;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
