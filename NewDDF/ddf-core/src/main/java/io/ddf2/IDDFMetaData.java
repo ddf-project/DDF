@@ -18,7 +18,7 @@ public interface IDDFMetaData {
 	public ISchema getDDFSchema(String ddfName) throws DDFException;
 	public  int dropAllDDF();
 	public  int getNumDDF() throws DDFException;
-	public  boolean dropDDF(String ddfName) throws IOException;
+	public  boolean dropDDF(String ddfName);
 	public long getCreationTime(String ddfName) throws DDFException;
 
 
