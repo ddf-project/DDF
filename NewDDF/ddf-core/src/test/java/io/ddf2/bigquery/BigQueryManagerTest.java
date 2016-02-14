@@ -47,8 +47,10 @@ public class BigQueryManagerTest {
 
     @Test
     public void testSimpleDDF() throws DDFException, SQLException {
-        IDDF ddf = ddfManager.newDDF("abc123","select * from demo.airline_2007 limit 10");
-        ISqlResult sqlResult = ddf.sql("select * from " + ddf.getDDFName());
+        String ddfName = "abc123";
+//        ddfManager.getDDFMetaData().dropDDF(ddfName);
+        IDDF ddf = ddfManager.newDDF(ddfName,"select * from demo.airline_2007 limit 10");
+        ISqlResult sqlResult = ddf.sql("select * from " + ddfName);
         ISchema schema = sqlResult.getSchema();
         System.out.println("---------- Schema --------------------");
         System.out.println(schema.toString());

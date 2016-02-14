@@ -41,7 +41,7 @@ public final class BigQueryManager extends DDFManager {
 
     @Override
     protected IDDFMetaData _getDDFMetaData() {
-        return null;
+        return new BigQueryMetaData();
     }
 
 
@@ -49,7 +49,7 @@ public final class BigQueryManager extends DDFManager {
     public ISqlResult sql(String query) throws SQLException {
         try {
             Bigquery bigquery = BigQueryUtils.newInstance();
-            String projectId = (String) BigQueryContext.getProperty(BigQueryContext.KEY_PROJECT_ID);
+            String projectId = BigQueryContext.getProjectId();
             QueryResponse response = bigquery.jobs().query(projectId, new QueryRequest().setQuery(query)).execute();
             return new BigQuerySqlResult(response);
         } catch (IOException e) {

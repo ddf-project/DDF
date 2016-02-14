@@ -23,13 +23,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class BigQueryPreparer implements IDataSourcePreparer {
     protected Bigquery bigquery;
-    public static final String TMP_VIEW_DATASET_ID = "tmp_view_ddf";
+
     //ToDo: Move isFirstTime & hasTmpDataset to ThreadLocal
     public static final AtomicBoolean isFirstTime = new AtomicBoolean(true);
     public static final AtomicBoolean hasTmpDataSet = new AtomicBoolean(false);
     public BigQueryPreparer(Bigquery bigquery) {
         this.bigquery = bigquery;
-        removeOldView();
+//        removeOldView();
 
 
     }
@@ -39,7 +39,7 @@ public class BigQueryPreparer implements IDataSourcePreparer {
             if(isFirstTime.get()==true){
                 synchronized (isFirstTime){
                     if (isFirstTime.get()==true){
-                        bigquery.datasets().delete(BigQueryContext.getProjectId(), TMP_VIEW_DATASET_ID).execute();
+                        bigquery.datasets().delete(BigQueryContext.getProjectId(), BigQueryUtils.TMP_VIEW_DATASET_ID).execute();
                         isFirstTime.set(false);
                     }
                 }
@@ -59,7 +59,7 @@ public class BigQueryPreparer implements IDataSourcePreparer {
             TableReference tableReference = new TableReference();
             tableReference.setTableId(ddfName);
             tableReference.setProjectId(datasource.getProjectId());
-            tableReference.setDatasetId(TMP_VIEW_DATASET_ID);
+            tableReference.setDatasetId(BigQueryUtils.TMP_VIEW_DATASET_ID);
 
             table.setTableReference(tableReference);
 
@@ -69,11 +69,11 @@ public class BigQueryPreparer implements IDataSourcePreparer {
             long expirationTime = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1);
             table.setExpirationTime(expirationTime);
 
-            Table tblResponse = bigquery.tables().insert(datasource.getProjectId(), TMP_VIEW_DATASET_ID, table).execute();
+            Table tblResponse = bigquery.tables().insert(datasource.getProjectId(), BigQueryUtils.TMP_VIEW_DATASET_ID, table).execute();
 
             return BQDataSource.builder().setProjectId(((BQDataSource) dataSource).getProjectId())
                     .setNumRows(tblResponse.getNumRows().longValue())
-                    .setDatasetId(TMP_VIEW_DATASET_ID)
+                    .setDatasetId(BigQueryUtils.TMP_VIEW_DATASET_ID)
                     .setCreatedTime(tblResponse.getCreationTime())
                     .setSchema(BigQueryUtils.convertToDDFSchema(tblResponse.getSchema()))
                     .build();
@@ -97,18 +97,18 @@ public class BigQueryPreparer implements IDataSourcePreparer {
                     DatasetList list = bigquery.datasets().list(BigQueryContext.getProjectId()).execute();
                     for (DatasetList.Datasets ds :list.getDatasets()){
                         String datasetId = ds.getDatasetReference().getDatasetId();
-                        if(datasetId.equals(TMP_VIEW_DATASET_ID)){
+                        if(datasetId.equals(BigQueryUtils.TMP_VIEW_DATASET_ID)){
                             isFound = true; break;
                         }
                     }
                     if(isFound == false){
                         DatasetReference ref = new DatasetReference();
-                        ref.setDatasetId(TMP_VIEW_DATASET_ID);
+                        ref.setDatasetId(BigQueryUtils.TMP_VIEW_DATASET_ID);
                         Dataset dataset = new Dataset();
                         dataset.setDatasetReference(ref);
                         dataset = bigquery.datasets()
                                 .insert(BigQueryContext.getProjectId(),dataset).execute();
-                        if(dataset == null || dataset.getDatasetReference().getDatasetId().equals(TMP_VIEW_DATASET_ID) == false){
+                        if(dataset == null || dataset.getDatasetReference().getDatasetId().equals(BigQueryUtils.TMP_VIEW_DATASET_ID) == false){
                             throw new PrepareDataSourceException("Couldn't Create Temprory Dataset to store View");
                         }
                     }

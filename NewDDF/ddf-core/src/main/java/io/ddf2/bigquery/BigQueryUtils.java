@@ -19,6 +19,7 @@ import java.util.List;
  * Created by sangdn on 1/19/16.
  */
 public class BigQueryUtils {
+    public static final String TMP_VIEW_DATASET_ID = "tmp_view_ddf";
 
     /***
      * @param appName:      Application Name to submit to Google Bigquery Service

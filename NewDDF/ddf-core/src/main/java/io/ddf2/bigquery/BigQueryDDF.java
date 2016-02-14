@@ -1,6 +1,7 @@
 package io.ddf2.bigquery;
 
 import com.google.api.services.bigquery.Bigquery;
+import com.google.api.services.bigquery.model.DatasetReference;
 import com.google.api.services.bigquery.model.QueryRequest;
 import com.google.api.services.bigquery.model.QueryResponse;
 import io.ddf2.*;
@@ -64,7 +65,10 @@ public class BigQueryDDF extends DDF {
     @Override
     public ISqlResult sql(String sql) throws DDFException {
         try {
-            QueryResponse queryResponse = bigquery.jobs().query(projectId, new QueryRequest().setQuery(sql)).execute();
+            DatasetReference datasetReference = new DatasetReference();
+            datasetReference.setProjectId(projectId);
+            datasetReference.setDatasetId(datasetId);
+            QueryResponse queryResponse = bigquery.jobs().query(projectId, new QueryRequest().setQuery(sql).setDefaultDataset(datasetReference)).execute();
             return new BigQuerySqlResult(queryResponse);
         } catch (IOException e) {
             e.printStackTrace();
