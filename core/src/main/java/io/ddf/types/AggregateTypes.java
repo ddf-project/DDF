@@ -35,6 +35,12 @@ public class AggregateTypes {
         case AVG:
           return String.format("AVG(%s)", column);
 
+        case VARIANCE:
+          return String.format("VAR_SAMP(%s)", column);
+
+        case STDDEV:
+          return String.format("STDDEV_SAMP(%s)", column);
+
         default:
           return String.format("%s(%s)", this.toString(), column);
       }
@@ -97,7 +103,7 @@ public class AggregateTypes {
      * An aggregated column
      *
      * @param column
-     * @param aggregationFunction if null, then this is an unaggregated column
+     * @param aggregateFunction if null, then this is an unaggregated column
      */
     public AggregateField(String aggregateFunction, String column) {
       this(AggregateFunction.fromString(aggregateFunction), column);
