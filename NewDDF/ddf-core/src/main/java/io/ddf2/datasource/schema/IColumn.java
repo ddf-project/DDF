@@ -10,7 +10,8 @@ public interface IColumn {
 	boolean isIntegral();
 	boolean isFractional();
 
-	void setFactor(IFactor factor);
+	void setAsFactor(IFactor factor);
+	void unsetAsFactor();
 }
 
 

@@ -48,8 +48,13 @@ public class Column implements IColumn {
     }
 
     @Override
-    public void setFactor(IFactor factor) {
+    public void setAsFactor(IFactor factor) {
         this.factor = factor;
+    }
+
+    @Override
+    public void unsetAsFactor() {
+        this.factor = null;
     }
 
     @Override

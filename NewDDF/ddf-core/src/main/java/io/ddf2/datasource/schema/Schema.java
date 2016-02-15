@@ -15,7 +15,7 @@ import java.util.*;
  * Schema keeps list of IColumn in order.
  */
 @NotThreadSafe
-public class Schema implements ISchema {
+public abstract class Schema implements ISchema {
 
 
     // TODO: Actually do we have to keep column names? These can be get by scanning columns?
@@ -72,16 +72,6 @@ public class Schema implements ISchema {
     }
 
     @Override
-    public void computeFactorLevelsAndLevelCounts() throws DDFException {
-
-    }
-
-    @Override
-    public void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
-
-    }
-
-    @Override
     public IFactor setAsFactor(String columnName) throws DDFException {
         IFactor factor = null;
         IColumn column  = this.getColumn(columnName);
@@ -106,23 +96,26 @@ public class Schema implements ISchema {
             factor = new Factor<Timestamp>(this.associatedDDF, columnName);
         }
 
-        column.setFactor(factor);
+        column.setAsFactor(factor);
         return factor;
     }
 
     @Override
     public IFactor setAsFactor(int columnIndex) throws DDFException {
-        return null;
+        String columnName = this.getColumnName(columnIndex);
+        return this.setAsFactor(columnName);
     }
 
     @Override
-    public void unsetAsFactor(String columnName) {
-
+    public void unsetAsFactor(String columnName) throws DDFException {
+        IColumn column = this.getColumn(columnName);
+        column.unsetAsFactor();
     }
 
     @Override
-    public void unsetAsFactor(int columnIndex) {
-
+    public void unsetAsFactor(int columnIndex) throws DDFException {
+        String columnName = this.getColumnName(columnIndex);
+        this.unsetAsFactor(columnName);
     }
 
     @Override

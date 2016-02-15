@@ -27,9 +27,9 @@ public interface ISchema {
 
 	IFactor setAsFactor(int columnIndex) throws DDFException;
 
-	void unsetAsFactor(String columnName);
+	void unsetAsFactor(String columnName) throws DDFException;
 
-	void unsetAsFactor(int columnIndex);
+	void unsetAsFactor(int columnIndex) throws DDFException;
 
 	void setFactorLevels(String columnName, IFactor factor) throws DDFException;
 
