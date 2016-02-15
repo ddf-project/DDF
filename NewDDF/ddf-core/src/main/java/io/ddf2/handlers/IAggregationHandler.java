@@ -10,6 +10,7 @@ import io.ddf2.Utils;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,11 +105,15 @@ public interface IAggregationHandler extends IDDFHandler {
         private static final long serialVersionUID = -7809562958792876728L;
 
         protected AggregationResult(){}
+        
         public AggregationResult(ISqlResult sqlResult){
 
         }
-        //ToDo: @Jing implement Aggregation Result
+
         public AggregationResult(ISqlResult sqlResult,int numUnaggregatedFields){
+            assert sqlResult.next() && numUnaggregatedFields > 0;
+            List<Double> stats = new ArrayList<>();
+            // TODO: @sang we need an api in ISqlResult to get the width (column number) of the result.
 
         }
 
