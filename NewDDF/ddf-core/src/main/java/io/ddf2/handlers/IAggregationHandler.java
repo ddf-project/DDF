@@ -105,7 +105,7 @@ public interface IAggregationHandler extends IDDFHandler {
         private static final long serialVersionUID = -7809562958792876728L;
 
         protected AggregationResult(){}
-        
+
         public AggregationResult(ISqlResult sqlResult){
 
         }
