@@ -71,10 +71,10 @@ public class ViewHandler implements IViewHandler{
         // Copy the factor
         for (IColumn column : this.getDDF().getSchema().getColumns()) {
             if (projectedDDF.getSchema().getColumn(column.getName()) != null) {
-                Factor factor = column.getFactor();
-                if (factor != null) {
+                // Factor factor = column.getFactor();
+                //if (factor != null) {
                     // TODO: copy factor here
-                }
+                //}
             }
         }
         return projectedDDF;

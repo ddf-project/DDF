@@ -5,7 +5,7 @@ public interface IColumn {
 	// TODO: @sang, should we have our own column type instead of using java class. For example, the column type can be
 	// blob.
 	Class getType();
-	Factor getFactor();
+	IFactor getFactor();
 	boolean isNumeric();
 	boolean isIntegral();
 	boolean isFractional();

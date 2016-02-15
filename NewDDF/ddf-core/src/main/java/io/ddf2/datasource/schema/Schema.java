@@ -82,8 +82,8 @@ public class Schema implements ISchema {
     }
 
     @Override
-    public Factor<?> setAsFactor(String columnName) throws DDFException {
-        Factor<?> factor = null;
+    public IFactor setAsFactor(String columnName) throws DDFException {
+        IFactor factor = null;
         IColumn column  = this.getColumn(columnName);
         if (column == null) {
             throw new DDFException(String.format("Column : %s doesn't exist", columnName));
@@ -106,10 +106,12 @@ public class Schema implements ISchema {
             factor = new Factor<Timestamp>(this.associatedDDF, columnName);
         }
 
+        column.setFactor(factor);
+        return factor;
     }
 
     @Override
-    public Factor<?> setAsFactor(int columnIndex) throws DDFException {
+    public IFactor setAsFactor(int columnIndex) throws DDFException {
         return null;
     }
 
@@ -124,9 +126,9 @@ public class Schema implements ISchema {
     }
 
     @Override
-    public void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
+    public void setFactorLevels(String columnName, IFactor factor) throws DDFException {
         IColumn column = this.getColumn(columnName);
-        Factor<?> f = column.getFactor();
+        IFactor f = column.getFactor();
         if (f.getLevelCounts() != null) {
             f.setLevelCounts(factor.getLevelCounts());
         }

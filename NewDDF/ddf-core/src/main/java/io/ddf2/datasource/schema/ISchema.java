@@ -23,15 +23,15 @@ public interface ISchema {
 
 	void setFactorLevelsForStringColumns(String[] xCols) throws DDFException;
 
-	Factor<?> setAsFactor(String columnName) throws DDFException;
+	IFactor setAsFactor(String columnName) throws DDFException;
 
-	Factor<?> setAsFactor(int columnIndex) throws DDFException;
+	IFactor setAsFactor(int columnIndex) throws DDFException;
 
 	void unsetAsFactor(String columnName);
 
 	void unsetAsFactor(int columnIndex);
 
-	void setFactorLevels(String columnName, Factor<?> factor) throws DDFException;
+	void setFactorLevels(String columnName, IFactor factor) throws DDFException;
 
 	public void generateDummyCoding() throws NumberFormatException, DDFException;
 	 

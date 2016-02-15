@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class Column implements IColumn {
     protected String colName;
     protected Class dataType;
-    protected Factor factor;
+    protected IFactor factor;
 
     public Column(String colName, Class dataType){
         this.colName = colName;
@@ -32,7 +32,7 @@ public class Column implements IColumn {
     }
 
     @Override
-    public Factor getFactor() {
+    public IFactor getFactor() {
         return factor;
     }
 
@@ -49,7 +49,7 @@ public class Column implements IColumn {
 
     @Override
     public void setFactor(IFactor factor) {
-        // TODO: implement
+        this.factor = factor;
     }
 
     @Override
