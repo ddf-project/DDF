@@ -48,6 +48,11 @@ public class Column implements IColumn {
     }
 
     @Override
+    public void setFactor(IFactor factor) {
+        // TODO: implement
+    }
+
+    @Override
     public boolean isIntegral() {
         return dataType.equals(Byte.class) ||
                 dataType.equals(Short.class) ||

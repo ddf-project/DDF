@@ -4,7 +4,7 @@ package io.ddf2.datasource.schema;
  *
  */
 
-import io.ddf2.DDF;
+import io.ddf2.IDDF;
 import io.ddf2.DDFException;
 
 import java.io.Serializable;
@@ -48,7 +48,7 @@ public class Vector<T> implements Serializable {
    * @param theDDF
    * @param theColumnName
    */
-  public Vector(DDF theDDF, String theColumnName) {
+  public Vector(IDDF theDDF, String theColumnName) {
     this.initialize(theDDF, theColumnName);
   }
 
@@ -88,7 +88,7 @@ public class Vector<T> implements Serializable {
     */
   }
 
-  private void initialize(DDF theDDF, String name) {
+  private void initialize(IDDF theDDF, String name) {
     this.setDDF(theDDF);
     this.setDDFColumnName(name);
   }
@@ -98,7 +98,7 @@ public class Vector<T> implements Serializable {
    * The DDF that contains this vector
    */
 
-  private transient DDF mDDF;
+  private transient IDDF mDDF;
 
   /**
    * The name of the DDF column we are pointing to
@@ -109,14 +109,14 @@ public class Vector<T> implements Serializable {
   /**
    * @return the mDDF
    */
-  public DDF getDDF() {
+  public IDDF getDDF() {
     return mDDF;
   }
 
   /**
    * @param mDDF the mDDF to set
    */
-  public void setDDF(DDF mDDF) {
+  public void setDDF(IDDF mDDF) {
     this.mDDF = mDDF;
   }
 

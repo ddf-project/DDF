@@ -1,6 +1,7 @@
 package io.ddf2.datasource.schema;
 
 import io.ddf2.DDFException;
+import io.ddf2.IDDF;
 
 import org.apache.http.annotation.NotThreadSafe;
 
@@ -20,11 +21,12 @@ public class Schema implements ISchema {
     // TODO: Actually do we have to keep column names? These can be get by scanning columns?
     protected List<String> colNames;
     protected List<IColumn> columns;
+    // TODO: @sang I think we need an inverse reference to the ddf?
+    private IDDF associatedDDF;
 
     public Schema() {
         colNames = new ArrayList<>();
         columns = new ArrayList<>();
-
     }
 
     public Schema(Schema schema) {
@@ -33,7 +35,6 @@ public class Schema implements ISchema {
         columns.addAll(schema.getColumns());
         assert colNames.size() == columns.size();
     }
-
 
     @Override
     public int getNumColumn() {
@@ -82,7 +83,29 @@ public class Schema implements ISchema {
 
     @Override
     public Factor<?> setAsFactor(String columnName) throws DDFException {
-        return null;
+        Factor<?> factor = null;
+        IColumn column  = this.getColumn(columnName);
+        if (column == null) {
+            throw new DDFException(String.format("Column : %s doesn't exist", columnName));
+        }
+
+        Class columnType = column.getType();
+        if (columnType.equals(Double.class)) {
+            factor = new Factor<Double>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Float.class)) {
+            factor = new Factor<Float>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Integer.class)) {
+            factor = new Factor<Integer>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Long.class)) {
+            factor = new Factor<Long>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Boolean.class)) {
+            factor = new Factor<Boolean>(this.associatedDDF, columnName);
+        } else if (columnType.equals(String.class)) {
+            factor = new Factor<String>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Timestamp.class)) {
+            factor = new Factor<Timestamp>(this.associatedDDF, columnName);
+        }
+
     }
 
     @Override
@@ -102,7 +125,14 @@ public class Schema implements ISchema {
 
     @Override
     public void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
-
+        IColumn column = this.getColumn(columnName);
+        Factor<?> f = column.getFactor();
+        if (f.getLevelCounts() != null) {
+            f.setLevelCounts(factor.getLevelCounts());
+        }
+        if (f.getLevels() != null) {
+            f.setLevels(factor.getLevels());
+        }
     }
 
     @Override

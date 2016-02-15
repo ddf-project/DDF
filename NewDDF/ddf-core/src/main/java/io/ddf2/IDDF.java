@@ -17,7 +17,6 @@ import java.util.Map;
  */
 public interface IDDF {
 
-
     public IDataSource getDataSource();
 
     public String getDDFName();

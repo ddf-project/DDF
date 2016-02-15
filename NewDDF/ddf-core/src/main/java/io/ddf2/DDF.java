@@ -268,8 +268,6 @@ public abstract class DDF implements IDDF {
       ddf.ddfManager = ddfManager;
       return this;
     }
-
-
   }
 }
  

@@ -1,6 +1,6 @@
 package io.ddf2.datasource.schema;
 
-import io.ddf2.DDF;
+import io.ddf2.IDDF;
 import io.ddf2.DDFException;
 
 import java.io.Serializable;
@@ -72,7 +72,7 @@ import java.util.Map;
  * <li>http://www.psychstat.missouristate.edu/multibook/mlt08m.html</li>
  * </ul>
  */
-public class Factor<T> extends io.ddf2.datasource.schema.Vector<T> implements Serializable {
+public class Factor<T> extends io.ddf2.datasource.schema.Vector<T> implements Serializable, IFactor {
 
   /**
    * Instantiate a new Factor based on an existing DDF, given a column name. The column name is not verified for
@@ -81,15 +81,15 @@ public class Factor<T> extends io.ddf2.datasource.schema.Vector<T> implements Se
    * @param theDDF
    * @param theColumnName
    */
-  public Factor(DDF theDDF, String theColumnName) {
+  public Factor(IDDF theDDF, String theColumnName) {
     super(theDDF, theColumnName);
   }
 
   /**
    * Instantiate a new Factor with the given T array
    *
+   * @param name
    * @param data
-   * @param theColumnName
    * @throws DDFException
    */
   public Factor(String name, T[] data) throws DDFException {
@@ -99,8 +99,8 @@ public class Factor<T> extends io.ddf2.datasource.schema.Vector<T> implements Se
   /**
    * Instantiate a new Factor with the given T array
    *
+   * @param name
    * @param data
-   * @param theColumnName
    * @param engineName
    * @throws DDFException
    */
@@ -131,7 +131,6 @@ public class Factor<T> extends io.ddf2.datasource.schema.Vector<T> implements Se
    */
   public Map<String, Integer> computeLevelMap() throws DDFException {
     // TODO: retrieve the list of levels from the underlying data, e.g.,
-
     return mLevelMap;
   }
 

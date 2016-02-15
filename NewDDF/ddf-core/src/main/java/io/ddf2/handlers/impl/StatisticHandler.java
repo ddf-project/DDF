@@ -20,11 +20,6 @@ public abstract class StatisticHandler implements IStatisticHandler {
         this.ddf = ddf;
     }
 
-    // TODO (sang): Why these 2 functions are put in statisticHandler? I think it's for column types and should be in IColumn?
-    protected abstract boolean isIntegral(Class type);
-
-    protected abstract boolean isFractional(Class type);
-
     @Override
     public SimpleSummary[] getSimpleSummary() throws DDFException {
         List<IColumn> categoricalColumns = this.getCategoricalColumns();
