@@ -6,7 +6,6 @@ import com.google.common.base.Strings;
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
-import io.ddf2.datasource.schema.Factor;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IViewHandler;
 

@@ -132,12 +132,23 @@ public abstract class Schema implements ISchema {
 
     @Override
     public void copyFactor(IDDF ddf) throws DDFException {
-        // TODO: implement
+        this.copyFactor(ddf, null);
     }
 
     @Override
     public void copyFactor(IDDF ddf, List<String> columns) throws DDFException {
-
+        if (columns != null) {
+            for (IColumn column : ddf.getSchema().getColumns()) {
+                if (this.associatedDDF.getSchema().getColumn(column.getName()) != null
+                    && column.getFactor() != null) {
+                    this.associatedDDF.getSchema().setAsFactor(column.getName());
+                    if (!columns.contains(column.getName())) {
+                        this.associatedDDF.getSchema().setFactorLevels(column.getName(), column.getFactor());
+                    }
+                }
+            }
+        }
+        this.associatedDDF.getSchema().computeFactorLevelsAndLevelCounts();
     }
 
     @Override
