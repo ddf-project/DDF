@@ -18,7 +18,7 @@ import java.util.*;
 public abstract class Schema implements ISchema {
 
 
-    // TODO: Actually do we have to keep column names? These can be get by scanning columns?
+    // TODO: @sang Actually do we have to keep column names? These can be get by scanning columns?
     protected List<String> colNames;
     protected List<IColumn> columns;
     // TODO: @sang I think we need an inverse reference to the ddf?
@@ -131,6 +131,16 @@ public abstract class Schema implements ISchema {
     }
 
     @Override
+    public void copyFactor(IDDF ddf) throws DDFException {
+        // TODO: implement
+    }
+
+    @Override
+    public void copyFactor(IDDF ddf, List<String> columns) throws DDFException {
+
+    }
+
+    @Override
     public void generateDummyCoding() throws NumberFormatException, DDFException {
 
     }
@@ -172,7 +182,9 @@ public abstract class Schema implements ISchema {
         return new SchemaBuilder() {
             @Override
             public Schema newSchema() {
-                return new Schema();
+                // TODO
+                // return new Schema();
+                return null;
             }
 
             @Override
@@ -209,6 +221,7 @@ public abstract class Schema implements ISchema {
             }
         };
     }
+
     public static abstract class SchemaBuilder<T extends Schema> {
         protected T schema;
         protected abstract T newSchema();
@@ -232,6 +245,7 @@ public abstract class Schema implements ISchema {
             }
             return this;
         }
+
         /**
          * @param multiNameAndType a list of multi column name with type, seperate by comma
          *                    example. SchemaBuilder.add("username string, age int, birthdate date")
@@ -262,7 +276,5 @@ public abstract class Schema implements ISchema {
             this.add(multiNameAndType);
             return build();
         }
-
-
     }
 }
