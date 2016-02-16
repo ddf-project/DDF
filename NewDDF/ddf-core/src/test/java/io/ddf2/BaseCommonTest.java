@@ -8,6 +8,8 @@ import utils.TestUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -64,7 +66,11 @@ public class BaseCommonTest {
             String ddfName = itDDFName.next();
             ISchema ddfSchema = ddfMetaData.getDDFSchema(ddfName);
             assert  allDDFNameWithSchema.contains(new ImmutablePair<String,ISchema>(ddfName,ddfSchema));
+            System.out.println("--------------------------");
+            System.out.println(ddfName);
+            System.out.println(ddfSchema);
         }
+
 
     }
 }

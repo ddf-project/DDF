@@ -30,10 +30,12 @@ public class BigQueryMetaData implements IDDFMetaData {
             Set<String> ddfNames = new HashSet<>();
             DatasetList datasets = bigquery.datasets().list(BigQueryContext.getProjectId()).execute();
             for (DatasetList.Datasets dataset : datasets.getDatasets()) {
-                String datasetId = dataset.getId();
+                String datasetId = dataset.getDatasetReference().getDatasetId();
                 TableList tableList = bigquery.tables().list(BigQueryContext.getProjectId(), datasetId).execute();
-                for (TableList.Tables tables : tableList.getTables()) {
-                    ddfNames.add(String.format("%s.%s", datasetId, tables.getId()));
+                if (tableList.getTables() != null) {
+                    for (TableList.Tables tables : tableList.getTables()) {
+                        ddfNames.add(String.format("%s.%s", datasetId, tables.getTableReference().getTableId()));
+                    }
                 }
             }
             return ddfNames;
@@ -48,14 +50,16 @@ public class BigQueryMetaData implements IDDFMetaData {
             Set<Pair<String, ISchema>> ddfNameAndSchema = new HashSet<>();
             DatasetList datasets = bigquery.datasets().list(BigQueryContext.getProjectId()).execute();
             for (DatasetList.Datasets dataset : datasets.getDatasets()) {
-                String datasetId = dataset.getId();
+                String datasetId = dataset.getDatasetReference().getDatasetId();
                 TableList tableList = bigquery.tables().list(BigQueryContext.getProjectId(), datasetId).execute();
-                for (TableList.Tables tables : tableList.getTables()) {
-                    TableSchema schema = bigquery.tables().get(BigQueryContext.getProjectId(), datasetId, tables.getId()).execute().getSchema();
-                    String tableName = String.format("%s.%s", datasetId, tables.getId());
-                    ISchema tableSchema = BigQueryUtils.convertToDDFSchema(schema);
-                    Pair<String, ISchema> tableInfo = new ImmutablePair<>(tableName, tableSchema);
-                    ddfNameAndSchema.add(tableInfo);
+                if (tableList.getTables() != null) {
+                    for (TableList.Tables tables : tableList.getTables()) {
+                        TableSchema schema = bigquery.tables().get(BigQueryContext.getProjectId(), datasetId, tables.getTableReference().getTableId()).execute().getSchema();
+                        String tableName = String.format("%s.%s", datasetId, tables.getTableReference().getTableId());
+                        ISchema tableSchema = BigQueryUtils.convertToDDFSchema(schema);
+                        Pair<String, ISchema> tableInfo = new ImmutablePair<>(tableName, tableSchema);
+                        ddfNameAndSchema.add(tableInfo);
+                    }
                 }
             }
             return ddfNameAndSchema;
@@ -74,7 +78,7 @@ public class BigQueryMetaData implements IDDFMetaData {
             String datasetId = BigQueryUtils.TMP_VIEW_DATASET_ID;
             String tableName = ddfName;
             if (ddfName.contains(".")) {
-                String[] tmp = ddfName.split(".");
+                String[] tmp = ddfName.split("\\.");
                 datasetId = tmp[0];
                 tableName = tmp[1];
             }
@@ -99,7 +103,7 @@ public class BigQueryMetaData implements IDDFMetaData {
             for (DatasetList.Datasets dataset : datasets.getDatasets()) {
                 String datasetId = dataset.getId();
                 TableList tableList = bigquery.tables().list(BigQueryContext.getProjectId(), datasetId).execute();
-                numDDF +=tableList.size();
+                numDDF += tableList.size();
             }
             return numDDF;
         } catch (Exception e) {
