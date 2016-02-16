@@ -24,37 +24,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class BigQueryPreparer implements IDataSourcePreparer {
     protected Bigquery bigquery;
 
-    //ToDo: Move isFirstTime & hasTmpDataset to ThreadLocal
-    public static final AtomicBoolean isFirstTime = new AtomicBoolean(true);
-    public static final AtomicBoolean hasTmpDataSet = new AtomicBoolean(false);
+
+    protected ThreadLocal<Boolean> hasTmpDataSet =ThreadLocal.withInitial(() -> { return new Boolean(false);});
     public BigQueryPreparer(Bigquery bigquery) {
         this.bigquery = bigquery;
-//        removeOldView();
-
-
     }
 
-    private void removeOldView() {
-        try{
-            if(isFirstTime.get()==true){
-                synchronized (isFirstTime){
-                    if (isFirstTime.get()==true){
-                        bigquery.datasets().delete(BigQueryContext.getProjectId(), BigQueryUtils.TMP_VIEW_DATASET_ID).execute();
-                        isFirstTime.set(false);
-                    }
-                }
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
+
 
     @Override
     public IDataSource prepare(String ddfName, IDataSource dataSource) throws PrepareDataSourceException {
-        // TODO: @sang, I have 2 questions here.
-        // 1. Will this change be reflected on the bigquery part -> If user check his bigquery storage, will they see
-        // the view we created.
-        // 2. Does this operation have any permission requirement?
+
         try {
             ensureTmpViewDataSet();
             BQDataSource datasource = (BQDataSource) dataSource;
@@ -94,6 +74,7 @@ public class BigQueryPreparer implements IDataSourcePreparer {
      * @throws PrepareDataSourceException
      */
     private void ensureTmpViewDataSet() throws IOException, PrepareDataSourceException {
+
         if(hasTmpDataSet.get() == false){
             synchronized (hasTmpDataSet){
                 if(hasTmpDataSet.get()==false){

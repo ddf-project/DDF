@@ -11,8 +11,6 @@ import java.util.*;
 
 /**
  * Created by sangdn on 1/4/16.
- * <p>
- * Schema keeps list of IColumn in order.
  */
 @NotThreadSafe
 public  class Schema implements ISchema {
