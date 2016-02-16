@@ -34,7 +34,6 @@ public class BigQueryPreparer implements IDataSourcePreparer {
 
     @Override
     public IDataSource prepare(String ddfName, IDataSource dataSource) throws PrepareDataSourceException {
-
         try {
             ensureTmpViewDataSet();
             BQDataSource datasource = (BQDataSource) dataSource;
