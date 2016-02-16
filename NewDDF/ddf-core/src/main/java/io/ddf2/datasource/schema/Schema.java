@@ -16,7 +16,7 @@ import java.util.*;
 public  class Schema implements ISchema {
 
 
-    // TODO: @sang Actually do we have to keep column names? These can be get by scanning columns?
+
     protected List<String> colNames;
     protected List<IColumn> columns;
     // TODO: @sang I think we need an inverse reference to the ddf?

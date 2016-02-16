@@ -17,10 +17,7 @@ import java.util.Map;
  */
 public interface IDDF {
 
-    // Todo: @sang, should we add all the functional interfaces here?
-    // For example, transform(), agg().
-    // If we don't do these, users have to call ddf.getTransformationHandler().transform()
-    // I think from user's perspecitve, they should be able to call ddf.transform()
+
     public IDataSource getDataSource();
 
     public String getDDFName();

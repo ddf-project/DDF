@@ -130,7 +130,7 @@ public class Factor<T> extends io.ddf2.datasource.schema.Vector<T> implements Se
    * @throws DDFException
    */
   public Map<String, Integer> computeLevelMap() throws DDFException {
-    // TODO: retrieve the list of levels from the underlying data, e.g.,
+
     return mLevelMap;
   }
 

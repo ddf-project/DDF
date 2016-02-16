@@ -41,7 +41,7 @@ public class BaseCommonTest {
         ISqlResult sqlResult = ddf.sql("select * from " + ddf.getDDFName());
         while(sqlResult.next()){
             System.out.println(sqlResult.getRaw());
-//            assert sqlResult.getSchema().equals(schema); //ToDo review schema not same because of diff column order
+
         }
         System.out.println("Schema" + schema.toString());
         manager.getDDFMetaData().dropDDF(ddfName);

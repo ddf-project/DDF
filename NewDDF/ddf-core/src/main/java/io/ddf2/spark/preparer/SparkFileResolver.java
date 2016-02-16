@@ -73,7 +73,7 @@ public class SparkFileResolver implements ISchemaResolver {
 
     protected ISchema resolveJsonFileFormat(LocalFileDataSource LocalFileDataSource) throws PrepareDataSourceException {
         JSonFile jsonFile = (JSonFile) LocalFileDataSource.getFileFormat();
-        String sampleFile = LocalFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
+        String sampleFile = LocalFileDataSource.getPaths().get(0);
 
 
         DataFrame load = hiveContext.jsonFile(sampleFile);
@@ -85,7 +85,7 @@ public class SparkFileResolver implements ISchemaResolver {
 
     protected ISchema resolveParquet(LocalFileDataSource LocalFileDataSource) throws PrepareDataSourceException {
         ParquetFile parquetFile = (ParquetFile) LocalFileDataSource.getFileFormat();
-        String sampleFile = LocalFileDataSource.getPaths().get(0); //ToDo: select better samplefile (not empty..)
+        String sampleFile = LocalFileDataSource.getPaths().get(0);
 
         DataFrame load = hiveContext.parquetFile(sampleFile);
 
