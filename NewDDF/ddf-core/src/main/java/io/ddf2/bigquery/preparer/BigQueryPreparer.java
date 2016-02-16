@@ -51,6 +51,10 @@ public class BigQueryPreparer implements IDataSourcePreparer {
 
     @Override
     public IDataSource prepare(String ddfName, IDataSource dataSource) throws PrepareDataSourceException {
+        // TODO: @sang, I have 2 questions here.
+        // 1. Will this change be reflected on the bigquery part -> If user check his bigquery storage, will they see
+        // the view we created.
+        // 2. Does this operation have any permission requirement?
         try {
             ensureTmpViewDataSet();
             BQDataSource datasource = (BQDataSource) dataSource;

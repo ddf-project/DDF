@@ -1,6 +1,7 @@
 package io.ddf2.datasource.schema;
 
 import io.ddf2.DDFException;
+import io.ddf2.IDDF;
 
 import org.apache.http.annotation.NotThreadSafe;
 
@@ -14,17 +15,18 @@ import java.util.*;
  * Schema keeps list of IColumn in order.
  */
 @NotThreadSafe
-public class Schema implements ISchema {
+public  class Schema implements ISchema {
 
 
-    // TODO: Actually do we have to keep column names? These can be get by scanning columns?
+    // TODO: @sang Actually do we have to keep column names? These can be get by scanning columns?
     protected List<String> colNames;
     protected List<IColumn> columns;
+    // TODO: @sang I think we need an inverse reference to the ddf?
+    private IDDF associatedDDF;
 
     public Schema() {
         colNames = new ArrayList<>();
         columns = new ArrayList<>();
-
     }
 
     public Schema(Schema schema) {
@@ -33,7 +35,6 @@ public class Schema implements ISchema {
         columns.addAll(schema.getColumns());
         assert colNames.size() == columns.size();
     }
-
 
     @Override
     public int getNumColumn() {
@@ -70,6 +71,7 @@ public class Schema implements ISchema {
         return this.getColumnNames().indexOf(columnName);
     }
 
+    // TODO: @sang the schema class should be abstract and we should remove these 2 overrides later
     @Override
     public void computeFactorLevelsAndLevelCounts() throws DDFException {
 
@@ -81,28 +83,83 @@ public class Schema implements ISchema {
     }
 
     @Override
-    public Factor<?> setAsFactor(String columnName) throws DDFException {
-        return null;
+    public IFactor setAsFactor(String columnName) throws DDFException {
+        IFactor factor = null;
+        IColumn column  = this.getColumn(columnName);
+        if (column == null) {
+            throw new DDFException(String.format("Column : %s doesn't exist", columnName));
+        }
+
+        Class columnType = column.getType();
+        if (columnType.equals(Double.class)) {
+            factor = new Factor<Double>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Float.class)) {
+            factor = new Factor<Float>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Integer.class)) {
+            factor = new Factor<Integer>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Long.class)) {
+            factor = new Factor<Long>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Boolean.class)) {
+            factor = new Factor<Boolean>(this.associatedDDF, columnName);
+        } else if (columnType.equals(String.class)) {
+            factor = new Factor<String>(this.associatedDDF, columnName);
+        } else if (columnType.equals(Timestamp.class)) {
+            factor = new Factor<Timestamp>(this.associatedDDF, columnName);
+        }
+
+        column.setAsFactor(factor);
+        return factor;
     }
 
     @Override
-    public Factor<?> setAsFactor(int columnIndex) throws DDFException {
-        return null;
+    public IFactor setAsFactor(int columnIndex) throws DDFException {
+        String columnName = this.getColumnName(columnIndex);
+        return this.setAsFactor(columnName);
     }
 
     @Override
-    public void unsetAsFactor(String columnName) {
-
+    public void unsetAsFactor(String columnName) throws DDFException {
+        IColumn column = this.getColumn(columnName);
+        column.unsetAsFactor();
     }
 
     @Override
-    public void unsetAsFactor(int columnIndex) {
-
+    public void unsetAsFactor(int columnIndex) throws DDFException {
+        String columnName = this.getColumnName(columnIndex);
+        this.unsetAsFactor(columnName);
     }
 
     @Override
-    public void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
+    public void setFactorLevels(String columnName, IFactor factor) throws DDFException {
+        IColumn column = this.getColumn(columnName);
+        IFactor f = column.getFactor();
+        if (f.getLevelCounts() != null) {
+            f.setLevelCounts(factor.getLevelCounts());
+        }
+        if (f.getLevels() != null) {
+            f.setLevels(factor.getLevels());
+        }
+    }
 
+    @Override
+    public void copyFactor(IDDF ddf) throws DDFException {
+        this.copyFactor(ddf, null);
+    }
+
+    @Override
+    public void copyFactor(IDDF ddf, List<String> columns) throws DDFException {
+        if (columns != null) {
+            for (IColumn column : ddf.getSchema().getColumns()) {
+                if (this.associatedDDF.getSchema().getColumn(column.getName()) != null
+                    && column.getFactor() != null) {
+                    this.associatedDDF.getSchema().setAsFactor(column.getName());
+                    if (!columns.contains(column.getName())) {
+                        this.associatedDDF.getSchema().setFactorLevels(column.getName(), column.getFactor());
+                    }
+                }
+            }
+        }
+        this.associatedDDF.getSchema().computeFactorLevelsAndLevelCounts();
     }
 
     @Override
@@ -184,6 +241,7 @@ public class Schema implements ISchema {
             }
         };
     }
+
     public static abstract class SchemaBuilder<T extends Schema> {
         protected T schema;
         protected abstract T newSchema();
@@ -207,6 +265,7 @@ public class Schema implements ISchema {
             }
             return this;
         }
+
         /**
          * @param multiNameAndType a list of multi column name with type, seperate by comma
          *                    example. SchemaBuilder.add("username string, age int, birthdate date")
@@ -237,7 +296,5 @@ public class Schema implements ISchema {
             this.add(multiNameAndType);
             return build();
         }
-
-
     }
 }

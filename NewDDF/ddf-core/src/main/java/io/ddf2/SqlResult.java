@@ -27,6 +27,7 @@ public class SqlResult implements ISqlResult {
         this.itResult = iterable;
         iterator = itResult.iterator();
     }
+
     @Override
     public void close() {
         itResult = null;

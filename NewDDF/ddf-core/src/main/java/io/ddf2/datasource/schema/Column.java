@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class Column implements IColumn {
     protected String colName;
     protected Class dataType;
-    protected Factor factor;
+    protected IFactor factor;
 
     public Column(String colName, Class dataType){
         this.colName = colName;
@@ -32,7 +32,7 @@ public class Column implements IColumn {
     }
 
     @Override
-    public Factor getFactor() {
+    public IFactor getFactor() {
         return factor;
     }
 
@@ -45,6 +45,16 @@ public class Column implements IColumn {
         return dataType.equals(Float.class) ||
                 dataType.equals(Double.class) ||
                 dataType.equals(BigDecimal.class);
+    }
+
+    @Override
+    public void setAsFactor(IFactor factor) {
+        this.factor = factor;
+    }
+
+    @Override
+    public void unsetAsFactor() {
+        this.factor = null;
     }
 
     @Override

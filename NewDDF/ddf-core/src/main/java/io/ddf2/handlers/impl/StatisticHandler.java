@@ -20,11 +20,6 @@ public abstract class StatisticHandler implements IStatisticHandler {
         this.ddf = ddf;
     }
 
-    // TODO (sang): Why these 2 functions are put in statisticHandler? I think it's for column types and should be in IColumn?
-    protected abstract boolean isIntegral(Class type);
-
-    protected abstract boolean isFractional(Class type);
-
     @Override
     public SimpleSummary[] getSimpleSummary() throws DDFException {
         List<IColumn> categoricalColumns = this.getCategoricalColumns();
@@ -134,23 +129,47 @@ public abstract class StatisticHandler implements IStatisticHandler {
         if (listPercentiles.size() > 0) {
             IColumn column = ddf.getSchema().getColumn(columnName);
             if (column.isIntegral()) {
-                sqlSelect.add(String.format("percentile(%s,array(%s))", columnName, StringUtils.join(listPercentiles, ",")));
+                sqlSelect.add(String.format("PERCENTILE(%s, ARRAY(%s))", columnName, StringUtils.join(listPercentiles,
+                    ", ")));
             } else if (column.isFractional()) {
-                sqlSelect.add(String.format("percentile_approx(%s,array(%s))", columnName, StringUtils.join(listPercentiles, ",")));
+                sqlSelect.add(String.format("PERCENTILE_APPROX(%s, ARRAY(%s))", columnName, StringUtils.join
+                    (listPercentiles, ", ")));
             } else {
                 throw new DDFException("Only support numeric vectors!!!");
             }
         }
-        if (hasZero) sqlSelect.add("min(" + columnName + ")");
-        if (hasOne) sqlSelect.add("max(" + columnName + ")");
+        if (hasZero) sqlSelect.add("MIN(" + columnName + ")");
+        if (hasOne) sqlSelect.add("MAX(" + columnName + ")");
 
 
         String sqlCmd = String.format("SELECT %s FROM %s", StringUtils.join(sqlSelect, ","), ddf.getDDFName());
 
         ISqlResult sqlResult = ddf.sql(sqlCmd);
 
-        //Todo: @Jing plz help to parse the result. I don't know which kind we want to parse here.
-        return new Double[0];
+        if (!sqlResult.next()) {
+            throw new DDFException(String.format("Can't get quantiles for column %s", columnName));
+        }
+
+        HashMap<Double, Double> mappedValues = new HashMap<Double, Double>();
+        for (int i = 0; i < listPercentiles.size(); ++i) {
+            mappedValues.put(listPercentiles.get(i), sqlResult.getDouble(i));
+        }
+
+        if (hasZero && hasOne) {
+            mappedValues.put(0.0, sqlResult.getDouble(listPercentiles.size() + 1));
+            mappedValues.put(1.0, sqlResult.getDouble(listPercentiles.size()));
+        } else if (hasOne) {
+            mappedValues.put(1.0, sqlResult.getDouble(listPercentiles.size()));
+        } else if (hasZero) {
+            mappedValues.put(0.0, sqlResult.getDouble(listPercentiles.size()));
+        }
+
+        Double[] ret = new Double[percentiles.length];
+        for (int i = 0; i < percentiles.length; ++i) {
+            ret[i] = mappedValues.get(percentiles[i]);
+        }
+
+        return ret;
     }
 
     @Override
@@ -231,7 +250,6 @@ public abstract class StatisticHandler implements IStatisticHandler {
     private List<IColumn> getCategoricalColumns() {
         List<IColumn> columns = new ArrayList<IColumn>();
         for(IColumn column: this.getDDF().getSchema().getColumns()) {
-            // TODO: how to check factor
             if(column.getFactor() != null) {
                 columns.add(column);
             }
