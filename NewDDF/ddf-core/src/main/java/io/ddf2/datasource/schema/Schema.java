@@ -15,7 +15,7 @@ import java.util.*;
  * Schema keeps list of IColumn in order.
  */
 @NotThreadSafe
-public abstract class Schema implements ISchema {
+public  class Schema implements ISchema {
 
 
     // TODO: @sang Actually do we have to keep column names? These can be get by scanning columns?
@@ -69,6 +69,17 @@ public abstract class Schema implements ISchema {
     @Override
     public int getColumnIndex(String columnName) throws DDFException {
         return this.getColumnNames().indexOf(columnName);
+    }
+
+    // TODO: @sang the schema class should be abstract and we should remove these 2 overrides later
+    @Override
+    public void computeFactorLevelsAndLevelCounts() throws DDFException {
+
+    }
+
+    @Override
+    public void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
+
     }
 
     @Override
@@ -193,9 +204,7 @@ public abstract class Schema implements ISchema {
         return new SchemaBuilder() {
             @Override
             public Schema newSchema() {
-                // TODO
-                // return new Schema();
-                return null;
+                return new Schema();
             }
 
             @Override

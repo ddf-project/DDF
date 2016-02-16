@@ -250,7 +250,6 @@ public abstract class StatisticHandler implements IStatisticHandler {
     private List<IColumn> getCategoricalColumns() {
         List<IColumn> columns = new ArrayList<IColumn>();
         for(IColumn column: this.getDDF().getSchema().getColumns()) {
-            // TODO: how to check factor
             if(column.getFactor() != null) {
                 columns.add(column);
             }

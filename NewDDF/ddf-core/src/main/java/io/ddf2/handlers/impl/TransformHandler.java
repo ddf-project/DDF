@@ -54,7 +54,7 @@ public class TransformHandler implements ITransformHandler{
         sqlCmdBuffer.append("FROM ").append(this.getDDF().getDDFName());
 
         IDDF newddf = this.getDDF().sql2ddf(sqlCmdBuffer.toString());
-        // TODO factor
+        newddf.getSchema().copyFactor(this.getDDF());
         return newddf;
     }
 

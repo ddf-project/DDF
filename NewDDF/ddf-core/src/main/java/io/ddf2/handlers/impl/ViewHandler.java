@@ -7,6 +7,7 @@ import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
 import io.ddf2.datasource.schema.IColumn;
+import io.ddf2.datasource.schema.IFactor;
 import io.ddf2.handlers.IViewHandler;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class ViewHandler implements IViewHandler{
     }
     @Override
     public ISqlResult getRandomSample(int numSamples, boolean withReplacement) throws DDFException {
-        return ddf.sql(buildRandomSampleSql(numSamples,withReplacement));
+        return ddf.sql(buildRandomSampleSql(numSamples, withReplacement));
     }
 
     /**
@@ -70,10 +71,17 @@ public class ViewHandler implements IViewHandler{
         // Copy the factor
         for (IColumn column : this.getDDF().getSchema().getColumns()) {
             if (projectedDDF.getSchema().getColumn(column.getName()) != null) {
-                // Factor factor = column.getFactor();
-                //if (factor != null) {
-                    // TODO: copy factor here
-                //}
+                IFactor factor = column.getFactor();
+                if (factor != null) {
+                    projectedDDF.getSchema().setAsFactor(column.getName());
+                    IFactor newFactor = projectedDDF.getSchema().getColumn(column.getName()).getFactor();
+                    if (factor.getLevelCounts() != null) {
+                        newFactor.setLevelCounts(factor.getLevelCounts());
+                    }
+                    if (factor.getLevels() != null) {
+                        newFactor.setLevels(factor.getLevels());
+                    }
+                }
             }
         }
         return projectedDDF;

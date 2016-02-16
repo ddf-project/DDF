@@ -26,8 +26,7 @@ public abstract class BinningHandler implements io.ddf2.handlers.IBinningHandler
         } else if (binningType.equalsIgnoreCase("equalfreq")) {
             return this.binningEqFreq(column, numBins, includeLowest, right);
         }
-        // TODO: return null here?
-        return null;
+        throw new DDFException(String.format("Unsupported binning type: %s", binningType));
     }
 
     @Override
