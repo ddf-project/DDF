@@ -18,8 +18,8 @@ public class DataSourceResolver {
 
   public static DataSourceDescriptor resolve(String source,
                         Map<String, String> options) throws DDFException, URISyntaxException {
-    switch (source) {
-      case "S3": {
+    switch (source.toLowerCase()) {
+      case "s3": {
         return resolveS3(options);
       }
       case "hdfs": {

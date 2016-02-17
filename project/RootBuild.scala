@@ -46,6 +46,9 @@ object RootBuild extends Build {
   val sparkProjectName = "ddf_spark"
   val sparkVersion = rootVersion
 
+  val s3ProjectName = "ddf_s3"
+  val s3Version = rootVersion
+  
   val testProjectName = "ddf_test"
   val testVersion = rootVersion
 
@@ -65,12 +68,12 @@ object RootBuild extends Build {
 
 
   // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples, test_ddf)
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, s3, examples, test_ddf)
   lazy val core = Project("core", file("core"), settings = coreSettings)
   lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (core)
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core)
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core, s3)
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
-
+  lazy val s3 = Project("s3", file("s3"), settings = s3Settings) dependsOn (core)
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend(Compile)
   lazy val publishLocalBoth = TaskKey[Unit]("publish-local", "publish local for m2 and ivy")
@@ -111,6 +114,7 @@ object RootBuild extends Build {
   val scalaDependencies = scalaArtifacts.map( artifactId => "org.scala-lang" % artifactId % theScalaVersion)
 
   val spark_dependencies = Seq(
+    "com.databricks" % "spark-csv_2.10" % "1.3.0",
     "commons-configuration" % "commons-configuration" % "1.6",
     "com.google.code.gson"% "gson" % "2.2.2",
     "com.novocode" % "junit-interface" % "0.10" % "test",
@@ -129,6 +133,10 @@ object RootBuild extends Build {
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
     "com.google.protobuf" % "protobuf-java" % "2.5.0",
     "com.databricks" % "spark-csv_2.10" % "1.3.0"
+  )
+  
+  val s3_dependencies = Seq(
+    "com.amazonaws" % "aws-java-sdk" % "1.10.8"
   )
 
   val test_dependencies = Seq(
@@ -202,7 +210,7 @@ object RootBuild extends Build {
     publishMavenStyle in MavenCompile := true,
     publishLocal in MavenCompile <<= publishTask(publishLocalConfiguration in MavenCompile, deliverLocal),
     publishLocalBoth <<= Seq(publishLocal in MavenCompile, publishLocal).dependOn,
-
+    publishArtifact in (Compile, packageDoc) := false,
 
     dependencyOverrides += "commons-lang" % "commons-lang" % "2.6",
     dependencyOverrides += "it.unimi.dsi" % "fastutil" % "6.4.4",
@@ -210,7 +218,7 @@ object RootBuild extends Build {
     dependencyOverrides += "org.slf4j" % "slf4j-api" % slf4jVersion,
     dependencyOverrides += "org.slf4j" % "slf4j-log4j12" % slf4jVersion,
     dependencyOverrides += "commons-io" % "commons-io" % "2.4", //tachyon 0.2.1
-    dependencyOverrides += "org.apache.httpcomponents" % "httpclient" % "4.1.3", //libthrift
+    dependencyOverrides += "org.apache.httpcomponents" % "httpclient" % "4.4.1", //libthrift
     dependencyOverrides += "com.google.guava" % "guava" % "14.0.1", //spark-core
     dependencyOverrides += "org.codehaus.jackson" % "jackson-core-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
@@ -221,7 +229,7 @@ object RootBuild extends Build {
     dependencyOverrides += "com.google.code.findbugs" % "jsr305" % "2.0.1",
     dependencyOverrides += "com.thoughtworks.paranamer" % "paranamer" % "2.4.1", //net.liftweb conflict with avro
     dependencyOverrides += "org.xerial.snappy" % "snappy-java" % "1.0.5", //spark-core conflicts with avro
-    dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.1.4",
+    dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.4.1",
     dependencyOverrides += "org.apache.avro" % "avro-ipc" % "1.7.4",
     dependencyOverrides += "org.apache.avro" % "avro" % "1.7.4",
     dependencyOverrides += "org.apache.zookeeper" % "zookeeper" % "3.4.5",
@@ -277,10 +285,10 @@ object RootBuild extends Build {
               <version>2.15</version>
               <configuration>
                 <reuseForks>false</reuseForks>
-                <enableAssertions>false</enableAssertions>
-                <environmentVariables>
-                    <RSERVER_JAR>${{basedir}}/{targetDir}/*.jar,${{basedir}}/{targetDir}/lib/*</RSERVER_JAR>              
-                </environmentVariables>
+	<enableAssertions>false</enableAssertions>
+        <environmentVariables>
+		 <RSERVER_JAR>${{basedir}}/{targetDir}/*.jar,${{basedir}}/{targetDir}/lib/*</RSERVER_JAR>
+	</environmentVariables> 
                 <systemPropertyVariables>
                   <spark.serializer>org.apache.spark.serializer.KryoSerializer</spark.serializer>
                   <spark.kryo.registrator>io.ddf.spark.content.KryoRegistrator</spark.kryo.registrator>
@@ -518,6 +526,13 @@ object RootBuild extends Build {
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch examples/" + targetDir + "/*timestamp") }
   ) ++ assemblySettings ++ extraAssemblySettings
 
+  def s3Settings = commonSettings ++ Seq(
+    name := s3ProjectName,
+    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch s3/" + targetDir + "/*timestamp") },
+    testOptions in Test += Tests.Argument("-oI"),
+    libraryDependencies ++= s3_dependencies
+  ) ++ assemblySettings ++ extraAssemblySettings
+  
   def testSettings = commonSettings ++ Seq(
     name := testProjectName,
     libraryDependencies ++= test_dependencies,

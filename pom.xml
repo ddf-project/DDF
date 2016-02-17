@@ -60,7 +60,8 @@
 	<modules>
 	  	<module>core</module>
 	  	<module>spark</module>
-	  	<module>examples</module>
+	  	<module>s3</module>
+		<module>examples</module>
 		<module>ddf-test</module>
 	</modules>
 

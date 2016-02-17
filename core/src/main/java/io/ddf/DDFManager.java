@@ -86,26 +86,15 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     POSTGRES,
     AWS,
     REDSHIFT,
-    BASIC
+    BASIC,
+    S3
     ;
 
     public static EngineType fromString(String str) throws DDFException {
-      if (str.equalsIgnoreCase("spark")) {
-        return SPARK;
-      } else if (str.equalsIgnoreCase("jdbc")) {
-        return JDBC;
-      } else if (str.equalsIgnoreCase("sfdc")) {
-        return SFDC;
-      } else if (str.equalsIgnoreCase("postgres")) {
-        return POSTGRES;
-      } else if(str.equalsIgnoreCase("aws")) {
-        return AWS;
-      } else if(str.equalsIgnoreCase("redshift")) {
-        return REDSHIFT;
-      } else if(str.equalsIgnoreCase("basic")) {
-        return BASIC;
-      } else {
-        throw new DDFException("Engine type should be either spark, jdbc, postgres, aws, redshift, basic");
+      try {
+        return EngineType.valueOf(str.toUpperCase());
+      } catch (RuntimeException e) {
+        throw new DDFException("Unknown engine type: " + str, e);
       }
     }
   }
@@ -269,8 +258,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
 
     try {
       Class[] classType = new Class[2];
-      classType[0] = DataSourceDescriptor.class;
-      classType[1] = EngineType.class;
+      classType[0] = dataSourceDescriptor.getClass();
+      classType[1] = engineType.getClass();
 
       DDFManager manager = (DDFManager) Class.forName(className).getDeclaredConstructor(classType)
           .newInstance(dataSourceDescriptor, engineType);
@@ -652,6 +641,14 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   public DDF load(DataSourceDescriptor ds) throws DDFException {
     return (new DataSourceManager()).load(ds, this);
   }
+
+  /**
+   * @brief Copy the ddf content and return a local ddf.
+   * @param fromDDF The ddf from other engine. From example, copy a s3DDF/JDBCDDF into spark.
+   * @return
+   * @throws DDFException
+   */
+  public abstract DDF copyFrom(DDF fromDDF) throws DDFException;
 
   public abstract DDF createDDF(Map<Object, Object> options) throws DDFException;
 

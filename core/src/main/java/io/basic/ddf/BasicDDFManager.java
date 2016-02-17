@@ -65,8 +65,8 @@ public class BasicDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF createDDF(Map<Object, Object> options) throws DDFException {
-    throw new UnsupportedOperationException();
+  public DDF copyFrom(DDF fromDDF) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
   }
 
   @Override
@@ -79,3 +79,8 @@ public class BasicDDFManager extends DDFManager {
     return "basic://";
   }
 }
+
+ @Override
+  public DDF createDDF(Map<Object, Object> options) throws DDFException {
+    throw new UnsupportedOperationException();
+  }
