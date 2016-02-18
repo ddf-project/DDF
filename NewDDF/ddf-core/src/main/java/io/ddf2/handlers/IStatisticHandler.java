@@ -3,8 +3,6 @@ package io.ddf2.handlers;
 import com.google.common.base.Joiner;
 import io.ddf2.DDFException;
 import io.ddf2.Utils;
-import io.ddf2.analytics.FiveNumSummary;
-import io.ddf2.analytics.SimpleSummary;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,6 +10,7 @@ import java.util.List;
 public interface IStatisticHandler extends IDDFHandler {
     /**
      * Get summary for the ddf.
+     *
      * @return
      * @throws DDFException
      */
@@ -19,6 +18,7 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get min/max for numeric columns, list of distinct values for categorical columns
+     *
      * @return
      * @throws DDFException
      */
@@ -26,6 +26,7 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get five num (0, 0.25, 0.5, 0.75 and 1 percentile) summary
+     *
      * @return
      * @throws DDFException
      */
@@ -33,7 +34,8 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get values at the given percentiles.
-     * @param columnName The name of the column.
+     *
+     * @param columnName  The name of the column.
      * @param percentiles The percentiles.
      * @return
      * @throws DDFException
@@ -42,6 +44,7 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get variance for the column data.
+     *
      * @param columnName The column name.
      * @return
      * @throws DDFException
@@ -50,6 +53,7 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get mean value for the column name.
+     *
      * @param columnName The column name.
      * @return
      * @throws DDFException
@@ -58,6 +62,7 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get correlation between the two columns.
+     *
      * @param xColumnName The first column name.
      * @param yColumnName The second column name.
      * @return
@@ -67,6 +72,7 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get covariance between the two columns.
+     *
      * @param xColumnName The first column name.
      * @param yColumnName The second column name.
      * @return
@@ -76,6 +82,7 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get min value for the column.
+     *
      * @param columnName The column name.
      * @return
      * @throws DDFException
@@ -84,6 +91,7 @@ public interface IStatisticHandler extends IDDFHandler {
 
     /**
      * Get max value for the column.
+     *
      * @param columnName The column name.
      * @return
      * @throws DDFException
@@ -94,7 +102,6 @@ public interface IStatisticHandler extends IDDFHandler {
     /**
      * Basic statistics for a set of double numbers including min, max, count,
      * NAcount, mean, variance and stdev
-     *
      */
     @SuppressWarnings("serial")
     public class Summary implements Serializable {
@@ -245,5 +252,84 @@ public interface IStatisticHandler extends IDDFHandler {
                     Utils.roundUp(max()));
         }
     }
+
+    public class FiveNumSummary implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+        private double mMin = 0;
+        private double mMax = 0;
+        private double mFirst_quantile = 0;
+        private double mMedian = 0;
+        private double mThird_quantile = 0;
+
+
+        public FiveNumSummary() {
+
+        }
+
+        public FiveNumSummary(double mMin, double mMax, double first_quantile, double median, double third_quantile) {
+            this.mMin = mMin;
+            this.mMax = mMax;
+            this.mFirst_quantile = first_quantile;
+            this.mMedian = median;
+            this.mThird_quantile = third_quantile;
+        }
+
+        public double getMin() {
+            return mMin;
+        }
+
+        public void setMin(double mMin) {
+            this.mMin = mMin;
+        }
+
+        public double getMax() {
+            return mMax;
+        }
+
+        public void setMax(double mMax) {
+            this.mMax = mMax;
+        }
+
+        public double getFirstQuantile() {
+            return mFirst_quantile;
+        }
+
+        public void setFirstQuantile(double mFirst_quantile) {
+            this.mFirst_quantile = mFirst_quantile;
+        }
+
+        public double getMedian() {
+            return mMedian;
+        }
+
+        public void setMedian(double mMedian) {
+            this.mMedian = mMedian;
+        }
+
+        public double getThirdQuantile() {
+            return mThird_quantile;
+        }
+
+        public void setThirdQuantile(double mThird_quantile) {
+            this.mThird_quantile = mThird_quantile;
+        }
+
+    }
+
+    public abstract class SimpleSummary implements Serializable {
+
+        private String mColumnName;
+
+        public String getColumnName() {
+            return this.mColumnName;
+        }
+
+        public void setColumnName(String colName) {
+            this.mColumnName = colName;
+        }
+    }
+
+
 }
  

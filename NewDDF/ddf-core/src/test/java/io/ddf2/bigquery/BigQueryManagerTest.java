@@ -59,6 +59,7 @@ public class BigQueryManagerTest {
             Object row = sqlResult.getRaw();
             System.out.println(row.toString());
         }
+        assert ddf.equals(ddfManager.getDDF(ddfName));
     }
 
 
