@@ -3,10 +3,6 @@ package io.ddf2.handlers.impl;
 import io.ddf2.DDFException;
 import io.ddf2.IDDF;
 import io.ddf2.ISqlResult;
-import io.ddf2.analytics.CategoricalSimpleSummary;
-import io.ddf2.analytics.FiveNumSummary;
-import io.ddf2.analytics.NumericSimpleSummary;
-import io.ddf2.analytics.SimpleSummary;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IStatisticHandler;
 import org.apache.commons.lang.StringUtils;
@@ -265,6 +261,38 @@ public abstract class StatisticHandler implements IStatisticHandler {
            }
         }
         return columns;
+    }
+
+    public class CategoricalSimpleSummary extends SimpleSummary{
+        private List<String> values;
+
+        public void setValues(List<String> values) {
+            this.values = values;
+        }
+
+        public List<String> getValues() {
+            return this.values;
+        }
+    }
+    public class NumericSimpleSummary extends SimpleSummary {
+        private double min;
+        private double max;
+
+        public void setMin(double min) {
+            this.min = min;
+        }
+
+        public void setMax(double max) {
+            this.max = max;
+        }
+
+        public double getMin() {
+            return this.min;
+        }
+
+        public double getMax() {
+            return this.max;
+        }
     }
 }
 
