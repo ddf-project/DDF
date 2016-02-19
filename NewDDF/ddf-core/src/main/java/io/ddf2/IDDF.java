@@ -54,6 +54,9 @@ public interface IDDF {
 
     @Deprecated
     public ITransformHandler getTransformHandler();
+
+    //TODO @jing please check transform function
+    // [?] Should we change function name
     //<editor-fold desc="StatisticHandler Api">
 
     /**
@@ -195,58 +198,100 @@ public interface IDDF {
     IAggregationHandler.AggregationResult aggregate(List<IAggregationHandler.AggregateField> fields) throws DDFException;
 
     /**
-     * Do aggregation on a single column.
-     * @param column The column name.
-     * @param function The function on this column, e.g. "max(columnName)"
-     * @return
-     * @throws DDFException
+     * @see IAggregationHandler#aggregate(String, IAggregationHandler.AggregateFunction)
      */
     double aggregate(String column, IAggregationHandler.AggregateFunction function) throws DDFException;
 
-//    /**
-//     * this function need to called after groupby so we shouldn't use it.
-//     * use Aggregation with groupedColumns instead @see groupBy
-//     *
-//     * @param aggregateFunctions
-//     * @return
-//     * @throws DDFException
-//     */
-//    @Deprecated
-//    IDDF agg(List<String> aggregateFunctions) throws DDFException;
-//
-//    /**
-//     * Set columns to group by.
-//     * @param groupedColumns The columns to group by.
-//     * @return
-//     */
-//    @Deprecated
-//    IDDF groupBy(List<String> groupedColumns);
 
     /**
-     * Do aggregation.
-     * @param columns The columns used to do group by.
-     * @param functions The functions that will be used in select statement, e.g. "avg(depdealy)".
-     * @return
-     * @throws DDFException
+     * @see IAggregationHandler#groupBy(List, List)
      */
     IDDF groupBy(List<String> columns, List<String> functions) throws DDFException;
 
     /**
-     * Create a contingency table (optionally a sparse matrix) from cross-classifying factors.
-     * @param fields
-     * @return
-     * @throws DDFException
+     * @see IAggregationHandler#xtabs(List)
      */
     @Deprecated
-    AggregationResult xtabs(List<AggregateField> fields) throws DDFException;
+    IAggregationHandler.AggregationResult xtabs(List<IAggregationHandler.AggregateField> fields) throws DDFException;
 
-    AggregationResult xtabs(String fields) throws DDFException;
+    /**
+     * @see IAggregationHandler#xtabs(String)
+     */
+    IAggregationHandler.AggregationResult xtabs(String fields) throws DDFException;
 
     //</editor-fold>
     //<editor-fold desc="BinningHandler API>
 
+    /**
+     * @see IBinningHandler#binning(String, String, int, double[], boolean, boolean)
+     */
+    @Deprecated
+    public IDDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
+                        boolean right) throws DDFException;
+
+    /**
+     * @see IBinningHandler#binningCustom(String, double[], boolean, boolean)
+     */
+    public IDDF binningCustom(String column,double[] breaks, boolean includeLowest,boolean right) throws DDFException;
+
+    /**
+     * @see IBinningHandler#binningEq(String, int, boolean, boolean)
+     */
+    public IDDF binningEq(String column,int numBins, boolean includeLowest,boolean right) throws DDFException;
+
+    /**
+     * @see IBinningHandler#binningEqFreq(String, int, boolean, boolean)
+     */
+    public IDDF binningEqFreq(String column,int numBins, boolean includeLowest,boolean right) throws DDFException;
+
     //</editor-fold>
     //<editor-fold desc="TransformHandler API>
+
+    /**
+     * @see ITransformHandler#transformScaleMinMax()
+     */
+    IDDF transformScaleMinMax() throws DDFException;
+
+    /**
+     * @see ITransformHandler#transformScaleStandard()
+     */
+    IDDF transformScaleStandard() throws DDFException;
+
+    /**
+     * @see ITransformHandler#transformNativeRserve(String)
+     */
+    IDDF transformNativeRserve(String transformExpression);
+
+    /**
+     * @see ITransformHandler#transformNativeRserve(String[])
+     */
+    IDDF transformNativeRserve(String[] transformExpression);
+
+    /**
+     * @see ITransformHandler#transformPython(String[], String[], String[], String[][])
+     */
+    IDDF transformPython(String[] transformFunctions, String[] functionNames,
+                         String[] destColumns, String[][] sourceColumns);
+
+    /**
+     * @see ITransformHandler#transformMapReduceNative(String, String, boolean)
+     */
+    IDDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine);
+
+    /**
+     * @see ITransformHandler#transformUDF(List, List)
+     */
+    public IDDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException;
+
+    /**
+     * @see ITransformHandler#flattenDDF(String[])
+     */
+    IDDF flattenDDF(String[] columns) throws DDFException;
+
+    /**
+     * @see ITransformHandler#flattenDDF()
+     */
+    IDDF flattenDDF() throws DDFException;
 
     //</editor-fold>
 
