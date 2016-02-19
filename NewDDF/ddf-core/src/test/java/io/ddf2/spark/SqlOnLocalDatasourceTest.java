@@ -63,6 +63,8 @@ public class SqlOnLocalDatasourceTest {
 
         ddfManager.getDDFMetaData().dropDDF("DDF_USER_INFO");
         IDDF ddf = ddfManager.newDDF("DDF_USER_INFO", localFileDataSource);
+//        SparkDDF ddf = ddfManager.newDDF("DDF_USER_INFO", localFileDataSource);
+
         ISqlResult sql = ddf.sql("select username as name,age,married,birthday from " + ddf.getDDFName());
         while(sql.next()){
             System.out.println(sql.getRaw());

@@ -260,23 +260,23 @@ public interface IDDF {
     /**
      * @see ITransformHandler#transformNativeRserve(String)
      */
-    IDDF transformNativeRserve(String transformExpression);
+    IDDF transformNativeRserve(String transformExpression) throws DDFException;
 
     /**
      * @see ITransformHandler#transformNativeRserve(String[])
      */
-    IDDF transformNativeRserve(String[] transformExpression);
+    IDDF transformNativeRserve(String[] transformExpression) throws DDFException;
 
     /**
      * @see ITransformHandler#transformPython(String[], String[], String[], String[][])
      */
     IDDF transformPython(String[] transformFunctions, String[] functionNames,
-                         String[] destColumns, String[][] sourceColumns);
+                         String[] destColumns, String[][] sourceColumns) throws DDFException;
 
     /**
      * @see ITransformHandler#transformMapReduceNative(String, String, boolean)
      */
-    IDDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine);
+    IDDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) throws DDFException;
 
     /**
      * @see ITransformHandler#transformUDF(List, List)

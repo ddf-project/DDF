@@ -4,15 +4,10 @@ import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.PrepareDataSourceException;
 import io.ddf2.datasource.schema.ISchema;
-import io.ddf2.handlers.IAggregationHandler;
-import io.ddf2.handlers.IBinningHandler;
-import io.ddf2.handlers.IMLHandler;
-import io.ddf2.handlers.IMLMetricHandler;
-import io.ddf2.handlers.IStatisticHandler;
-import io.ddf2.handlers.ITransformHandler;
-import io.ddf2.handlers.IViewHandler;
+import io.ddf2.handlers.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class DDF implements IDDF {
@@ -269,5 +264,382 @@ public abstract class DDF implements IDDF {
       return this;
     }
   }
+
+
+  //<editor-fold desc="Handler Adapter>
+
+  //<editor-fold desc="StatisticHandler Api>
+
+  /**
+   * @see IStatisticHandler#getSummary()
+   */
+  public IStatisticHandler.Summary[] getSummary() throws DDFException{
+    assertNotNull(statisticHandler);
+    return statisticHandler.getSummary();
+  }
+
+  /**
+   * @see IStatisticHandler#getSimpleSummary()
+   */
+  public IStatisticHandler.SimpleSummary[] getSimpleSummary() throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getSimpleSummary();
+
+  }
+
+  /**
+   * @see IStatisticHandler#getFiveNumSummary(List)
+   */
+  public IStatisticHandler.FiveNumSummary[] getFiveNumSummary(List<String> columns) throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getFiveNumSummary(columns);
+  }
+
+  /**
+   * @see IStatisticHandler#getQuantiles(String, Double[])
+   */
+  public Double[] getQuantiles(String column, Double[] percentiles) throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getQuantiles(column,percentiles);
+  }
+
+  /**
+   * @see IStatisticHandler#getVariance(String)
+   */
+  public Double[] getVariance(String column) throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getVariance(column);
+  }
+
+  /**
+   * @see IStatisticHandler#getMean(String)
+   */
+  public Double getMean(String column) throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getMean(column);
+  }
+
+  /**
+   * @see IStatisticHandler#getCor(String, String)
+   */
+  public Double getCor(String xColumn, String yColumn) throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getCor(xColumn,yColumn);
+  }
+
+  /**
+   * @see IStatisticHandler#getCovariance(String, String)
+   */
+  public Double getCovariance(String xColumnName, String yColumnName) throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getCovariance(xColumnName,yColumnName);
+  }
+
+  /**
+   * @see IStatisticHandler#getMin(String)
+   */
+  public Double getMin(String column) throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getMin(column);
+  }
+
+  /**
+   * @see IStatisticHandler#getMax(String)
+   */
+  public Double getMax(String column) throws DDFException {
+    assertNotNull(statisticHandler);
+    return statisticHandler.getMax(column);
+  }
+
+  //</editor-fold>
+  //<editor-fold desc="ViewHandler API>
+
+  /**
+   * @see IViewHandler#getRandomSample(int, boolean)
+   */
+  public ISqlResult getRandomSample(int numSamples, boolean withReplacement) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.getRandomSample(numSamples,withReplacement);
+  }
+
+  /**
+   * @see IViewHandler#getRandomSample2(int, boolean)
+   */
+  public IDDF getRandomSample2(int numSamples, boolean withReplacement) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.getRandomSample2(numSamples,withReplacement);
+  }
+
+  /**
+   * @see IViewHandler#getRandomSample(double, boolean)
+   */
+  public IDDF getRandomSample(double percent, boolean withReplacement) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.getRandomSample(percent,withReplacement);
+  }
+
+  /**
+   * @see IViewHandler#head(int)
+   */
+  public ISqlResult head(int numRows) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.head(numRows);
+  }
+
+  /**
+   * @see IViewHandler#top(int, String, boolean)
+   */
+  public ISqlResult top(int numRows, String orderByCols, boolean isDesc) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.top(numRows,orderByCols,isDesc);
+  }
+
+  /**
+   * @see IViewHandler#project(String...)
+   */
+  public IDDF project(String... columns) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.project(columns);
+  }
+
+  /**
+   * @see IViewHandler#project(List)
+   */
+  public IDDF project(List<String> columns) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.project(columns);
+  }
+
+  /**
+   * @see IViewHandler#subset(List, IViewHandler.Expression)
+   */
+  @Deprecated
+  public IDDF subset(List<IViewHandler.Column> columnExpr, IViewHandler.Expression filter) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.subset(columnExpr,filter);
+  }
+
+  /**
+   * @see IViewHandler#subset(List, String)
+   */
+  public IDDF subset(List<String> columnExpr, String filter) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.subset(columnExpr,filter);
+  }
+
+  /**
+   * @see IViewHandler#removeColumn(String)
+   */
+  public IDDF removeColumn(String column) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.removeColumn(column);
+  }
+
+  /**
+   * @see IViewHandler#removeColumns(String...)
+   */
+  public IDDF removeColumns(String... columns) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.removeColumns(columns);
+  }
+
+  /**
+   * @see IViewHandler#removeColumns(List)
+   */
+  public IDDF removeColumns(List<String> columns) throws DDFException {
+    assertNotNull(viewHandler);
+    return viewHandler.removeColumns(columns);
+  }
+
+  //</editor-fold>
+  //<editor-fold desc="MLHandler API>
+
+  //</editor-fold>
+  //<editor-fold desc="MLMetricHandler API>
+
+  //</editor-fold>
+  //<editor-fold desc="AggregationHandler API>
+
+  /**
+   * @see IAggregationHandler#computeCorrelation(String, String)
+   */
+  public double computeCorrelation(String columnA, String columnB) throws DDFException {
+    assertNotNull(aggregationHandler);
+    return aggregationHandler.computeCorrelation(columnA,columnB);
+  }
+
+
+  /**
+   * @see IAggregationHandler#aggregate(String)
+   */
+  public IAggregationHandler.AggregationResult aggregate(String query) throws DDFException {
+    assertNotNull(aggregationHandler);
+    return aggregationHandler.aggregate(query);
+  }
+
+  /**
+   * @see IAggregationHandler#aggregate(List)
+   */
+  @Deprecated
+  public IAggregationHandler.AggregationResult aggregate(List<IAggregationHandler.AggregateField> fields) throws DDFException {
+    assertNotNull(aggregationHandler);
+    return aggregationHandler.aggregate(fields);
+  }
+
+  /**
+   * @see IAggregationHandler#aggregate(String, IAggregationHandler.AggregateFunction)
+   */
+  public double aggregate(String column, IAggregationHandler.AggregateFunction function) throws DDFException {
+    assertNotNull(aggregationHandler);
+    return aggregationHandler.aggregate(column,function);
+  }
+
+
+  /**
+   * @see IAggregationHandler#groupBy(List, List)
+   */
+  public IDDF groupBy(List<String> columns, List<String> functions) throws DDFException {
+    assertNotNull(aggregationHandler);
+    return aggregationHandler.groupBy(columns,functions);
+  }
+
+  /**
+   * @see IAggregationHandler#xtabs(List)
+   */
+  @Deprecated
+  public IAggregationHandler.AggregationResult xtabs(List<IAggregationHandler.AggregateField> fields) throws DDFException {
+    assertNotNull(aggregationHandler);
+    return aggregationHandler.xtabs(fields);
+  }
+
+  /**
+   * @see IAggregationHandler#xtabs(String)
+   */
+  public IAggregationHandler.AggregationResult xtabs(String fields) throws DDFException {
+    assertNotNull(aggregationHandler);
+    return aggregationHandler.xtabs(fields);
+  }
+
+  //</editor-fold>
+  //<editor-fold desc="BinningHandler API>
+
+  /**
+   * @see IBinningHandler#binning(String, String, int, double[], boolean, boolean)
+   */
+  @Deprecated
+  public IDDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
+                      boolean right) throws DDFException {
+    assertNotNull(binningHandler);
+    return binningHandler.binning(column,binningType,numBins,breaks,includeLowest,right);
+  }
+
+  /**
+   * @see IBinningHandler#binningCustom(String, double[], boolean, boolean)
+   */
+  public IDDF binningCustom(String column, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
+    assertNotNull(binningHandler);
+    return binningHandler.binningCustom(column,breaks,includeLowest,right);
+  }
+
+  /**
+   * @see IBinningHandler#binningEq(String, int, boolean, boolean)
+   */
+  public IDDF binningEq(String column, int numBins, boolean includeLowest, boolean right) throws DDFException {
+    assertNotNull(binningHandler);
+    return binningHandler.binningEq(column,numBins,includeLowest,right);
+  }
+
+  /**
+   * @see IBinningHandler#binningEqFreq(String, int, boolean, boolean)
+   */
+  public IDDF binningEqFreq(String column, int numBins, boolean includeLowest, boolean right) throws DDFException {
+    assertNotNull(binningHandler);
+    return binningHandler.binningEqFreq(column,numBins,includeLowest,right);
+  }
+
+  //</editor-fold>
+  //<editor-fold desc="TransformHandler API>
+
+  /**
+   * @see ITransformHandler#transformScaleMinMax()
+   */
+  public IDDF transformScaleMinMax() throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.transformScaleMinMax();
+  }
+
+  /**
+   * @see ITransformHandler#transformScaleStandard()
+   */
+  public IDDF transformScaleStandard() throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.transformScaleStandard();
+  }
+
+  /**
+   * @see ITransformHandler#transformNativeRserve(String)
+   */
+  public IDDF transformNativeRserve(String transformExpression) throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.transformNativeRserve(transformExpression);
+  }
+
+  /**
+   * @see ITransformHandler#transformNativeRserve(String[])
+   */
+  public IDDF transformNativeRserve(String[] transformExpression) throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.transformNativeRserve(transformExpression);
+  }
+
+  /**
+   * @see ITransformHandler#transformPython(String[], String[], String[], String[][])
+   */
+  public IDDF transformPython(String[] transformFunctions, String[] functionNames,
+                              String[] destColumns, String[][] sourceColumns) throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.transformPython(transformFunctions,functionNames,destColumns,sourceColumns);
+  }
+
+  /**
+   * @see ITransformHandler#transformMapReduceNative(String, String, boolean)
+   */
+  public IDDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.transformMapReduceNative(mapFuncDef,reduceFuncDef,mapsideCombine);
+  }
+
+  /**
+   * @see ITransformHandler#transformUDF(List, List)
+   */
+  public IDDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.transformUDF(transformExpressions,columns);
+  }
+
+  /**
+   * @see ITransformHandler#flattenDDF(String[])
+   */
+  public IDDF flattenDDF(String[] columns) throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.flattenDDF(columns);
+  }
+
+  /**
+   * @see ITransformHandler#flattenDDF()
+   */
+  public IDDF flattenDDF() throws DDFException {
+    assertNotNull(transformHandler);
+    return transformHandler.flattenDDF();
+  }
+
+  //</editor-fold>
+
+
+  private void assertNotNull(IDDFHandler handler) throws DDFException {
+    if(handler == null) throw  new DDFException("Function Not Supported");
+  }
+
+  //</editor-fold>
 }
  

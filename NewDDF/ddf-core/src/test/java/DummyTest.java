@@ -1,3 +1,6 @@
+import io.ddf2.DDFManager;
+import io.ddf2.spark.SparkDDF;
+import io.ddf2.spark.SparkDDFManager;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DecimalType;
 
@@ -67,6 +70,10 @@ public class DummyTest {
         for(URL url: urls){
             System.out.println(url.getFile());
         }
+    }
+
+    public static void maina(String[] args) {
+        SparkDDFManager instance = DDFManager.getInstance(SparkDDFManager.class, null);
     }
 
 }
