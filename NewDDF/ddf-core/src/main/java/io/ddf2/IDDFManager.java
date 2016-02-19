@@ -17,11 +17,11 @@ import java.util.Map;
  */
 public interface IDDFManager {
 
-	public IDDF newDDF(String name,IDataSource ds) throws DDFException;
-	public IDDF newDDF(IDataSource ds) throws DDFException;
-	public IDDF newDDF(String query) throws DDFException;
-	public IDDF newDDF(String name,String query) throws DDFException;
-	public IDDF getDDF(String name) throws DDFException;
+	public <T extends IDDF> T newDDF(String name,IDataSource ds) throws DDFException;
+	public <T extends IDDF> T newDDF(IDataSource ds) throws DDFException;
+	public <T extends IDDF> T newDDF(String query) throws DDFException;
+	public <T extends IDDF> T newDDF(String name,String query) throws DDFException;
+	public <T extends IDDF> T getDDF(String name) throws DDFException;
 	public IDDFMetaData getDDFMetaData();
 	public IPersistentHandler getPersistentHandler();
 	public String getDDFManagerId();

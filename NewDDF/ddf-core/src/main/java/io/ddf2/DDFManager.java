@@ -26,7 +26,7 @@ public abstract class DDFManager implements IDDFManager {
 	protected final static AtomicInteger ddfManagerCounter = new AtomicInteger();
 	protected final String ddfManagerId;
 	protected static Map<String,IDDFManager> mapDDFManager = new ConcurrentHashMap<>();
-	private static Map<String, IDDF> mapDDF = new ConcurrentHashMap<>();
+	private static Map<String, ? super IDDF> mapDDF = new ConcurrentHashMap<>();
 
 	protected DDFManager(Map mapProperties){
 		this.mapProperties = new HashMap<>();
@@ -84,36 +84,36 @@ public abstract class DDFManager implements IDDFManager {
 
 
 	@Override
-	public final IDDF newDDF(IDataSource ds) throws DDFException {
+	public final <T extends IDDF> T newDDF(IDataSource ds) throws DDFException {
 		return newDDF(generateDDFName(), ds);
 	}
 
 
 	@Override
-	public IDDF newDDF(String name, String query) throws DDFException {
+	public <T extends IDDF> T newDDF(String name, String query) throws DDFException {
 		return newDDF(name, BQDataSource.builder().setProjectId(BigQueryContext.getProjectId()).setQuery(query).build());
 	}
 
 
 
 	@Override
-	public IDDF newDDF(String query) throws DDFException {
+	public <T extends IDDF> T newDDF(String query) throws DDFException {
 		return newDDF(generateDDFName(),query);
 	}
 
 	@Override
-	public final IDDF newDDF(String name, IDataSource ds) throws DDFException {
+	public final <T extends IDDF> T newDDF(String name, IDataSource ds) throws DDFException {
 		if(mapDDF.containsKey(name)){
 			throw new DDFException("DDF " + name + "exist");
 		}
 
-		IDDF ddf =_newDDF(name, ds);
+		T ddf =_newDDF(name, ds);
 		mapDDF.put(name,ddf);
 		return ddf;
 	}
 
 
-	protected abstract IDDF _newDDF(String name, IDataSource ds) throws DDFException;
+	protected abstract <T extends IDDF> T _newDDF(String name, IDataSource ds) throws DDFException;
 
 	/**
 	 * Get an instance of DDF by DDFName.
@@ -121,11 +121,11 @@ public abstract class DDFManager implements IDDFManager {
 	 * @return
 	 * @throws DDFException if not exist ddfName
 	 */
-	public final IDDF getDDF(String ddfName) throws DDFException {
+	public final <T extends IDDF> T getDDF(String ddfName) throws DDFException {
 		if(mapDDF.containsKey(ddfName)){
 			throw new DDFException("DDF " + ddfName + "exist");
 		}
-		return mapDDF.get(ddfName);
+		return (T) mapDDF.get(ddfName);
 	}
 
 	@Override
