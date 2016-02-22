@@ -11,6 +11,7 @@ import io.ddf.DDFManager;
 import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
+import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
 
 import java.io.BufferedReader;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -218,6 +220,21 @@ public class S3DDFManager extends DDFManager {
 
     @Override
     public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
+        return null;
+    }
+
+    @Override
+    public DDF createDDF(Map<Object, Object> options) throws DDFException {
+        return null;
+    }
+
+    @Override
+    public void validateCredential(DataSourceCredential credential) throws DDFException {
+
+    }
+
+    @Override
+    public String getSourceUri() {
         return null;
     }
 

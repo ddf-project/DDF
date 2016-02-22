@@ -8,9 +8,11 @@ import io.ddf.DDFManager;
 import io.ddf.content.Schema;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
+import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.content.SchemaHandler;
+import io.ddf.spark.ds.DataSource;
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
 import io.ddf.spark.etl.DateUDF;
@@ -22,6 +24,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 import scala.Function1;
@@ -35,6 +38,7 @@ import java.util.*;
 //import shark.api.JavaSharkContext;
 import org.apache.spark.api.java.function.Function;
 
+import io.ddf.s3.S3DDF;
 
 /**
  * An Apache-Spark-based implementation of DDFManager

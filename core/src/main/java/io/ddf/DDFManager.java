@@ -87,7 +87,8 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     AWS,
     REDSHIFT,
     BASIC,
-    S3
+    S3,
+    HDFS
     ;
 
     public static EngineType fromString(String str) throws DDFException {

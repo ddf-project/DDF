@@ -46,8 +46,8 @@ public class BasicDDFManager extends DDFManager {
       throw new DDFException("Non-null/zero-length List is required to instantiate a new BasicDDF");
     }
 
-    return this.newDDF(this, rows, new Class[] { List.class, unitType },
-         namespace, name, schema);
+    return this.newDDF(this, rows, new Class[]{List.class, unitType},
+        namespace, name, schema);
   }
 
   public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
@@ -78,9 +78,9 @@ public class BasicDDFManager extends DDFManager {
   public String getSourceUri() {
     return "basic://";
   }
-}
 
- @Override
+  @Override
   public DDF createDDF(Map<Object, Object> options) throws DDFException {
     throw new UnsupportedOperationException();
   }
+}

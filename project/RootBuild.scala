@@ -48,6 +48,9 @@ object RootBuild extends Build {
 
   val s3ProjectName = "ddf_s3"
   val s3Version = rootVersion
+
+  val hdfsProjectName = "ddf_hdfs"
+  val hdfsVersion = rootVersion
   
   val testProjectName = "ddf_test"
   val testVersion = rootVersion
@@ -68,12 +71,13 @@ object RootBuild extends Build {
 
 
   // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
-  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, s3, examples, test_ddf)
+  lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, s3, hdfs, examples, test_ddf)
   lazy val core = Project("core", file("core"), settings = coreSettings)
   lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (core)
   lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core, s3)
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
   lazy val s3 = Project("s3", file("s3"), settings = s3Settings) dependsOn (core)
+  lazy val hdfs = Project("hdfs", file("hdfs"), settings = hdfsSettings) dependsOn(core)
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend(Compile)
   lazy val publishLocalBoth = TaskKey[Unit]("publish-local", "publish local for m2 and ivy")
@@ -137,6 +141,9 @@ object RootBuild extends Build {
   
   val s3_dependencies = Seq(
     "com.amazonaws" % "aws-java-sdk" % "1.10.8"
+  )
+
+  val hdfs_dependencies = Seq(
   )
 
   val test_dependencies = Seq(
@@ -531,6 +538,13 @@ object RootBuild extends Build {
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch s3/" + targetDir + "/*timestamp") },
     testOptions in Test += Tests.Argument("-oI"),
     libraryDependencies ++= s3_dependencies
+  ) ++ assemblySettings ++ extraAssemblySettings
+
+  def hdfsSettings = commonSettings ++ Seq(
+    name := hdfsProjectName,  
+    compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch hdfs/" + targetDir + "/*timestamp") },
+    testOptions in Test += Tests.Argument("-oI"),
+    libraryDependencies ++= hdfs_dependencies
   ) ++ assemblySettings ++ extraAssemblySettings
   
   def testSettings = commonSettings ++ Seq(

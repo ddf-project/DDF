@@ -30,7 +30,6 @@
                 <version>2.15</version>
                 <configuration>
                     <reuseForks>false</reuseForks>
-                    <argLine>-Xmx2g -XX:MaxPermSize=256m</argLine>
                     <enableAssertions>false</enableAssertions>
                     <environmentVariables>
                         <RSERVER_JAR>${basedir}/target/scala-2.10/*.jar,${basedir}/target/scala-2.10/lib/*</RSERVER_JAR>
@@ -419,11 +418,6 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>2.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.databricks</groupId>
-            <artifactId>spark-csv_2.10</artifactId>
-            <version>1.3.0</version>
         </dependency>
     </dependencies>
     <repositories>
