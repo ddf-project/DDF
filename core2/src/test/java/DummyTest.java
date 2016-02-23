@@ -72,8 +72,4 @@ public class DummyTest {
         }
     }
 
-    public static void maina(String[] args) {
-        SparkDDFManager instance = DDFManager.getInstance(SparkDDFManager.class, null);
-    }
-
 }
