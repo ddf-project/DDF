@@ -3,15 +3,12 @@ package io.ddf.hdfs;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.datasource.DataFormat;
-import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,32 +17,29 @@ import java.util.UUID;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 
+import jnr.posix.FileStat;
+
 /**
  * Created by jing on 2/22/16.
  */
 public class HDFSDDFManager extends DDFManager {
-    FileSystem fs = null;
+    // File system connector.
+    private FileSystem fs = null;
 
     // Upper limit for content preview.
     private static final int K_LIMIT = 1000;
 
+    private String fsUri = null;
 
     public HDFSDDFManager() {
         try {
             Configuration conf = new Configuration();
-            // this.fs = FileSystem.get(new URI("hdfs://52.87.219.211:9000"), conf);
-            conf.set("fs.defaultFS", "hdfs://52.87.219.211:9000");
+            conf.set("fs.defaultFS", fsUri);
             this.fs = FileSystem.get(conf);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        /*
-        catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        */
     }
-
 
     /**
      * @brief To check whether the hdfs file already contains header.
@@ -63,7 +57,13 @@ public class HDFSDDFManager extends DDFManager {
      * @return
      */
     public Boolean isDir(HDFSDDF hdfsDDF) throws DDFException {
-        return true;
+        String path = hdfsDDF.getPath();
+        try {
+            FileStatus fileStatus = fs.getFileStatus(new Path(path));
+            return fileStatus.isDirectory();
+        } catch (IOException e) {
+            throw new DDFException(String.format("Error in checking when hdfsDDF: %s is directory."));
+        }
     }
 
     /**
@@ -72,7 +72,9 @@ public class HDFSDDFManager extends DDFManager {
      * @return
      */
     public DataFormat getDataFormat(HDFSDDF hdfsDDF) throws DDFException {
-        return null;
+        String path = hdfsDDF.getPath();
+        String extension = path.substring(path.lastIndexOf(".") + 1);
+        return DataFormat.valueOf(extension.toUpperCase());
     }
 
 
@@ -123,15 +125,38 @@ public class HDFSDDFManager extends DDFManager {
 
         List<String> rows = new ArrayList<String>();
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(new Path(hdfsDDF.getPath()))))) {
-            String s;
-            int pos = 0;
-            while ((s = br.readLine()) != null && pos < limit) {
-                rows.add(s);
-                ++ pos;
+        int pos = 0;
+        String s = null;
+
+        if (hdfsDDF.getIsDir()) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(new Path(hdfsDDF.getPath()))))) {
+                while ( (s = br.readLine()) != null && pos < limit) {
+                    rows.add(s);
+                    ++pos;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            RemoteIterator<LocatedFileStatus> files = null;
+            try {
+                files = fs.listFiles(new Path(hdfsDDF.getPath()), false);
+                while (files.hasNext() && pos < limit) {
+                    LocatedFileStatus lfs = files.next();
+                    try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(
+                            fs.open(lfs.getPath())))) {
+                        while ( (s = br.readLine()) != null && pos < limit) {
+                            rows.add(s);
+                            ++pos;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                throw new DDFException(e);
+            }
         }
         return rows;
     }

@@ -32,11 +32,13 @@ public class HDFSDDF extends DDF {
     public HDFSDDF(HDFSDDFManager manager, String path, String schema) throws DDFException {
         super(manager, null, null, null, null, null);
         mSchemaString = schema;
+        mPath = path;
         initialize();
     }
 
     public HDFSDDF(HDFSDDFManager manager, String path) throws DDFException {
         super(manager, null, null, null, null, null);
+        mPath = path;
         initialize();
     }
 
@@ -44,13 +46,13 @@ public class HDFSDDF extends DDF {
     private void initialize() throws DDFException {
         // Check key and path
         if (Strings.isNullOrEmpty(mPath)) {
-            throw new DDFException("The bucket of s3ddf is null");
+            throw new DDFException("The path of hdfsddf is null");
         }
         // Check directory or file.
-        HDFSDDFManager s3DDFManager = (HDFSDDFManager)this.getManager();
-        mIsDir = s3DDFManager.isDir(this);
+        HDFSDDFManager hdfsDDFManager = (HDFSDDFManager)this.getManager();
+        mIsDir = hdfsDDFManager.isDir(this);
         // Check dataformat.
-        mDataFormat = s3DDFManager.getDataFormat(this);
+        mDataFormat = hdfsDDFManager.getDataFormat(this);
         if (mDataFormat.equals(DataFormat.CSV)) {
             // Check header.
             // TODO (discuss with bigapps guy)

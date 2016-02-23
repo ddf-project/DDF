@@ -32,20 +32,20 @@ public class HDFSDDFManagerTests {
 
     @Test
     public void testListing() throws DDFException {
-        List<String> files = manager.listFiles("hdfs://52.87.219.211:9000/");
+        List<String> files = manager.listFiles("/user");
         LOG.info("========== buckets ==========");
         for (String file: files) {
             System.out.println(file);
-            //LOG.info(file);
+            LOG.info(file);
         }
 
     }
 
-    /*
+
     @Test
     public void testCreateDDF() throws DDFException {
         try {
-            HDFSDDF folderDDF = manager.newDDF("", null);
+            HDFSDDF folderDDF = manager.newDDF("/user/jing/hasHeader.csv", null);
             assert (false);
             assert(folderDDF.getIsDir() == true);
         } catch (Exception e) {
@@ -101,5 +101,5 @@ public class HDFSDDFManagerTests {
         rows = manager.head(ddf1024, 9999);
         assert (rows.size() == 1000);
     }
-    */
+
 }
