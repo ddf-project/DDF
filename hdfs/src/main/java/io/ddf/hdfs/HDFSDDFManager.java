@@ -6,6 +6,8 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
 
+import com.google.common.base.Strings;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,8 +18,6 @@ import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
-
-import jnr.posix.FileStat;
 
 /**
  * Created by jing on 2/22/16.
@@ -31,13 +31,15 @@ public class HDFSDDFManager extends DDFManager {
 
     private String fsUri = null;
 
-    public HDFSDDFManager() {
+    public HDFSDDFManager(String fsUri) throws DDFException {
+        assert !Strings.isNullOrEmpty(fsUri);
+        this.fsUri = fsUri;
         try {
             Configuration conf = new Configuration();
             conf.set("fs.defaultFS", fsUri);
             this.fs = FileSystem.get(conf);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new DDFException(e);
         }
     }
 
@@ -62,7 +64,7 @@ public class HDFSDDFManager extends DDFManager {
             FileStatus fileStatus = fs.getFileStatus(new Path(path));
             return fileStatus.isDirectory();
         } catch (IOException e) {
-            throw new DDFException(String.format("Error in checking when hdfsDDF: %s is directory."));
+            throw new DDFException(e);
         }
     }
 
@@ -72,6 +74,7 @@ public class HDFSDDFManager extends DDFManager {
      * @return
      */
     public DataFormat getDataFormat(HDFSDDF hdfsDDF) throws DDFException {
+        if (hdfsDDF.getIsDir()) return DataFormat.UNDEF;
         String path = hdfsDDF.getPath();
         String extension = path.substring(path.lastIndexOf(".") + 1);
         return DataFormat.valueOf(extension.toUpperCase());
@@ -128,7 +131,7 @@ public class HDFSDDFManager extends DDFManager {
         int pos = 0;
         String s = null;
 
-        if (hdfsDDF.getIsDir()) {
+        if (!hdfsDDF.getIsDir()) {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(new Path(hdfsDDF.getPath()))))) {
                 while ( (s = br.readLine()) != null && pos < limit) {
                     rows.add(s);

@@ -27,7 +27,7 @@ public class HDFSDDFManagerTests {
     public static void startServer() throws Exception {
         Thread.sleep(1000);
         LOG = LoggerFactory.getLogger(HDFSDDFManagerTests.class);
-        manager = (HDFSDDFManager)DDFManager.get(DDFManager.EngineType.HDFS);
+        manager = new HDFSDDFManager("hdfs://localhost:9000");
     }
 
     @Test
@@ -45,16 +45,15 @@ public class HDFSDDFManagerTests {
     @Test
     public void testCreateDDF() throws DDFException {
         try {
-            HDFSDDF folderDDF = manager.newDDF("/user/jing/hasHeader.csv", null);
-            assert (false);
+            HDFSDDF folderDDF = manager.newDDF("/user/jing/testFolder", null);
             assert(folderDDF.getIsDir() == true);
         } catch (Exception e) {
 
         }
 
-        HDFSDDF cleanFolderDDF = manager.newDDF("", null);
-        HDFSDDF jsonDDF = manager.newDDF("", null);
-        HDFSDDF csvDDF = manager.newDDF("", null);
+        HDFSDDF cleanFolderDDF = manager.newDDF("/user/jing/testFolder", null);
+        HDFSDDF jsonDDF = manager.newDDF("/user/jing/a.json", null);
+        HDFSDDF csvDDF = manager.newDDF("/user/jing/hasHeader.csv", null);
         assert (cleanFolderDDF.getIsDir() == true);
         assert(jsonDDF.getIsDir() == false);
         assert(csvDDF.getIsDir() == false);
@@ -62,29 +61,28 @@ public class HDFSDDFManagerTests {
         assert(csvDDF.getDataFormat().equals(DataFormat.CSV));
         try {
             // Test on non-exist folder/file. Should throw exception.
-            HDFSDDF nonExistDDF = manager.newDDF("", null);
+            HDFSDDF nonExistDDF = manager.newDDF("/user/jing/nonexist.csv", null);
             assert (false);
         } catch (Exception e) {
 
         }
         try {
-            HDFSDDF nonExistDDF2 = manager.newDDF("", null);
+            HDFSDDF nonExistDDF2 = manager.newDDF("/user/jing/nonexsist", null);
             assert (false);
         } catch (Exception e) {
 
         }
-        // TODO: Add pqt
     }
 
 
     @Test
     public void testHead() throws DDFException {
-        HDFSDDF csvDDF = manager.newDDF("", null);
+        HDFSDDF csvDDF = manager.newDDF("/user/jing/year.csv", null);
         List<String> rows = manager.head(csvDDF, 5);
         assert(rows.size() == 2);
         LOG.info("========== content of year.csv ==========");
         for (String s : rows) {
-            LOG.info(s);
+            System.out.println(s);
         }
 
         rows = manager.head(csvDDF, 20000);
@@ -93,11 +91,11 @@ public class HDFSDDFManagerTests {
         rows = manager.head(csvDDF, 1000);
         assert(rows.size() == 2);
 
-        HDFSDDF folderDDF = manager.newDDF("", null);
+        HDFSDDF folderDDF = manager.newDDF("/user/jing/testFolder", null);
         rows = manager.head(folderDDF, 5);
         assert (rows.size() == 4);
 
-        HDFSDDF ddf1024 = manager.newDDF("", null);
+        HDFSDDF ddf1024 = manager.newDDF("/user/jing/1024.csv", null);
         rows = manager.head(ddf1024, 9999);
         assert (rows.size() == 1000);
     }
