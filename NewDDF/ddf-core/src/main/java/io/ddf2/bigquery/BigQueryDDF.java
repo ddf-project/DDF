@@ -167,7 +167,7 @@ public class BigQueryDDF extends DDF {
             super(dataSource);
         }
     }
-    public static BigQueryDDFBuilder<?> builder(IDataSource dataSource){
+    public static BigQueryDDFBuilder<BigQueryDDF> builder(IDataSource dataSource){
         return new BigQueryDDFBuilder<BigQueryDDF>(dataSource) {
             @Override
             public BigQueryDDF newInstance(IDataSource ds) {
@@ -184,8 +184,7 @@ public class BigQueryDDF extends DDF {
 
             @Override
             public BigQueryDDF build() throws DDFException {
-                ddf.build(mapProperties);
-                return ddf;
+                return super.build();
             }
         };
     }

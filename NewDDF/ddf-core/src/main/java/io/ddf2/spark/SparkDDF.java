@@ -94,7 +94,7 @@ public class SparkDDF extends DDF {
             super(dataSource);
         }
     }
-    public static SparkDDFBuilder<?> builder(IDataSource dataSource){
+    public static SparkDDFBuilder<SparkDDF> builder(IDataSource dataSource){
         return new SparkDDFBuilder<SparkDDF>(dataSource) {
             @Override
             public SparkDDF newInstance(IDataSource ds) {
@@ -107,11 +107,6 @@ public class SparkDDF extends DDF {
                 return newInstance(ds);
             }
 
-            @Override
-            public SparkDDF build() throws DDFException {
-                ddf.build(mapProperties);
-                return ddf;
-            }
         };
     }
 }

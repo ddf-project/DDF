@@ -15,13 +15,13 @@ import java.util.Map;
  * Provide method to get PersistentHandler to persist/remove/restore an DDF to storage.
  * 
  */
-public interface IDDFManager {
+public interface IDDFManager<T extends IDDF> {
 
-	public <T extends IDDF> T newDDF(String name,IDataSource ds) throws DDFException;
-	public <T extends IDDF> T newDDF(IDataSource ds) throws DDFException;
-	public <T extends IDDF> T newDDF(String query) throws DDFException;
-	public <T extends IDDF> T newDDF(String name,String query) throws DDFException;
-	public <T extends IDDF> T getDDF(String name) throws DDFException;
+	public T newDDF(String name,IDataSource ds) throws DDFException;
+	public T newDDF(IDataSource ds) throws DDFException;
+	public T newDDF(String query) throws DDFException;
+	public T newDDF(String name,String query) throws DDFException;
+	public T getDDF(String name) throws DDFException;
 	public IDDFMetaData getDDFMetaData();
 	public IPersistentHandler getPersistentHandler();
 	public String getDDFManagerId();

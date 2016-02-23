@@ -16,7 +16,7 @@ import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.SqlDataSource;
 import io.ddf2.handlers.IPersistentHandler;
 
-public abstract class DDFManager implements IDDFManager {
+public abstract class DDFManager<T extends IDDF> implements IDDFManager {
 
 	protected IDDFMetaData ddfMetaData;
 	protected IPersistentHandler persistentHandler;
@@ -84,25 +84,25 @@ public abstract class DDFManager implements IDDFManager {
 
 
 	@Override
-	public final <T extends IDDF> T newDDF(IDataSource ds) throws DDFException {
+	public final T newDDF(IDataSource ds) throws DDFException {
 		return newDDF(generateDDFName(), ds);
 	}
 
 
 	@Override
-	public <T extends IDDF> T newDDF(String name, String query) throws DDFException {
+	public T newDDF(String name, String query) throws DDFException {
 		return newDDF(name, BQDataSource.builder().setProjectId(BigQueryContext.getProjectId()).setQuery(query).build());
 	}
 
 
 
 	@Override
-	public <T extends IDDF> T newDDF(String query) throws DDFException {
+	public T newDDF(String query) throws DDFException {
 		return newDDF(generateDDFName(),query);
 	}
 
 	@Override
-	public final <T extends IDDF> T newDDF(String name, IDataSource ds) throws DDFException {
+	public final T newDDF(String name, IDataSource ds) throws DDFException {
 		if(mapDDF.containsKey(name)){
 			throw new DDFException("DDF " + name + "exist");
 		}
@@ -113,7 +113,7 @@ public abstract class DDFManager implements IDDFManager {
 	}
 
 
-	protected abstract <T extends IDDF> T _newDDF(String name, IDataSource ds) throws DDFException;
+	protected abstract T _newDDF(String name, IDataSource ds) throws DDFException;
 
 	/**
 	 * Get an instance of DDF by DDFName.
@@ -121,23 +121,12 @@ public abstract class DDFManager implements IDDFManager {
 	 * @return
 	 * @throws DDFException if not exist ddfName
 	 */
-	public final <T extends IDDF> T getDDF(String ddfName) throws DDFException {
+	public final T getDDF(String ddfName) throws DDFException {
 		if(mapDDF.containsKey(ddfName)){
 			throw new DDFException("DDF " + ddfName + "exist");
 		}
 		return (T) mapDDF.get(ddfName);
 	}
-
-	@Override
-	public ISqlResult sql(String query) throws SQLException {
-		return null;
-	}
-
-	@Override
-	public ISqlResult sql(String query, Map<String, String> options) throws SQLException {
-		return null;
-	}
-
 
 	@Override
 	public final String getDDFManagerId(){

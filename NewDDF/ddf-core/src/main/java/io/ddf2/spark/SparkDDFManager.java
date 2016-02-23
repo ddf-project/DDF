@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SparkDDFManager extends DDFManager {
+public class SparkDDFManager extends DDFManager<SparkDDF> {
     protected SparkConf sparkConf;
     protected SparkContext sparkContext;
     protected HiveContext hiveContext;
@@ -72,19 +72,9 @@ public class SparkDDFManager extends DDFManager {
     }
 
     @Override
-    protected IDDF _newDDF(String name, IDataSource ds) throws DDFException {
+    protected SparkDDF _newDDF(String name, IDataSource ds) throws DDFException {
         return newDDF(name, ds, mapProperties);
     }
-    @Override
-    public IDDF newDDF(String query) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public IDDF newDDF(String name, String query) throws DDFException {
-        return null;
-    }
-
 
     @Override
     protected IPersistentHandler _getPersistentHanlder() {
@@ -106,7 +96,7 @@ public class SparkDDFManager extends DDFManager {
     }
 
     @Override
-    public ISqlResult sql(String query, Map<String, String> options) throws SQLException {
+    public ISqlResult sql(String query, Map options) throws SQLException {
         return null;
     }
 

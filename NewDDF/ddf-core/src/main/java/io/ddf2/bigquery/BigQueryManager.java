@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by sangdn on 1/18/16.
  * @see io.ddf2.IDDFManager
  */
-public final class BigQueryManager extends DDFManager {
+public final class BigQueryManager extends DDFManager<BigQueryDDF> {
 
 
     protected BigQueryManager(Map mapProperties) throws DDFException {
@@ -26,8 +26,8 @@ public final class BigQueryManager extends DDFManager {
     }
 
     @Override
-    public IDDF _newDDF(String name, IDataSource ds) throws DDFException {
-        return BigQueryDDF.builder(ds)
+    public BigQueryDDF _newDDF(String name, IDataSource ds) throws DDFException {
+        return  (BigQueryDDF) BigQueryDDF.builder(ds)
                 .setName(name)
                 .putProperty(mapProperties)
                 .setDDFManager(this)
@@ -58,7 +58,7 @@ public final class BigQueryManager extends DDFManager {
     }
 
     @Override
-    public ISqlResult sql(String query, Map<String, String> options) throws SQLException {
+    public ISqlResult sql(String query, Map options) throws SQLException {
         return sql(query);
     }
 
