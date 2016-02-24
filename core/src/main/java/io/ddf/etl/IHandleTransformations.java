@@ -4,7 +4,6 @@ package io.ddf.etl;
 import io.ddf.DDF;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
-
 import java.util.List;
 
 public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
@@ -25,7 +24,8 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
   /**
    * Create new columns or overwrite existing ones
    *
-   * @param transformExpressions A list of expressions, each is in format of column=expression or expression
+   * @param transformExpressions
+   *          A list of expressions, each is in format of column=expression or expression
    * @param columns
    * @return
    * @throws DDFException
@@ -35,4 +35,6 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
   public DDF flattenDDF(String[] columns) throws DDFException;
 
   public DDF flattenDDF() throws DDFException;
+
+  public DDF flattenArrayTypeColumn(String colName) throws DDFException;
 }

@@ -94,12 +94,12 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
+  public synchronized void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
 
   }
 
   @Override
-  public void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
+  public synchronized void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
     Column c = this.getColumn(columnName);
     Factor<?> f = c.getOptionalFactor();
     if(factor.getLevelCounts() != null) {
@@ -111,14 +111,14 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public void computeFactorLevelsAndLevelCounts() throws DDFException {
+  public synchronized void computeFactorLevelsAndLevelCounts() throws DDFException {
 
   }
 
 
 
   @Override
-  public Factor<?> setAsFactor(String columnName) throws DDFException {
+  public synchronized Factor<?> setAsFactor(String columnName) throws DDFException {
     if (this.getSchema() == null)
       return null;
 
@@ -167,22 +167,22 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public Factor<?> setAsFactor(int columnIndex) throws DDFException {
+  public synchronized Factor<?> setAsFactor(int columnIndex) throws DDFException {
     return this.setAsFactor(this.getColumnName(columnIndex));
   }
 
   @Override
-  public void unsetAsFactor(String columnName) {
+  public synchronized void unsetAsFactor(String columnName) {
     this.unsetAsFactor(this.getColumnIndex(columnName));
   }
 
   @Override
-  public void unsetAsFactor(int columnIndex) {
+  public synchronized void unsetAsFactor(int columnIndex) {
     if (this.getSchema() != null)
       this.getSchema().getColumn(columnIndex).unsetAsFactor();
   }
 
-  public void computeFactorLevelsForAllStringColumns() throws DDFException {
+  public synchronized void computeFactorLevelsForAllStringColumns() throws DDFException {
     // TODO Auto-generated method stub
 
   }
