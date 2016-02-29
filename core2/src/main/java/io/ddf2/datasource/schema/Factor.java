@@ -1,6 +1,6 @@
 package io.ddf2.datasource.schema;
 
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.DDFException;
 
 import java.io.Serializable;
@@ -81,7 +81,7 @@ public class Factor<T> extends io.ddf2.datasource.schema.Vector<T> implements Se
    * @param theDDF
    * @param theColumnName
    */
-  public Factor(IDDF theDDF, String theColumnName) {
+  public Factor(DDF theDDF, String theColumnName) {
     super(theDDF, theColumnName);
   }
 

@@ -3,7 +3,7 @@ package io.ddf2.spark;
 import io.ddf2.*;
 import io.ddf2.DDF;
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.ISqlResult;
 import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.IDataSourcePreparer;
@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * SparkDDF implement DDF using HiveContext
- * @see io.ddf2.IDDF
+ * @see io.ddf2.DDF
  */
 public class SparkDDF extends DDF {
 
@@ -57,7 +57,7 @@ public class SparkDDF extends DDF {
 
     /**
      * @param sql
-     * @see IDDF#sql(String)
+     * @see DDF#sql(String)
      */
     @Override
     public ISqlResult sql(String sql) {
@@ -67,12 +67,12 @@ public class SparkDDF extends DDF {
     }
 
     @Override
-    public IDDF sql2ddf(String sql) throws DDFException {
+    public DDF sql2ddf(String sql) throws DDFException {
         return ddfManager.newDDF(SqlDataSource.builder().setQuery(sql).build());
     }
 
     @Override
-    public IDDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
+    public DDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
         return null;
     }
 
@@ -94,7 +94,7 @@ public class SparkDDF extends DDF {
             super(dataSource);
         }
     }
-    public static SparkDDFBuilder<SparkDDF> builder(IDataSource dataSource){
+    protected static SparkDDFBuilder<SparkDDF> builder(IDataSource dataSource){
         return new SparkDDFBuilder<SparkDDF>(dataSource) {
             @Override
             public SparkDDF newInstance(IDataSource ds) {

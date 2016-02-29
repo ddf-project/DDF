@@ -16,7 +16,7 @@ import io.ddf2.datasource.IDataSource;
 import io.ddf2.datasource.SqlDataSource;
 import io.ddf2.handlers.IPersistentHandler;
 
-public abstract class DDFManager<T extends IDDF> implements IDDFManager {
+public abstract class DDFManager<T extends DDF> implements IDDFManager {
 
 	protected IDDFMetaData ddfMetaData;
 	protected IPersistentHandler persistentHandler;
@@ -26,7 +26,7 @@ public abstract class DDFManager<T extends IDDF> implements IDDFManager {
 	protected final static AtomicInteger ddfManagerCounter = new AtomicInteger();
 	protected final String ddfManagerId;
 	protected static Map<String,IDDFManager> mapDDFManager = new ConcurrentHashMap<>();
-	private static Map<String, ? super IDDF> mapDDF = new ConcurrentHashMap<>();
+	private static Map<String, ? super DDF> mapDDF = new ConcurrentHashMap<>();
 
 	protected DDFManager(Map mapProperties){
 		this.mapProperties = new HashMap<>();

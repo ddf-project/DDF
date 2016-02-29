@@ -2,7 +2,7 @@ package io.ddf2.handlers.impl;
 
 import io.ddf2.DDF;
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.handlers.IBinningHandler;
 
 import java.util.ArrayList;
@@ -10,14 +10,14 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class BinningHandler implements io.ddf2.handlers.IBinningHandler {
-    protected IDDF associatedDDF;
+    protected DDF associatedDDF;
 
-    public BinningHandler(IDDF associatedDDF){
+    public BinningHandler(DDF associatedDDF){
         this.associatedDDF = associatedDDF;
     }
 
     @Override
-    public IDDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
+    public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
         assert Arrays.asList("custom", "equalInterval", "equalfreq").contains(binningType.toLowerCase());
         if (binningType.equalsIgnoreCase("custom")) {
             return this.binningCustom(column, breaks, includeLowest, right);
@@ -30,7 +30,7 @@ public abstract class BinningHandler implements io.ddf2.handlers.IBinningHandler
     }
 
     @Override
-    public IDDF getDDF() {
+    public DDF getDDF() {
         return associatedDDF;
     }
 }

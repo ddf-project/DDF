@@ -1,7 +1,7 @@
 package io.ddf2.handlers.impl;
 
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IStatisticHandler;
 import io.ddf2.handlers.ITransformHandler;
@@ -15,22 +15,22 @@ import java.util.Map;
 import java.util.Set;
 
 public class TransformHandler implements ITransformHandler{
-    protected IDDF associatedDDF;
-    public TransformHandler(IDDF associatedDDF){
+    protected DDF associatedDDF;
+    public TransformHandler(DDF associatedDDF){
         this.associatedDDF = associatedDDF;
     }
 
     @Override
-    public IDDF transformScaleMinMax() throws DDFException {
+    public DDF transformScaleMinMax() throws DDFException {
         return this.transformScaleImpl("minmax");
     }
 
     @Override
-    public IDDF transformScaleStandard() throws DDFException {
+    public DDF transformScaleStandard() throws DDFException {
         return this.transformScaleImpl("standard");
     }
 
-    protected IDDF transformScaleImpl(String transformType) throws DDFException {
+    protected DDF transformScaleImpl(String transformType) throws DDFException {
         assert Arrays.asList("minmax", "standard").contains(transformType.toLowerCase());
 
         IStatisticHandler.Summary[] summaryArr = this.getDDF().getStatisticHandler().getSummary();
@@ -53,7 +53,7 @@ public class TransformHandler implements ITransformHandler{
         sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
         sqlCmdBuffer.append("FROM ").append(this.getDDF().getDDFName());
 
-        IDDF newddf = this.getDDF().sql2ddf(sqlCmdBuffer.toString());
+        DDF newddf = this.getDDF().sql2ddf(sqlCmdBuffer.toString());
         newddf.getSchema().copyFactor(this.getDDF());
         return newddf;
     }
@@ -71,47 +71,47 @@ public class TransformHandler implements ITransformHandler{
     }
 
     @Override
-    public IDDF transformNativeRserve(String transformExpression) {
+    public DDF transformNativeRserve(String transformExpression) {
         return null;
     }
 
     @Override
-    public IDDF transformNativeRserve(String[] transformExpression) {
+    public DDF transformNativeRserve(String[] transformExpression) {
         return null;
     }
 
     @Override
-    public IDDF transformPython(String[] transformFunctions, String[] functionNames, String[] destColumns, String[][] sourceColumns) {
+    public DDF transformPython(String[] transformFunctions, String[] functionNames, String[] destColumns, String[][] sourceColumns) {
         return null;
     }
 
     @Override
-    public IDDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) {
+    public DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) {
         return null;
     }
 
     @Override
-    public IDDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException {
+    public DDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException {
         List<String> curCols = new ArrayList<>();
         String sqlcmd = String.format("SELECT %s FROM %s",
             this.RToSqlUDF(transformExpressions, columns, this.getDDF().getSchema().getColumnNames()));
-        IDDF newddf = this.getDDF().sql2ddf(sqlcmd);
+        DDF newddf = this.getDDF().sql2ddf(sqlcmd);
         // TODO factor
         return newddf;
     }
 
     @Override
-    public IDDF flattenDDF(String[] columns) throws DDFException {
+    public DDF flattenDDF(String[] columns) throws DDFException {
         return null;
     }
 
     @Override
-    public IDDF flattenDDF() throws DDFException {
+    public DDF flattenDDF() throws DDFException {
         return null;
     }
 
     @Override
-    public IDDF getDDF() {
+    public DDF getDDF() {
         return associatedDDF;
     }
 

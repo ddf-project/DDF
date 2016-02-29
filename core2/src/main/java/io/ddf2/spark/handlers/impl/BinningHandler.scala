@@ -1,6 +1,6 @@
 package io.ddf.spark.handlers.impl
 
-import io.ddf2.{DDFException, IDDF, DDF}
+import io.ddf2.{DDFException, DDF, DDF}
 import io.ddf2.handlers.{IStatisticHandler, IBinningHandler}
 import org.apache.spark.rdd.{DoubleRDDFunctions, RDD}
 import org.apache.spark.sql.Row
@@ -24,7 +24,7 @@ class BinningHandler(mDDF: DDF) extends io.ddf2.handlers.impl.BinningHandler(mDD
   }
 
   override def getHistogram(columnName: String, numBins: Int): java.util.List[IBinningHandler.HistogramBin] = {
-    val projectedDDF: IDDF = mDDF.getViewHandler.project(columnName)
+    val projectedDDF: DDF = mDDF.getViewHandler.project(columnName)
     val rdd: RDD[Row] = projectedDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
     val rdd1 = rdd.map(r => {
       try {
@@ -50,7 +50,7 @@ class BinningHandler(mDDF: DDF) extends io.ddf2.handlers.impl.BinningHandler(mDD
   override def getApproxHistogram(columnName: String, numBins: Int): java.util.List[IBinningHandler
   .HistogramBin] = {
     val command: String = s"select histogram_numeric($columnName,$numBins) from @this"
-    val ddf: IDDF = this.getDDF.sql2ddf(command)
+    val ddf: DDF = this.getDDF.sql2ddf(command)
     val rddbins = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]].collect
     val histbins = rddbins(0).get(0).asInstanceOf[Seq[Row]]
 
@@ -63,7 +63,7 @@ class BinningHandler(mDDF: DDF) extends io.ddf2.handlers.impl.BinningHandler(mDD
 
   @throws(classOf[DDFException])
   override def binningCustom(columnName: String, breaks: Array[Double], includeLowest: Boolean, right: Boolean)
-  : IDDF = {
+  : DDF = {
     assert(breaks != null && breaks.size != 0)
     val column = mDDF.getSchema.getColumn(columnName)
     if (breaks.sorted.deep != breaks.deep) throw new DDFException("Please enter increasing breaks")
@@ -79,7 +79,7 @@ class BinningHandler(mDDF: DDF) extends io.ddf2.handlers.impl.BinningHandler(mDD
   }
 
   @throws(classOf[DDFException])
-  override def binningEq(columnName: String, numBins: Int, includeLowest: Boolean, right: Boolean) : IDDF = {
+  override def binningEq(columnName: String, numBins: Int, includeLowest: Boolean, right: Boolean) : DDF = {
     assert(numBins >= 2)
 
   }

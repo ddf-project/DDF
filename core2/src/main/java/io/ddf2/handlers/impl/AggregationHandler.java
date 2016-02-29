@@ -3,7 +3,7 @@ package io.ddf2.handlers.impl;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.ISqlResult;
 import io.ddf2.Utils;
 import io.ddf2.datasource.schema.IColumn;
@@ -17,9 +17,9 @@ import java.util.List;
  */
 public abstract class AggregationHandler implements io.ddf2.handlers.IAggregationHandler {
 
-    protected IDDF associatedDDF;
+    protected DDF associatedDDF;
 
-    public AggregationHandler(IDDF associatedDDF) {
+    public AggregationHandler(DDF associatedDDF) {
         this.associatedDDF = associatedDDF;
     }
 
@@ -79,7 +79,7 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
 
 
     @Override
-    public IDDF groupBy(List<String> columns, List<String> functions) throws DDFException {
+    public DDF groupBy(List<String> columns, List<String> functions) throws DDFException {
         assert columns != null && columns.size() > 0;
         assert functions != null && functions.size() > 0;
         String groupedColSql = StringUtils.join(columns, ",");
@@ -109,7 +109,7 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
     }
 
     @Override
-    public IDDF getDDF() {
+    public DDF getDDF() {
         return associatedDDF;
     }
 

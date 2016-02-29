@@ -1,14 +1,14 @@
 package io.ddf2.handlers;
 
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 
 public interface IPersistentHandler {
  
-	public boolean persist(IDDF ddf);
+	public boolean persist(DDF ddf);
 	 
 	public boolean remove(String ddfName);
 	 
-	public IDDF restore(String ddfName);
+	public DDF restore(String ddfName);
 
 	public long getLastPersistTime(String ddfName);
 }

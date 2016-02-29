@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.ISqlResult;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.datasource.schema.IFactor;
@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ViewHandler implements IViewHandler{
-    protected IDDF ddf;
-    public ViewHandler(IDDF ddf){
+    protected DDF ddf;
+    public ViewHandler(DDF ddf){
         this.ddf = ddf;
     }
     @Override
@@ -34,13 +34,13 @@ public class ViewHandler implements IViewHandler{
      * @return DDF containing `numSamples` rows selected randomly from our owner DDF.
      */
     @Override
-    public IDDF getRandomSample2(int numSamples, boolean withReplacement) throws DDFException {
+    public DDF getRandomSample2(int numSamples, boolean withReplacement) throws DDFException {
         return ddf.sql2ddf(buildRandomSampleSql(numSamples, withReplacement));
     }
 
 
     @Override
-    public IDDF getRandomSample(double percent, boolean withReplacement) throws DDFException {
+    public DDF getRandomSample(double percent, boolean withReplacement) throws DDFException {
         return ddf.sql2ddf(buildRandomSampleSql(percent, withReplacement));
     }
 
@@ -60,14 +60,14 @@ public class ViewHandler implements IViewHandler{
     }
 
     @Override
-    public IDDF project(String... columnNames) throws DDFException {
+    public DDF project(String... columnNames) throws DDFException {
         return project(Arrays.asList(columnNames));
     }
 
     @Override
-    public IDDF project(List<String> columnNames) throws DDFException {
+    public DDF project(List<String> columnNames) throws DDFException {
         String selectedColumns = Joiner.on(",").join(columnNames);
-        IDDF projectedDDF =  ddf.sql2ddf(String.format("SELECT %s FROM %s", selectedColumns));
+        DDF projectedDDF =  ddf.sql2ddf(String.format("SELECT %s FROM %s", selectedColumns));
         // Copy the factor
         for (IColumn column : this.getDDF().getSchema().getColumns()) {
             if (projectedDDF.getSchema().getColumn(column.getName()) != null) {
@@ -107,7 +107,7 @@ public class ViewHandler implements IViewHandler{
     }
 
     @Override
-    public IDDF subset(List<Column> columnExprs, Expression filter) throws DDFException {
+    public DDF subset(List<Column> columnExprs, Expression filter) throws DDFException {
         this.updateColumnName(filter);
         List<String> columnStrs = new ArrayList<>();
         for (Column column : columnExprs) {
@@ -118,7 +118,7 @@ public class ViewHandler implements IViewHandler{
     }
 
     @Override
-    public IDDF subset(List<String> columnExprs, String filter) throws DDFException {
+    public DDF subset(List<String> columnExprs, String filter) throws DDFException {
         String sqlcmd = String.format("SELECT %s FROM %s", Joiner.on(", ").join(columnExprs),
             this.getDDF().getDDFName());
         if (!Strings.isNullOrEmpty(filter)) {
@@ -128,19 +128,19 @@ public class ViewHandler implements IViewHandler{
     }
 
     @Override
-    public IDDF removeColumn(String columnName) throws DDFException {
+    public DDF removeColumn(String columnName) throws DDFException {
         assert !Strings.isNullOrEmpty(columnName);
         return this.removeColumns(Collections.singletonList(columnName));
     }
 
     @Override
-    public IDDF removeColumns(String... columnNames) throws DDFException {
+    public DDF removeColumns(String... columnNames) throws DDFException {
         assert columnNames != null && columnNames.length > 0;
         return this.removeColumns(Arrays.asList(columnNames));
     }
 
     @Override
-    public IDDF removeColumns(List<String> columnNames) throws DDFException {
+    public DDF removeColumns(List<String> columnNames) throws DDFException {
         assert columnNames != null && !columnNames.isEmpty();
         List<String> curColNames = this.getDDF().getSchema().getColumnNames();
         List<String> remainCols = new ArrayList<>(curColNames);
@@ -150,13 +150,13 @@ public class ViewHandler implements IViewHandler{
             }
             remainCols.remove(columnName);
         }
-        IDDF ddf = this.project(remainCols);
+        DDF ddf = this.project(remainCols);
         // TODO: updateInPlace and copyFactor
         return ddf;
     }
 
     @Override
-    public IDDF getDDF() {
+    public DDF getDDF() {
         return ddf;
     }
 

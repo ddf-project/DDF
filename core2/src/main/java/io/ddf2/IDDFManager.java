@@ -10,12 +10,12 @@ import java.util.Map;
 /**
  * Each DDFManager have an unique UUID
  * Abstract factory, entry point of application to get concrete DDFManager (ex: SparkDDFManager)
- * Provide method to new IDDF & get IDDFMetaData
+ * Provide method to new DDF & get IDDFMetaData
  * Manage all created DDF/DDFManager instance.
  * Provide method to get PersistentHandler to persist/remove/restore an DDF to storage.
  * 
  */
-public interface IDDFManager<T extends IDDF> {
+public interface IDDFManager<T extends DDF> {
 
 	public T newDDF(String name,IDataSource ds) throws DDFException;
 	public T newDDF(IDataSource ds) throws DDFException;

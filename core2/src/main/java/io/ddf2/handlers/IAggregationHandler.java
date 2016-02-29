@@ -4,7 +4,7 @@ package io.ddf2.handlers;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.ISqlResult;
 import io.ddf2.Utils;
 
@@ -70,7 +70,7 @@ public interface IAggregationHandler extends IDDFHandler {
 //     * @throws DDFException
 //     */
 //    @Deprecated
-//    IDDF agg(List<String> aggregateFunctions) throws DDFException;
+//    DDF agg(List<String> aggregateFunctions) throws DDFException;
 //
 //    /**
 //     * Set columns to group by.
@@ -78,7 +78,7 @@ public interface IAggregationHandler extends IDDFHandler {
 //     * @return
 //     */
 //    @Deprecated
-//    IDDF groupBy(List<String> groupedColumns);
+//    DDF groupBy(List<String> groupedColumns);
 
     /**
      * Do aggregation.
@@ -87,7 +87,7 @@ public interface IAggregationHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    IDDF groupBy(List<String> columns, List<String> functions) throws DDFException;
+    DDF groupBy(List<String> columns, List<String> functions) throws DDFException;
 
     /**
      * Create a contingency table (optionally a sparse matrix) from cross-classifying factors.

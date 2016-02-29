@@ -2,7 +2,7 @@ package io.ddf2.handlers;
 
 import com.google.common.base.Joiner;
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.Utils;
 
 import java.io.Serializable;
@@ -15,23 +15,23 @@ public interface ITransformHandler extends IDDFHandler{
      * @return
      * @throws DDFException
      */
-    IDDF transformScaleMinMax() throws DDFException;
+    DDF transformScaleMinMax() throws DDFException;
 
     /**
      * Transform the ddf so that all numeric columns values are scaled based on the formula
      * @return
      * @throws DDFException
      */
-    IDDF transformScaleStandard() throws DDFException;
+    DDF transformScaleStandard() throws DDFException;
 
-    IDDF transformNativeRserve(String transformExpression);
+    DDF transformNativeRserve(String transformExpression);
 
-    IDDF transformNativeRserve(String[] transformExpression);
+    DDF transformNativeRserve(String[] transformExpression);
 
-    IDDF transformPython(String[] transformFunctions, String[] functionNames,
+    DDF transformPython(String[] transformFunctions, String[] functionNames,
                                String[] destColumns, String[][] sourceColumns);
 
-    IDDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine);
+    DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine);
 
     /**
      * Create new columns or overwrite existing ones.
@@ -44,7 +44,7 @@ public interface ITransformHandler extends IDDFHandler{
      * @return
      * @throws DDFException
      */
-    public IDDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException;
+    public DDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException;
 
     /**
      * Flatten columns with structure to flat one, e.g. a column named a with properties val1, val2. Then new columns
@@ -53,7 +53,7 @@ public interface ITransformHandler extends IDDFHandler{
      * @return
      * @throws DDFException
      */
-    IDDF flattenDDF(String[] columns) throws DDFException;
+    DDF flattenDDF(String[] columns) throws DDFException;
 
     /**
      * Flatten all columns with structure to flat one, e.g. a column named a with properties val1, val2. Then new
@@ -61,7 +61,7 @@ public interface ITransformHandler extends IDDFHandler{
      * @return
      * @throws DDFException
      */
-    IDDF flattenDDF() throws DDFException;
+    DDF flattenDDF() throws DDFException;
 
 
 

@@ -1,6 +1,6 @@
 package io.ddf2.handlers;
 
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 
 public interface IDDFHandler {
     /**
@@ -8,6 +8,6 @@ public interface IDDFHandler {
      * @return Associated DDF
      */
 
-    IDDF getDDF();
+    DDF getDDF();
 }
  

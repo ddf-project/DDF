@@ -1,17 +1,17 @@
 package io.ddf2.handlers.impl;
 
 
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.handlers.IDDFHandler;
 import io.ddf2.handlers.IMLMetricHandler;
 
 public class MLMetricHandler implements IMLMetricHandler{
-    protected IDDF associatedDDF;
-    public MLMetricHandler(IDDF associatedDDF){
+    protected DDF associatedDDF;
+    public MLMetricHandler(DDF associatedDDF){
         this.associatedDDF = associatedDDF;
     }
     @Override
-    public IDDF getDDF() {
+    public DDF getDDF() {
         return associatedDDF;
     }
 }

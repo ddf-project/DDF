@@ -1,7 +1,7 @@
 package io.ddf2.datasource.schema;
 
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 
 import java.util.List;
 import java.util.Set;
@@ -38,8 +38,8 @@ public interface ISchema {
 
 	void generateDummyCoding() throws NumberFormatException, DDFException;
 
-	void copyFactor(IDDF ddf) throws DDFException;
+	void copyFactor(DDF ddf) throws DDFException;
 
-	void copyFactor(IDDF ddf, List<String> columns) throws DDFException;
+	void copyFactor(DDF ddf, List<String> columns) throws DDFException;
 }
  

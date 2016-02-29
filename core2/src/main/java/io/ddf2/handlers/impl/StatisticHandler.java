@@ -1,7 +1,7 @@
 package io.ddf2.handlers.impl;
 
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 import io.ddf2.ISqlResult;
 import io.ddf2.datasource.schema.IColumn;
 import io.ddf2.handlers.IStatisticHandler;
@@ -10,9 +10,9 @@ import org.apache.commons.lang.StringUtils;
 import java.util.*;
 
 public abstract class StatisticHandler implements IStatisticHandler {
-    protected IDDF ddf;
+    protected DDF ddf;
 
-    public StatisticHandler(IDDF ddf) {
+    public StatisticHandler(DDF ddf) {
         this.ddf = ddf;
     }
 
@@ -239,7 +239,7 @@ public abstract class StatisticHandler implements IStatisticHandler {
     }
 
     @Override
-    public IDDF getDDF() {
+    public DDF getDDF() {
         return ddf;
     }
 

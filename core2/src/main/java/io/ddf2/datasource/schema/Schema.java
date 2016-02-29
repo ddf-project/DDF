@@ -1,7 +1,7 @@
 package io.ddf2.datasource.schema;
 
 import io.ddf2.DDFException;
-import io.ddf2.IDDF;
+import io.ddf2.DDF;
 
 import org.apache.http.annotation.NotThreadSafe;
 
@@ -20,7 +20,7 @@ public  class Schema implements ISchema {
     protected List<String> colNames;
     protected List<IColumn> columns;
     // TODO: @sang I think we need an inverse reference to the ddf?
-    private IDDF associatedDDF;
+    private DDF associatedDDF;
 
     public Schema() {
         colNames = new ArrayList<>();
@@ -140,12 +140,12 @@ public  class Schema implements ISchema {
     }
 
     @Override
-    public void copyFactor(IDDF ddf) throws DDFException {
+    public void copyFactor(DDF ddf) throws DDFException {
         this.copyFactor(ddf, null);
     }
 
     @Override
-    public void copyFactor(IDDF ddf, List<String> columns) throws DDFException {
+    public void copyFactor(DDF ddf, List<String> columns) throws DDFException {
         if (columns != null) {
             for (IColumn column : ddf.getSchema().getColumns()) {
                 if (this.associatedDDF.getSchema().getColumn(column.getName()) != null

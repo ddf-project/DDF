@@ -18,16 +18,17 @@ import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by sangdn on 1/18/16.
  */
 public class BigQueryDDF extends DDF {
-
     protected String projectId;
     protected String query;
     protected Bigquery bigquery;
     protected String datasetId;
+
     protected BigQueryDDF(IDataSource dataSource) {
         super(dataSource);
         bigquery = BigQueryUtils.newInstance();
@@ -60,7 +61,7 @@ public class BigQueryDDF extends DDF {
 
     /**
      * @param sql
-     * @see IDDF#sql(String)
+     * @see DDF#sql(String)
      */
     @Override
     public ISqlResult sql(String sql) throws DDFException {
@@ -82,12 +83,12 @@ public class BigQueryDDF extends DDF {
     }
 
     @Override
-    public IDDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
+    public DDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
         return sql2ddf(sql);
     }
 
     @Override
-    public IDDF sql2ddf(String sql) throws DDFException {
+    public DDF sql2ddf(String sql) throws DDFException {
         BQDataSource bqDataSource = BQDataSource.builder().setProjectId(projectId).setQuery(sql).build();
         return ddfManager.newDDF(bqDataSource);
     }
@@ -99,7 +100,7 @@ public class BigQueryDDF extends DDF {
 
 
     /**
-     * @see IDDF#getDDFName()
+     * @see DDF#getDDFName()
      */
     @Override
     public String getDDFName() {
@@ -167,7 +168,7 @@ public class BigQueryDDF extends DDF {
             super(dataSource);
         }
     }
-    public static BigQueryDDFBuilder<BigQueryDDF> builder(IDataSource dataSource){
+    protected static BigQueryDDFBuilder<BigQueryDDF> builder(IDataSource dataSource){
         return new BigQueryDDFBuilder<BigQueryDDF>(dataSource) {
             @Override
             public BigQueryDDF newInstance(IDataSource ds) {

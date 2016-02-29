@@ -31,7 +31,7 @@ public class BaseCommonTest {
         System.out.println("BaseCommonTest::TestSql Begin Test");
         String ddfName = TestUtils.genString();
         manager.getDDFMetaData().dropDDF(ddfName);
-        IDDF ddf = manager.newDDF(ddfName,dataSource);
+        DDF ddf = manager.newDDF(ddfName,dataSource);
         ISchema schema = ddf.getSchema();
         assert schema != null;
         assert  schema.getNumColumn() > 0;
