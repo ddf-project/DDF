@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class DDF {
+    // TODO: @sang (1) Every ddf should have an uri style identifier, which may be generated from name. (2) When
+    // should we persist ddf, when should we not persist? Does the persistence behavior relates to the name of ddf?
     /*
     Common Properties For DDF
 	 */
@@ -55,6 +57,7 @@ public abstract class DDF {
     protected final void build(Map mapDDFProperties) throws PrepareDataSourceException, UnsupportedDataSourceException {
         this.mapDDFProperties = mapDDFProperties;
         beforeBuild(this.mapDDFProperties);
+        // TODO: If so we have to init every datasource preparer in order to use them. Better just init when needed.
         initDSPreparer();
 
         IDataSourcePreparer preparer = mapDataSourcePreparer.get(dataSource.getClass());
