@@ -2,9 +2,9 @@ package io.ddf2.handlers;
 
 import io.ddf2.DDF;
 
-public interface IPersistentHandler {
+public interface IPersistentHandler <T extends DDF<T>>{
  
-	public boolean persist(DDF ddf);
+	public boolean persist(T ddf);
 	 
 	public boolean remove(String ddfName);
 	 

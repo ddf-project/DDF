@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by sangdn on 1/18/16.
  */
-public class BigQueryDDF extends DDF {
+public class BigQueryDDF extends DDF<BigQueryDDF> {
     protected String projectId;
     protected String query;
     protected Bigquery bigquery;
@@ -83,12 +83,12 @@ public class BigQueryDDF extends DDF {
     }
 
     @Override
-    public DDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
+    public BigQueryDDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
         return sql2ddf(sql);
     }
 
     @Override
-    public DDF sql2ddf(String sql) throws DDFException {
+    public BigQueryDDF sql2ddf(String sql) throws DDFException {
         BQDataSource bqDataSource = BQDataSource.builder().setProjectId(projectId).setQuery(sql).build();
         return ddfManager.newDDF(bqDataSource);
     }

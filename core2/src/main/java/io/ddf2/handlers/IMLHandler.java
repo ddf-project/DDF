@@ -1,6 +1,8 @@
 package io.ddf2.handlers;
 
-public interface IMLHandler extends IDDFHandler{
+import io.ddf2.DDF;
+
+public interface IMLHandler<T extends DDF<T>> extends IDDFHandler<T>{
  
 }
  

@@ -1,6 +1,7 @@
 package io.ddf2.handlers;
 
 import com.google.common.base.Joiner;
+import io.ddf2.DDF;
 import io.ddf2.DDFException;
 import io.ddf2.Utils;
 
@@ -8,7 +9,7 @@ import io.ddf2.Utils;
 import java.io.Serializable;
 import java.util.List;
 
-public interface IStatisticHandler extends IDDFHandler {
+public interface IStatisticHandler<T extends DDF<T>> extends IDDFHandler<T> {
     /**
      * Get summary for the ddf.
      *

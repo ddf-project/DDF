@@ -5,17 +5,20 @@ import io.ddf2.datasource.IDataSourcePreparer;
 import io.ddf2.datasource.PrepareDataSourceException;
 import io.ddf2.datasource.schema.ISchema;
 import io.ddf2.handlers.*;
+import io.ddf2.spark.SparkDDF;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class DDF {
-    // TODO: @sang (1) Every ddf should have an uri style identifier, which may be generated from name. (2) When
-    // should we persist ddf, when should we not persist? Does the persistence behavior relates to the name of ddf?
+
+public abstract class DDF<T extends DDF<T>> {
     /*
     Common Properties For DDF
 	 */
+
+    // TODO: @sang (1) Every ddf should have an uri style identifier, which may be generated from name. (2) When
+    // should we persist ddf, when should we not persist? Does the persistence behavior relates to the name of ddf?
 
     /* DataSource keeps all data info of DDF like schema, Storage */
     protected IDataSource dataSource;
@@ -24,7 +27,7 @@ public abstract class DDF {
     /* DDF Name */
     protected String name;
     /* An instance of IDDFManager which create this DDF*/
-    protected IDDFManager ddfManager;
+    protected IDDFManager<T> ddfManager;
     /*Each DDFManager will pass all required Properties to its DDF */
     protected Map mapDDFProperties;
     /*All supported datasource preparer*/
@@ -34,13 +37,13 @@ public abstract class DDF {
         Common Handler. Each handler provide subset function for Analytics & Machine Learning
 	 */
 
-    protected IAggregationHandler aggregationHandler;
-    protected IBinningHandler binningHandler;
-    protected IMLHandler mlHandler;
-    protected IMLMetricHandler mlMetricHandler;
-    protected IStatisticHandler statisticHandler;
-    protected ITransformHandler transformHandler;
-    protected IViewHandler viewHandler;
+    protected IAggregationHandler<T> aggregationHandler;
+    protected IBinningHandler<T>  binningHandler;
+    protected IMLHandler<T> mlHandler;
+    protected IMLMetricHandler<T> mlMetricHandler;
+    protected IStatisticHandler<T> statisticHandler;
+    protected ITransformHandler<T> transformHandler;
+    protected IViewHandler<T> viewHandler;
 
 
     protected DDF(IDataSource dataSource) {
@@ -92,9 +95,9 @@ public abstract class DDF {
 
     public abstract ISqlResult sql(String sql, Map<String, String> options) throws DDFException;
 
-    public abstract DDF sql2ddf(String sql) throws DDFException;
+    public abstract T sql2ddf(String sql) throws DDFException;
 
-    public abstract DDF sql2ddf(String sql, Map<String, String> options) throws DDFException;
+    public abstract T sql2ddf(String sql, Map<String, String> options) throws DDFException;
 
 
     /**
@@ -141,21 +144,21 @@ public abstract class DDF {
     /**
      * @see io.ddf2.DDF#getStatisticHandler()
      */
-    public IStatisticHandler getStatisticHandler() {
+    public IStatisticHandler<T> getStatisticHandler() {
         return null;
     }
 
     /**
      * @see io.ddf2.DDF#getViewHandler()
      */
-    public IViewHandler getViewHandler() {
+    public IViewHandler<T> getViewHandler() {
         return viewHandler;
     }
 
     /**
      * @see io.ddf2.DDF#getMLHandler()
      */
-    public IMLHandler getMLHandler() {
+    public IMLHandler<T> getMLHandler() {
         return mlHandler;
     }
 
@@ -371,7 +374,7 @@ public abstract class DDF {
     /**
      * @see IViewHandler#getRandomSample2(int, boolean)
      */
-    public DDF getRandomSample2(int numSamples, boolean withReplacement) throws DDFException {
+    public T getRandomSample2(int numSamples, boolean withReplacement) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.getRandomSample2(numSamples, withReplacement);
     }
@@ -379,7 +382,7 @@ public abstract class DDF {
     /**
      * @see IViewHandler#getRandomSample(double, boolean)
      */
-    public DDF getRandomSample(double percent, boolean withReplacement) throws DDFException {
+    public T getRandomSample(double percent, boolean withReplacement) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.getRandomSample(percent, withReplacement);
     }
@@ -403,7 +406,7 @@ public abstract class DDF {
     /**
      * @see IViewHandler#project(String...)
      */
-    public DDF project(String... columns) throws DDFException {
+    public T project(String... columns) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.project(columns);
     }
@@ -411,7 +414,7 @@ public abstract class DDF {
     /**
      * @see IViewHandler#project(List)
      */
-    public DDF project(List<String> columns) throws DDFException {
+    public T project(List<String> columns) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.project(columns);
     }
@@ -420,7 +423,7 @@ public abstract class DDF {
      * @see IViewHandler#subset(List, IViewHandler.Expression)
      */
     @Deprecated
-    public DDF subset(List<IViewHandler.Column> columnExpr, IViewHandler.Expression filter) throws DDFException {
+    public T subset(List<IViewHandler.Column> columnExpr, IViewHandler.Expression filter) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.subset(columnExpr, filter);
     }
@@ -428,7 +431,7 @@ public abstract class DDF {
     /**
      * @see IViewHandler#subset(List, String)
      */
-    public DDF subset(List<String> columnExpr, String filter) throws DDFException {
+    public T subset(List<String> columnExpr, String filter) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.subset(columnExpr, filter);
     }
@@ -436,7 +439,7 @@ public abstract class DDF {
     /**
      * @see IViewHandler#removeColumn(String)
      */
-    public DDF removeColumn(String column) throws DDFException {
+    public T removeColumn(String column) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.removeColumn(column);
     }
@@ -444,7 +447,7 @@ public abstract class DDF {
     /**
      * @see IViewHandler#removeColumns(String...)
      */
-    public DDF removeColumns(String... columns) throws DDFException {
+    public T removeColumns(String... columns) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.removeColumns(columns);
     }
@@ -452,7 +455,7 @@ public abstract class DDF {
     /**
      * @see IViewHandler#removeColumns(List)
      */
-    public DDF removeColumns(List<String> columns) throws DDFException {
+    public T removeColumns(List<String> columns) throws DDFException {
         assertNotNull(viewHandler);
         return viewHandler.removeColumns(columns);
     }
@@ -504,7 +507,7 @@ public abstract class DDF {
     /**
      * @see IAggregationHandler#groupBy(List, List)
      */
-    public DDF groupBy(List<String> columns, List<String> functions) throws DDFException {
+    public T groupBy(List<String> columns, List<String> functions) throws DDFException {
         assertNotNull(aggregationHandler);
         return aggregationHandler.groupBy(columns, functions);
     }
@@ -533,8 +536,8 @@ public abstract class DDF {
      * @see IBinningHandler#binning(String, String, int, double[], boolean, boolean)
      */
     @Deprecated
-    public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
-                       boolean right) throws DDFException {
+    public T binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
+                     boolean right) throws DDFException {
         assertNotNull(binningHandler);
         return binningHandler.binning(column, binningType, numBins, breaks, includeLowest, right);
     }
@@ -542,7 +545,7 @@ public abstract class DDF {
     /**
      * @see IBinningHandler#binningCustom(String, double[], boolean, boolean)
      */
-    public DDF binningCustom(String column, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
+    public T binningCustom(String column, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
         assertNotNull(binningHandler);
         return binningHandler.binningCustom(column, breaks, includeLowest, right);
     }
@@ -550,7 +553,7 @@ public abstract class DDF {
     /**
      * @see IBinningHandler#binningEq(String, int, boolean, boolean)
      */
-    public DDF binningEq(String column, int numBins, boolean includeLowest, boolean right) throws DDFException {
+    public T binningEq(String column, int numBins, boolean includeLowest, boolean right) throws DDFException {
         assertNotNull(binningHandler);
         return binningHandler.binningEq(column, numBins, includeLowest, right);
     }
@@ -558,7 +561,7 @@ public abstract class DDF {
     /**
      * @see IBinningHandler#binningEqFreq(String, int, boolean, boolean)
      */
-    public DDF binningEqFreq(String column, int numBins, boolean includeLowest, boolean right) throws DDFException {
+    public T binningEqFreq(String column, int numBins, boolean includeLowest, boolean right) throws DDFException {
         assertNotNull(binningHandler);
         return binningHandler.binningEqFreq(column, numBins, includeLowest, right);
     }
@@ -569,7 +572,7 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#transformScaleMinMax()
      */
-    public DDF transformScaleMinMax() throws DDFException {
+    public T transformScaleMinMax() throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.transformScaleMinMax();
     }
@@ -577,7 +580,7 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#transformScaleStandard()
      */
-    public DDF transformScaleStandard() throws DDFException {
+    public T transformScaleStandard() throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.transformScaleStandard();
     }
@@ -585,7 +588,7 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#transformNativeRserve(String)
      */
-    public DDF transformNativeRserve(String transformExpression) throws DDFException {
+    public T transformNativeRserve(String transformExpression) throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.transformNativeRserve(transformExpression);
     }
@@ -593,7 +596,7 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#transformNativeRserve(String[])
      */
-    public DDF transformNativeRserve(String[] transformExpression) throws DDFException {
+    public T transformNativeRserve(String[] transformExpression) throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.transformNativeRserve(transformExpression);
     }
@@ -601,8 +604,8 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#transformPython(String[], String[], String[], String[][])
      */
-    public DDF transformPython(String[] transformFunctions, String[] functionNames,
-                               String[] destColumns, String[][] sourceColumns) throws DDFException {
+    public T transformPython(String[] transformFunctions, String[] functionNames,
+                             String[] destColumns, String[][] sourceColumns) throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.transformPython(transformFunctions, functionNames, destColumns, sourceColumns);
     }
@@ -610,7 +613,7 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#transformMapReduceNative(String, String, boolean)
      */
-    public DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) throws DDFException {
+    public T transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.transformMapReduceNative(mapFuncDef, reduceFuncDef, mapsideCombine);
     }
@@ -618,7 +621,7 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#transformUDF(List, List)
      */
-    public DDF transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException {
+    public T transformUDF(List<String> transformExpressions, List<String> columns) throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.transformUDF(transformExpressions, columns);
     }
@@ -626,7 +629,7 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#flattenDDF(String[])
      */
-    public DDF flattenDDF(String[] columns) throws DDFException {
+    public T flattenDDF(String[] columns) throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.flattenDDF(columns);
     }
@@ -634,7 +637,7 @@ public abstract class DDF {
     /**
      * @see ITransformHandler#flattenDDF()
      */
-    public DDF flattenDDF() throws DDFException {
+    public T flattenDDF() throws DDFException {
         assertNotNull(transformHandler);
         return transformHandler.flattenDDF();
     }

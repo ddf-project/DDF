@@ -2,10 +2,10 @@ package io.ddf2.handlers.impl;
 
 import io.ddf2.DDF;
 
-public class PersistentHandler  implements io.ddf2.handlers.IPersistentHandler{
+public class PersistentHandler<T extends DDF<T>> implements io.ddf2.handlers.IPersistentHandler<T>{
 
     @Override
-    public boolean persist(DDF ddf) {
+    public boolean persist(T ddf) {
         return false;
     }
 
@@ -15,7 +15,7 @@ public class PersistentHandler  implements io.ddf2.handlers.IPersistentHandler{
     }
 
     @Override
-    public DDF restore(String ddfName) {
+    public T restore(String ddfName) {
         return null;
     }
 
