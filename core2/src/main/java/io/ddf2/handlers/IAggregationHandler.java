@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  *
  */
-public interface IAggregationHandler extends IDDFHandler {
+public interface IAggregationHandler<T extends DDF<T>> extends IDDFHandler<T> {
     /**
      * Compute corrlelation between 2 numeric columns.
      *
@@ -87,7 +87,7 @@ public interface IAggregationHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    DDF groupBy(List<String> columns, List<String> functions) throws DDFException;
+    T groupBy(List<String> columns, List<String> functions) throws DDFException;
 
     /**
      * Create a contingency table (optionally a sparse matrix) from cross-classifying factors.

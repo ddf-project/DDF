@@ -26,7 +26,7 @@ import java.util.Map;
  * SparkDDF implement DDF using HiveContext
  * @see io.ddf2.DDF
  */
-public class SparkDDF extends DDF {
+public class SparkDDF extends DDF<SparkDDF> {
 
 
     protected SparkContext sparkContext;
@@ -67,12 +67,12 @@ public class SparkDDF extends DDF {
     }
 
     @Override
-    public DDF sql2ddf(String sql) throws DDFException {
+    public SparkDDF sql2ddf(String sql) throws DDFException {
         return ddfManager.newDDF(SqlDataSource.builder().setQuery(sql).build());
     }
 
     @Override
-    public DDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
+    public SparkDDF sql2ddf(String sql, Map<String, String> options) throws DDFException {
         return null;
     }
 

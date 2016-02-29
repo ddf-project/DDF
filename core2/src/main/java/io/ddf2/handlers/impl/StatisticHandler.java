@@ -9,10 +9,10 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
-public abstract class StatisticHandler implements IStatisticHandler {
-    protected DDF ddf;
+public abstract class StatisticHandler<T extends DDF<T>> implements IStatisticHandler<T> {
+    protected T ddf;
 
-    public StatisticHandler(DDF ddf) {
+    public StatisticHandler(T ddf) {
         this.ddf = ddf;
     }
 
@@ -239,7 +239,7 @@ public abstract class StatisticHandler implements IStatisticHandler {
     }
 
     @Override
-    public DDF getDDF() {
+    public T getDDF() {
         return ddf;
     }
 

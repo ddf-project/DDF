@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-public interface IViewHandler extends IDDFHandler {
+public interface IViewHandler<T extends DDF<T>> extends IDDFHandler<T> {
     /**
      * Sample from ddf.
      * @param numSamples number of samples.
@@ -25,7 +25,7 @@ public interface IViewHandler extends IDDFHandler {
      * @param withReplacement Can elements be sampled multiple times.
      * @return DDF containing `numSamples` rows selected randomly from our owner DDF.
      */
-    DDF getRandomSample2(int numSamples, boolean withReplacement) throws DDFException;
+    T getRandomSample2(int numSamples, boolean withReplacement) throws DDFException;
 
     /**
      * Sample from ddf.
@@ -33,7 +33,7 @@ public interface IViewHandler extends IDDFHandler {
      * @param withReplacement Can elements be sampled multiple times.
      * @return DDF containing `numSamples` rows selected randomly from our owner DDF.
      */
-    DDF getRandomSample(double percent, boolean withReplacement) throws DDFException;
+    T getRandomSample(double percent, boolean withReplacement) throws DDFException;
 
     /**
      * Preview the content of ddf.
@@ -59,7 +59,7 @@ public interface IViewHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    DDF project(String... columnNames) throws DDFException;
+    T project(String... columnNames) throws DDFException;
 
     /**
      * Project the content of ddf.
@@ -67,7 +67,7 @@ public interface IViewHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    DDF project(List<String> columnNames) throws DDFException;
+    T project(List<String> columnNames) throws DDFException;
 
     /**
      * Subset on ddf.
@@ -77,7 +77,7 @@ public interface IViewHandler extends IDDFHandler {
      * @throws DDFException
      */
     @Deprecated
-    DDF subset(List<Column> columnExpr, Expression filter) throws DDFException;
+    T subset(List<Column> columnExpr, Expression filter) throws DDFException;
 
     /**
      * Subset on ddf.
@@ -86,7 +86,7 @@ public interface IViewHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    DDF subset(List<String> columnExpr, String filter) throws DDFException;
+    T subset(List<String> columnExpr, String filter) throws DDFException;
 
     /**
      * Remove single column from ddf.
@@ -94,7 +94,7 @@ public interface IViewHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    DDF removeColumn(String columnName) throws DDFException;
+    T removeColumn(String columnName) throws DDFException;
 
     /**
      * Remove columns from ddf.
@@ -102,7 +102,7 @@ public interface IViewHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    DDF removeColumns(String... columnNames) throws DDFException;
+    T removeColumns(String... columnNames) throws DDFException;
 
     /**
      * Remove columns from ddf.
@@ -110,7 +110,7 @@ public interface IViewHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    DDF removeColumns(List<String> columnNames) throws DDFException;
+    T removeColumns(List<String> columnNames) throws DDFException;
 
 
     /**

@@ -9,15 +9,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class BinningHandler implements io.ddf2.handlers.IBinningHandler {
-    protected DDF associatedDDF;
+public abstract class BinningHandler<T extends DDF<T>> implements io.ddf2.handlers.IBinningHandler<T> {
+    protected T associatedDDF;
 
-    public BinningHandler(DDF associatedDDF){
+    public BinningHandler(T associatedDDF){
         this.associatedDDF = associatedDDF;
     }
 
     @Override
-    public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
+    public T binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest, boolean right) throws DDFException {
         assert Arrays.asList("custom", "equalInterval", "equalfreq").contains(binningType.toLowerCase());
         if (binningType.equalsIgnoreCase("custom")) {
             return this.binningCustom(column, breaks, includeLowest, right);
@@ -30,7 +30,7 @@ public abstract class BinningHandler implements io.ddf2.handlers.IBinningHandler
     }
 
     @Override
-    public DDF getDDF() {
+    public T getDDF() {
         return associatedDDF;
     }
 }

@@ -5,7 +5,7 @@ import io.ddf2.DDF;
 
 import java.util.List;
 
-public interface IBinningHandler extends IDDFHandler {
+public interface IBinningHandler<T extends DDF<T>> extends IDDFHandler<T> {
 
     /**
      * Compute factor of columns using histogram.
@@ -20,7 +20,7 @@ public interface IBinningHandler extends IDDFHandler {
      * @throws DDFException
      */
     @Deprecated
-    public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
+    public T binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
                         boolean right) throws DDFException;
 
     /**
@@ -32,7 +32,7 @@ public interface IBinningHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    public DDF binningCustom(String column,double[] breaks, boolean includeLowest,boolean right) throws DDFException;
+    public T binningCustom(String column,double[] breaks, boolean includeLowest,boolean right) throws DDFException;
 
     /**
      * Compute factor using histogram by equal intervals.
@@ -43,7 +43,7 @@ public interface IBinningHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    public DDF binningEq(String column,int numBins, boolean includeLowest,boolean right) throws DDFException;
+    public T binningEq(String column,int numBins, boolean includeLowest,boolean right) throws DDFException;
 
     /**
      * Compute factor using histogram by equal frequency.
@@ -54,7 +54,7 @@ public interface IBinningHandler extends IDDFHandler {
      * @return
      * @throws DDFException
      */
-    public DDF binningEqFreq(String column,int numBins, boolean includeLowest,boolean right) throws DDFException;
+    public T binningEqFreq(String column,int numBins, boolean includeLowest,boolean right) throws DDFException;
 
     /**
      * Compute histogram of the column using numBins buckets, evenly spaced between the minimum and maximum value.

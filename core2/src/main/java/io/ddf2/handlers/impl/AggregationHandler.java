@@ -15,11 +15,11 @@ import java.util.List;
 /**
  * Created by sangdn on 1/24/16.
  */
-public abstract class AggregationHandler implements io.ddf2.handlers.IAggregationHandler {
+public class AggregationHandler<T extends DDF<T>> implements io.ddf2.handlers.IAggregationHandler<T>{
 
-    protected DDF associatedDDF;
+    protected T associatedDDF;
 
-    public AggregationHandler(DDF associatedDDF) {
+    public AggregationHandler(T associatedDDF) {
         this.associatedDDF = associatedDDF;
     }
 
@@ -79,7 +79,7 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
 
 
     @Override
-    public DDF groupBy(List<String> columns, List<String> functions) throws DDFException {
+    public T groupBy(List<String> columns, List<String> functions) throws DDFException {
         assert columns != null && columns.size() > 0;
         assert functions != null && functions.size() > 0;
         String groupedColSql = StringUtils.join(columns, ",");
@@ -109,7 +109,7 @@ public abstract class AggregationHandler implements io.ddf2.handlers.IAggregatio
     }
 
     @Override
-    public DDF getDDF() {
+    public T getDDF() {
         return associatedDDF;
     }
 
