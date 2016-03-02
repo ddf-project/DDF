@@ -8,6 +8,8 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -50,12 +52,35 @@ public class Utils {
           + "(?<timezone>Z|\\s?[+-](?:2[0-3]|[01][0-9])(:?[0-5][0-9])?)?)?)?)?$"
   );
 
+  public static Integer getQuarter(DateTime dateTime) {
+    if(dateTime != null) {
+      int month = dateTime.getMonthOfYear();
+      if (month >= 1 && month <= 3) {
+        return 1;
+      } else if (month >= 4 && month <= 6) {
+        return 2;
+      } else if (month >= 7 && month <= 9) {
+        return 3;
+      } else if (month >= 10 && month <= 12) {
+        return 4;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
   public static DateTime toDateTimeObject(Object object) {
     if (object instanceof Integer) {
       // Unix timestamp
-      return new DateTime((Integer) object * 1000L).withZone(DateTimeZone.UTC);
+      return new DateTime((Integer) object * 1000L);
     } else if (object instanceof Long) {
-      return new DateTime((Long)object * 1000L).withZone(DateTimeZone.UTC);
+      return new DateTime((Long) object * 1000L);
+    } else if (object instanceof Date) {
+      return new DateTime(((Date) object).getTime());
+    } else if (object instanceof Timestamp) {
+      return new DateTime(((Timestamp) object).getTime());
     } else if (object instanceof String) {
 
       Matcher matcher = isoPattern.matcher((String)object);
@@ -92,7 +117,7 @@ public class Utils {
         sb2.append(ms != null ? ("." + "SSS") : "");
         sb2.append(timezone != null ? timezone.startsWith(" ") ? " Z" : "Z" : "");
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(sb2.toString()).withZoneUTC();
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(sb2.toString());
         return formatter.parseDateTime(sb.toString());
       } else {
         return null;

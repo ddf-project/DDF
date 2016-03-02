@@ -13,7 +13,7 @@ object DateParseUDF {
         val dateTime = if (format.equalsIgnoreCase("iso")) {
           Utils.toDateTimeObject(string)
         } else {
-          val formatter = DateTimeFormat.forPattern(format).withZoneUTC()
+          val formatter = DateTimeFormat.forPattern(format)
           formatter.parseDateTime(string)
         }
         dateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
