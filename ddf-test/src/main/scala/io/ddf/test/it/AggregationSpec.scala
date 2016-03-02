@@ -29,7 +29,7 @@ trait AggregationSpec extends BaseSpec with Matchers {
     scenario("calculate simple aggregates") {
       val ddf = loadAirlineDDF()
       val aggregateResult = ddf.aggregate("Year, Month, min(ArrDelay), max(DepDelay)")
-      val result: Array[Double] = aggregateResult.get("2008\t3")
+      val result: Array[java.lang.Double] = aggregateResult.get("2008\t3")
       result.length should be(2)
 
       val colAggregate = ddf.getAggregationHandler.aggregateOnColumn(AggregateFunction.MAX, "Year")

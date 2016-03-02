@@ -81,7 +81,7 @@ trait MissingDataSpec extends BaseSpec with Matchers {
       val ddf1: DDF = ddf.VIEWS.project(List("Year", "LateAircraftDelay"))
       val filledDDF: DDF = ddf1.fillNA("0")
       val annualDelay = filledDDF.aggregate("Year, sum(LateAircraftDelay)").get("2008")(0)
-      annualDelay should be(282.0 +- 0.1)
+      scala.Double.unbox(annualDelay) should be(282.0 +- 0.1)
     }
 
     ignore("fill by dictionary") {
@@ -90,7 +90,7 @@ trait MissingDataSpec extends BaseSpec with Matchers {
       val dict: Map[String, String] = Map("Year" -> "2000", "SecurityDelay" -> "0", "LateAircraftDelay" -> "1")
       val filledDDF = ddf1.getMissingDataHandler.fillNA(null, null, 0, null, dict, null)
       val annualDelay = filledDDF.aggregate("Year, sum(LateAircraftDelay)").get("2008")(0)
-      annualDelay should be(282.0 +- 0.1)
+      scala.Double.unbox(annualDelay) should be(282.0 +- 0.1)
     }
 
     scenario("fill by aggregate function") {
