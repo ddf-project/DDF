@@ -87,19 +87,6 @@ trait SchemaSpec extends BaseSpec with Matchers {
       assert(ddf.getSchemaHandler.getColumn("cyl").getOptionalFactor.getLevelCounts.get("8") == 14)
     }*/
 
-    scenario("test set factor for string columns") {
-      val ddf = loadAirlineNADDF()
-      assert(ddf.getSchemaHandler.getColumn("Origin").getType == ColumnType.STRING)
-      assert(ddf.getSchemaHandler.getColumn("Origin").getColumnClass == ColumnClass.CHARACTER)
-      ddf.getSchemaHandler.setFactorLevelsForStringColumns(ddf.getSchemaHandler.getColumns.asScala.map { col => col
-        .getName
-      }.toArray)
-      ddf.getSchemaHandler.computeFactorLevelsAndLevelCounts()
-      assert(ddf.getSchemaHandler.getColumn("Origin").getType == ColumnType.STRING)
-      assert(ddf.getSchemaHandler.getColumn("Origin").getColumnClass == ColumnClass.FACTOR)
-      assert(ddf.getSchemaHandler.getColumn("Origin").getOptionalFactor.getLevelCounts.size() == 3)
-    }
-
     scenario("test NA handling") {
       val ddf = loadAirlineNADDF()
       val schemaHandler = ddf.getSchemaHandler

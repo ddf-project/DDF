@@ -94,11 +94,6 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public synchronized void setFactorLevelsForStringColumns(String[] xCols) throws DDFException {
-
-  }
-
-  @Override
   public synchronized void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
     Column c = this.getColumn(columnName);
     Factor<?> f = c.getOptionalFactor();
