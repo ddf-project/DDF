@@ -92,7 +92,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     } catch (Exception e) {
       e.printStackTrace();
       mLog.error(e.getMessage());
-      throw new DDFException("Unable to query from " + tableName, e);
+      throw new DDFException(e.getMessage(), e);
     }
   }
 
@@ -150,7 +150,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
 
       } catch (Exception e) {
         e.printStackTrace();
-        throw new DDFException("Unable to query from " + this.getDDF().getTableName(),
+        throw new DDFException(e.getMessage(),
                 e);
       }
 
