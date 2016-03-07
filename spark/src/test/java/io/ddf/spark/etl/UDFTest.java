@@ -147,10 +147,6 @@ public class UDFTest extends BaseTest {
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
 
-    ddf3 = ddf.sql2ddf("select extract('2015-01-22 20:23 +0000', 'dayofmonth') from @this");
-    rows = ddf3.VIEWS.head(1);
-    Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
-
     ddf3 = ddf.sql2ddf("select extract('2015-01-22 20:23 +0000', 'dayofweek') from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfWeek());
@@ -194,10 +190,6 @@ public class UDFTest extends BaseTest {
     Assert.assertTrue(Integer.parseInt(rows.get(0))== Utils.getQuarter(dt));
 
     ddf3 = ddf.sql2ddf("select extract(1433386800, 'day') from @this");
-    rows = ddf3.VIEWS.head(1);
-    Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
-
-    ddf3 = ddf.sql2ddf("select extract(1433386800, 'dayofmonth') from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
 
@@ -251,10 +243,6 @@ public class UDFTest extends BaseTest {
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
 
-    ddf3 = ddf.sql2ddf("select extract(4147483647, 'dayofmonth') from @this");
-    rows = ddf3.VIEWS.head(1);
-    Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
-
     ddf3 = ddf.sql2ddf("select extract(4147483647, 'dayofweek') from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfWeek());
@@ -281,7 +269,6 @@ public class UDFTest extends BaseTest {
 
     // Support date type
     dt = new DateTime(new java.sql.Date(1433386800 * 1000L));
-    System.out.println(dt.toString("yyyy-MM-dd HH:mm:ss"));
     ddf3 = ddf.sql2ddf("select extract(to_date(from_unixtime(1433386800)), 'year') from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getYear());
@@ -316,7 +303,6 @@ public class UDFTest extends BaseTest {
 
     ddf3 = ddf.sql2ddf("select extract(to_date(from_unixtime(1433386800)), 'hour') from @this");
     rows = ddf3.VIEWS.head(1);
-    System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0))== 0);
 
     ddf3 = ddf.sql2ddf("select extract(to_date(from_unixtime(1433386800)), 'minute') from @this");
@@ -425,10 +411,6 @@ public class UDFTest extends BaseTest {
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0)) == dt.getDayOfMonth());
 
-    ddf3 = ddf.sql2ddf("select dayofmonth('2015-01-22 20:23 +0000') from @this");
-    rows = ddf3.VIEWS.head(1);
-    Assert.assertTrue(Integer.parseInt(rows.get(0)) == dt.getDayOfMonth());
-
     ddf3 = ddf.sql2ddf("select dayofweek('2015-01-22 20:23 +0000') from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0)) == dt.getDayOfWeek());
@@ -515,10 +497,6 @@ public class UDFTest extends BaseTest {
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(rows.get(0).equalsIgnoreCase(dt.dayOfWeek().getAsShortText()));
 
-    ddf3 = ddf.sql2ddf("select dayofmonth(1433386800) from @this");
-    rows = ddf3.VIEWS.head(1);
-    Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
-
     ddf3 = ddf.sql2ddf("select dayofweek(1433386800) from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfWeek());
@@ -581,10 +559,6 @@ public class UDFTest extends BaseTest {
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
 
-    ddf3 = ddf.sql2ddf("select dayofmonth(4147483647) from @this");
-    rows = ddf3.VIEWS.head(1);
-    Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfMonth());
-
     ddf3 = ddf.sql2ddf("select dayofweek(4147483647) from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getDayOfWeek());
@@ -623,7 +597,6 @@ public class UDFTest extends BaseTest {
 
     // Support date type
     dt = new DateTime(new java.sql.Date(1433386800 * 1000L));
-    System.out.println(dt.toString("yyyy-MM-dd HH:mm:ss"));
     ddf3 = ddf.sql2ddf("select year(to_date(from_unixtime(1433386800))) from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getYear());
@@ -682,7 +655,6 @@ public class UDFTest extends BaseTest {
 
     ddf3 = ddf.sql2ddf("select hour(to_date(from_unixtime(1433386800))) from @this");
     rows = ddf3.VIEWS.head(1);
-    System.out.println(rows.get(0));
     Assert.assertTrue(Integer.parseInt(rows.get(0))== 0);
 
     ddf3 = ddf.sql2ddf("select minute(to_date(from_unixtime(1433386800))) from @this");

@@ -15,7 +15,6 @@ object DateTimeExtractUDF {
           case "weekyear" => DateUDF.parseWeekYear(obj)
           case "weekofyear" => DateUDF.parseWeekOfYear(obj)
           case "day" => DateUDF.parseDay(obj)
-          case "dayofmonth" => DateUDF.parseDay(obj)
           case "dayofweek" => DateUDF.parseDayOfWeek(obj)
           case "dayofyear" => DateUDF.parseDayOfYear(obj)
           case "hour" => DateUDF.parseHour(obj)
