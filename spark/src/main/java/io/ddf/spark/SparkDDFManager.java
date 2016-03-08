@@ -100,34 +100,6 @@ public class SparkDDFManager extends DDFManager {
                 + ", " + loadDS.getDbTable());
         return this.load(loadDS);
       }
-      // TODO
-      /*
-      if (fromManager.getEngine().equals("sfdc")) {
-        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri
-                ().toString());
-        mLog.info("sfdc uri: " + jdbcDataSourceDescriptor.getDataSourceUri()
-                .getUri().toString());
-      } else {
-        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri()
-                .toString() + "?user=" + jdbcCredential.getUsername() +
-                "&password="+jdbcCredential.getPassword());
-
-      }
-
-
-      // TODO: Pay attention here. Some maybe username?
-      // options.put("user", jdbcCredential.getUserName());
-      // options.put("password", jdbcCredential.getPassword());
-      // TODO: What if sfdc.
-      DataFrame rdd = mHiveContext.load("jdbc", options);
-      if (rdd == null) {
-        throw new DDFException("fail use spark datasource api");
-      }
-      Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
-      DDF ddf = this.newDDF(this, rdd, new Class<?>[]
-              {DataFrame.class}, null, null, null, schema);
-      ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
-      */
     } else {
       throw new DDFException("Currently no other DataSourceDescriptor is " +
               "supported");
@@ -166,6 +138,7 @@ public class SparkDDFManager extends DDFManager {
           break;
         case TSV:
           dfr = dfr.option("delimiter", "\t");
+          // fall through
         case CSV:
           dfr = dfr.format("com.databricks.spark.csv").option("header", s3DDF.getHasHeader() ? "true" : "false");
           if (s3DDF.getSchema() == null) {
@@ -178,8 +151,8 @@ public class SparkDDFManager extends DDFManager {
             // TODO
           }
           break;
-        case PQT:
-          break;
+        case PQT: case AVRO: case ORC:
+          dfr = dfr.format(s3DDF.getDataFormat().toString().toLowerCase());
       }
       df = dfr.load(s3uri);
       if (s3DDF.getSchema() == null) {

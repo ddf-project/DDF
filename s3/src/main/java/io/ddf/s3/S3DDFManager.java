@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -86,9 +87,40 @@ public class S3DDFManager extends DDFManager {
      * @return
      */
     public DataFormat getDataFormat(S3DDF s3DDF) throws DDFException {
-        String key = this.firstFileKey(s3DDF);
-        String extension = key.substring(key.lastIndexOf('.') + 1);
-        return DataFormat.valueOf(extension.toUpperCase());
+        if (s3DDF.getIsDir()) {
+            List<String> keys = this.fileKeys(s3DDF);
+            if (keys.isEmpty()) {
+                throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
+            } else {
+                HashSet<DataFormat> dataFormats = new HashSet<>();
+                for (String key: keys) {
+                    int dotIndex = key.lastIndexOf('.');
+                    if (dotIndex != -1) {
+                        String extension = key.substring(dotIndex + 1);
+                        try {
+                            DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
+                            dataFormats.add(dataFormat);
+                        } catch (Exception e) {
+                            throw new DDFException(String.format("Unsupported dataformat: %s", extension));
+                        }
+                    }
+                }
+                if (dataFormats.size() > 1) {
+                    throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
+                            "%s", s3DDF.getKey(), dataFormats.toArray().toString()));
+                }
+                return dataFormats.iterator().next();
+            }
+        } else {
+            String key = s3DDF.getKey();
+            int dotIndex = key.lastIndexOf('.');
+            if (dotIndex != -1) {
+               return DataFormat.valueOf(key.substring(dotIndex + 1));
+            } else {
+                // CSV by default
+                return DataFormat.CSV;
+            }
+        }
     }
 
     /**
