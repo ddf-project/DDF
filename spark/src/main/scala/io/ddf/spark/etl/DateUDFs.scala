@@ -175,7 +175,6 @@ object DateUDF {
     sQLContext.udf.register("weekyear", parseWeekYear)
     sQLContext.udf.register("weekofyear", parseWeekOfYear)
     sQLContext.udf.register("day", parseDay)
-    sQLContext.udf.register("dayofmonth", parseDay)
     sQLContext.udf.register("dayofweek", parseDayOfWeek)
     sQLContext.udf.register("dayofweek_text", parseDayOfWeekAsText)
     sQLContext.udf.register("dayofyear", parseDayOfYear)
