@@ -45,23 +45,7 @@ object DateUDF {
   val parseQuarter: Object => Integer = {
     (obj: Object) => {
       val dateTime = Utils.toDateTimeObject(obj)
-      if(dateTime != null) {
-        val month = dateTime.getMonthOfYear
-        if (month >= 1 && month <= 3) {
-          1
-        } else if (month >= 4 && month <= 6) {
-          2
-        } else if (month >= 7 && month <= 9) {
-          3
-        } else if (month >= 10 && month <= 12) {
-          4
-        } else {
-          null
-        }
-
-      } else {
-        null
-      }
+      Utils.getQuarter(dateTime)
     }
   }
 
@@ -187,13 +171,12 @@ object DateUDF {
     sQLContext.udf.register("year", parseYear)
     sQLContext.udf.register("quarter", parseQuarter)
     sQLContext.udf.register("month", parseMonth)
-    sQLContext.udf.register("month_as_text", parseMonthAsText)
+    sQLContext.udf.register("month_text", parseMonthAsText)
     sQLContext.udf.register("weekyear", parseWeekYear)
     sQLContext.udf.register("weekofyear", parseWeekOfYear)
-    sQLContext.udf.register("weekofweekyear", parseWeekOfYear)
     sQLContext.udf.register("day", parseDay)
     sQLContext.udf.register("dayofweek", parseDayOfWeek)
-    sQLContext.udf.register("dayofweek_as_text", parseDayOfWeekAsText)
+    sQLContext.udf.register("dayofweek_text", parseDayOfWeekAsText)
     sQLContext.udf.register("dayofyear", parseDayOfYear)
     sQLContext.udf.register("hour", parseHour)
     sQLContext.udf.register("minute", parseMinute)
