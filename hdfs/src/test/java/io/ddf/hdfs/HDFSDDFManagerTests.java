@@ -41,7 +41,6 @@ public class HDFSDDFManagerTests {
 
     }
 
-
     @Test
     public void testCreateDDF() throws DDFException {
         try {
@@ -72,6 +71,19 @@ public class HDFSDDFManagerTests {
         } catch (Exception e) {
 
         }
+
+        HDFSDDF pqtDDF = manager.newDDF("/user/jing/parquet/sleep_parquet/", null);
+        assert (pqtDDF.getIsDir() == true);
+        assert (pqtDDF.getDataFormat().equals(DataFormat.PARQUET));
+
+
+        HDFSDDF avroDDF = manager.newDDF("/user/jing/avro/partition_avro/", null);
+        assert (avroDDF.getIsDir() == true);
+        assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
+
+        HDFSDDF orcDDF = manager.newDDF("/user/jing/orc/", null);
+        assert (orcDDF.getIsDir() == true);
+        assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
     }
 
 

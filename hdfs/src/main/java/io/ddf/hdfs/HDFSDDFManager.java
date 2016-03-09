@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,199 +24,220 @@ import org.apache.hadoop.fs.*;
  * Created by jing on 2/22/16.
  */
 public class HDFSDDFManager extends DDFManager {
-    // File system connector.
-    private FileSystem fs = null;
+  // File system connector.
+  private FileSystem fs = null;
+  // Upper limit for content preview.
+  private static final int K_LIMIT = 1000;
+  private String fsUri = null;
 
-    // Upper limit for content preview.
-    private static final int K_LIMIT = 1000;
+  public HDFSDDFManager(String fsUri) throws DDFException {
+    assert !Strings.isNullOrEmpty(fsUri);
+    this.fsUri = fsUri;
+    try {
+      Configuration conf = new Configuration();
+      conf.set("fs.defaultFS", fsUri);
+      this.fs = FileSystem.get(conf);
+    } catch (IOException e) {
+      throw new DDFException(e);
+    }
+  }
 
-    private String fsUri = null;
+  /**
+   * @param hdfsDDF The uri of the hdfs file (single file).
+   * @return True if it has header, otherwise false.
+   * @brief To check whether the hdfs file already contains header.
+   */
+  public Boolean hasHeader(HDFSDDF hdfsDDF) {
+    // TODO: Should we do this check in backend?
+    return false;
+  }
 
-    public HDFSDDFManager(String fsUri) throws DDFException {
-        assert !Strings.isNullOrEmpty(fsUri);
-        this.fsUri = fsUri;
-        try {
-            Configuration conf = new Configuration();
-            conf.set("fs.defaultFS", fsUri);
-            this.fs = FileSystem.get(conf);
-        } catch (IOException e) {
-            throw new DDFException(e);
+  /**
+   * @brief To check whether the ddf is a directory.
+   */
+  public Boolean isDir(HDFSDDF hdfsDDF) throws DDFException {
+    String path = hdfsDDF.getPath();
+    try {
+      FileStatus fileStatus = fs.getFileStatus(new Path(path));
+      return fileStatus.isDirectory();
+    } catch (IOException e) {
+      throw new DDFException(e);
+    }
+  }
+
+  /**
+   * @breif To get the dataformat.
+   */
+  public DataFormat getDataFormat(HDFSDDF hdfsDDF) throws DDFException {
+    if (hdfsDDF.getIsDir()) {
+      try {
+        FileStatus[] files = this.fs.listStatus(new Path(hdfsDDF.getPath()));
+        if (files.length == 0) {
+          throw new DDFException(String.format("There is no file under %s", hdfsDDF.getPath()));
         }
-    }
-
-    /**
-     * @brief To check whether the hdfs file already contains header.
-     * @param hdfsDDF The uri of the hdfs file (single file).
-     * @return True if it has header, otherwise false.
-     */
-    public Boolean hasHeader(HDFSDDF hdfsDDF) {
-        // TODO: Should we do this check in backend?
-        return false;
-    }
-
-    /**
-     * @brief To check whether the ddf is a directory.
-     * @param hdfsDDF
-     * @return
-     */
-    public Boolean isDir(HDFSDDF hdfsDDF) throws DDFException {
-        String path = hdfsDDF.getPath();
-        try {
-            FileStatus fileStatus = fs.getFileStatus(new Path(path));
-            return fileStatus.isDirectory();
-        } catch (IOException e) {
-            throw new DDFException(e);
-        }
-    }
-
-    /**
-     * @breif To get the dataformat.
-     * @param hdfsDDF
-     * @return
-     */
-    public DataFormat getDataFormat(HDFSDDF hdfsDDF) throws DDFException {
-        if (hdfsDDF.getIsDir()) return DataFormat.UNDEF;
-        String path = hdfsDDF.getPath();
-        String extension = path.substring(path.lastIndexOf(".") + 1);
-        return DataFormat.valueOf(extension.toUpperCase());
-    }
-
-
-    /**
-     * @brief List all the files (including directories under one path)
-     * @param path The path.
-     * @return The list of file names
-     * // TODO: Interator to avoid oom.
-     */
-    public List<String> listFiles(String path) throws DDFException {
-        List<String> ret = new ArrayList<>();
-        try {
-            FileStatus[] status = fs.listStatus(new Path(path));
-            for (int i = 0; i < status.length; i++){
-                ret.add(status[i].getPath().toString());
-            }
-        } catch (IOException e) {
-            throw new DDFException(e);
-        }
-        return ret;
-    }
-
-
-    /**
-     * @brief Create a ddf given path.
-     * @param path The path.
-     * @return
-     */
-    public HDFSDDF newDDF(String path) throws DDFException {
-        return new HDFSDDF(this, path);
-    }
-
-    public HDFSDDF newDDF(String path, String schema) throws DDFException {
-        return new HDFSDDF(this, path, schema);
-    }
-
-
-    /**
-     * @brief Show the first several rows of the s3ddf.
-     * @param hdfsDDF
-     * @param limit
-     * @return
-     * @throws DDFException
-     */
-    public List<String> head(HDFSDDF hdfsDDF, int limit) throws DDFException {
-        if (limit > K_LIMIT) {
-            limit = K_LIMIT;
-        }
-
-        List<String> rows = new ArrayList<String>();
-
-        int pos = 0;
-        String s = null;
-
-        if (!hdfsDDF.getIsDir()) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(new Path(hdfsDDF.getPath()))))) {
-                while ( (s = br.readLine()) != null && pos < limit) {
-                    rows.add(s);
-                    ++pos;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            RemoteIterator<LocatedFileStatus> files = null;
+        HashSet<DataFormat> dataFormats = new HashSet<>();
+        for (FileStatus file : files) {
+          String filePath = file.getPath().toString();
+          int dotIndex = filePath.lastIndexOf('.');
+          if (dotIndex != -1) {
+            String extension = filePath.substring(dotIndex + 1);
             try {
-                files = fs.listFiles(new Path(hdfsDDF.getPath()), false);
-                while (files.hasNext() && pos < limit) {
-                    LocatedFileStatus lfs = files.next();
-                    try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(
-                            fs.open(lfs.getPath())))) {
-                        while ( (s = br.readLine()) != null && pos < limit) {
-                            rows.add(s);
-                            ++pos;
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (IOException e) {
-                throw new DDFException(e);
+              DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
+              dataFormats.add(dataFormat);
+            } catch (Exception e) {
+              throw new DDFException(String.format("Unsupported dataformat: %s", extension));
             }
+          }
         }
-        return rows;
+        if (dataFormats.size() > 1) {
+          throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: %s", hdfsDDF
+              .getPath(), dataFormats.toArray().toString()));
+        }
+        return dataFormats.iterator().next();
+      } catch (IOException e) {
+        throw new DDFException(String.format("Can't open directory : %s", hdfsDDF.getPath()));
+      }
+    } else {
+      String filePath = hdfsDDF.getPath();
+      int dotIndex = filePath.lastIndexOf('.');
+      if (dotIndex != -1) {
+        return DataFormat.valueOf(filePath.substring(dotIndex + 1).toUpperCase());
+      } else {
+        // CSV by default
+        return DataFormat.CSV;
+      }
+    }
+  }
+
+  /**
+   * @param path The path.
+   * @return The list of file names
+   * @brief List all the files (including directories under one path)
+   */
+  public List<String> listFiles(String path) throws DDFException {
+    List<String> ret = new ArrayList<>();
+    try {
+      FileStatus[] status = fs.listStatus(new Path(path));
+      for (int i = 0; i < status.length; i++) {
+        ret.add(status[i].getPath().toString());
+      }
+    } catch (IOException e) {
+      throw new DDFException(e);
+    }
+    return ret;
+  }
+
+
+  /**
+   * @param path The path.
+   * @brief Create a ddf given path.
+   */
+  public HDFSDDF newDDF(String path) throws DDFException {
+    return new HDFSDDF(this, path);
+  }
+
+  public HDFSDDF newDDF(String path, String schema) throws DDFException {
+    return new HDFSDDF(this, path, schema);
+  }
+
+
+  /**
+   * @brief Show the first several rows of the s3ddf.
+   */
+  public List<String> head(HDFSDDF hdfsDDF, int limit) throws DDFException {
+    if (limit > K_LIMIT) {
+      limit = K_LIMIT;
     }
 
-    @Override
-    public DDF transfer(UUID fromEngine, UUID ddfuuid) throws DDFException {
-        throw new DDFException(new UnsupportedOperationException());
-    }
+    List<String> rows = new ArrayList<String>();
 
-    @Override
-    public DDF transferByTable(UUID fromEngine, String tableName) throws DDFException {
-        throw new DDFException(new UnsupportedOperationException());
-    }
+    int pos = 0;
+    String s = null;
 
-    @Override
-    public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
-        throw new DDFException(new UnsupportedOperationException());
+    if (!hdfsDDF.getIsDir()) {
+      try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(new Path(hdfsDDF.getPath()))))) {
+        while ((s = br.readLine()) != null && pos < limit) {
+          rows.add(s);
+          ++pos;
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else {
+      RemoteIterator<LocatedFileStatus> files = null;
+      try {
+        files = fs.listFiles(new Path(hdfsDDF.getPath()), false);
+        while (files.hasNext() && pos < limit) {
+          LocatedFileStatus lfs = files.next();
+          try (BufferedReader br = new BufferedReader(
+              new InputStreamReader(
+                  fs.open(lfs.getPath())))) {
+            while ((s = br.readLine()) != null && pos < limit) {
+              rows.add(s);
+              ++pos;
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      } catch (IOException e) {
+        throw new DDFException(e);
+      }
     }
+    return rows;
+  }
 
-    @Override
-    public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-        return null;
-    }
+  @Override
+  public DDF transfer(UUID fromEngine, UUID ddfuuid) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
 
-    @Override
-    public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-        return null;
-    }
+  @Override
+  public DDF transferByTable(UUID fromEngine, String tableName) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
 
-    @Override
-    public DDF copyFrom(DDF fromDDF) throws DDFException {
-        return null;
-    }
+  @Override
+  public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
 
-    @Override
-    public DDF createDDF(Map<Object, Object> options) throws DDFException {
-        return null;
-    }
+  @Override
+  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
+    return null;
+  }
 
-    @Override
-    public void validateCredential(DataSourceCredential credential) throws DDFException {
+  @Override
+  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
+    return null;
+  }
 
-    }
+  @Override
+  public DDF copyFrom(DDF fromDDF) throws DDFException {
+    return null;
+  }
 
-    @Override
-    public String getSourceUri() {
-        return null;
-    }
+  @Override
+  public DDF createDDF(Map<Object, Object> options) throws DDFException {
+    return null;
+  }
 
-    @Override
-    public String getEngine() {
-        return "hdfs";
-    }
+  @Override
+  public void validateCredential(DataSourceCredential credential) throws DDFException {
 
-    public void stop() {
-        // TODO: Does s3 connection has to be closed?
-    }
+  }
+
+  @Override
+  public String getSourceUri() {
+    return null;
+  }
+
+  @Override
+  public String getEngine() {
+    return "hdfs";
+  }
+
+  public void stop() {
+    // TODO: Does s3 connection has to be closed?
+  }
 }

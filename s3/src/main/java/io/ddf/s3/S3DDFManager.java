@@ -27,260 +27,249 @@ import java.util.UUID;
  * Created by jing on 12/2/15.
  */
 public class S3DDFManager extends DDFManager {
-    // Descriptor.
-    private S3DataSourceCredentials mCredential;
+  // Descriptor.
+  private S3DataSourceCredentials mCredential;
 
-    // Amazon client connection.
-    private AmazonS3 mConn;
+  // Amazon client connection.
+  private AmazonS3 mConn;
 
-    // Upper limit for content preview.
-    private static final int K_LIMIT = 1000;
+  // Upper limit for content preview.
+  private static final int K_LIMIT = 1000;
 
-    // TODO: Remove Engine Type
-    public S3DDFManager(S3DataSourceDescriptor s3dsd, EngineType engineType) throws DDFException {
-        this((S3DataSourceCredentials)s3dsd.getDataSourceCredentials(), engineType);
+  // TODO: Remove Engine Type
+  public S3DDFManager(S3DataSourceDescriptor s3dsd, EngineType engineType) throws DDFException {
+    this((S3DataSourceCredentials) s3dsd.getDataSourceCredentials(), engineType);
+  }
+
+  public S3DDFManager(S3DataSourceCredentials s3Credentials, EngineType engineType) throws DDFException {
+    mCredential = s3Credentials;
+    AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
+    mConn = new AmazonS3Client(credentials);
+  }
+
+  public S3DDFManager(S3DataSourceDescriptor s3dsd) throws DDFException {
+    this((S3DataSourceCredentials) s3dsd.getDataSourceCredentials());
+  }
+
+  public S3DDFManager(S3DataSourceCredentials s3Credentials) throws DDFException {
+    this(s3Credentials, EngineType.S3);
+  }
+
+  /**
+   * @param s3DDF The uri of the s3 file (single file).
+   * @return True if it has header, otherwise false.
+   * @brief To check whether the s3 file already contains header.
+   */
+  public Boolean hasHeader(DDF s3DDF) {
+    // TODO: Should we do this check in backend?
+    return false;
+  }
+
+  /**
+   * @brief To check whether the ddf is a directory.
+   */
+  public Boolean isDir(S3DDF s3DDF) throws DDFException {
+    S3Object s3Object = mConn.getObject(s3DDF.getBucket(), s3DDF.getKey());
+    List<String> keys = this.listFiles(s3DDF.getBucket(), s3Object.getKey());
+    for (String key : keys) {
+      if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
+        throw new DDFException("This folder contains subfolder, S3 DDF does not support nested folders");
+      }
     }
+    return s3Object.getKey().endsWith("/");
+  }
 
-    public S3DDFManager(S3DataSourceCredentials s3Credentials, EngineType engineType) throws DDFException {
-        mCredential = s3Credentials;
-        AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
-        mConn = new AmazonS3Client(credentials);
-    }
-
-    public S3DDFManager(S3DataSourceDescriptor s3dsd) throws DDFException {
-        this((S3DataSourceCredentials)s3dsd.getDataSourceCredentials());
-    }
-
-    public S3DDFManager(S3DataSourceCredentials s3Credentials) throws DDFException {
-        this(s3Credentials, EngineType.S3);
-    }
-
-    /**
-     * @brief To check whether the s3 file already contains header.
-     * @param s3DDF The uri of the s3 file (single file).
-     * @return True if it has header, otherwise false.
-     */
-    public Boolean hasHeader(DDF s3DDF) {
-        // TODO: Should we do this check in backend?
-        return false;
-    }
-
-    /**
-     * @brief To check whether the ddf is a directory.
-     * @param s3DDF
-     * @return
-     */
-    public Boolean isDir(S3DDF s3DDF) throws DDFException {
-        S3Object s3Object = mConn.getObject(s3DDF.getBucket(), s3DDF.getKey());
-        List<String> keys = this.listFiles(s3DDF.getBucket(), s3Object.getKey());
+  /**
+   * @breif To get the dataformat.
+   */
+  public DataFormat getDataFormat(S3DDF s3DDF) throws DDFException {
+    if (s3DDF.getIsDir()) {
+      List<String> keys = this.fileKeys(s3DDF);
+      if (keys.isEmpty()) {
+        throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
+      } else {
+        HashSet<DataFormat> dataFormats = new HashSet<>();
         for (String key : keys) {
-            if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
-                throw new DDFException("This folder contains subfolder, S3 DDF does not support nested folders");
+          int dotIndex = key.lastIndexOf('.');
+          if (dotIndex != -1) {
+            String extension = key.substring(dotIndex + 1);
+            try {
+              DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
+              dataFormats.add(dataFormat);
+            } catch (Exception e) {
+              throw new DDFException(String.format("Unsupported dataformat: %s", extension));
             }
+          }
         }
-        return s3Object.getKey().endsWith("/");
-    }
-
-    /**
-     * @breif To get the dataformat.
-     * @param s3DDF
-     * @return
-     */
-    public DataFormat getDataFormat(S3DDF s3DDF) throws DDFException {
-        if (s3DDF.getIsDir()) {
-            List<String> keys = this.fileKeys(s3DDF);
-            if (keys.isEmpty()) {
-                throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
-            } else {
-                HashSet<DataFormat> dataFormats = new HashSet<>();
-                for (String key: keys) {
-                    int dotIndex = key.lastIndexOf('.');
-                    if (dotIndex != -1) {
-                        String extension = key.substring(dotIndex + 1);
-                        try {
-                            DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
-                            dataFormats.add(dataFormat);
-                        } catch (Exception e) {
-                            throw new DDFException(String.format("Unsupported dataformat: %s", extension));
-                        }
-                    }
-                }
-                if (dataFormats.size() > 1) {
-                    throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
-                            "%s", s3DDF.getKey(), dataFormats.toArray().toString()));
-                }
-                return dataFormats.iterator().next();
-            }
-        } else {
-            String key = s3DDF.getKey();
-            int dotIndex = key.lastIndexOf('.');
-            if (dotIndex != -1) {
-               return DataFormat.valueOf(key.substring(dotIndex + 1).toUpperCase());
-            } else {
-                // CSV by default
-                return DataFormat.CSV;
-            }
+        if (dataFormats.size() > 1) {
+          throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
+              "%s", s3DDF.getKey(), dataFormats.toArray().toString()));
         }
+        return dataFormats.iterator().next();
+      }
+    } else {
+      String key = s3DDF.getKey();
+      int dotIndex = key.lastIndexOf('.');
+      if (dotIndex != -1) {
+        return DataFormat.valueOf(key.substring(dotIndex + 1).toUpperCase());
+      } else {
+        // CSV by default
+        return DataFormat.CSV;
+      }
+    }
+  }
+
+  /**
+   * @brief List buckets.
+   */
+  public List<String> listBuckets() {
+    List<Bucket> bucketList = mConn.listBuckets();
+    List<String> ret = new ArrayList<String>();
+    for (Bucket bucket : bucketList) {
+      ret.add(bucket.getName());
+    }
+    return ret;
+  }
+
+  /**
+   * @param bucket The bucket.
+   * @param key    The key.
+   * @return The list of file names (TODO: should we return more info here.)
+   * @brief List all the files (including directories under one path)
+   */
+  public List<String> listFiles(String bucket, String key) {
+    List<String> files = new ArrayList<String>();
+    ObjectListing objects = mConn.listObjects(bucket, key);
+    for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
+      files.add(objectSummary.getKey());
+    }
+    return files;
+  }
+
+
+  /**
+   * @param path The path.
+   * @brief Create a ddf given path.
+   */
+  public S3DDF newDDF(String path) throws DDFException {
+    return new S3DDF(this, path);
+  }
+
+  public S3DDF newDDF(String path, String schema) throws DDFException {
+    return new S3DDF(this, path, schema);
+  }
+
+  public S3DDF newDDF(String bucket, String key, String schema) throws DDFException {
+    return new S3DDF(this, bucket, key, schema);
+  }
+
+  /**
+   * @param s3DDF The s3ddf.
+   * @brief Return the key of the first non-folder file under this folder.
+   */
+  private String firstFileKey(S3DDF s3DDF) throws DDFException {
+    if (s3DDF.getIsDir()) {
+      List<String> ret = this.fileKeys(s3DDF);
+      if (ret.isEmpty()) {
+        throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
+      } else {
+        return ret.get(0);
+      }
+    } else {
+      return s3DDF.getKey();
+    }
+  }
+
+  private List<String> fileKeys(S3DDF s3DDF) throws DDFException {
+    List<String> ret = new ArrayList<String>();
+    ObjectListing objectListing = mConn.listObjects(new ListObjectsRequest().withBucketName(s3DDF.getBucket())
+        .withPrefix(s3DDF.getKey()));
+    for (S3ObjectSummary summary : objectListing.getObjectSummaries()) {
+      if (!summary.getKey().endsWith("/")) {
+        ret.add(summary.getKey());
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * @brief Show the first several rows of the s3ddf.
+   */
+  public List<String> head(S3DDF s3DDF, int limit) throws DDFException {
+    if (limit > K_LIMIT) {
+      limit = K_LIMIT;
     }
 
-    /**
-     * @brief List buckets.
-     * @return
-     */
-    public List<String> listBuckets() {
-        List<Bucket> bucketList = mConn.listBuckets();
-        List<String> ret = new ArrayList<String>();
-        for (Bucket bucket : bucketList) {
-            ret.add(bucket.getName());
+    String bucket = s3DDF.getBucket();
+    List<String> keys = this.fileKeys(s3DDF);
+    List<String> rows = new ArrayList<String>();
+
+    for (int i = 0; i < keys.size() && limit > 0; ++i) {
+      try (BufferedReader br = new BufferedReader(
+          new InputStreamReader(mConn.getObject(bucket, keys.get(i)).getObjectContent()))) {
+        String line = null;
+        while (limit > 0 && ((line = br.readLine()) != null)) {
+          rows.add(line);
+          --limit;
         }
-        return ret;
+      } catch (IOException e) {
+        throw new DDFException(e);
+      }
     }
+    return rows;
+  }
 
-    /**
-     * @brief List all the files (including directories under one path)
-     * @param bucket The bucket.
-     * @param key The key.
-     * @return The list of file names (TODO: should we return more info here.)
-     */
-    public List<String> listFiles(String bucket, String key) {
-        List<String> files = new ArrayList<String>();
-        ObjectListing objects = mConn.listObjects(bucket, key);
-        for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
-            files.add(objectSummary.getKey());
-        }
-        return files;
-    }
+  @Override
+  public DDF transfer(UUID fromEngine, UUID ddfuuid) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
 
+  @Override
+  public DDF transferByTable(UUID fromEngine, String tableName) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
 
-    /**
-     * @brief Create a ddf given path.
-     * @param path The path.
-     * @return
-     */
-    public S3DDF newDDF(String path) throws DDFException {
-        return new S3DDF(this, path);
-    }
+  @Override
+  public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
 
-    public S3DDF newDDF(String path, String schema) throws DDFException {
-        return new S3DDF(this, path, schema);
-    }
+  @Override
+  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
+    return null;
+  }
 
-    public S3DDF newDDF(String bucket, String key, String schema) throws DDFException {
-        return new S3DDF(this, bucket, key, schema);
-    }
+  @Override
+  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
+    return null;
+  }
 
-    /**
-     * @brief Return the key of the first non-folder file under this folder.
-     * @param s3DDF The s3ddf.
-     * @return
-     */
-    private String firstFileKey(S3DDF s3DDF) throws DDFException {
-        if (s3DDF.getIsDir()) {
-            List<String> ret = this.fileKeys(s3DDF);
-            if (ret.isEmpty()) {
-                throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
-            } else {
-                return ret.get(0);
-            }
-        } else {
-            return s3DDF.getKey();
-        }
-    }
+  @Override
+  public DDF createDDF(Map<Object, Object> options) throws DDFException {
+    return null;
+  }
 
-    private List<String> fileKeys(S3DDF s3DDF) throws DDFException {
-        List<String> ret = new ArrayList<String>();
-        ObjectListing objectListing = mConn.listObjects(new ListObjectsRequest().withBucketName(s3DDF.getBucket())
-            .withPrefix(s3DDF.getKey()));
-        for (S3ObjectSummary summary: objectListing.getObjectSummaries()) {
-            if (!summary.getKey().endsWith("/")) {
-                ret.add(summary.getKey());
-            }
-        }
-        return ret;
-    }
+  @Override
+  public void validateCredential(DataSourceCredential credential) throws DDFException {
 
-    /**
-     * @brief Show the first several rows of the s3ddf.
-     * @param s3DDF
-     * @param limit
-     * @return
-     * @throws DDFException
-     */
-    public List<String> head(S3DDF s3DDF, int limit) throws DDFException {
-        if (limit > K_LIMIT) {
-            limit = K_LIMIT;
-        }
+  }
 
-        String bucket = s3DDF.getBucket();
-        List<String> keys = this.fileKeys(s3DDF);
-        List<String> rows = new ArrayList<String>();
+  @Override
+  public String getSourceUri() {
+    return null;
+  }
 
-        for (int i = 0; i < keys.size() && limit > 0; ++i) {
-            try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(mConn.getObject(bucket, keys.get(i)).getObjectContent()))) {
-                String line = null;
-                while (limit > 0 &&  ((line = br.readLine()) != null)) {
-                    rows.add(line);
-                    --limit;
-                }
-            } catch (IOException e) {
-                throw new DDFException(e);
-            }
-        }
-        return rows;
-    }
+  @Override
+  public DDF copyFrom(DDF fromDDF) throws DDFException {
+    throw new DDFException(new UnsupportedOperationException());
+  }
 
-    @Override
-    public DDF transfer(UUID fromEngine, UUID ddfuuid) throws DDFException {
-        throw new DDFException(new UnsupportedOperationException());
-    }
+  @Override
+  public String getEngine() {
+    return "s3";
+  }
 
-    @Override
-    public DDF transferByTable(UUID fromEngine, String tableName) throws DDFException {
-        throw new DDFException(new UnsupportedOperationException());
-    }
-
-    @Override
-    public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
-        throw new DDFException(new UnsupportedOperationException());
-    }
-
-    @Override
-    public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public DDF createDDF(Map<Object, Object> options) throws DDFException {
-        return null;
-    }
-
-    @Override
-    public void validateCredential(DataSourceCredential credential) throws DDFException {
-
-    }
-
-    @Override
-    public String getSourceUri() {
-        return null;
-    }
-
-    @Override
-    public DDF copyFrom(DDF fromDDF) throws DDFException {
-        throw new DDFException(new UnsupportedOperationException());
-    }
-
-    @Override
-    public String getEngine() {
-        return "s3";
-    }
-
-    public void stop() {
-        // TODO: Does s3 connection has to be closed?
-    }
+  public void stop() {
+    // TODO: Does s3 connection has to be closed?
+  }
 }
