@@ -15,7 +15,7 @@ object RootBuild extends Build {
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
-  val SPARK_VERSION = "1.5.1-adatao"
+  val SPARK_VERSION = "1.6.0-adatao-1.7.0"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
