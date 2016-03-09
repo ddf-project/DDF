@@ -127,5 +127,18 @@ public class SparkDDFManagerTests extends BaseTest {
     LOG.info(tsvSparkDDF.sql("select * from @this", "error").getRows().toString());
     assert (tsvSparkDDF.getNumRows()==73);
     */
+
+    System.out.println("========== pqt ==========");
+    S3DDF pqtDDF = s3DDFManager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null);
+    DDF pqtSparkDDF = sparkDDFManager.copyFrom(pqtDDF);
+    System.out.println(pqtSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
+    System.out.println("========== avro ==========");
+    S3DDF avroDDF = s3DDFManager.newDDF("adatao-sample-data", "test/avro/partition_avro/", null);
+    DDF avroSparkDDF = sparkDDFManager.copyFrom(avroDDF);
+    System.out.println(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
+    System.out.println("========== orc ==========");
+    S3DDF orcDDF = s3DDFManager.newDDF("adatao-test", "orc/", null);
+    DDF orcSparkDDF = sparkDDFManager.copyFrom(orcDDF);
+    System.out.println(orcSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
   }
 }

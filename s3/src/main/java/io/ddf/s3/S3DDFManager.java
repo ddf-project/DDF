@@ -115,7 +115,7 @@ public class S3DDFManager extends DDFManager {
             String key = s3DDF.getKey();
             int dotIndex = key.lastIndexOf('.');
             if (dotIndex != -1) {
-               return DataFormat.valueOf(key.substring(dotIndex + 1));
+               return DataFormat.valueOf(key.substring(dotIndex + 1).toUpperCase());
             } else {
                 // CSV by default
                 return DataFormat.CSV;

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
+import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.datasource.S3DataSourceDescriptor;
@@ -119,8 +120,8 @@ public class SparkDDFManager extends DDFManager {
 
     String fromTableName = fromDDF.getTableName();
     return this.transferByTable(fromEngine, fromTableName);
-
   }
+
 
 
   @Override
@@ -151,8 +152,15 @@ public class SparkDDFManager extends DDFManager {
             // TODO
           }
           break;
-        case PQT: case AVRO: case ORC:
+        case PARQUET: case ORC:
           dfr = dfr.format(s3DDF.getDataFormat().toString().toLowerCase());
+          break;
+        case AVRO:
+          dfr = dfr.format("com.databricks.spark.avro");
+      }
+      if (s3DDF.getDataFormat().equals(DataFormat.ORC)) {
+        //s3uri = "/Users/jing/Github/OpenSourceSpark/spark-1.6.0-bin-hadoop2.6/people";
+        System.out.println(s3uri);
       }
       df = dfr.load(s3uri);
       if (s3DDF.getSchema() == null) {

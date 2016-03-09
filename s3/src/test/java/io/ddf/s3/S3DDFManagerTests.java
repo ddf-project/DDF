@@ -97,7 +97,20 @@ public class S3DDFManagerTests {
         } catch (Exception e) {
 
         }
-        // TODO: Add pqt
+
+        // PQT, AVRO and ORC
+        S3DDF pqtDDF = manager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null);
+        assert (pqtDDF.getIsDir() == true);
+        assert (pqtDDF.getDataFormat().equals(DataFormat.PARQUET));
+
+
+        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/partition_avro/", null);
+        assert (avroDDF.getIsDir() == true);
+        assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
+
+        S3DDF orcDDF = manager.newDDF("adatao-test", "orc/", null);
+        assert (orcDDF.getIsDir() == true);
+        assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
     }
 
 

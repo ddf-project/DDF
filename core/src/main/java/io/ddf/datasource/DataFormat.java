@@ -1,7 +1,7 @@
 package io.ddf.datasource;
 
 public enum DataFormat {
-  UNDEF, SQL, CSV, TSV, JSON, PQT, AVRO, ORC;
+  UNDEF, SQL, CSV, TSV, JSON, PARQUET, AVRO, ORC;
 
   public static DataFormat fromInt(int x) {
     switch(x) {
@@ -14,7 +14,7 @@ public enum DataFormat {
       case 3:
         return JSON;
       case 4:
-        return PQT;
+        return PARQUET;
       case 5:
         return AVRO;
       case 6:

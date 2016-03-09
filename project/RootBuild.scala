@@ -118,8 +118,8 @@ object RootBuild extends Build {
   val scalaDependencies = scalaArtifacts.map( artifactId => "org.scala-lang" % artifactId % theScalaVersion)
 
   val spark_dependencies = Seq(
-    "com.databricks" % "spark-csv_2.10" % "1.3.0",
-    "com.databricks" % "spark-avro" % "2.0.1",
+    "com.databricks" % "spark-csv_2.10" % "1.4.0",
+    "com.databricks" % "spark-avro_2.10" % "2.0.1",
     "commons-configuration" % "commons-configuration" % "1.6",
     "com.google.code.gson"% "gson" % "2.2.2",
     "com.novocode" % "junit-interface" % "0.10" % "test",
