@@ -42,9 +42,9 @@ public class BinningHandlerTest extends BaseTest {
     DDF ddf1 = ddf.binning("month", "custom", 0, new double[] { 2, 4, 6, 8 }, true, true);
     Assert.assertTrue(ddf1.getSchemaHandler().getColumn("month").getColumnClass() == ColumnClass.FACTOR);
     // {'[2,4]'=1, '(4,6]'=2, '(6,8]'=3}
-    ddf1.getSchemaHandler().computeFactorLevelsAndLevelCounts();
-    Assert.assertTrue(ddf1.getSchemaHandler().getColumn("month").getOptionalFactor().getLevelMap().get("[2,4]") > 0);
-    Assert.assertEquals(ddf1.getSchemaHandler().getColumn("month").getOptionalFactor().getLevelCounts().get("[2,4]"), 6, 0);
+    Map<String, Map<String, Integer>> map = ddf1.getSchemaHandler().computeLevelCounts(new String[]{"month"});
+    Assert.assertTrue(map.get("month").get("[2,4]") > 0);
+    Assert.assertEquals(map.get("month").get("[2,4]"), 6, 0);
     Assert.assertFalse(Strings.isNullOrEmpty(newddf.sql("select dayofweek from @this", "").getRows().get(0)));
     Assert.assertFalse(Strings.isNullOrEmpty(ddf1.sql("select month from @this", "").getRows().get(0)));
 
@@ -60,16 +60,6 @@ public class BinningHandlerTest extends BaseTest {
         Assert.assertEquals(2, m[i].getFactor().size());
       }
     }
-
-//    // test mutable binning
-//    ddf.setMutable(true);
-//    ddf.binning("distance", "EQUALINTERVAL", 3, null, true, true);
-//    Assert.assertEquals(ColumnClass.FACTOR, ddf.getSchemaHandler().getColumn("distance").getColumnClass());
-//
-//    Assert.assertEquals(3, ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().size());
-//    Assert.assertEquals("[162,869]", ddf.VIEWS.head(3).get(0).split("\t")[6]);
-//    System.out.println(">>>>>NEW 1st ROW"
-//        + ddf.getSchemaHandler().getColumn("distance").getOptionalFactor().getLevelMap().keySet().toString());// [162,869],
   }
 
   public static MetaInfo[] generateMetaInfo(Schema schema) throws DDFException {

@@ -13,6 +13,7 @@ import io.ddf.util.DDFUtils;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -97,20 +98,10 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   public synchronized void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
     Column c = this.getColumn(columnName);
     Factor<?> f = c.getOptionalFactor();
-    if(factor.getLevelCounts() != null) {
-      f.setLevelCounts(factor.getLevelCounts());
-    }
     if(factor.getLevels() != null) {
       f.setLevels(factor.getLevels(), false);
     }
   }
-
-  @Override
-  public synchronized void computeFactorLevelsAndLevelCounts() throws DDFException {
-
-  }
-
-
 
   @Override
   public synchronized Factor<?> setAsFactor(String columnName) throws DDFException {
@@ -154,6 +145,10 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
     column.setAsFactor(factor);
 
     return factor;
+  }
+
+  @Override public Map<String, Map<String, Integer>> computeLevelCounts(String[] columnNames) throws DDFException {
+    throw new UnsupportedOperationException();
   }
 
   public void generateDummyCoding() throws NumberFormatException,

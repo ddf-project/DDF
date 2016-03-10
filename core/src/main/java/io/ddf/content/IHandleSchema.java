@@ -7,6 +7,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.misc.IHandleDDFFunctionalGroup;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface IHandleSchema extends IHandleDDFFunctionalGroup {
@@ -42,7 +43,7 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
    */
   Schema generateSchema() throws DDFException;
 
-  void computeFactorLevelsAndLevelCounts() throws DDFException;
+  Map<String, Map<String, Integer>> computeLevelCounts(String[] columnNames) throws DDFException;
 
   Factor<?> setAsFactor(String columnName) throws DDFException;
 

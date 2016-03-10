@@ -58,7 +58,7 @@ trait SchemaSpec extends BaseSpec with Matchers {
       Array(7, 8, 9, 10).foreach {
         idx => schemaHandler.setAsFactor(idx)
       }
-      schemaHandler.computeFactorLevelsAndLevelCounts()
+//      schemaHandler.computeFactorLevelsAndLevelCounts()
       val cols = Array(7, 8, 9, 10).map {
         idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
       }
@@ -94,7 +94,7 @@ trait SchemaSpec extends BaseSpec with Matchers {
       Array(0, 8, 16, 17, 24, 25).foreach {
         idx => schemaHandler.setAsFactor(idx)
       }
-      schemaHandler.computeFactorLevelsAndLevelCounts()
+//      schemaHandler.computeFactorLevelsAndLevelCounts()
 
       val cols = Array(0, 8, 16, 17, 24, 25).map {
         idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
@@ -126,7 +126,7 @@ trait SchemaSpec extends BaseSpec with Matchers {
       Array(0, 8, 16, 17, 24, 25).foreach {
         idx => schemaHandler2.setAsFactor(idx)
       }
-      schemaHandler2.computeFactorLevelsAndLevelCounts()
+//      schemaHandler2.computeFactorLevelsAndLevelCounts()
 
       val cols2 = Array(0, 8, 16, 17, 24, 25).map {
         idx => schemaHandler2.getColumn(schemaHandler2.getColumnName(idx))
