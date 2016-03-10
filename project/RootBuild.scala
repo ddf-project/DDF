@@ -74,7 +74,7 @@ object RootBuild extends Build {
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, s3, hdfs, examples, test_ddf)
   lazy val core = Project("core", file("core"), settings = coreSettings)
   lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (core)
-  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core, s3)
+  lazy val spark = Project("spark", file("spark"), settings = sparkSettings) dependsOn (test_ddf % "test") dependsOn (core, s3, hdfs)
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
   lazy val s3 = Project("s3", file("s3"), settings = s3Settings) dependsOn (core)
   lazy val hdfs = Project("hdfs", file("hdfs"), settings = hdfsSettings) dependsOn(core)
@@ -136,8 +136,7 @@ object RootBuild extends Build {
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
-    "com.google.protobuf" % "protobuf-java" % "2.5.0",
-    "com.databricks" % "spark-csv_2.10" % "1.3.0"
+    "com.google.protobuf" % "protobuf-java" % "2.5.0"
   )
   
   val s3_dependencies = Seq(
@@ -145,6 +144,7 @@ object RootBuild extends Build {
   )
 
   val hdfs_dependencies = Seq(
+    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java")
   )
 
   val test_dependencies = Seq(

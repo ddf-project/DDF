@@ -12,6 +12,7 @@ import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
+import io.ddf.hdfs.HDFSDDF;
 import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.ds.DataSource;
 import io.ddf.spark.etl.DateParseUDF;
@@ -38,6 +39,7 @@ import java.util.*;
 //import shark.SharkEnv;
 //import shark.api.JavaSharkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.sql.types.StructType;
 
 import io.ddf.s3.S3DDF;
 
@@ -126,13 +128,34 @@ public class SparkDDFManager extends DDFManager {
 
   @Override
   public DDF copyFrom(DDF ddf) throws DDFException {
-    if (ddf instanceof S3DDF) {
-      // different loading function.
-      S3DDF s3DDF = (S3DDF)ddf;
+    if (ddf instanceof S3DDF || ddf instanceof HDFSDDF) {
+      DataFormat dataFormat = null;
+      String uri = null;
+      Boolean hasHeader = false;
+      StructType schema = null;
+
+      if (ddf instanceof S3DDF) {
+        S3DDF s3DDF = (S3DDF)ddf;
+        uri = String.format("s3n://%s/%s", s3DDF.getBucket(), s3DDF.getKey());
+        dataFormat = s3DDF.getDataFormat();
+        hasHeader = s3DDF.getHasHeader();
+        if (s3DDF.getSchemaString() != null) {
+          schema = SparkUtils.str2SparkSchema(s3DDF.getSchemaString());
+        }
+      } else {
+        HDFSDDF hdfsDDF = (HDFSDDF) ddf;
+        uri = String.format("hdfs://localhost:9000%s", hdfsDDF.getPath());
+        dataFormat = hdfsDDF.getDataFormat();
+        hasHeader = hdfsDDF.getHasHeader();
+        if (hdfsDDF.getSchemaString() != null) {
+          schema = SparkUtils.str2SparkSchema(hdfsDDF.getSchemaString());
+        }
+      }
+
+
       DataFrameReader dfr =  this.getHiveContext().read();
       DataFrame df = null;
-      String s3uri = "s3n://" + s3DDF.getBucket() + "/" + s3DDF.getKey();
-      switch (s3DDF.getDataFormat()) {
+      switch (dataFormat) {
         case JSON:
           dfr = dfr.format("json");
           // TODO(Should we flatten the df here?)
@@ -141,33 +164,26 @@ public class SparkDDFManager extends DDFManager {
           dfr = dfr.option("delimiter", "\t");
           // fall through
         case CSV:
-          dfr = dfr.format("com.databricks.spark.csv").option("header", s3DDF.getHasHeader() ? "true" : "false");
-          if (s3DDF.getSchema() == null) {
-            if (s3DDF.getSchemaString() == null) {
-              dfr = dfr.option("inferSchema", "true");
-            } else {
-              dfr = dfr.option("inferSchema", "false").schema(SparkUtils.str2SparkSchema(s3DDF.getSchemaString()));
-            }
+          dfr = dfr.format("com.databricks.spark.csv").option("header", hasHeader ? "true" : "false");
+          // TODO: reuse ddf schema.
+          if (schema == null) {
+            dfr = dfr.option("inferSchema", "true");
           } else {
-            // TODO
+            dfr = dfr.option("inferSchema", "false").schema(schema);
           }
           break;
         case PARQUET: case ORC:
-          dfr = dfr.format(s3DDF.getDataFormat().toString().toLowerCase());
+          dfr = dfr.format(dataFormat.toString().toLowerCase());
           break;
         case AVRO:
           dfr = dfr.format("com.databricks.spark.avro");
       }
-      if (s3DDF.getDataFormat().equals(DataFormat.ORC)) {
-        //s3uri = "/Users/jing/Github/OpenSourceSpark/spark-1.6.0-bin-hadoop2.6/people";
-        System.out.println(s3uri);
-      }
-      df = dfr.load(s3uri);
-      if (s3DDF.getSchema() == null) {
-        s3DDF.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
+      df = dfr.load(uri);
+      if (ddf.getSchema() == null) {
+        ddf.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
       }
       DDF newDDF = this.newDDF(this, df, new Class<?>[] {DataFrame.class}, null,
-          null, s3DDF.getSchema());
+          null, ddf.getSchema());
       newDDF.getRepresentationHandler().cache(false);
       newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
       return newDDF;

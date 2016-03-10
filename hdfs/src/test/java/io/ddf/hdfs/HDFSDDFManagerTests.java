@@ -32,10 +32,9 @@ public class HDFSDDFManagerTests {
 
     @Test
     public void testListing() throws DDFException {
-        List<String> files = manager.listFiles("/user");
-        LOG.info("========== buckets ==========");
+        List<String> files = manager.listFiles("/usr");
+        LOG.info("========== files ==========");
         for (String file: files) {
-            System.out.println(file);
             LOG.info(file);
         }
 
@@ -44,15 +43,15 @@ public class HDFSDDFManagerTests {
     @Test
     public void testCreateDDF() throws DDFException {
         try {
-            HDFSDDF folderDDF = manager.newDDF("/user/jing/testFolder", null);
+            HDFSDDF folderDDF = manager.newDDF("/user/testFolder", null);
             assert(folderDDF.getIsDir() == true);
         } catch (Exception e) {
 
         }
 
-        HDFSDDF cleanFolderDDF = manager.newDDF("/user/jing/testFolder", null);
-        HDFSDDF jsonDDF = manager.newDDF("/user/jing/a.json", null);
-        HDFSDDF csvDDF = manager.newDDF("/user/jing/hasHeader.csv", null);
+        HDFSDDF cleanFolderDDF = manager.newDDF("/user/estFolder", null);
+        HDFSDDF jsonDDF = manager.newDDF("/user/a.json", null);
+        HDFSDDF csvDDF = manager.newDDF("/user/hasHeader.csv", null);
         assert (cleanFolderDDF.getIsDir() == true);
         assert(jsonDDF.getIsDir() == false);
         assert(csvDDF.getIsDir() == false);
@@ -72,16 +71,16 @@ public class HDFSDDFManagerTests {
 
         }
 
-        HDFSDDF pqtDDF = manager.newDDF("/user/jing/parquet/sleep_parquet/", null);
+        HDFSDDF pqtDDF = manager.newDDF("/usr/parquet/", null);
         assert (pqtDDF.getIsDir() == true);
         assert (pqtDDF.getDataFormat().equals(DataFormat.PARQUET));
 
 
-        HDFSDDF avroDDF = manager.newDDF("/user/jing/avro/partition_avro/", null);
+        HDFSDDF avroDDF = manager.newDDF("/usr/avro/", null);
         assert (avroDDF.getIsDir() == true);
         assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
 
-        HDFSDDF orcDDF = manager.newDDF("/user/jing/orc/", null);
+        HDFSDDF orcDDF = manager.newDDF("/usr/orc/", null);
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
     }
