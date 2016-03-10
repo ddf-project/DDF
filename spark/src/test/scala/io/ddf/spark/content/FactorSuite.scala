@@ -33,10 +33,6 @@ class FactorSuite extends ATestSuite {
     }
     val factorMap = schemaHandler.computeLevelCounts(columns)
 
-    val cols2 = Array(7, 8, 9, 10).map {
-      idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
-    }
-
     assert(factorMap.get("vs").get("1") === 14)
     assert(factorMap.get("vs").get("0") === 18)
     assert(factorMap.get("am").get("1") === 13)
@@ -49,7 +45,6 @@ class FactorSuite extends ATestSuite {
   test("test NA handling") {
     val ddf = manager.sql2ddf("select * from airlineWithNA", "SparkSQL")
     val schemaHandler = ddf.getSchemaHandler
-
     val columnNames = Array(0, 8, 16, 17, 24, 25).map {
       idx => schemaHandler.getColumnName(idx)
     }
