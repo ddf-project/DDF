@@ -132,7 +132,7 @@ public class TransformationHandlerTest extends BaseTest {
     ddf.setAsFactor("month");
 
     Assert.assertTrue(ddf.getSchema() != null);
-
+    ddf.getSchemaHandler().computeLevelCounts(new String[]{"year", "month"});
 
     LOG.info(">>>>> column class = " + ddf.getColumn("year").getColumnClass());
     LOG.info(">>>>> column class = " + ddf.getColumn("month").getColumnClass());
