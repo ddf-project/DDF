@@ -99,7 +99,7 @@ trait SchemaSpec extends BaseSpec with Matchers {
       val cols = Array(0, 8, 16, 17, 24, 25).map {
         idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
       }
-      
+
       assert(cols(0).getOptionalFactor.getLevels.contains("2008"))
       assert(cols(0).getOptionalFactor.getLevels.contains("2010"))
       assert(factorMap.get(columnNames(0)).get("2008") === 28.0)

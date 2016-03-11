@@ -43,6 +43,8 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
    */
   Schema generateSchema() throws DDFException;
 
+  Map<String, Integer> computeLevelCounts(String columnName) throws DDFException;
+
   Map<String, Map<String, Integer>> computeLevelCounts(String[] columnNames) throws DDFException;
 
   Factor<?> setAsFactor(String columnName) throws DDFException;

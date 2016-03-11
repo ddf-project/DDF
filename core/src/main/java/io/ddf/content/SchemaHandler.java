@@ -147,7 +147,13 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
     return factor;
   }
 
-  @Override public Map<String, Map<String, Integer>> computeLevelCounts(String[] columnNames) throws DDFException {
+  @Override
+  public Map<String, Integer> computeLevelCounts(String columnName) throws DDFException {
+    return this.computeLevelCounts(new String[]{columnName}).get(columnName);
+  }
+
+  @Override
+  public Map<String, Map<String, Integer>> computeLevelCounts(String[] columnNames) throws DDFException {
     throw new UnsupportedOperationException();
   }
 
