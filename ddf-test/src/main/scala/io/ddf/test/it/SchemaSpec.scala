@@ -94,16 +94,17 @@ trait SchemaSpec extends BaseSpec with Matchers {
       val columnNames = Array(0, 8, 16, 17, 24, 25).map {
         idx => schemaHandler.getColumnName(idx)
       }
+      columnNames.foreach {
+        col => schemaHandler.setAsFactor(col)
+      }
       val factorMap = schemaHandler.computeLevelCounts(columnNames)
 
       val cols = Array(0, 8, 16, 17, 24, 25).map {
         idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
       }
-
-      assert(cols(0).getOptionalFactor.getLevels.contains("2008"))
-      assert(cols(0).getOptionalFactor.getLevels.contains("2010"))
-      assert(factorMap.get(columnNames(0)).get("2008") === 28.0)
-      assert(factorMap.get(columnNames(0)).get("2010") === 1.0)
+      val levels = cols(0).getOptionalFactor.getLevels
+      assert(levels.contains("2008"))
+      assert(levels.contains("2010"))
       assert(factorMap.get(columnNames(3)).get("MCO") === 3.0)
       assert(factorMap.get(columnNames(3)).get("TPA") === 3.0)
       assert(factorMap.get(columnNames(3)).get("JAX") === 1.0)

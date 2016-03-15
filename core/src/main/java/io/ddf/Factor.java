@@ -2,6 +2,8 @@ package io.ddf;
 
 
 import io.ddf.exception.DDFException;
+import io.ddf.misc.Config;
+import io.ddf.util.ConfigHandler;
 
 import java.io.Serializable;
 import java.util.*;
@@ -69,6 +71,10 @@ import java.util.*;
  */
 public class Factor<T> extends Vector<T> implements Serializable {
 
+  public static Long getMaxLevelCounts() {
+    ConfigHandler.Configuration config = Config.getConfigHandler().getConfig();
+    return Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.MAX_LEVELS_COUNT));
+  }
   /**
    * Instantiate a new Factor based on an existing DDF, given a column name. The column name is not verified for
    * correctness; any errors would only show up on actual usage.
@@ -105,7 +111,7 @@ public class Factor<T> extends Vector<T> implements Serializable {
 
 
   private Map<String, Integer> mLevelMap;
-  private List<String> mLevels;
+  private List<Object> mLevels;
 
   /**
    * Derived classes should call this to instantiate a synchronized level map for thread safety. Internally, we use
@@ -135,7 +141,7 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @return
    * @throws DDFException
    */
-  public List<String> getLevels() throws DDFException {
+  public List<Object> getLevels() throws DDFException {
     return this.mLevels;
   }
 
@@ -153,11 +159,11 @@ public class Factor<T> extends Vector<T> implements Serializable {
    *                  meaning
    * @throws DDFException
    */
-  public void setLevels(List<String> levels, boolean isOrdered) throws DDFException {
+  public void setLevels(List<Object> levels, boolean isOrdered) throws DDFException {
     this.setLevels(levels, null, isOrdered);
   }
 
-  public void setLevels(List<String> levels) throws DDFException {
+  public void setLevels(List<Object> levels) throws DDFException {
     this.setLevels(levels, null, false); // with default values for level codes and isOrdered
   }
 
@@ -170,27 +176,19 @@ public class Factor<T> extends Vector<T> implements Serializable {
    *                  meaning
    * @throws DDFException
    */
-  public void setLevels(List<String> levels, List<Integer> codes, boolean isOrdered) throws DDFException {
+  public void setLevels(List<Object> levels, List<Integer> codes, boolean isOrdered) throws DDFException {
     if (levels == null || levels.isEmpty()) throw new DDFException("Levels cannot be null or empty");
     if (codes != null && codes.size() != levels.size()) throw new DDFException(String.format(
         "The number of levels is %d which does not match the number of codes %d", levels.size(), codes.size()));
-
-    if (mLevelMap == null) mLevelMap = this.instantiateSynchronizedLevelMap();
-
-    if (codes == null) {
-      // Auto-create a 1-based level-code map
-      codes = new ArrayList<Integer>();
-      for (int i = 1; i <= levels.size(); i++) {
-        codes.add(i);
+    if(codes != null) {
+      if (mLevelMap == null) mLevelMap = this.instantiateSynchronizedLevelMap();
+      Iterator<Object> levelIter = levels.iterator();
+      Iterator<Integer> codeIter = codes.iterator();
+      while (levelIter.hasNext()) {
+        mLevelMap.put(levelIter.next().toString(), codeIter.next());
       }
     }
-
-    Iterator<String> levelIter = levels.iterator();
-    Iterator<Integer> codeIter = codes.iterator();
-    while (levelIter.hasNext()) {
-      mLevelMap.put(levelIter.next(), codeIter.next());
-    }
-    this.mLevels = new ArrayList<String>(levels);
+    this.mLevels = new ArrayList<Object>(levels);
     this.setOrdered(isOrdered);
   }
 

@@ -179,7 +179,8 @@ public class Config {
 
     JDBC_DRIVER("Driver"), DEFAULT_JDBC_DRIVER("com.mysql.jdbc"),
     SFDC_JDBC_DRIVER("Driver"), DEFAULT_SFDC_JDBC_DRIVER("cdata.jdbc.salesforce.SalesforceDriver"),
-    JDBC_DDF_AUTOCREATE("DDFAutoCreate")
+    JDBC_DDF_AUTOCREATE("DDFAutoCreate"),
+    MAX_LEVELS_COUNT("MAX_LEVELS_COUNT")
     ;
     // @formatter:on
 

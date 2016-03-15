@@ -14,6 +14,7 @@ import io.ddf.spark.SparkDDF;
 import io.ddf.spark.util.SparkUtils;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,15 +80,6 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
         throw new DDFException("Error getting factor levels counts");
       }
 
-      for (Integer colIndex : columnIndexes) {
-        Column column = this.getColumn(this.getColumnName(colIndex));
-        Map<String, Integer> levelCounts = listLevelCounts.get(colIndex);
-        if (levelCounts != null) {
-          Factor<?> factor = column.getOptionalFactor();
-          List<String> levels = new ArrayList<String>(levelCounts.keySet());
-          factor.setLevels(levels, false);
-        }
-      }
       for (Integer columnIndex : columnIndexes) {
         String colName = this.getDDF().getColumnName(columnIndex);
         listLevelCountsWithName.put(colName, listLevelCounts.get(columnIndex));
@@ -96,6 +88,22 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
     } else {
       return new HashMap<String, Map<String, Integer>>();
     }
+  }
+  @Override protected List<Object> computeFactorLevels(String columnName) throws DDFException {
+    DataFrame df = (DataFrame) this.getDDF().getRepresentationHandler().get(DataFrame.class);
+    DataFrame distinctDF = df.select(columnName).distinct();
+    Long distinctCount = distinctDF.count();
+    if(distinctCount > Factor.getMaxLevelCounts()) {
+      throw new DDFException(String.format("Number of distinct values in column %s is %s larger than MAX_LEVELS_COUNTS = %s", distinctCount, columnName, Factor.getMaxLevelCounts()));
+    }
+    Row[] rows = distinctDF.collect();
+    List<Object> listValues = new ArrayList<Object>(rows.length);
+    for(Row row: rows) {
+      if(!row.isNullAt(0)) {
+        listValues.add(row.get(0));
+      }
+    }
+    return listValues;
   }
 }
 
