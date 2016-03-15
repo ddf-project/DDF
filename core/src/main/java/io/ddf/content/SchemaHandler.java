@@ -201,12 +201,8 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
       // loop
       if (currentColumn.getColumnClass() == Schema.ColumnClass.FACTOR) {
         if (currentColumn.getOptionalFactor() != null && currentColumn.getOptionalFactor().getLevels() != null) {
-          Map<String, Integer> levelMaps = null;
-          if(currentColumn.getOptionalFactor().getLevelMap() != null) {
-            levelMaps = currentColumn.getOptionalFactor().getLevelMap();
-          } else {
-            levelMaps = this.generateLevelMap(currentColumn.getOptionalFactor().getLevels());
-          }
+          Map<String, Integer> levelMaps = currentColumn.getOptionalFactor().getLevelMap();
+
           Iterator<String> valuesIterator = levelMaps.keySet().iterator();
 
           //TODO update this code
@@ -240,16 +236,5 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
     dummyCoding.setNumberFeatures(numFeatures);
     // set number of features in schema
     return dummyCoding;
-  }
-
-  private Map<String, Integer> generateLevelMap(List<Object> levels) {
-    int i = 1;
-    Map<String, Integer> levelMap = new HashMap<String, Integer>();
-    Iterator<Object> levelIterator = levels.iterator();
-    while(levelIterator.hasNext()) {
-      levelMap.put(levelIterator.next().toString(), i);
-      i+= 1;
-    }
-    return levelMap;
   }
 }

@@ -131,8 +131,14 @@ public class Factor<T> extends Vector<T> implements Serializable {
    */
   public Map<String, Integer> computeLevelMap() throws DDFException {
     // TODO: retrieve the list of levels from the underlying data, e.g.,
-
-    return mLevelMap;
+    int i = 1;
+    Map<String, Integer> levelMap = new HashMap<String, Integer>();
+    Iterator<Object> levelIterator = this.mLevels.iterator();
+    while(levelIterator.hasNext()) {
+      levelMap.put(levelIterator.next().toString(), i);
+      i+= 1;
+    }
+    return levelMap;
   }
 
   /**
