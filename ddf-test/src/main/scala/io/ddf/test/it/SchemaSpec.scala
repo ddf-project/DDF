@@ -22,6 +22,7 @@ import io.ddf.content.Schema.{Column, ColumnClass, ColumnType}
 import org.scalatest.Matchers
 
 import scala.collection.JavaConverters._
+import scala.collection.JavaConversions._
 
 trait SchemaSpec extends BaseSpec with Matchers {
 
@@ -102,7 +103,10 @@ trait SchemaSpec extends BaseSpec with Matchers {
       val cols = Array(0, 8, 16, 17, 24, 25).map {
         idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
       }
-      val levels = cols(0).getOptionalFactor.getLevels
+
+      val levels = cols(0).getOptionalFactor.getLevels.map {
+        l => l.toString
+      }
       assert(levels.contains("2008"))
       assert(levels.contains("2010"))
       assert(factorMap.get(columnNames(3)).get("MCO") === 3.0)
