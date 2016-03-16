@@ -332,7 +332,6 @@ public class Schema implements Serializable {
       }
       return clonedColumn;
     }
-
   }
 
 

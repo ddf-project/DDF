@@ -112,4 +112,12 @@ public class TransformFacade implements IHandleTransformations {
   public DDF flattenArrayTypeColumn(String colName) throws DDFException {
     return mTransformationHandler.flattenArrayTypeColumn(colName);
   }
+
+  public DDF factorIndexer(String[] columns) throws DDFException {
+    return mTransformationHandler.factorIndexer(columns);
+  }
+
+  public DDF inverseFactorIndexer(String[] columns) throws DDFException {
+    return mTransformationHandler.inverseFactorIndexer(columns);
+  }
 }

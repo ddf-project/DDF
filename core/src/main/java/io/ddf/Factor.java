@@ -6,6 +6,7 @@ import io.ddf.misc.Config;
 import io.ddf.util.ConfigHandler;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**
@@ -70,6 +71,16 @@ import java.util.*;
  * </ul>
  */
 public class Factor<T> extends Vector<T> implements Serializable {
+
+  @Override
+  public Class getParameterizedType() {
+    Class clazz = (Class) ((ParameterizedType) this.getClass().getGenericSuperclass())
+        .getActualTypeArguments()[0];
+    return clazz;
+  }
+
+  public Class clazz = (Class) ((ParameterizedType) this.getClass().getGenericSuperclass())
+      .getActualTypeArguments()[0];
 
   public static Long getMaxLevelCounts() {
     ConfigHandler.Configuration config = Config.getConfigHandler().getConfig();

@@ -1,5 +1,6 @@
 package io.ddf.spark.etl
 
+import _root_.io.ddf.spark.analytics.FactorIndexerModel
 import org.apache.spark.sql.DataFrame
 import org.python.core._
 import org.python.util.PythonInterpreter
@@ -270,6 +271,18 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
     ddf.getMetaDataHandler.copyFactor(this.getDDF)
     ddf
+  }
+
+  override def factorIndexer(columns: Array[String]): DDF = {
+    val cols = columns.map{col => this.getDDF.getColumn(col)}
+    val factorIndexerModel = FactorIndexerModel(cols)
+    factorIndexerModel.transform(this.getDDF)
+  }
+
+  override def inverseFactorIndexer(columns: Array[String]): DDF = {
+    val cols = columns.map{col => this.getDDF.getColumn(col)}
+    val factorIndexerModel = FactorIndexerModel(cols)
+    factorIndexerModel.inversedTransformDDF(this.getDDF)
   }
 }
 

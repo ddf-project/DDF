@@ -29,8 +29,8 @@ public class Vector<T> implements Serializable {
    * @return
    */
   @SuppressWarnings("unchecked")
-  protected Class<T> getParameterizedType() {
-    Class<T> clazz = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass())
+  public Class getParameterizedType() {
+    Class clazz = (Class) ((ParameterizedType) this.getClass().getGenericSuperclass())
         .getActualTypeArguments()[0];
     return clazz;
   }

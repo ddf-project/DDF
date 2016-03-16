@@ -11,7 +11,10 @@ import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.SparkDDF;
+import io.ddf.spark.analytics.FactorIndexer;
 import io.ddf.spark.util.SparkUtils;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
@@ -94,16 +97,16 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
     DataFrame distinctDF = df.select(columnName).distinct();
     Long distinctCount = distinctDF.count();
     if(distinctCount > Factor.getMaxLevelCounts()) {
-      throw new DDFException(String.format("Number of distinct values in column %s is %s larger than MAX_LEVELS_COUNTS = %s", distinctCount, columnName, Factor.getMaxLevelCounts()));
+      throw new DDFException(String.format("Number of distinct values in column %s is %s larger than MAX_LEVELS_COUNTS = %s", columnName, distinctCount, Factor.getMaxLevelCounts()));
     }
-    Row[] rows = distinctDF.collect();
-    List<Object> listValues = new ArrayList<Object>(rows.length);
-    for(Row row: rows) {
-      if(!row.isNullAt(0)) {
-        listValues.add(row.get(0));
-      }
-    }
+
+    List<Object> listValues = FactorIndexer.getFactorMapForColumn(this.getDDF(), columnName).values();
     return listValues;
+  }
+  class MapFunction implements Function<Row, Object> {
+    public Object call(Row row) {
+      return row.get(0);
+    }
   }
 }
 
