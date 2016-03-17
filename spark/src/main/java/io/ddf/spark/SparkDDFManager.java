@@ -9,6 +9,7 @@ import io.ddf.content.Schema;
 import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
+import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
@@ -29,16 +30,12 @@ import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
-import scala.Function1;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.*;
 
-//import shark.SharkEnv;
-//import shark.api.JavaSharkContext;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.types.StructType;
 
 import io.ddf.s3.S3DDF;
@@ -136,7 +133,9 @@ public class SparkDDFManager extends DDFManager {
 
       if (ddf instanceof S3DDF) {
         S3DDF s3DDF = (S3DDF)ddf;
-        uri = String.format("s3n://%s/%s", s3DDF.getBucket(), s3DDF.getKey());
+        S3DataSourceCredentials cred = s3DDF.getManager().getCredential();
+        uri = String.format("s3n://%s:%s@%s/%s", cred.getAwsKeyID(), cred.getAwsScretKey(),
+            s3DDF.getBucket(), s3DDF.getKey());
         dataFormat = s3DDF.getDataFormat();
         hasHeader = s3DDF.getHasHeader();
         if (s3DDF.getSchemaString() != null) {
@@ -144,14 +143,13 @@ public class SparkDDFManager extends DDFManager {
         }
       } else {
         HDFSDDF hdfsDDF = (HDFSDDF) ddf;
-        uri = String.format("hdfs://localhost:9000%s", hdfsDDF.getPath());
+        uri = String.format("%s%s", hdfsDDF.getManager().getSourceUri(), hdfsDDF.getPath());
         dataFormat = hdfsDDF.getDataFormat();
         hasHeader = hdfsDDF.getHasHeader();
         if (hdfsDDF.getSchemaString() != null) {
           schema = SparkUtils.str2SparkSchema(hdfsDDF.getSchemaString());
         }
       }
-
 
       DataFrameReader dfr =  this.getHiveContext().read();
       DataFrame df = null;
@@ -172,13 +170,21 @@ public class SparkDDFManager extends DDFManager {
             dfr = dfr.option("inferSchema", "false").schema(schema);
           }
           break;
-        case PARQUET: case ORC:
-          dfr = dfr.format(dataFormat.toString().toLowerCase());
+        case PQT:
+          dfr = dfr.format("parquet");
+          break;
+        case ORC:
+          dfr = dfr.format("orc");
           break;
         case AVRO:
           dfr = dfr.format("com.databricks.spark.avro");
       }
-      df = dfr.load(uri);
+      mLog.info(String.format("load data from uri: %s", uri));
+      try {
+        df = dfr.load(uri);
+      } catch (Exception e) {
+        throw new DDFException(e);
+      }
       if (ddf.getSchema() == null) {
         ddf.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
       }

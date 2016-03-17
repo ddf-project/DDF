@@ -73,7 +73,7 @@ public class HDFSDDFManagerTests {
 
         HDFSDDF pqtDDF = manager.newDDF("/usr/parquet/", null);
         assert (pqtDDF.getIsDir() == true);
-        assert (pqtDDF.getDataFormat().equals(DataFormat.PARQUET));
+        assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
 
         HDFSDDF avroDDF = manager.newDDF("/usr/avro/", null);

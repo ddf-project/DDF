@@ -3,6 +3,7 @@ package io.ddf.hdfs;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.datasource.DataFormat;
+import io.ddf.datasource.HDFSDataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
 
@@ -29,6 +30,10 @@ public class HDFSDDFManager extends DDFManager {
   // Upper limit for content preview.
   private static final int K_LIMIT = 1000;
   private String fsUri = null;
+
+  public HDFSDDFManager(HDFSDataSourceDescriptor hdfsDataSourceDescriptor, EngineType engineType) throws DDFException {
+    this(hdfsDataSourceDescriptor.getDataSourceUri().getUri().toString());
+  }
 
   public HDFSDDFManager(String fsUri) throws DDFException {
     assert !Strings.isNullOrEmpty(fsUri);
@@ -229,7 +234,7 @@ public class HDFSDDFManager extends DDFManager {
 
   @Override
   public String getSourceUri() {
-    return null;
+    return this.fsUri;
   }
 
   @Override

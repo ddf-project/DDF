@@ -102,6 +102,11 @@ public class HDFSDDF extends DDF {
     }
 
     @Override
+    public HDFSDDFManager getManager() {
+        return (HDFSDDFManager)super.getManager();
+    }
+
+    @Override
     public DDF copy() throws DDFException {
         return null;
     }

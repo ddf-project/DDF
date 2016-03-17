@@ -269,6 +269,10 @@ public class S3DDFManager extends DDFManager {
     return "s3";
   }
 
+  public S3DataSourceCredentials getCredential() {
+    return mCredential;
+  }
+
   public void stop() {
     // TODO: Does s3 connection has to be closed?
   }

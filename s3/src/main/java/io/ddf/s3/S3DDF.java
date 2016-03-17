@@ -1,9 +1,13 @@
 package io.ddf.s3;
 
+import com.amazonaws.services.s3.model.S3DataSource;
 import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.datasource.DataFormat;
+import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.exception.DDFException;
+
+import org.apache.hadoop.fs.s3.S3Credentials;
 
 /**
  * Created by jing on 12/2/15.
@@ -131,6 +135,11 @@ public class S3DDF extends DDF {
 
     public void setSchemaString(String schemaString) {
         this.mSchemaString = schemaString;
+    }
+
+    @Override
+    public S3DDFManager getManager() {
+        return (S3DDFManager)super.getManager();
     }
 
     @Override
