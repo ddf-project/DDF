@@ -338,10 +338,6 @@
                     <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.twitter</groupId>
-                    <artifactId>chill_2.10</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.jboss.netty</groupId>
                     <artifactId>netty</artifactId>
                 </exclusion>
@@ -418,18 +414,14 @@
             <artifactId>spark-csv_2.10</artifactId>
             <version>1.3.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>chill-java</artifactId>
-            <version>0.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>chill_2.10</artifactId>
-            <version>0.7.2</version>
-        </dependency>
     </dependencies>
     <repositories>
+        <repository>
+            <id>typesafereleases</id>
+            <name>typesafe-releases</name>
+            <url>http://repo.typesafe.com/typesafe/releases/</url>
+            <layout>default</layout>
+        </repository>
         <repository>
             <id>AdataoMvnreposSnapshots</id>
             <name>Adatao Mvnrepos Snapshots</name>
