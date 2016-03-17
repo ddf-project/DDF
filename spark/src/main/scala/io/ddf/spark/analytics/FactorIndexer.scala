@@ -187,7 +187,9 @@ object FactorIndexer {
   def getFactorMapForColumn(ddf: DDF, column: String): FactorMap = {
     val df = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     val columnDDF = df.select(column)
-    val counts = columnDDF.map{row => row.get(0)}.countByValue()
+    val counts = columnDDF.map{row => row.get(0)}.countByValue().filter {
+      case (value, count) => value != null
+    }
     val labels = counts.toSeq.sortBy{case (value, count) => count}.map(_._1.asInstanceOf[AnyRef]).toList.asJava
     new FactorMap(labels, ddf.getColumn(column).getType)
   }

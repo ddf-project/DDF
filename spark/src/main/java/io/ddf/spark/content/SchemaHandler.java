@@ -96,17 +96,14 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
     DataFrame df = (DataFrame) this.getDDF().getRepresentationHandler().get(DataFrame.class);
     DataFrame distinctDF = df.select(columnName).distinct();
     Long distinctCount = distinctDF.count();
-    if(distinctCount > Factor.getMaxLevelCounts()) {
-      throw new DDFException(String.format("Number of distinct values in column %s is %s larger than MAX_LEVELS_COUNTS = %s", columnName, distinctCount, Factor.getMaxLevelCounts()));
+    if (distinctCount > Factor.getMaxLevelCounts()) {
+      throw new DDFException(String
+          .format("Number of distinct values in column %s is %s larger than MAX_LEVELS_COUNTS = %s", columnName,
+              distinctCount, Factor.getMaxLevelCounts()));
     }
 
     List<Object> listValues = FactorIndexer.getFactorMapForColumn(this.getDDF(), columnName).values();
     return listValues;
-  }
-  class MapFunction implements Function<Row, Object> {
-    public Object call(Row row) {
-      return row.get(0);
-    }
   }
 }
 
