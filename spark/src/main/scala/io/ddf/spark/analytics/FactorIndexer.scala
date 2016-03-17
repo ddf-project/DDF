@@ -2,6 +2,7 @@ package io.ddf.spark.analytics
 
 import java.util
 
+import io.ddf.Factor.FactorBuilder
 import io.ddf.content.Schema
 import io.ddf.exception.DDFException
 import io.ddf.{Factor, DDF}
@@ -43,7 +44,9 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
     val newColumns = schema.getColumns.map {
       case column => categoryMap.get(column.getName) match {
         case Some(factorMap) => val newcolumn = new Column(column.getName, factorMap.getTransformedColumnType())
-          newcolumn.setAsFactor(column.getOptionalFactor)
+          val levels = factorMap.values
+          val factor: Factor[_] = new FactorBuilder().setType(column.getType).setLevels(levels).build()
+          newcolumn.setAsFactor(factor)
         case None => column.clone()
       }
     }
@@ -173,6 +176,19 @@ object FactorIndexerModel {
     }.toMap
     new FactorIndexerModel(factorMaps)
   }
+
+  def builModelFromFactorColumns(columns: Array[Column]): FactorIndexerModel = {
+    val notFactor = columns.filter(column => column.getColumnClass != ColumnClass.FACTOR).map{col => col.getName}
+    if(notFactor.size > 0) {
+      throw new DDFException(s"columns ${notFactor.mkString(", ")} are not factor column")
+    }
+    val factorMaps = columns.map{
+      column =>
+        val factor = column.getOptionalFactor
+        (column.getName, new FactorMap(factor.getLevels, factor.getType))
+    }.toMap
+    new FactorIndexerModel(factorMaps)
+  }
 }
 
 object FactorIndexer {
@@ -185,14 +201,20 @@ object FactorIndexer {
   }
 
   def getFactorMapForColumn(ddf: DDF, column: String): FactorMap = {
-    val df = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-    val columnDDF = df.select(column)
-    val counts = columnDDF.map{row => row.get(0)}.countByValue().filter {
-      case (value, count) => value != null
+    if(ddf.getColumn(column).getOptionalFactor == null || ddf.getColumn(column).getOptionalFactor.getLevels == null) {
+      val df = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+      val columnDDF = df.select(column)
+      val counts = columnDDF.map { row => row.get(0) }.countByValue().filter {
+        case (value, count) => value != null
+      }
+      val labels = counts.toSeq.sortBy { case (value, count) => -count }.map(_._1.asInstanceOf[AnyRef]).toList.asJava
+      new FactorMap(labels, ddf.getColumn(column).getType)
+    } else {
+      val labels = ddf.getColumn(column).getOptionalFactor.getLevels
+      new FactorMap(labels, ddf.getColumn(column).getType)
     }
-    val labels = counts.toSeq.sortBy{case (value, count) => -count}.map(_._1.asInstanceOf[AnyRef]).toList.asJava
-    new FactorMap(labels, ddf.getColumn(column).getType)
   }
+
   def buildIndexHashMap(values: JList[AnyRef]): java.util.HashMap[Any, Double] = {
     val size = values.size * 1.5
     val map = new util.HashMap[Any, Double](size.toInt)

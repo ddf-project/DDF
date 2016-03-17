@@ -89,8 +89,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
         Factor<?> factor = column.getOptionalFactor();
         if(factor != null) {
           mLog.info(">>> set factor for column " + column.getName());
-          projectedDDF.getSchemaHandler().setAsFactor(column.getName());
-          Factor<?> newFactor = projectedDDF.getSchema().getColumn(column.getName()).getOptionalFactor();
+          Factor<?> newFactor = projectedDDF.getSchemaHandler().setAsFactor(column.getName());
           if(factor.getLevels() != null) {newFactor.setLevels(factor.getLevels());}
         }
       }

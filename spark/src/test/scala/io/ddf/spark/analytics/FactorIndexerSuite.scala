@@ -14,7 +14,7 @@ class FactorIndexerSuite extends ATestSuite {
   test("factor indexer") {
     createTableFactor()
     val ddf = manager.sql2ddf("select * from factor", "SparkSQL")
-    ddf.setAsFactor("name")
+    //ddf.setAsFactor("name")
     val originalData = ddf.VIEWS.head(20).asScala
     val transformedDDF = ddf.Transform.factorIndexer(Array("name"))
     val data = transformedDDF.VIEWS.head(20).asScala

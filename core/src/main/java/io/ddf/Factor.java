@@ -8,6 +8,7 @@ import io.ddf.util.ConfigHandler;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -86,9 +87,10 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @param theDDF
    * @param theColumnName
    */
-  public Factor(DDF theDDF, String theColumnName) {
-    super(theDDF, theColumnName);
-    this.mType = theDDF.getColumn(theColumnName).getType();
+  private Factor(FactorBuilder builder) {
+    super(builder.getDDF(), builder.getColumnName());
+    this.mType = builder.getType();
+    this.mLevels = builder.getLevels();
   }
 
   /**
@@ -154,6 +156,14 @@ public class Factor<T> extends Vector<T> implements Serializable {
    */
   public Schema.ColumnType getType() {
     return this.mType;
+  }
+
+  /**
+   * Set type for this factor
+   * @param type
+   */
+  public void setType(Schema.ColumnType type) {
+    this.mType = type;
   }
 
   /**
@@ -229,5 +239,84 @@ public class Factor<T> extends Vector<T> implements Serializable {
    */
   public void setOrdered(boolean isOrdered) {
     this.mIsOrdered = isOrdered;
+  }
+
+  public static class FactorBuilder {
+
+    private Schema.ColumnType mType;
+
+    private DDF mDDF;
+
+    private String mColumnName;
+
+    private List<Object> mLevels;
+
+    public Schema.ColumnType getType() {
+      return mType;
+    }
+
+    public FactorBuilder setType(Schema.ColumnType mType) {
+      this.mType = mType;
+      return this;
+    }
+
+    public DDF getDDF() {
+      return mDDF;
+    }
+
+    public FactorBuilder setDDF(DDF mDDF) {
+      this.mDDF = mDDF;
+      return this;
+    }
+
+    public String getColumnName() {
+      return mColumnName;
+    }
+
+    public FactorBuilder setColumnName(String mColumnName) {
+      this.mColumnName = mColumnName;
+      return this;
+    }
+
+    public List<Object> getLevels() {
+      return mLevels;
+    }
+
+    public FactorBuilder setLevels(List<Object> mLevels) {
+      this.mLevels = mLevels;
+      return this;
+    }
+
+    public Factor<?> build() throws DDFException {
+      Factor<?> factor;
+      switch (this.getType()) {
+        case DOUBLE:
+          factor = new Factor<Double>(this);
+          break;
+        case FLOAT:
+          factor = new Factor<Float>(this);
+          break;
+        case INT:
+          factor = new Factor<Integer>(this);
+          break;
+        case BIGINT:
+          factor = new Factor<Long>(this);
+          break;
+        case BOOLEAN:
+          factor = new Factor<Boolean>(this);
+          break;
+        case STRING:
+          factor = new Factor<String>(this);
+          break;
+        case TIMESTAMP:
+          factor = new Factor<Timestamp>(this);
+          break;
+        case BLOB:
+        default:
+          factor = new Factor<Object>(this);
+          break;
+      }
+      return factor;
+    }
   }
 }

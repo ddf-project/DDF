@@ -111,40 +111,14 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
     if (this.getSchema() == null)
       throw new DDFException("Schema is null");
     List<Object> levels = this.computeFactorLevels(columnName);
-    Factor<?> factor;
 
     Column column = this.getSchema().getColumn(columnName);
     if(column == null) {
       throw new DDFException(String.format("Column with name %s does not exist in DDF", columnName), null);
     }
-    switch (column.getType()) {
-      case DOUBLE:
-        factor = new Factor<Double>(this.getDDF(), columnName);
-        break;
-      case FLOAT:
-        factor = new Factor<Float>(this.getDDF(), columnName);
-        break;
-      case INT:
-        factor = new Factor<Integer>(this.getDDF(), columnName);
-        break;
-      case BIGINT:
-        factor = new Factor<Long>(this.getDDF(), columnName);
-        break;
-      case BOOLEAN:
-        factor = new Factor<Boolean>(this.getDDF(), columnName);
-        break;
-      case STRING:
-        factor = new Factor<String>(this.getDDF(), columnName);
-        break;
-      case TIMESTAMP:
-        factor = new Factor<Timestamp>(this.getDDF(), columnName);
-        break;
-      case BLOB:
-      default:
-        factor = new Factor<Object>(this.getDDF(), columnName);
-        break;
-    }
-    factor.setLevels(levels);
+    Factor<?> factor = new Factor.FactorBuilder().setDDF(this.getDDF()).setColumnName(columnName).
+        setType(column.getType()).setLevels(levels).build();
+
     column.setAsFactor(factor);
     return factor;
   }
