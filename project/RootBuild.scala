@@ -118,7 +118,7 @@ object RootBuild extends Build {
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
-    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude("com.twitter", "chill_2.10")
+    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
@@ -128,9 +128,7 @@ object RootBuild extends Build {
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
     "com.google.protobuf" % "protobuf-java" % "2.5.0",
-    "com.databricks" % "spark-csv_2.10" % "1.3.0",
-    "com.twitter" % "chill-java" % "0.7.2",
-    "com.twitter" % "chill_2.10" % "0.7.2"
+    "com.databricks" % "spark-csv_2.10" % "1.3.0"
   )
 
   val test_dependencies = Seq(
@@ -257,8 +255,6 @@ object RootBuild extends Build {
     dependencyOverrides += "io.dropwizard.metrics" % "metrics-core" % "3.1.2",
     dependencyOverrides += "io.dropwizard.metrics" % "metrics-json" % "3.1.2",
     dependencyOverrides += "io.dropwizard.metrics" % "metrics-jvm" % "3.1.2",
-    dependencyOverrides += "com.twitter" % "chill-java" % "0.7.2",
-    dependencyOverrides += "com.twitter" % "chill_2.10" % "0.7.2",
     dependencyOverrides += "org.apache.commons" % "commons-lang3" % "3.1",
       pomExtra := (
       <!--
