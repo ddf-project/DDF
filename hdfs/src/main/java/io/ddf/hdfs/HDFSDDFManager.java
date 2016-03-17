@@ -48,16 +48,6 @@ public class HDFSDDFManager extends DDFManager {
   }
 
   /**
-   * @param hdfsDDF The uri of the hdfs file (single file).
-   * @return True if it has header, otherwise false.
-   * @brief To check whether the hdfs file already contains header.
-   */
-  public Boolean hasHeader(HDFSDDF hdfsDDF) {
-    // TODO: Should we do this check in backend?
-    return false;
-  }
-
-  /**
    * @brief To check whether the ddf is a directory.
    */
   public Boolean isDir(HDFSDDF hdfsDDF) throws DDFException {
@@ -87,6 +77,9 @@ public class HDFSDDFManager extends DDFManager {
           if (dotIndex != -1) {
             String extension = filePath.substring(dotIndex + 1);
             try {
+              if (extension.equalsIgnoreCase("parquet")) {
+                extension = "pqt";
+              }
               DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
               dataFormats.add(dataFormat);
             } catch (Exception e) {
@@ -137,12 +130,12 @@ public class HDFSDDFManager extends DDFManager {
    * @param path The path.
    * @brief Create a ddf given path.
    */
-  public HDFSDDF newDDF(String path) throws DDFException {
-    return new HDFSDDF(this, path);
+  public HDFSDDF newDDF(String path, Map<String, String> options) throws DDFException {
+    return new HDFSDDF(this, path, options);
   }
 
-  public HDFSDDF newDDF(String path, String schema) throws DDFException {
-    return new HDFSDDF(this, path, schema);
+  public HDFSDDF newDDF(String path, String schema, Map<String, String> options) throws DDFException {
+    return new HDFSDDF(this, path, schema, options);
   }
 
 
@@ -219,7 +212,7 @@ public class HDFSDDFManager extends DDFManager {
 
   @Override
   public DDF copyFrom(DDF fromDDF) throws DDFException {
-    return null;
+    throw new DDFException(new UnsupportedOperationException());
   }
 
   @Override
@@ -243,6 +236,6 @@ public class HDFSDDFManager extends DDFManager {
   }
 
   public void stop() {
-    // TODO: Does s3 connection has to be closed?
+    // close connection
   }
 }

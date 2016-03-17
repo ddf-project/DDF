@@ -56,16 +56,6 @@ public class S3DDFManager extends DDFManager {
   }
 
   /**
-   * @param s3DDF The uri of the s3 file (single file).
-   * @return True if it has header, otherwise false.
-   * @brief To check whether the s3 file already contains header.
-   */
-  public Boolean hasHeader(DDF s3DDF) {
-    // TODO: Should we do this check in backend?
-    return false;
-  }
-
-  /**
    * @brief To check whether the ddf is a directory.
    */
   public Boolean isDir(S3DDF s3DDF) throws DDFException {
@@ -94,6 +84,9 @@ public class S3DDFManager extends DDFManager {
           if (dotIndex != -1) {
             String extension = key.substring(dotIndex + 1);
             try {
+              if (extension.equalsIgnoreCase("parquet")) {
+                extension = "pqt";
+              }
               DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
               dataFormats.add(dataFormat);
             } catch (Exception e) {
@@ -151,16 +144,16 @@ public class S3DDFManager extends DDFManager {
    * @param path The path.
    * @brief Create a ddf given path.
    */
-  public S3DDF newDDF(String path) throws DDFException {
-    return new S3DDF(this, path);
+  public S3DDF newDDF(String path, Map<String, String> options) throws DDFException {
+    return new S3DDF(this, path, options);
   }
 
-  public S3DDF newDDF(String path, String schema) throws DDFException {
-    return new S3DDF(this, path, schema);
+  public S3DDF newDDF(String path, String schema, Map<String, String> options) throws DDFException {
+    return new S3DDF(this, path, schema, options);
   }
 
-  public S3DDF newDDF(String bucket, String key, String schema) throws DDFException {
-    return new S3DDF(this, bucket, key, schema);
+  public S3DDF newDDF(String bucket, String key, String schema, Map<String, String> options) throws DDFException {
+    return new S3DDF(this, bucket, key, schema, options);
   }
 
   /**

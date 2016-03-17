@@ -9,13 +9,12 @@ import io.ddf.exception.DDFException;
 
 import org.apache.hadoop.fs.s3.S3Credentials;
 
+import java.util.Map;
+
 /**
  * Created by jing on 12/2/15.
  */
 public class S3DDF extends DDF {
-    // Whether this ddf has header.
-    private Boolean mHasHeader = false;
-
     // It's a directory or file.
     private Boolean mIsDir;
 
@@ -32,28 +31,48 @@ public class S3DDF extends DDF {
     // Path after bucket.
     private String mKey;
 
+    // Options, including:
+    // key : possible values
+    // has_header : true / false
+    // format: csv / parquet / etc.
+    // delimiter : , \x001
+    // quote : "
+    // escape : \
+    // mode : used for spark
+    // charSet:
+    // inferSchema:
+    // comment:
+    // nullvalue:
+    // dateformat:
+    // flatten : true / false
+    private Map<String, String > options;
+
     /**
      * S3DDF is the ddf for s3. It point to a single S3DDFManager, and every S3DDF is a unqiue mapping to a s3 uri.
-     * The schema should store the s3 uri as tablename.
      */
-    public S3DDF(S3DDFManager manager, String path, String schema) throws DDFException {
+    public S3DDF(S3DDFManager manager, String path, Map<String, String> options) throws DDFException {
+        super(manager, null, null, null, null, null);
+        this.getBucketAndPath(path);
+        this.options = options;
+        initialize();
+    }
+
+    public S3DDF(S3DDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         mSchemaString = schema;
         this.getBucketAndPath(path);
+        this.options = options;
         initialize();
     }
 
-    public S3DDF(S3DDFManager manager, String path) throws DDFException {
-        super(manager, null, null, null, null, null);
-        this.getBucketAndPath(path);
-        initialize();
-    }
 
-    public S3DDF(S3DDFManager manager, String bucket, String key, String schema) throws DDFException {
+    public S3DDF(S3DDFManager manager, String bucket, String key, String schema, Map<String, String> options)
+        throws DDFException {
         super(manager, null, null, null, null, null);
         mBucket = bucket;
         mKey = key;
         mSchemaString = schema;
+        this.options = options;
         initialize();
     }
     
@@ -77,24 +96,18 @@ public class S3DDF extends DDF {
             throw new DDFException("The key of s3ddf is null");
         }
         // Check directory or file.
-        S3DDFManager s3DDFManager = (S3DDFManager)this.getManager();
+        S3DDFManager s3DDFManager = this.getManager();
         mIsDir = s3DDFManager.isDir(this);
         // Check dataformat.
-        mDataFormat = s3DDFManager.getDataFormat(this);
-        if (mDataFormat.equals(DataFormat.CSV)) {
-            // Check header.
-            // TODO (discuss with bigapps guy)
+        if (options != null && options.containsKey("format")) {
+            try {
+                mDataFormat = DataFormat.valueOf(options.get("format"));
+            } catch (IllegalArgumentException e) {
+                mDataFormat = s3DDFManager.getDataFormat(this);
+            }
         } else {
-            mHasHeader = false;
+            mDataFormat = s3DDFManager.getDataFormat(this);
         }
-    }
-
-    public Boolean getHasHeader() {
-        return mHasHeader;
-    }
-
-    public void setHasHeader(Boolean hasHeader) {
-        this.mHasHeader = hasHeader;
     }
 
     public DataFormat getDataFormat() {
@@ -137,6 +150,14 @@ public class S3DDF extends DDF {
         this.mSchemaString = schemaString;
     }
 
+    public Map<String, String> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Map<String, String> options) {
+        this.options = options;
+    }
+
     @Override
     public S3DDFManager getManager() {
         return (S3DDFManager)super.getManager();
@@ -144,6 +165,6 @@ public class S3DDF extends DDF {
 
     @Override
     public DDF copy() throws DDFException {
-        return null;
+        throw new DDFException(new UnsupportedOperationException());
     }
 }

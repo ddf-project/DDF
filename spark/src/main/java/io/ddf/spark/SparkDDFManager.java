@@ -2,6 +2,8 @@ package io.ddf.spark;
 
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
@@ -128,8 +130,18 @@ public class SparkDDFManager extends DDFManager {
     if (ddf instanceof S3DDF || ddf instanceof HDFSDDF) {
       DataFormat dataFormat = null;
       String uri = null;
-      Boolean hasHeader = false;
       StructType schema = null;
+      Map<String, String> options = null;
+      final Map<DataFormat, String> formatMapping = ImmutableMap.<DataFormat, String>builder()
+          .put(DataFormat.CSV, "com.databricks.spark.csv")
+          .put(DataFormat.JSON, "json")
+          .put(DataFormat.TSV, "com.databricks.spark.csv")
+          .put(DataFormat.PQT, "parquet")
+          .put(DataFormat.ORC, "orc")
+          .put(DataFormat.AVRO, "com.databricks.spark.avro").build();
+
+      final Set<DataFormat> flattenFormat = ImmutableSet.<DataFormat>builder()
+          .add(DataFormat.JSON, DataFormat.ORC, DataFormat.AVRO).build();
 
       if (ddf instanceof S3DDF) {
         S3DDF s3DDF = (S3DDF)ddf;
@@ -137,32 +149,27 @@ public class SparkDDFManager extends DDFManager {
         uri = String.format("s3n://%s:%s@%s/%s", cred.getAwsKeyID(), cred.getAwsScretKey(),
             s3DDF.getBucket(), s3DDF.getKey());
         dataFormat = s3DDF.getDataFormat();
-        hasHeader = s3DDF.getHasHeader();
         if (s3DDF.getSchemaString() != null) {
           schema = SparkUtils.str2SparkSchema(s3DDF.getSchemaString());
         }
+        options = s3DDF.getOptions();
       } else {
         HDFSDDF hdfsDDF = (HDFSDDF) ddf;
         uri = String.format("%s%s", hdfsDDF.getManager().getSourceUri(), hdfsDDF.getPath());
         dataFormat = hdfsDDF.getDataFormat();
-        hasHeader = hdfsDDF.getHasHeader();
         if (hdfsDDF.getSchemaString() != null) {
           schema = SparkUtils.str2SparkSchema(hdfsDDF.getSchemaString());
         }
+        options = hdfsDDF.getOptions();
       }
 
-      DataFrameReader dfr =  this.getHiveContext().read();
+      DataFrameReader dfr =  this.getHiveContext().read().format(formatMapping.get(dataFormat));
       DataFrame df = null;
       switch (dataFormat) {
-        case JSON:
-          dfr = dfr.format("json");
-          // TODO(Should we flatten the df here?)
-          break;
         case TSV:
           dfr = dfr.option("delimiter", "\t");
           // fall through
         case CSV:
-          dfr = dfr.format("com.databricks.spark.csv").option("header", hasHeader ? "true" : "false");
           // TODO: reuse ddf schema.
           if (schema == null) {
             dfr = dfr.option("inferSchema", "true");
@@ -170,14 +177,9 @@ public class SparkDDFManager extends DDFManager {
             dfr = dfr.option("inferSchema", "false").schema(schema);
           }
           break;
-        case PQT:
-          dfr = dfr.format("parquet");
-          break;
-        case ORC:
-          dfr = dfr.format("orc");
-          break;
-        case AVRO:
-          dfr = dfr.format("com.databricks.spark.avro");
+      }
+      if (options != null) {
+        dfr = dfr.options(options);
       }
       mLog.info(String.format("load data from uri: %s", uri));
       try {
@@ -192,6 +194,13 @@ public class SparkDDFManager extends DDFManager {
           null, ddf.getSchema());
       newDDF.getRepresentationHandler().cache(false);
       newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+
+      if (flattenFormat.contains(dataFormat)
+          && options != null
+          && options.get("flatten") != null
+          && options.get("flatten").equals("true")) {
+        newDDF = newDDF.getFlattenedDDF();
+      }
       return newDDF;
     } else {
       throw new DDFException(new UnsupportedOperationException());

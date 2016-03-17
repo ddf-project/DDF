@@ -43,15 +43,15 @@ public class HDFSDDFManagerTests {
     @Test
     public void testCreateDDF() throws DDFException {
         try {
-            HDFSDDF folderDDF = manager.newDDF("/user/testFolder", null);
+            HDFSDDF folderDDF = manager.newDDF("/user/testFolder", null, null);
             assert(folderDDF.getIsDir() == true);
         } catch (Exception e) {
 
         }
 
-        HDFSDDF cleanFolderDDF = manager.newDDF("/user/estFolder", null);
-        HDFSDDF jsonDDF = manager.newDDF("/user/a.json", null);
-        HDFSDDF csvDDF = manager.newDDF("/user/hasHeader.csv", null);
+        HDFSDDF cleanFolderDDF = manager.newDDF("/user/estFolder", null, null);
+        HDFSDDF jsonDDF = manager.newDDF("/user/a.json", null, null);
+        HDFSDDF csvDDF = manager.newDDF("/user/hasHeader.csv", null, null);
         assert (cleanFolderDDF.getIsDir() == true);
         assert(jsonDDF.getIsDir() == false);
         assert(csvDDF.getIsDir() == false);
@@ -59,28 +59,28 @@ public class HDFSDDFManagerTests {
         assert(csvDDF.getDataFormat().equals(DataFormat.CSV));
         try {
             // Test on non-exist folder/file. Should throw exception.
-            HDFSDDF nonExistDDF = manager.newDDF("/user/jing/nonexist.csv", null);
+            HDFSDDF nonExistDDF = manager.newDDF("/user/jing/nonexist.csv", null, null);
             assert (false);
         } catch (Exception e) {
 
         }
         try {
-            HDFSDDF nonExistDDF2 = manager.newDDF("/user/jing/nonexsist", null);
+            HDFSDDF nonExistDDF2 = manager.newDDF("/user/jing/nonexsist", null, null);
             assert (false);
         } catch (Exception e) {
 
         }
 
-        HDFSDDF pqtDDF = manager.newDDF("/usr/parquet/", null);
+        HDFSDDF pqtDDF = manager.newDDF("/usr/parquet/", null, null);
         assert (pqtDDF.getIsDir() == true);
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
 
-        HDFSDDF avroDDF = manager.newDDF("/usr/avro/", null);
+        HDFSDDF avroDDF = manager.newDDF("/usr/avro/", null, null);
         assert (avroDDF.getIsDir() == true);
         assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
 
-        HDFSDDF orcDDF = manager.newDDF("/usr/orc/", null);
+        HDFSDDF orcDDF = manager.newDDF("/usr/orc/", null, null);
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
     }
@@ -88,7 +88,7 @@ public class HDFSDDFManagerTests {
 
     @Test
     public void testHead() throws DDFException {
-        HDFSDDF csvDDF = manager.newDDF("/user/jing/year.csv", null);
+        HDFSDDF csvDDF = manager.newDDF("/user/jing/year.csv", null, null);
         List<String> rows = manager.head(csvDDF, 5);
         assert(rows.size() == 2);
         LOG.info("========== content of year.csv ==========");
@@ -102,11 +102,11 @@ public class HDFSDDFManagerTests {
         rows = manager.head(csvDDF, 1000);
         assert(rows.size() == 2);
 
-        HDFSDDF folderDDF = manager.newDDF("/user/jing/testFolder", null);
+        HDFSDDF folderDDF = manager.newDDF("/user/jing/testFolder", null, null);
         rows = manager.head(folderDDF, 5);
         assert (rows.size() == 4);
 
-        HDFSDDF ddf1024 = manager.newDDF("/user/jing/1024.csv", null);
+        HDFSDDF ddf1024 = manager.newDDF("/user/jing/1024.csv", null, null);
         rows = manager.head(ddf1024, 9999);
         assert (rows.size() == 1000);
     }

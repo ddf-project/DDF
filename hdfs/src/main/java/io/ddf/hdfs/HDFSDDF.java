@@ -5,13 +5,12 @@ import io.ddf.DDF;
 import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 
+import java.util.Map;
+
 /**
  * Created by jing on 2/22/16.
  */
 public class HDFSDDF extends DDF {
-    // Whether this ddf has header.
-    private Boolean mHasHeader = false;
-
     // It's a directory or file.
     private Boolean mIsDir;
 
@@ -25,20 +24,24 @@ public class HDFSDDF extends DDF {
     // File path.
     private String mPath;
 
+    private Map<String, String> options;
+
     /**
      * S3DDF is the ddf for s3. It point to a single S3DDFManager, and every S3DDF is a unqiue mapping to a s3 uri.
      * The schema should store the s3 uri as tablename.
      */
-    public HDFSDDF(HDFSDDFManager manager, String path, String schema) throws DDFException {
+    public HDFSDDF(HDFSDDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         mSchemaString = schema;
         mPath = path;
+        this.options = options;
         initialize();
     }
 
-    public HDFSDDF(HDFSDDFManager manager, String path) throws DDFException {
+    public HDFSDDF(HDFSDDFManager manager, String path, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         mPath = path;
+        this.options = options;
         initialize();
     }
 
@@ -49,24 +52,18 @@ public class HDFSDDF extends DDF {
             throw new DDFException("The path of hdfsddf is null");
         }
         // Check directory or file.
-        HDFSDDFManager hdfsDDFManager = (HDFSDDFManager)this.getManager();
+        HDFSDDFManager hdfsDDFManager = this.getManager();
         mIsDir = hdfsDDFManager.isDir(this);
         // Check dataformat.
-        mDataFormat = hdfsDDFManager.getDataFormat(this);
-        if (mDataFormat.equals(DataFormat.CSV)) {
-            // Check header.
-            // TODO (discuss with bigapps guy)
+        if (options != null && options.containsKey("format")) {
+            try {
+                mDataFormat = DataFormat.valueOf(options.get("format"));
+            } catch (IllegalArgumentException e) {
+                mDataFormat = hdfsDDFManager.getDataFormat(this);
+            }
         } else {
-            mHasHeader = false;
+            mDataFormat = hdfsDDFManager.getDataFormat(this);
         }
-    }
-
-    public Boolean getHasHeader() {
-        return mHasHeader;
-    }
-
-    public void setHasHeader(Boolean hasHeader) {
-        this.mHasHeader = hasHeader;
     }
 
     public DataFormat getDataFormat() {
@@ -101,6 +98,14 @@ public class HDFSDDF extends DDF {
         this.mSchemaString = schemaString;
     }
 
+    public Map<String, String> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Map<String, String> options) {
+        this.options = options;
+    }
+
     @Override
     public HDFSDDFManager getManager() {
         return (HDFSDDFManager)super.getManager();
@@ -108,6 +113,6 @@ public class HDFSDDF extends DDF {
 
     @Override
     public DDF copy() throws DDFException {
-        return null;
+        throw new DDFException(new UnsupportedOperationException());
     }
 }
