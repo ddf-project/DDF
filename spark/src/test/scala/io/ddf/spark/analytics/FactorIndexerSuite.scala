@@ -18,7 +18,7 @@ class FactorIndexerSuite extends ATestSuite {
     val transformedDDF = ddf.Transform.factorIndexer(Array("name"))
     val factor = transformedDDF.getColumn("name").getOptionalFactor
     val inversedTransformedDDF = transformedDDF.Transform.inverseFactorIndexer(Array("name"))
-    println(s">>> nrow = " + inversedTransformedDDF.getNumRows)
+    assert(inversedTransformedDDF.getNumRows == 4)
     val transformedData = inversedTransformedDDF.VIEWS.head(10).asScala
     val originalData = ddf.VIEWS.head(10).asScala
     originalData.foreach {
