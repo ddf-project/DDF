@@ -1,6 +1,7 @@
 package io.ddf;
 
 
+import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.Config;
 import io.ddf.util.ConfigHandler;
@@ -72,15 +73,7 @@ import java.util.*;
  */
 public class Factor<T> extends Vector<T> implements Serializable {
 
-  @Override
-  public Class getParameterizedType() {
-    Class clazz = (Class) ((ParameterizedType) this.getClass().getGenericSuperclass())
-        .getActualTypeArguments()[0];
-    return clazz;
-  }
-
-  public Class clazz = (Class) ((ParameterizedType) this.getClass().getGenericSuperclass())
-      .getActualTypeArguments()[0];
+  private Schema.ColumnType mType;
 
   public static Long getMaxLevelCounts() {
     ConfigHandler.Configuration config = Config.getConfigHandler().getConfig();
@@ -95,6 +88,7 @@ public class Factor<T> extends Vector<T> implements Serializable {
    */
   public Factor(DDF theDDF, String theColumnName) {
     super(theDDF, theColumnName);
+    this.mType = theDDF.getColumn(theColumnName).getType();
   }
 
   /**
@@ -104,8 +98,9 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @param theColumnName
    * @throws DDFException
    */
-  public Factor(String name, T[] data) throws DDFException {
+  public Factor(String name, T[] data, Schema.ColumnType type) throws DDFException {
     super(name, data);
+    this.mType = type;
   }
 
   /**
@@ -116,8 +111,9 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @param engineName
    * @throws DDFException
    */
-  public Factor(String name, T[] data, String engineName) throws DDFException {
+  public Factor(String name, T[] data, String engineName, Schema.ColumnType type) throws DDFException {
     super(name, data, engineName);
+    this.mType= type;
   }
 
 
@@ -150,6 +146,14 @@ public class Factor<T> extends Vector<T> implements Serializable {
       i+= 1;
     }
     return levelMap;
+  }
+
+  /**
+   *
+   * @return type of this factor
+   */
+  public Schema.ColumnType getType() {
+    return this.mType;
   }
 
   /**

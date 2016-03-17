@@ -35,16 +35,19 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
     }
     val rddRow = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
     val transformedRDD = this.transformRDD(rddRow, catMapwithColIndex, ddf.getNumColumns)
+    val schema = transformSchema(ddf.getSchema)
+    ddf.getManager.newDDF(transformedRDD, Array(classOf[RDD[_]], classOf[Row]), null, null, schema)
+  }
 
-    val newColumns = ddf.getSchema.getColumns.map {
+  private def transformSchema(schema: Schema): Schema = {
+    val newColumns = schema.getColumns.map {
       case column => categoryMap.get(column.getName) match {
         case Some(factorMap) => val newcolumn = new Column(column.getName, factorMap.getTransformedColumnType())
           newcolumn.setAsFactor(column.getOptionalFactor)
         case None => column.clone()
       }
     }
-    val schema = new Schema(newColumns)
-    ddf.getManager.newDDF(transformedRDD, Array(classOf[RDD[_]], classOf[Row]), null, null, schema)
+    new Schema(newColumns)
   }
 
   private def transformRDD(input: RDD[Row], categoryMapWithIndex: Map[Int, FactorMap], numCols: Int): RDD[Row] = {
@@ -79,7 +82,7 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
     }
   }
 
-  def inversedTransformDDF(ddf: DDF): DDF = {
+  def inversedTransform(ddf: DDF): DDF = {
     val catMapwithColIndex = categoryMap.map {
       case (colName, map) => val colIndex = ddf.getSchemaHandler.getColumnIndex(colName)
         (colIndex, map)
@@ -87,14 +90,18 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
     val rddRow = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row]).asInstanceOf[RDD[Row]]
     val transformedRDD = this.inversedTransformRDD(rddRow, catMapwithColIndex, ddf.getNumColumns)
 
-    val newColumns = ddf.getSchema.getColumns.map {
+    val schema = inversedTransformSchema(ddf.getSchema)
+    ddf.getManager.newDDF(transformedRDD, Array(classOf[RDD[_]], classOf[Row]), null, null, schema)
+  }
+
+  private def inversedTransformSchema(schema: Schema): Schema = {
+    val newColumns = schema.getColumns.map {
       case column => categoryMap.get(column.getName) match {
         case Some(factorMap) => new Column(column.getName, factorMap.originalColumnType)
         case None => column
       }
     }
-    val schema = new Schema(newColumns)
-    ddf.getManager.newDDF(transformedRDD, Array(classOf[RDD[_]], classOf[Row]), null, null, schema)
+    new Schema(newColumns)
   }
 
   private def inversedTransformRDD(rdd: RDD[Row], categoryMapWithIndex: Map[Int, FactorMap], numCols: Int): RDD[Row] = {
@@ -162,9 +169,7 @@ object FactorIndexerModel {
     val factorMaps = columns.map{
       column =>
         val factor = column.getOptionalFactor
-
-        val levels = column.getOptionalFactor.getLevels
-        (column.getName, new FactorMap(levels, column.getType))
+        (column.getName, new FactorMap(factor.getLevels, factor.getType))
     }.toMap
     new FactorIndexerModel(factorMaps)
   }
