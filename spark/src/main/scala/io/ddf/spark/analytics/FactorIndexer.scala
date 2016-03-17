@@ -190,10 +190,9 @@ object FactorIndexer {
     val counts = columnDDF.map{row => row.get(0)}.countByValue().filter {
       case (value, count) => value != null
     }
-    val labels = counts.toSeq.sortBy{case (value, count) => count}.map(_._1.asInstanceOf[AnyRef]).toList.asJava
+    val labels = counts.toSeq.sortBy{case (value, count) => -count}.map(_._1.asInstanceOf[AnyRef]).toList.asJava
     new FactorMap(labels, ddf.getColumn(column).getType)
   }
-
   def buildIndexHashMap(values: JList[AnyRef]): java.util.HashMap[Any, Double] = {
     val size = values.size * 1.5
     val map = new util.HashMap[Any, Double](size.toInt)
