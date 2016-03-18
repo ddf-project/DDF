@@ -110,14 +110,13 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   public synchronized Factor<?> setAsFactor(String columnName) throws DDFException {
     if (this.getSchema() == null)
       throw new DDFException("Schema is null");
-    List<Object> levels = this.computeFactorLevels(columnName);
 
     Column column = this.getSchema().getColumn(columnName);
     if(column == null) {
       throw new DDFException(String.format("Column with name %s does not exist in DDF", columnName), null);
     }
     Factor<?> factor = new Factor.FactorBuilder().setDDF(this.getDDF()).setColumnName(columnName).
-        setType(column.getType()).setLevels(levels).build();
+        setType(column.getType()).build();
 
     column.setAsFactor(factor);
     return factor;
@@ -173,9 +172,12 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
       int currentColumnIndex = this.getColumnIndex(currentColumn.getName());
       HashMap<String, Double> temp = new HashMap<String, java.lang.Double>();
       // loop
+      Factor<?> factor = currentColumn.getOptionalFactor();
       if (currentColumn.getColumnClass() == Schema.ColumnClass.FACTOR) {
-        if (currentColumn.getOptionalFactor() != null && currentColumn.getOptionalFactor().getLevels() != null) {
-          Map<String, Integer> levelMaps = currentColumn.getOptionalFactor().getLevelMap();
+        if (factor != null) {
+          List<Object>  levels = this.computeFactorLevels(currentColumn.getName());
+          factor.setLevels(levels);
+          Map<String, Integer> levelMaps = factor.getLevelMap();
 
           Iterator<String> valuesIterator = levelMaps.keySet().iterator();
 

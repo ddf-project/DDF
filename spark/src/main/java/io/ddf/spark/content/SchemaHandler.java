@@ -61,7 +61,7 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
       }
 
       Map<Integer, Map<String, Integer>> listLevelCounts;
-      Map<String, Map<String, Integer>> listLevelCountsWithName = new HashMap<String, Map<String, Integer>>();
+
       IHandleRepresentations repHandler = this.getDDF().getRepresentationHandler();
 
       try {
@@ -82,6 +82,7 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
       if (listLevelCounts == null) {
         throw new DDFException("Error getting factor levels counts");
       }
+      Map<String, Map<String, Integer>> listLevelCountsWithName = new HashMap<String, Map<String, Integer>>();
 
       for (Integer columnIndex : columnIndexes) {
         String colName = this.getDDF().getColumnName(columnIndex);
