@@ -144,7 +144,7 @@ object RootBuild extends Build {
   )
 
   val hdfs_dependencies = Seq(
-    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java")
+    "org.apache.hadoop" % "hadoop-hdfs" % "2.2.0"
   )
 
   val test_dependencies = Seq(

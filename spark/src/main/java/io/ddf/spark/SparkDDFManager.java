@@ -167,26 +167,29 @@ public class SparkDDFManager extends DDFManager {
       DataFrame df = null;
       switch (dataFormat) {
         case TSV:
-          dfr = dfr.option("delimiter", "\t");
+          if (options == null || !options.containsKey("delimiter")) {
+            dfr = dfr.option("delimiter", "\t");
+          }
           // fall through
         case CSV:
           // TODO: reuse ddf schema.
           if (schema == null) {
             dfr = dfr.option("inferSchema", "true");
           } else {
-            dfr = dfr.option("inferSchema", "false").schema(schema);
+            dfr = dfr.schema(schema);
           }
           break;
       }
       if (options != null) {
         dfr = dfr.options(options);
       }
-      mLog.info(String.format("load data from uri: %s", uri));
+      mLog.info(String.format(">>>>>>>> Load data from uri: %s", uri));
       try {
         df = dfr.load(uri);
       } catch (Exception e) {
         throw new DDFException(e);
       }
+      mLog.info(String.format(">>>>>>>> Finish loading for uri: %s", uri));
       if (ddf.getSchema() == null) {
         ddf.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
       }

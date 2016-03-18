@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import io.ddf.DDFManager;
 import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 
@@ -49,7 +48,7 @@ public class HDFSDDFManagerTests {
 
         }
 
-        HDFSDDF cleanFolderDDF = manager.newDDF("/user/estFolder", null, null);
+        HDFSDDF cleanFolderDDF = manager.newDDF("/user/testFolder", null, null);
         HDFSDDF jsonDDF = manager.newDDF("/user/a.json", null, null);
         HDFSDDF csvDDF = manager.newDDF("/user/hasHeader.csv", null, null);
         assert (cleanFolderDDF.getIsDir() == true);

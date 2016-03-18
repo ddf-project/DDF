@@ -24,6 +24,7 @@ import org.apache.hadoop.fs.*;
 /**
  * Created by jing on 2/22/16.
  */
+//TODO: Extract FileDDFManager as an abstract class for s3 and hdfs.
 public class HDFSDDFManager extends DDFManager {
   // File system connector.
   private FileSystem fs = null;

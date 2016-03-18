@@ -60,7 +60,6 @@ public class SparkDDFManagerTests extends BaseTest {
     Assert.assertEquals(ddf, manager.getDDF(ddf.getUUID()));
   }
 
-
   @Test
   public void testCopyFromS3() throws DDFException {
     LOG = LoggerFactory.getLogger(SparkDDFManagerTests.class);
@@ -87,15 +86,13 @@ public class SparkDDFManagerTests extends BaseTest {
     LOG.info("========== testFolder/allJson ==========");
     S3DDF allJsonDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/allJson/", null, null);
     DDF allJsonSparkDDF = sparkDDFManager.copyFrom(allJsonDDF);
-    // TODO: Why it's 6
+    // TODO: is it 6?
     // assert(allJsonSparkDDF.getNumRows() == 4);
 
-    // Copy From a json, the schema should already be included in the json.
     LOG.info("========== testFolder/folder/d.json ==========");
-    S3DDF jsonDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/d.json", null, null);
+    S3DDF jsonDDF = s3DDFManager.newDDF("adatao-test", "json/", null, null);
     DDF jsonSparkDDF = sparkDDFManager.copyFrom(jsonDDF);
-    LOG.info(jsonSparkDDF.sql("select * from @this", "error").getRows().toString());
-    // assert (jsonSparkDDF.getNumRows()==2);
+    LOG.info(jsonSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
 
 
     // Copy From a csv, the schema is not given.
@@ -143,6 +140,7 @@ public class SparkDDFManagerTests extends BaseTest {
     DDF avroSparkDDF = sparkDDFManager.copyFrom(avroDDF);
     LOG.info(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
 
+    // s3 doesn't work with orc now
     /*
     LOG.info("========== orc ==========");
     S3DDF orcDDF = s3DDFManager.newDDF("adatao-sample-data", "test/orc/", null);
@@ -151,37 +149,40 @@ public class SparkDDFManagerTests extends BaseTest {
     */
   }
 
-  @Test
+  // TODO: we need have a public hdfs
+  // @Test
   public void testCopyFromHDFS() throws DDFException {
     LOG = LoggerFactory.getLogger(SparkDDFManagerTests.class);
     HDFSDDFManager hdfsDDFManager = new HDFSDDFManager("hdfs://localhost:9000");
     SparkDDFManager sparkDDFManager = (SparkDDFManager) manager;
 
-    /*
+
     // Test copy from a folder, the schema should be given.
     LOG.info("========== testFolder/folder ==========");
-    HDFSDDF folderDDF = hdfsDDFManager.newDDF("/user/jing/testFolder/folder/", "year int, value int");
+    HDFSDDF folderDDF = hdfsDDFManager.newDDF("/user/jing/testFolder/folder/", "year int, value int", null);
     DDF folderSparkDDF = sparkDDFManager.copyFrom(folderDDF);
     LOG.info(folderSparkDDF.sql("select * from @this", "error").getRows().toString());
     assert(folderSparkDDF.getNumRows() == 4);
 
     // Test copy from a folder with all json files.
     LOG.info("========== testFolder/allJson ==========");
-    HDFSDDF allJsonDDF = hdfsDDFManager.newDDF("/user/jing/testFolder/allJson/", null);
+    HDFSDDF allJsonDDF = hdfsDDFManager.newDDF("/user/jing/testFolder/allJson/", null, null);
     DDF allJsonSparkDDF = sparkDDFManager.copyFrom(allJsonDDF);
     // assert(allJsonSparkDDF.getNumRows() == 4);
 
     // Copy From a json, the schema should already be included in the json.
     LOG.info("========== testFolder/folder/d.json ==========");
-    HDFSDDF jsonDDF = hdfsDDFManager.newDDF("/user/jing/testFolder/d.json", null);
+    HDFSDDF jsonDDF = hdfsDDFManager.newDDF("/user/jing/testFolder/d.json", null, null);
     DDF jsonSparkDDF = sparkDDFManager.copyFrom(jsonDDF);
     LOG.info(jsonSparkDDF.sql("select * from @this", "error").getRows().toString());
     // assert (jsonSparkDDF.getNumRows()==2);
 
     // Copy From a csv, the schema is not given.
     LOG.info("========== testFolder/hasHeader.csv ==========");
-    HDFSDDF csvDDF = hdfsDDFManager.newDDF("/user/jing/testFolder/hasHeader.csv", null);
-    csvDDF.setHasHeader(true);
+
+    Map<String, String> options = new HashMap<>() ;
+    options.put("header", "true");
+    HDFSDDF csvDDF = hdfsDDFManager.newDDF("/user/jing/testFolder/hasHeader.csv", null, options);
     DDF csvSparkDDF = sparkDDFManager.copyFrom(csvDDF);
     LOG.info(csvSparkDDF.sql("select * from @this", "error").getRows().toString());
     assert(csvSparkDDF.getNumRows()==2);
@@ -196,24 +197,25 @@ public class SparkDDFManagerTests extends BaseTest {
 
     // Copy From a csv, the schema is given and has no header.
     LOG.info("========== testFolder/noHeader.csv ==========");
-    HDFSDDF csvDDF3 = hdfsDDFManager.newDDF("/user/jing/testFolder/noHeader.csv", "year int, val " +
-        "string");
+    HDFSDDF csvDDF3 = hdfsDDFManager.newDDF("/user/jing/testFolder/noHeader.csv", "year int, val string", null);
     DDF csvSparkDDF3 = sparkDDFManager.copyFrom(csvDDF3);
     LOG.info(csvSparkDDF3.sql("select * from @this", "error").getRows().toString());
     assert (csvSparkDDF3.getNumRows()==2);
-    */
 
     LOG.info("========== pqt ==========");
     HDFSDDF pqtDDF = hdfsDDFManager.newDDF("/usr/parquet/", null, null);
     DDF pqtSparkDDF = sparkDDFManager.copyFrom(pqtDDF);
     LOG.info(pqtSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
+
     LOG.info("========== avro ==========");
-    HDFSDDF avroDDF = hdfsDDFManager.newDDF("/usr/avro/", null);
+    HDFSDDF avroDDF = hdfsDDFManager.newDDF("/usr/avro/", null, null);
     DDF avroSparkDDF = sparkDDFManager.copyFrom(avroDDF);
     LOG.info(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
+
     LOG.info("========== orc ==========");
-    HDFSDDF orcDDF = hdfsDDFManager.newDDF("/usr/orc/", null);
+    HDFSDDF orcDDF = hdfsDDFManager.newDDF("/usr/orc/", null, null);
     DDF orcSparkDDF = sparkDDFManager.copyFrom(orcDDF);
-    LOG.info(orcSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
+    LOG.info(orcSparkDDF.sql("select * from @this limit 5", "error").getRows().get(0).toString());
+    LOG.info(orcSparkDDF.sql("SELECT name FROM @this WHERE age < 15", "error").getRows().get(0).toString());
   }
 }

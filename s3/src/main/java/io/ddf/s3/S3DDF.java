@@ -95,6 +95,8 @@ public class S3DDF extends DDF {
         if (Strings.isNullOrEmpty(mKey)) {
             throw new DDFException("The key of s3ddf is null");
         }
+
+        mLog.info(String.format("init s3 ddf: %s %s", mBucket, mKey));
         // Check directory or file.
         S3DDFManager s3DDFManager = this.getManager();
         mIsDir = s3DDFManager.isDir(this);

@@ -66,7 +66,13 @@ public class S3DDFManager extends DDFManager {
         throw new DDFException("This folder contains subfolder, S3 DDF does not support nested folders");
       }
     }
-    return s3Object.getKey().endsWith("/");
+    Boolean isDir = s3Object.getKey().endsWith("/");
+    try {
+      s3Object.close();
+    } catch (IOException e) {
+      throw new DDFException(e);
+    }
+    return isDir;
   }
 
   /**
@@ -81,7 +87,9 @@ public class S3DDFManager extends DDFManager {
         HashSet<DataFormat> dataFormats = new HashSet<>();
         for (String key : keys) {
           int dotIndex = key.lastIndexOf('.');
-          if (dotIndex != -1) {
+          int slashIndex = key.lastIndexOf('/');
+          // Check for extension.
+          if (dotIndex != -1 && dotIndex > slashIndex) {
             String extension = key.substring(dotIndex + 1);
             try {
               if (extension.equalsIgnoreCase("parquet")) {

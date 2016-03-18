@@ -295,6 +295,7 @@ object SparkUtils {
       case "float" => FloatType
       case "timestamp" => TimestampType
       case "datetype" => DateType
+      case "boolean" => BooleanType
       case x => throw new DDFException(s"Type not support $x")
     }
   }

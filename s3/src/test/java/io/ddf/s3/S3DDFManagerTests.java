@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 import io.ddf.DDFManager;
 import io.ddf.datasource.DataFormat;
@@ -108,7 +109,7 @@ public class S3DDFManagerTests {
         assert (avroDDF.getIsDir() == true);
         assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
 
-        S3DDF orcDDF = manager.newDDF("adatao-test", "orc/", null);
+        S3DDF orcDDF = manager.newDDF("adatao-test", "orc/", null, null);
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
     }
