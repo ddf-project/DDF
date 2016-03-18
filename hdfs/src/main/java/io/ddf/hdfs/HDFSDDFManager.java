@@ -131,8 +131,13 @@ public class HDFSDDFManager extends DDFManager {
    * @param path The path.
    * @brief Create a ddf given path.
    */
+
+  public HDFSDDF newDDF(String path) throws DDFException {
+    return this.newDDF(path, null);
+  }
+
   public HDFSDDF newDDF(String path, Map<String, String> options) throws DDFException {
-    return new HDFSDDF(this, path, options);
+    return this.newDDF(path, null, options);
   }
 
   public HDFSDDF newDDF(String path, String schema, Map<String, String> options) throws DDFException {

@@ -152,8 +152,13 @@ public class S3DDFManager extends DDFManager {
    * @param path The path.
    * @brief Create a ddf given path.
    */
+  // TODO: switch to builder pattern
+  public S3DDF newDDF(String path) throws DDFException {
+    return this.newDDF(path, null);
+  }
+
   public S3DDF newDDF(String path, Map<String, String> options) throws DDFException {
-    return new S3DDF(this, path, options);
+    return this.newDDF(path, null, options);
   }
 
   public S3DDF newDDF(String path, String schema, Map<String, String> options) throws DDFException {

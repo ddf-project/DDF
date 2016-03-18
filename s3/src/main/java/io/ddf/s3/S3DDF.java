@@ -33,7 +33,7 @@ public class S3DDF extends DDF {
 
     // Options, including:
     // key : possible values
-    // has_header : true / false
+    // header : true / false
     // format: csv / parquet / etc.
     // delimiter : , \x001
     // quote : "
