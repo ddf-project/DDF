@@ -159,14 +159,6 @@ public class Factor<T> extends Vector<T> implements Serializable {
   }
 
   /**
-   * Set type for this factor
-   * @param type
-   */
-  public void setType(Schema.ColumnType type) {
-    this.mType = type;
-  }
-
-  /**
    * Returns a String list of the named levels (sometimes referred to as "labels") in the factor
    *
    * @return
