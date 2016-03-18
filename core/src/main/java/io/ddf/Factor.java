@@ -77,7 +77,6 @@ public class Factor<T> extends Vector<T> implements Serializable {
   private Schema.ColumnType mType;
 
   public static Long getMaxLevelCounts() {
-    ConfigHandler.Configuration config = Config.getConfigHandler().getConfig();
     return Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.MAX_LEVELS_COUNT));
   }
   /**
@@ -120,6 +119,7 @@ public class Factor<T> extends Vector<T> implements Serializable {
 
 
   private Map<String, Integer> mLevelMap;
+
   private List<Object> mLevels;
 
   /**
