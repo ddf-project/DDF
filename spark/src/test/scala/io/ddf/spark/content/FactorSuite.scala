@@ -58,7 +58,7 @@ class FactorSuite extends ATestSuite {
     val factor = cols(0).getOptionalFactor
     factor.setLevels(schemaHandler.computeFactorLevels(cols(0).getName))
 
-    val levels = cols(0).getOptionalFactor.getLevels.map {
+    val levels = cols(0).getOptionalFactor.getLevels.get().map {
       l => l.toString
     }
     assert(levels.contains("2008"))
