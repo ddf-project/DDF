@@ -33,7 +33,7 @@ trait BinningSpec extends BaseSpec with Matchers {
       val monthColumn: Column = newDDF.getSchemaHandler.getColumn(monthColumnLabel)
       monthColumn.getColumnClass should be(ColumnClass.FACTOR)
       //  {"[1,6]" = 26,"(6,11]" = 5}
-      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.size should be(2)
+      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.get().size should be(2)
       val levelCounts: java.util.Map[String, Integer] = newDDF.getSchemaHandler.computeLevelCounts(monthColumnLabel)
       levelCounts.get("[1,6]") should be(26)
       levelCounts.get("(6,11]") should be(5)
@@ -48,7 +48,7 @@ trait BinningSpec extends BaseSpec with Matchers {
       val monthColumn: Column = newDDF.getSchemaHandler.getColumn(monthColumnLabel)
       monthColumn.getColumnClass should be(ColumnClass.FACTOR)
       //  [1,1] -> 17--(1,11] -> 14
-      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.size() should be(2)
+      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.get().size() should be(2)
       val levelCounts: java.util.Map[String, Integer] = newDDF.getSchemaHandler.computeLevelCounts(monthColumnLabel)
       levelCounts.get("[1,1]") should be(17)
       levelCounts.values().asScala.reduce(_ + _) should be(31)
@@ -62,7 +62,7 @@ trait BinningSpec extends BaseSpec with Matchers {
       val monthColumn: Column = newDDF.getSchemaHandler.getColumn("Month")
       monthColumn.getColumnClass should be(ColumnClass.FACTOR)
       // {"[2,4]"=6, "(4,6]"=3, "(6,8]"=2}
-      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.size should be(3)
+      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.get().size should be(3)
       val levelCounts: java.util.Map[String, Integer] = newDDF.getSchemaHandler.computeLevelCounts(monthColumnLabel)
       levelCounts.get("[2,4]") should be(6)
       levelCounts.get("(4,6]") should be(3)
@@ -93,7 +93,7 @@ trait BinningSpec extends BaseSpec with Matchers {
       val monthColumn: Column = newDDF.getSchemaHandler.getColumn(monthColumnLabel)
       monthColumn.getColumnClass should be(ColumnClass.FACTOR)
       //  {"(1,6]" = 9,"(6,11]" = 5}
-      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.size should be(2)
+      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.get().size should be(2)
       val levelCounts: java.util.Map[String, Integer] = newDDF.getSchemaHandler.computeLevelCounts(monthColumnLabel)
       levelCounts.get("(1,6]") should be(9)
       levelCounts.get("(6,11]") should be(5)
@@ -108,7 +108,7 @@ trait BinningSpec extends BaseSpec with Matchers {
       val monthColumn: Column = newDDF.getSchemaHandler.getColumn(monthColumnLabel)
       monthColumn.getColumnClass should be(ColumnClass.FACTOR)
       //  {"(1,6)" = 7,"(6,11)" = 4}
-      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.size should be(2)
+      newDDF.getSchemaHandler.getColumn(monthColumnLabel).getOptionalFactor.getLevels.get.size should be(2)
       val levelCounts: java.util.Map[String, Integer] = newDDF.getSchemaHandler.computeLevelCounts(monthColumnLabel)
       levelCounts.get("(1,6)") should be(7)
       levelCounts.get("(6,11)") should be(4)

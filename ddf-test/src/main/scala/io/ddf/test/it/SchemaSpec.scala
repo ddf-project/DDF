@@ -104,11 +104,9 @@ trait SchemaSpec extends BaseSpec with Matchers {
         idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
       }
 
-      val levels = cols(0).getOptionalFactor.getLevels.map {
-        l => l.toString
-      }
-      assert(levels.contains("2008"))
-      assert(levels.contains("2010"))
+      val levels = schemaHandler.computeFactorLevels(cols(0).getName)
+      assert(levels.contains(2008))
+      assert(levels.contains(2010))
       assert(factorMap.get(columnNames(3)).get("MCO") === 3.0)
       assert(factorMap.get(columnNames(3)).get("TPA") === 3.0)
       assert(factorMap.get(columnNames(3)).get("JAX") === 1.0)

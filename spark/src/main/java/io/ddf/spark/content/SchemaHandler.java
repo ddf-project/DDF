@@ -93,7 +93,7 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
       return new HashMap<String, Map<String, Integer>>();
     }
   }
-  @Override protected List<Object> computeFactorLevels(String columnName) throws DDFException {
+  @Override public List<Object> computeFactorLevels(String columnName) throws DDFException {
     DataFrame df = (DataFrame) this.getDDF().getRepresentationHandler().get(DataFrame.class);
     DataFrame distinctDF = df.select(columnName).distinct();
     Long distinctCount = distinctDF.count();

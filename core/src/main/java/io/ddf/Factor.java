@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Timestamp;
 import java.util.*;
+import com.google.common.base.Optional;
 
 /**
  * A factor is a column vector representing a categorical variable. It is presented as a coding of numeric values, which
@@ -140,12 +141,18 @@ public class Factor<T> extends Vector<T> implements Serializable {
    */
   public Map<String, Integer> computeLevelMap() throws DDFException {
     // TODO: retrieve the list of levels from the underlying data, e.g.,
-    int i = 1;
+    Iterator<Object> levelIterator;
     Map<String, Integer> levelMap = new HashMap<String, Integer>();
-    Iterator<Object> levelIterator = this.mLevels.iterator();
-    while(levelIterator.hasNext()) {
+    if(this.mLevels != null) {
+      levelIterator = this.mLevels.iterator();
+    } else {
+      List<Object> levels = this.getDDF().getSchemaHandler().computeFactorLevels(this.getDDFColumnName());
+      levelIterator = levels.iterator();
+    }
+    int i = 1;
+    while (levelIterator.hasNext()) {
       levelMap.put(levelIterator.next().toString(), i);
-      i+= 1;
+      i += 1;
     }
     return levelMap;
   }
@@ -164,8 +171,8 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @return
    * @throws DDFException
    */
-  public List<Object> getLevels() throws DDFException {
-    return this.mLevels;
+  public Optional<List<Object>> getLevels() throws DDFException {
+    return Optional.fromNullable(this.mLevels);
   }
 
   public Map<String, Integer> getLevelMap() throws DDFException {

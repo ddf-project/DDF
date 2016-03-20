@@ -163,21 +163,8 @@ class FactorMap(val values: JList[AnyRef], val originalColumnType: ColumnType)
 }
 
 object FactorIndexerModel {
-  def apply(columns: Array[Column]): FactorIndexerModel = {
-    val notFactor = columns.filter(column => column.getColumnClass != ColumnClass.FACTOR).map{col => col.getName}
-    if(notFactor.size > 0) {
-      throw new DDFException(s"columns ${notFactor.mkString(", ")} are not factor column")
-    }
 
-    val factorMaps = columns.map{
-      column =>
-        val factor = column.getOptionalFactor
-        (column.getName, new FactorMap(factor.getLevels, factor.getType))
-    }.toMap
-    new FactorIndexerModel(factorMaps)
-  }
-
-  def builModelFromFactorColumns(columns: Array[Column]): FactorIndexerModel = {
+  def buildModelFromFactorColumns(columns: Array[Column]): FactorIndexerModel = {
     val notFactor = columns.filter(column => column.getColumnClass != ColumnClass.FACTOR).map{col => col.getName}
     if(notFactor.size > 0) {
       throw new DDFException(s"columns ${notFactor.mkString(", ")} are not factor column")
@@ -185,7 +172,11 @@ object FactorIndexerModel {
     val factorMaps = columns.map{
       column =>
         val factor = column.getOptionalFactor
-        (column.getName, new FactorMap(factor.getLevels, factor.getType))
+        if(!factor.getLevels.isPresent) {
+          (column.getName, new FactorMap(factor.getLevels.get(), factor.getType))
+        } else {
+          throw new DDFException(s"Column ${column.getName} does not contain levels")
+        }
     }.toMap
     new FactorIndexerModel(factorMaps)
   }
@@ -201,7 +192,8 @@ object FactorIndexer {
   }
 
   def getFactorMapForColumn(ddf: DDF, column: String): FactorMap = {
-    if(ddf.getColumn(column).getOptionalFactor == null || ddf.getColumn(column).getOptionalFactor.getLevels == null) {
+    if(ddf.getColumn(column).getOptionalFactor == null || !ddf.getColumn(column).getOptionalFactor.getLevels.isPresent) {
+      println(s">>> get Factor map for column $column")
       val df = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
       val columnDDF = df.select(column)
       val counts = columnDDF.map { row => row.get(0) }.countByValue().filter {
@@ -210,7 +202,7 @@ object FactorIndexer {
       val labels = counts.toSeq.sortBy { case (value, count) => -count }.map(_._1.asInstanceOf[AnyRef]).toList.asJava
       new FactorMap(labels, ddf.getColumn(column).getType)
     } else {
-      val labels = ddf.getColumn(column).getOptionalFactor.getLevels
+      val labels = ddf.getColumn(column).getOptionalFactor.getLevels.get()
       new FactorMap(labels, ddf.getColumn(column).getType)
     }
   }

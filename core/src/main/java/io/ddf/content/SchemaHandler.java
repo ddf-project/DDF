@@ -101,8 +101,8 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   public synchronized void setFactorLevels(String columnName, Factor<?> factor) throws DDFException {
     Column c = this.getColumn(columnName);
     Factor<?> f = c.getOptionalFactor();
-    if(factor.getLevels() != null) {
-      f.setLevels(factor.getLevels(), false);
+    if(factor.getLevels().isPresent()) {
+      f.setLevels(factor.getLevels().get(), false);
     }
   }
 
@@ -132,7 +132,7 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
     throw new UnsupportedOperationException();
   }
 
-  protected List<Object> computeFactorLevels(String columnName) throws DDFException {
+  public List<Object> computeFactorLevels(String columnName) throws DDFException {
     throw new UnsupportedOperationException();
   }
 

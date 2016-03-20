@@ -118,13 +118,13 @@ object RootBuild extends Build {
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
-    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java")
+    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
     "org.apache.spark" % "spark-sql_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
-    "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
+    "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
     "com.google.protobuf" % "protobuf-java" % "2.5.0",
@@ -218,7 +218,6 @@ object RootBuild extends Build {
     dependencyOverrides += "org.codehaus.jackson" % "jackson-jaxrs" % "1.8.8",
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4",
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.4.4",
-    dependencyOverrides += "com.google.code.findbugs" % "jsr305" % "2.0.1",
     dependencyOverrides += "com.thoughtworks.paranamer" % "paranamer" % "2.4.1", //net.liftweb conflict with avro
     dependencyOverrides += "org.xerial.snappy" % "snappy-java" % "1.0.5", //spark-core conflicts with avro
     dependencyOverrides += "org.apache.httpcomponents" % "httpcore" % "4.1.4",
@@ -451,6 +450,7 @@ object RootBuild extends Build {
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch core/" + targetDir + "/*timestamp") },
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.7.2",
+    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "2.0.1",
     libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.2.0" exclude("org.mortbay.jetty", "servlet-api")
       exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",

@@ -281,7 +281,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
   override def inverseFactorIndexer(columns: Array[String]): DDF = {
     val cols = columns.map{col => this.getDDF.getColumn(col)}
-    val factorIndexerModel = FactorIndexerModel.builModelFromFactorColumns(cols)
+    val factorIndexerModel = FactorIndexerModel.buildModelFromFactorColumns(cols)
     factorIndexerModel.inversedTransform(this.getDDF)
   }
 }

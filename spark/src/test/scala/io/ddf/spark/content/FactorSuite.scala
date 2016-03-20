@@ -52,10 +52,11 @@ class FactorSuite extends ATestSuite {
       col => schemaHandler.setAsFactor(col)
     }
     val factorMap = schemaHandler.computeLevelCounts(columnNames)
-
     val cols = Array(0, 8, 16, 17, 24, 25).map {
       idx => schemaHandler.getColumn(schemaHandler.getColumnName(idx))
     }
+    val factor = cols(0).getOptionalFactor
+    factor.setLevels(schemaHandler.computeFactorLevels(cols(0).getName))
 
     val levels = cols(0).getOptionalFactor.getLevels.map {
       l => l.toString
@@ -79,7 +80,9 @@ class FactorSuite extends ATestSuite {
     val schemaHandler = ddf.getSchemaHandler
     val factorColumns = Array("vs", "am", "gear", "carb")
     factorColumns.foreach {
-      column => schemaHandler.setAsFactor(column)
+      column =>
+        val factor = schemaHandler.setAsFactor(column)
+        factor.setLevels(schemaHandler.computeFactorLevels(column))
     }
     schemaHandler.computeLevelCounts(factorColumns)
 //    schemaHandler.computeFactorLevelsAndLevelCounts()
@@ -89,7 +92,6 @@ class FactorSuite extends ATestSuite {
       col =>
         val column = projectedDDF.getColumn(col)
         assert(column.getOptionalFactor != null)
-        assert(column.getOptionalFactor.getLevels != null)
     }
   }
 }
