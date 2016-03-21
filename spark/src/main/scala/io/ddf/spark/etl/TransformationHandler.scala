@@ -27,6 +27,7 @@ import _root_.io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
 import _root_.io.ddf.exception.DDFException
 import _root_.io.ddf.spark.util.SparkUtils
 import java.util.{Properties, ArrayList, List}
+import scala.collection.JavaConversions._
 
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
@@ -273,15 +274,16 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     ddf
   }
 
-  override def factorIndexer(columns: Array[String]): DDF = {
-    val cols = columns.map{col => this.getDDF.getColumn(col)}
-    val factorIndexerModel = FactorIndexer.fit(mDDF, columns)
+  override def factorIndexer(columns: java.util.List[String]): DDF = {
+
+    val factorIndexerModel = FactorIndexer.fit(mDDF, columns.asScala.toArray)
     factorIndexerModel.transform(this.getDDF)
   }
 
-  override def inverseFactorIndexer(columns: Array[String]): DDF = {
+  override def inverseFactorIndexer(columns: java.util.List[String]): DDF = {
     val cols = columns.map{col => this.getDDF.getColumn(col)}
-    val factorIndexerModel = FactorIndexerModel.buildModelFromFactorColumns(cols)
+
+    val factorIndexerModel = FactorIndexerModel.buildModelFromFactorColumns(cols.toArray)
     factorIndexerModel.inversedTransform(this.getDDF)
   }
 }

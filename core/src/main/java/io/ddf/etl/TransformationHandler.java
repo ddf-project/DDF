@@ -241,12 +241,12 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public DDF factorIndexer(String[] columns) throws DDFException {
+  public DDF factorIndexer(List<String> columns) throws DDFException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DDF inverseFactorIndexer(String[] columns) throws DDFException {
+  public DDF inverseFactorIndexer(List<String> columns) throws DDFException {
     throw new UnsupportedOperationException();
   }
 }

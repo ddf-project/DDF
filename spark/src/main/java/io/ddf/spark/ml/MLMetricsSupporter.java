@@ -15,6 +15,9 @@ import org.apache.spark.mllib.recommendation.Rating;
 import org.apache.spark.mllib.regression.LabeledPoint;
 import org.apache.spark.rdd.RDD;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MLMetricsSupporter extends AMLMetricsSupporter {
 
   private Boolean sIsNonceInitialized = false;
@@ -30,7 +33,7 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
    * @see io.ddf.ml.AMLMetricsSupporter#r2score(io.ddf.DDF, double)
    */
   public double r2score(double meanYTrue) throws DDFException {
-    SparkDDF predictionDDF = (SparkDDF) this.getDDF();
+    SparkDDF predictionDDF = (SparkDDF) this.handleCategoricalColumns();
     JavaRDD<double[]> resultRDD = predictionDDF.getJavaRDD(double[].class);
 
     double[] result = (double[]) resultRDD.map(new MetricsMapperR2(meanYTrue)).reduce(new MetricsReducerR2());
@@ -98,7 +101,7 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
 
   @Override
   public DDF residuals() throws DDFException {
-    SparkDDF predictionDDF = (SparkDDF) this.getDDF();
+    SparkDDF predictionDDF = (SparkDDF) this.handleCategoricalColumns();
     JavaRDD<double[]> predictionRDD = predictionDDF.getJavaRDD(double[].class);
 
     JavaRDD<double[]> result = predictionRDD.map(new MetricsMapperResiduals());
@@ -147,13 +150,19 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
    * (non-Javadoc)
    * @see io.ddf.ml.AMLMetricsSupporter#roc(io.ddf.DDF, int)
    */
-  public RocMetric roc(DDF predictionDDF, int alpha_length) throws DDFException {
-
+  public RocMetric roc(int alpha_length) throws DDFException {
+    DDF predictionDDF = this.handleCategoricalColumns();
     RDD<LabeledPoint> rddLabeledPoint = (RDD<LabeledPoint>) predictionDDF.getRepresentationHandler()
         .get(RDD.class, LabeledPoint.class);
     ROCComputer rc = new ROCComputer();
 
     return (rc.ROC(rddLabeledPoint, alpha_length));
+  }
+
+  public double rmse(DDF predictedDDF, boolean implicitPrefs) throws DDFException {
+    RDD<Rating> predictions = (RDD<Rating>) predictedDDF.getRepresentationHandler().get(RDD.class, Rating.class);
+    RDD<Rating> ratings = (RDD<Rating>) this.getDDF().getRepresentationHandler().get(RDD.class, Rating.class);
+    return new ROCComputer().computeRmse(ratings, predictions, false);
   }
 
   public MLMetricsSupporter(DDF theDDF) {
@@ -182,10 +191,17 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
     // }
   }
 
-  public double rmse(DDF predictedDDF, boolean implicitPrefs) throws DDFException {
-    RDD<Rating> predictions = (RDD<Rating>) predictedDDF.getRepresentationHandler().get(RDD.class, Rating.class);
-    RDD<Rating> ratings = (RDD<Rating>) this.getDDF().getRepresentationHandler().get(RDD.class, Rating.class);
-    return new ROCComputer().computeRmse(ratings, predictions, false);
+  protected DDF handleCategoricalColumns() throws DDFException {
+    List<String> factorColumns = new ArrayList<String>();
+    for(Schema.Column column: this.getDDF().getSchema().getColumns()) {
+      if(column.getColumnClass() == Schema.ColumnClass.FACTOR) {
+        factorColumns.add(column.getName());
+      }
+    }
+    if(factorColumns.size() > 0) {
+      return this.getDDF().getTransformationHandler().factorIndexer(factorColumns);
+    } else {
+      return this.getDDF();
+    }
   }
-
 }

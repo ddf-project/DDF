@@ -82,9 +82,9 @@ class FactorSuite extends ATestSuite {
     factorColumns.foreach {
       column =>
         val factor = schemaHandler.setAsFactor(column)
-        factor.setLevels(schemaHandler.computeFactorLevels(column))
+//        factor.setLevels(schemaHandler.computeFactorLevels(column))
     }
-    schemaHandler.computeLevelCounts(factorColumns)
+//    schemaHandler.computeLevelCounts(factorColumns)
 //    schemaHandler.computeFactorLevelsAndLevelCounts()
     val projectedColumns = Array("wt", "qsec", "vs", "am", "gear", "carb")
     val projectedDDF = ddf.VIEWS.project(projectedColumns: _*)

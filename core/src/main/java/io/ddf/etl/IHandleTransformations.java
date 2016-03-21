@@ -38,7 +38,7 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
 
   public DDF flattenArrayTypeColumn(String colName) throws DDFException;
 
-  public DDF factorIndexer(String[] columns) throws DDFException;
+  public DDF factorIndexer(List<String> columns) throws DDFException;
 
-  public DDF inverseFactorIndexer(String[] columns) throws DDFException;
+  public DDF inverseFactorIndexer(List<String> columns) throws DDFException;
 }
