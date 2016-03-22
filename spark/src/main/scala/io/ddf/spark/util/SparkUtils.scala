@@ -313,11 +313,7 @@ object SparkUtils {
     def handleInvalidCharacter(sqlError: String, char: String): String = {
       var errorMessage = s"Expressions or columns containing invalid character $char: "
       val exprs = expressions.filter(exp => exp.contains(char))
-      if (exprs.nonEmpty) {
-        errorMessage = errorMessage.concat(exprs.mkString(", "))
-      }
-
-      errorMessage
+      errorMessage.concat(exprs.mkString(", "))
     }
 
     def handleInvalidExpression(sqlError: String, pos: Int): String = {
@@ -328,7 +324,7 @@ object SparkUtils {
 
     def handleGeneralSQLError(sqlError: String): String = {
       // Remove Exception info
-      val sqlErrorRemovedException = sqlError.substring(sqlError.indexOf("Exception:")+11, sqlError.length)
+      val sqlErrorRemovedException = sqlError.substring(sqlError.indexOf("Exception:") + "Exception:".length + 1, sqlError.length)
       // Remove line info
       val containLineInfo = sqlErrorRemovedException.indexOf("; line 1")
       if ( containLineInfo != -1) {
