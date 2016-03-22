@@ -22,7 +22,6 @@ class AggregationHandler(theDDF: DDF) extends CoreAggregationHandler(theDDF) {
       super.groupBy(groupedColumns, aggregateFunctions)
     } catch {
       case ddfException: DDFException => throw new DDFException(SparkUtils.sqlErrorToDDFError(ddfException.getMessage, buildGroupBySQL(aggregateFunctions), aggregateFunctions.asScala.toList:::groupedColumns.asScala.toList))
-      case throwable: Throwable => throw throwable
     }
   }
 
@@ -34,7 +33,6 @@ class AggregationHandler(theDDF: DDF) extends CoreAggregationHandler(theDDF) {
       case ddfException: DDFException =>
         val tableName: String = this.getDDF.getTableName
         throw new DDFException(SparkUtils.sqlErrorToDDFError(ddfException.getMessage, AggregateField.toSql(fields, tableName), fields.asScala.toList.map(_.toString)))
-      case throwable: Throwable => throw throwable
     }
   }
 }
