@@ -203,7 +203,6 @@ object FactorIndexer {
         case (value, count) => value != null
       }
       val labels = counts.toSeq.sortBy { case (value, count) => -count }.map(_._1.asInstanceOf[AnyRef]).toList.asJava
-      ddf.getColumn(column).getOptionalFactor.setLevels(labels)
       new FactorMap(labels, ddf.getColumn(column).getType)
     } else {
       val labels = ddf.getColumn(column).getOptionalFactor.getLevels.get()
