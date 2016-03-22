@@ -122,24 +122,31 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     return this.getDDF();
   }
 
+  protected String buildGroupBySQL(List<String> aggregateFunctions) {
+    String groupedColSql = Joiner.on(",").join(mGroupedColumns);
+
+    String selectFuncSql = convertAggregateFunctionsToSql(aggregateFunctions.get(0));
+    for (int i = 1; i < aggregateFunctions.size(); i++) {
+      selectFuncSql += "," + convertAggregateFunctionsToSql(aggregateFunctions.get(i));
+    }
+
+    String sqlCmd = String.format("SELECT %s , %s FROM %s GROUP BY %s",
+            selectFuncSql,
+            groupedColSql,
+            "{1}",
+            groupedColSql);
+
+    return sqlCmd;
+  }
+
   @Override
   public DDF agg(List<String> aggregateFunctions) throws DDFException {
 
     if (mGroupedColumns.size() > 0) {
       // String tableName = this.getDDF().getTableName();
 
-      String groupedColSql = Joiner.on(",").join(mGroupedColumns);
+      String sqlCmd = buildGroupBySQL(aggregateFunctions);
 
-      String selectFuncSql = convertAggregateFunctionsToSql(aggregateFunctions.get(0));
-      for (int i = 1; i < aggregateFunctions.size(); i++) {
-        selectFuncSql += "," + convertAggregateFunctionsToSql(aggregateFunctions.get(i));
-      }
-
-      String sqlCmd = String.format("SELECT %s , %s FROM %s GROUP BY %s",
-                                    selectFuncSql,
-                                    groupedColSql,
-                                    "{1}",
-                                    groupedColSql);
       mLog.info("SQL Command: " + sqlCmd);
 
       try {
