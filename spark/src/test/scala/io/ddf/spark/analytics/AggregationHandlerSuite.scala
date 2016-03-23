@@ -82,4 +82,11 @@ class AggregationHandlerSuite extends ATestSuite {
     val thrown1 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("newcol@=avg(arrdelay)").asJava)}
     assert(thrown1.getMessage === "Expressions or columns containing invalid character @: newcol@=avg(arrdelay)")
   }
+
+  test("Proper error message for new columns that exist") {
+    val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
+
+    val thrown1 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("Year=avg(arrdelay)").asJava)}
+    assert(thrown1.getMessage === "Cannot create a new column with the same name as an existing one: Year")
+  }
 }

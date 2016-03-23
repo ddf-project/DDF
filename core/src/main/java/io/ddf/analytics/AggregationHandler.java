@@ -11,8 +11,6 @@ import io.ddf.types.AggregateTypes.AggregateField;
 import io.ddf.types.AggregateTypes.AggregateFunction;
 import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.util.Utils;
-
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -25,25 +23,6 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
 
   public AggregationHandler(DDF theDDF) {
     super(theDDF);
-  }
-
-
-  public static class FiveNumSumary implements Serializable {
-
-    private static final long serialVersionUID = -2810459228746952242L;
-
-    // private double mMin = Double.MAX_VALUE;
-    // private double mMax = Double.MIN_VALUE;
-    // private double first_quantile;
-    // private double median;
-    // private double third_quantile;
-
-  }
-
-
-  public FiveNumSumary getFiveNumSumary() {
-    // String cmd;
-    return null;
   }
 
   @Override
@@ -69,7 +48,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
    *
    * @param fields {@link AggregateField}s representing a list of column specs, some of which may be aggregated, while other
    *               non-aggregated fields are the GROUP BY keys
-   * @return
+   * @return an object of class {@link AggregationResult}
    * @throws DDFException
    */
   @Override
@@ -122,7 +101,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     return this.getDDF();
   }
 
-  protected String buildGroupBySQL(List<String> aggregateFunctions) {
+  protected String buildGroupBySQL(List<String> aggregateFunctions) throws DDFException {
     String groupedColSql = Joiner.on(",").join(mGroupedColumns);
 
     String selectFuncSql = convertAggregateFunctionsToSql(aggregateFunctions.get(0));
@@ -130,13 +109,11 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
       selectFuncSql += "," + convertAggregateFunctionsToSql(aggregateFunctions.get(i));
     }
 
-    String sqlCmd = String.format("SELECT %s , %s FROM %s GROUP BY %s",
+    return String.format("SELECT %s , %s FROM %s GROUP BY %s",
             selectFuncSql,
             groupedColSql,
             "{1}",
             groupedColSql);
-
-    return sqlCmd;
   }
 
   @Override
@@ -150,10 +127,9 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
       mLog.info("SQL Command: " + sqlCmd);
 
       try {
-        DDF resultDDF = this.getManager().sql2ddf(sqlCmd,
+        return this.getManager().sql2ddf(sqlCmd,
                         new SQLDataSourceDescriptor(sqlCmd,
                         null, null,null, this.getDDF().getUUID().toString()));
-        return resultDDF;
 
       } catch (Exception e) {
         e.printStackTrace();
@@ -166,12 +142,17 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     }
   }
 
-  private String convertAggregateFunctionsToSql(String sql) {
+  private String convertAggregateFunctionsToSql(String sql) throws DDFException {
 
     if (Strings.isNullOrEmpty(sql)) return null;
 
     String[] splits = sql.trim().split("=(?![^()]*+\\))");
     if (splits.length == 2) {
+      // A new column name is provided
+      // Check for existence
+      if (this.getDDF().getSchema().getColumn(splits[0]) != null) {
+        throw new DDFException("Cannot create a new column with the same name as an existing one: " + splits[0]);
+      }
       return String.format("%s AS %s", splits[1], splits[0]);
     } else if (splits.length == 1) { // no name for aggregated value
       return splits[0];
