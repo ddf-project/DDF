@@ -311,9 +311,8 @@ object SparkUtils {
     val NonexistentColumns = ".*cannot resolve '(.+)' given input columns.*".r
 
     def handleInvalidCharacter(sqlError: String, char: String): String = {
-      var errorMessage = s"Expressions or columns containing invalid character $char: "
-      val exprs = expressions.filter(exp => exp.contains(char))
-      errorMessage.concat(exprs.mkString(", "))
+      val exprs = expressions.filter(exp => exp.contains(char)).mkString(", ")
+      s"Expressions or columns containing invalid character $char: $exprs"
     }
 
     def handleInvalidExpression(sqlError: String, pos: Int): String = {

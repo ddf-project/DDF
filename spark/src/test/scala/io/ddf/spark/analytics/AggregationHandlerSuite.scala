@@ -57,7 +57,7 @@ class AggregationHandlerSuite extends ATestSuite {
   test("Proper error message for expressions or columns that contain invalid characters") {
     val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
 
-    val thrown1 = intercept[DDFException]{ddf.groupBy(List("Year@").asJava, List("avg(arrdelay1)").asJava)}
+    val thrown1 = intercept[DDFException]{ddf.groupBy(List("Year@").asJava, List("avg(arrdelay)").asJava)}
     assert(thrown1.getMessage === "Expressions or columns containing invalid character @: Year@")
 
     val thrown2 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("avg(arrdelay@)").asJava)}
@@ -74,5 +74,12 @@ class AggregationHandlerSuite extends ATestSuite {
 
     val thrown6 = intercept[DDFException]{ddf.aggregate("Year,avg(arrdelay@)")}
     assert(thrown6.getMessage === "Expressions or columns containing invalid character @: AVG(arrdelay@)")
+  }
+
+  test("Proper error message for new columns that contain invalid characters") {
+    val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
+
+    val thrown1 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("newcol@=avg(arrdelay)").asJava)}
+    assert(thrown1.getMessage === "Expressions or columns containing invalid character @: newcol@=avg(arrdelay)")
   }
 }
