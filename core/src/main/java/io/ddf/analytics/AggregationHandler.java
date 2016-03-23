@@ -111,7 +111,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
       aggregationFuncSql.add(convertAggregateFunctionsToSql(aggregateFunctions.get(i)));
     }
 
-    String selectFuncSql = Joiner.on(",").join(aggregateFunctions);
+    String selectFuncSql = Joiner.on(",").join(aggregationFuncSql);
 
     return String.format("SELECT %s , %s FROM %s GROUP BY %s",
             selectFuncSql,
