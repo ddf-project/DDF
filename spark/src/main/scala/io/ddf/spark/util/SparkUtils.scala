@@ -286,4 +286,65 @@ object SparkUtils {
     val schema = SparkUtils.schemaFromDataFrame(df)
     manager.newDDF(manager, df, Array(classOf[DataFrame]), null, null, schema)
   }
+
+  /**
+   * This util function produces appropriate error message for SQL-based APIs based on the SparkSQL error message and the SQL
+   *
+   * @param sqlError SparkSQL org.apache.spark.sql.AnalysisException's message
+   * @param sql the query
+   * @param expressions list of expressions including columns
+   * @return
+   */
+  def sqlErrorToDDFError(sqlError: String, sql:String, expressions: List[String]): String = {
+    // Invalid expression
+    val InvalidExpressionJSQLParser = ".*Encountered \" \".\" \". \"\" at line 1, column (\\d+).*".r
+
+    // Invalid expression SparkSQL
+    val InvalidExpression = ".*cannot recognize input near .+ in expression specification; line 1 pos (\\d+).*".r
+
+    // Invalid character SparkSQL
+    val InvalidCharacter1 = ".*character '(.)' not supported here\n.*".r
+    val InvalidCharacter2 = ".*character '(.)' not supported here;.*".r
+
+    // non-existent column SparkSQL
+    // "cannot resolve 'substring' given input columns ; line 1 pos 7"
+    val NonexistentColumns = ".*cannot resolve '(.+)' given input columns.*".r
+
+    def handleInvalidCharacter(sqlError: String, char: String): String = {
+      val exprs = expressions.filter(exp => exp.contains(char)).mkString(", ")
+      s"Expressions or columns containing invalid character $char: $exprs"
+    }
+
+    def handleInvalidExpression(sqlError: String, pos: Int): String = {
+      // Find the expression right before the position
+      val exprPos = expressions.map(exp => sql.substring(0, pos).indexOf(exp)).zipWithIndex.maxBy(_._1)
+      s"Column or Expression with invalid syntax: '${expressions(exprPos._2)}'"
+    }
+
+    def handleGeneralSQLError(sqlError: String): String = {
+      // Remove Exception info
+      val sqlErrorRemovedException = sqlError.substring(sqlError.indexOf("Exception:") + "Exception:".length + 1, sqlError.length)
+      // Remove line info
+      val containLineInfo = sqlErrorRemovedException.indexOf("; line 1")
+      if ( containLineInfo != -1) {
+        sqlErrorRemovedException.substring(0, containLineInfo).trim
+      } else sqlErrorRemovedException.trim
+    }
+
+    sqlError match {
+
+      case InvalidExpressionJSQLParser(pos) => handleInvalidExpression(sqlError, pos.toInt)
+
+      case InvalidExpression(pos) => handleInvalidExpression(sqlError, pos.toInt)
+
+      case InvalidCharacter1(char) => handleInvalidCharacter(sqlError, char)
+
+      case InvalidCharacter2(char) => handleInvalidCharacter(sqlError, char)
+
+      case NonexistentColumns(column) => s"Non-existent column: $column"
+
+      case _ => handleGeneralSQLError(sqlError)
+
+    }
+  }
 }
