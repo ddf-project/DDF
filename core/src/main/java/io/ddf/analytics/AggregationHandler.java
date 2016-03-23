@@ -11,6 +11,8 @@ import io.ddf.types.AggregateTypes.AggregateField;
 import io.ddf.types.AggregateTypes.AggregateFunction;
 import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.util.Utils;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -104,10 +106,12 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
   protected String buildGroupBySQL(List<String> aggregateFunctions) throws DDFException {
     String groupedColSql = Joiner.on(",").join(mGroupedColumns);
 
-    String selectFuncSql = convertAggregateFunctionsToSql(aggregateFunctions.get(0));
-    for (int i = 1; i < aggregateFunctions.size(); i++) {
-      selectFuncSql += "," + convertAggregateFunctionsToSql(aggregateFunctions.get(i));
+    List<String> aggregationFuncSql = new ArrayList<String>();
+    for (int i = 0; i < aggregateFunctions.size(); i++) {
+      aggregationFuncSql.add(convertAggregateFunctionsToSql(aggregateFunctions.get(i)));
     }
+
+    String selectFuncSql = Joiner.on(",").join(aggregateFunctions);
 
     return String.format("SELECT %s , %s FROM %s GROUP BY %s",
             selectFuncSql,
