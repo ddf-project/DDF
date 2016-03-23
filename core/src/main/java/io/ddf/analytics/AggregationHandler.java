@@ -13,7 +13,9 @@ import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.util.Utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -21,7 +23,6 @@ import java.util.List;
 public class AggregationHandler extends ADDFFunctionalGroupHandler implements IHandleAggregation {
 
   private List<String> mGroupedColumns;
-
 
   public AggregationHandler(DDF theDDF) {
     super(theDDF);
@@ -106,12 +107,23 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
   protected String buildGroupBySQL(List<String> aggregateFunctions) throws DDFException {
     String groupedColSql = Joiner.on(",").join(mGroupedColumns);
 
-    List<String> aggregationFuncSql = new ArrayList<String>();
-    for(String aggFunc: aggregateFunctions) {
-      aggregationFuncSql.add(convertAggregateFunctionsToSql(aggFunc));
+    Set<String> aggregatedColumnNames = new HashSet<>();
+    List<AggregatedColumnExpression> aggregatedColumnExpressions = new ArrayList<>();
+    for (String aggFunc: aggregateFunctions) {
+      AggregatedColumnExpression newExp = AggregatedColumnExpression.fromString(aggFunc);
+      if (newExp.columnName != null) {
+        if (aggregatedColumnNames.contains(newExp.columnName)) {
+          throw new DDFException("Duplicated column name in aggregations: " + newExp.columnName);
+        }
+        if (mGroupedColumns.contains(newExp.columnName)) {
+          throw new DDFException("New column name in aggregation cannot be a group by column: " + newExp.columnName);
+        }
+        aggregatedColumnNames.add(newExp.columnName);
+      }
+      aggregatedColumnExpressions.add(newExp);
     }
 
-    String selectFuncSql = Joiner.on(",").join(aggregationFuncSql);
+    String selectFuncSql = Joiner.on(", ").join(aggregatedColumnExpressions);
 
     return String.format("SELECT %s , %s FROM %s GROUP BY %s",
             selectFuncSql,
@@ -146,21 +158,46 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     }
   }
 
-  private String convertAggregateFunctionsToSql(String sql) throws DDFException {
+  private static class AggregatedColumnExpression {
+    public final String columnName;
+    public final String columnExpression;
 
-    if (Strings.isNullOrEmpty(sql)) return null;
-
-    String[] splits = sql.trim().split("=(?![^()]*+\\))");
-    if (splits.length == 2) {
-      // A new column name is provided
-      // Check for existence
-      if (this.getDDF().getSchema().getColumn(splits[0]) != null) {
-        throw new DDFException("Cannot create a new column with the same name as an existing one: " + splits[0]);
-      }
-      return String.format("%s AS %s", splits[1], splits[0]);
-    } else if (splits.length == 1) { // no name for aggregated value
-      return splits[0];
+    public AggregatedColumnExpression(String columnName, String columnExpression) {
+      this.columnName = columnName;
+      this.columnExpression = columnExpression;
     }
-    return sql;
+
+    public AggregatedColumnExpression(String expression) {
+      this(null, expression);
+    }
+
+    // TODO: this function need test
+    public static AggregatedColumnExpression fromString(String exp) throws DDFException {
+      if (Strings.isNullOrEmpty(exp)) {
+        throw new DDFException("Aggregation function cannot be null or empty");
+      }
+
+      // XXX @nhanitvn what is this regexp doing?
+      String[] splits = exp.trim().split("=(?![^()]*+\\))");
+      if (splits.length == 2) {
+        // A new column name is provided
+        String name = splits[0];
+        String value = splits[1];
+        return new AggregatedColumnExpression(name, value);
+      } else if (splits.length == 1) {
+        // no new name for aggregated value
+        return new AggregatedColumnExpression(splits[0]);
+      }
+      return new AggregatedColumnExpression(exp);
+    }
+
+    @Override
+    public String toString() {
+      // format as sql expression
+      if (columnName != null) {
+        return String.format("%s AS %s", columnExpression, columnName);
+      }
+      return columnExpression;
+    }
   }
 }

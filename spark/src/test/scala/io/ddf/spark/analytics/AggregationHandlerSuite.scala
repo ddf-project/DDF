@@ -1,7 +1,8 @@
 package io.ddf.spark.analytics
 
 import io.ddf.exception.DDFException
-import io.ddf.spark.{SparkDDF, ATestSuite}
+import io.ddf.spark.{ATestSuite, SparkDDF}
+
 import scala.collection.JavaConverters._
 
 
@@ -86,7 +87,14 @@ class AggregationHandlerSuite extends ATestSuite {
   test("Proper error message for new columns that exist") {
     val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
 
+    // this should be ok
+    val groupped = ddf.groupBy(List("Year").asJava, List("arrdelay=avg(arrdelay)").asJava)
+    assert(groupped.getColumnNames.contains("arrdelay"))
+
     val thrown1 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("Year=avg(arrdelay)").asJava)}
-    assert(thrown1.getMessage === "Cannot create a new column with the same name as an existing one: Year")
+    assert(thrown1.getMessage === "New column name in aggregation cannot be a group by column: Year")
+
+    val thrown2 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("foo=avg(arrdelay)", "foo=sum(arrdelay)").asJava)}
+    assert(thrown2.getMessage === "Duplicated column name in aggregations: foo")
   }
 }
