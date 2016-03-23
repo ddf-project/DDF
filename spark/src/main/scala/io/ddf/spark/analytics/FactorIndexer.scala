@@ -100,7 +100,11 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
   private def inversedTransformSchema(schema: Schema): Schema = {
     val newColumns = schema.getColumns.map {
       case column => categoryMap.get(column.getName) match {
-        case Some(factorMap) => new Column(column.getName, factorMap.originalColumnType)
+        case Some(factorMap) =>
+          val newColumn = new Column(column.getName, factorMap.originalColumnType)
+          val levels = factorMap.values
+          val factor = new FactorBuilder().setType(newColumn.getType).setLevels(levels).build()
+          newColumn.setAsFactor(factor)
         case None => column
       }
     }
