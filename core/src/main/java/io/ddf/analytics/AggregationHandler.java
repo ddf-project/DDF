@@ -107,8 +107,8 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     String groupedColSql = Joiner.on(",").join(mGroupedColumns);
 
     List<String> aggregationFuncSql = new ArrayList<String>();
-    for (int i = 0; i < aggregateFunctions.size(); i++) {
-      aggregationFuncSql.add(convertAggregateFunctionsToSql(aggregateFunctions.get(i)));
+    for(String aggFunc: aggregateFunctions) {
+      aggregationFuncSql.add(convertAggregateFunctionsToSql(aggFunc));
     }
 
     String selectFuncSql = Joiner.on(",").join(aggregationFuncSql);
