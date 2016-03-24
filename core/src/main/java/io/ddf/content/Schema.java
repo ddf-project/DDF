@@ -527,6 +527,7 @@ public class Schema implements Serializable {
 
   public static class DummyCoding implements Serializable {
     private HashMap<Integer, HashMap<String, java.lang.Double>> mapping = new HashMap<Integer, HashMap<String, java.lang.Double>>();
+    private Map<String, Map<String, java.lang.Double>> mColNameMapping = null;
     private Integer numDummyCoding;
     public int[] xCols;
     private Integer numberFeatures = 0;
@@ -547,7 +548,14 @@ public class Schema implements Serializable {
     public void setMapping(HashMap<Integer, HashMap<String, java.lang.Double>> mapping) {
       this.mapping = mapping;
     }
+    
+    public void setColNameMapping(Map<String, Map<String, java.lang.Double>> colMapping) {
+       this.mColNameMapping = colMapping;
+    }
 
+    public Map<String, Map<String, java.lang.Double>> getColNameMapping() {
+      return this.mColNameMapping;
+    }
     public Integer getNumDummyCoding() {
       return numDummyCoding;
     }
