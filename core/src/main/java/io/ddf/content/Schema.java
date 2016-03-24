@@ -212,75 +212,6 @@ public class Schema implements Serializable {
     return Joiner.on(",").join(columnSpecs);
   }
 
-  /*
-   *
-   */
-  public void generateDummyCoding() throws NumberFormatException,
-      DDFException {
-    DummyCoding dummyCoding = new DummyCoding();
-    // initialize array xCols which is just 0, 1, 2 ..
-    dummyCoding.xCols = new int[this.getColumns().size()];
-    int i = 0;
-    while (i < dummyCoding.xCols.length) {
-      dummyCoding.xCols[i] = i;
-      i += 1;
-    }
-
-    List<Column> columns = this.getColumns();
-    Iterator<Column> columnIterator = columns.iterator();
-    int count = 0;
-    while (columnIterator.hasNext()) {
-      Column currentColumn = columnIterator.next();
-      int currentColumnIndex = this.getColumnIndex(currentColumn.getName());
-      HashMap<String, java.lang.Double> temp = new HashMap<String, java.lang.Double>();
-      // loop
-      if (currentColumn.getColumnClass() == ColumnClass.FACTOR) {
-        if (currentColumn.getOptionalFactor() != null && currentColumn.getOptionalFactor().getLevelMap() != null) {
-          Map<String, Integer> currentColumnFactor = currentColumn.getOptionalFactor().getLevelMap();
-          Iterator<String> valuesIterator = currentColumnFactor.keySet().iterator();
-
-          //TODO update this code
-          i = 0;
-          temp = new HashMap<String, java.lang.Double>();
-          while (valuesIterator.hasNext()) {
-            String columnValue = valuesIterator.next();
-            temp.put(columnValue, Double.parseDouble(i + ""));
-            i += 1;
-          }
-          dummyCoding.getMapping().put(currentColumnIndex, temp);
-          count += temp.size() - 1;
-        }
-      }
-    }
-    dummyCoding.setNumDummyCoding(count);
-
-
-    // ignore Y column
-    Integer numFeatures = this.getNumColumns() - 1;
-    // plus bias term for linear model
-    numFeatures += 1;
-    // plus the new dummy coding columns
-    numFeatures += dummyCoding.getNumDummyCoding();
-
-    //dc.getMapping().size() means number of factor column
-    //numFeatures -= (!dummyCoding.getMapping().isEmpty()) ? dummyCoding.getMapping().size() : 0;
-    if(!dummyCoding.getMapping().isEmpty()) {
-      numFeatures -= dummyCoding.getMapping().size();
-    }
-    dummyCoding.setNumberFeatures(numFeatures);
-    // set number of features in schema
-    this.setDummyCoding(dummyCoding);
-  }
-
-  public DummyCoding getDummyCoding() {
-    return dummyCoding;
-  }
-
-  public void setDummyCoding(DummyCoding dummyCoding) {
-    dummyCoding.toPrint();
-    this.dummyCoding = dummyCoding;
-  }
-
   /**
    * @return number of columns
    */
@@ -401,7 +332,6 @@ public class Schema implements Serializable {
       }
       return clonedColumn;
     }
-
   }
 
 
@@ -597,7 +527,6 @@ public class Schema implements Serializable {
 
   public static class DummyCoding implements Serializable {
     private HashMap<Integer, HashMap<String, java.lang.Double>> mapping = new HashMap<Integer, HashMap<String, java.lang.Double>>();
-    private Map<String, Map<String, java.lang.Double>> mColNameMapping = null;
     private Integer numDummyCoding;
     public int[] xCols;
     private Integer numberFeatures = 0;
@@ -617,14 +546,6 @@ public class Schema implements Serializable {
 
     public void setMapping(HashMap<Integer, HashMap<String, java.lang.Double>> mapping) {
       this.mapping = mapping;
-    }
-
-    public void setColNameMapping(Map<String, Map<String, java.lang.Double>> colMapping) {
-      this.mColNameMapping = colMapping;
-    }
-
-    public Map<String, Map<String, java.lang.Double>> getColNameMapping() {
-      return this.mColNameMapping;
     }
 
     public Integer getNumDummyCoding() {

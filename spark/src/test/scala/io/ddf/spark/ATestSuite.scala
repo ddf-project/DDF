@@ -82,6 +82,21 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
     manager.sql("LOAD DATA LOCAL INPATH '${hiveconf:shark.test.data.path}/test/mtcars' INTO TABLE mtcars", "SparkSQL")
   }
 
+  def createTableCarOwner() {
+    manager.sql("set shark.test.data.path=../resources", "SparkSQL")
+    manager.sql("drop table if exists carowner", "SparkSQL")
+    manager.sql(" create table carowner (name string, cyl int, disp double) " +
+      "ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '", "SparkSQL")
+    manager.sql("load data local inpath '${hiveconf:shark.test.data.path}/test/carowner' into table carowner", "SparkSQL")
+  }
+
+  def createTableFactor(): Unit = {
+    manager.sql("set shark.test.data.path=../resources", "SparkSQL")
+    manager.sql("drop table if exists factor", "SparkSQL")
+    manager.sql("create table factor(name string, num double) row format delimited fields terminated by ','", "SparkSQL")
+    manager.sql("load data local inpath '${hiveconf:shark.test.data.path}/test/factor' into table factor", "SparkSQL")
+  }
+
   def createTableAdmission() = {
     manager.sql("set shark.test.data.path=../resources", "SparkSQL")
     manager.sql("drop table if exists admission", "SparkSQL")

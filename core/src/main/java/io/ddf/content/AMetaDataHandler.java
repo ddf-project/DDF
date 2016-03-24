@@ -133,7 +133,6 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
         }
       }
     }
-    this.getDDF().getSchemaHandler().computeFactorLevelsAndLevelCounts();
   }
 
   public void copy(IHandleMetaData fromMetaData) throws DDFException {

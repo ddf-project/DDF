@@ -18,7 +18,7 @@ class DataFrame2MatrixVector(@transient ddf: DDF) extends ConvertFunction(ddf) {
 
   override def apply(representation: Representation): Representation = {
     val columns = ddf.getSchemaHandler.getColumns
-    val dummyCoding = ddf.getSchema.getDummyCoding
+    val dummyCoding = ddf.getSchemaHandler.getDummyCoding
     val rddMatrixVector = representation.getValue match {
       case rdd: DataFrame => {
         rdd.rdd.mapPartitions {

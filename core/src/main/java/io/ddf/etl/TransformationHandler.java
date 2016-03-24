@@ -239,4 +239,14 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     RExps.add(RExp);
     return RToSqlUdf(RExps, null, null);
   }
+
+  @Override
+  public DDF factorIndexer(List<String> columns) throws DDFException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public DDF inverseFactorIndexer(List<String> columns) throws DDFException {
+    throw new UnsupportedOperationException();
+  }
 }

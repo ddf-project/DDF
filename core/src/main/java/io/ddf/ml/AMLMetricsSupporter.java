@@ -25,7 +25,7 @@ public class AMLMetricsSupporter extends ADDFFunctionalGroupHandler implements I
   }
 
   @Override
-  public RocMetric roc(DDF predictionDDF, int alpha_length)
+  public RocMetric roc(int alpha_length)
       throws DDFException {
     // TODO Auto-generated method stub
     return null;
