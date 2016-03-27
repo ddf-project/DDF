@@ -11,8 +11,12 @@ import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.SparkDDF;
+import io.ddf.spark.SparkDDFManager;
 import io.ddf.spark.analytics.FactorIndexer;
 import io.ddf.spark.util.SparkUtils;
+
+import org.apache.commons.math3.util.Pair;
+import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
@@ -23,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import scala.Tuple2;
 
 
 public class SchemaHandler extends io.ddf.content.SchemaHandler {
@@ -105,6 +111,48 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
 
     List<Object> listValues = FactorIndexer.getFactorMapForColumn(this.getDDF(), columnName).values();
     return listValues;
+  }
+
+  /**
+   * applySchema(Schema newSchema) will do apply change column type from current to new data type.
+   * This function return new DDF and also statistic when its applied new schema
+   * @param schema will use to apply for current DDF
+   * @return Tuple2<SparkDDF,ApplySchemaStatistic>
+   *          +SparkDDF: new sparkddf which applied new schema already
+   *          +ApplySchemaStatistic:  applied schema statistic @see ApplySchemaStatistic
+   */
+  public Tuple2<SparkDDF,ApplySchemaStatistic> applySchema(Schema schema) throws DDFException{
+    // Keep info to Convert column at <pos> to <ColumnType>
+    List<Pair<Integer,Schema.ColumnType>> listConvertColumns = getListConvertColumn(this.getSchema(),schema);
+
+    try {
+      SparkDDFManager manager = (SparkDDFManager) this.getManager();
+      SparkContext sparkContext = manager.getSparkContext();
+
+    }catch(ClassCastException cce){
+      throw new DDFException("applySchema only works with SparkDDFManager");
+
+    }
+    return null;
+  }
+  protected List<Pair<Integer,Schema.ColumnType>> getListConvertColumn(Schema fromSchema,Schema toSchema)throws DDFException{
+    return null;
+  }
+
+  /**
+   * ApplySchemaStatistic will hold:
+   *  + total line processed
+   *  + total line success
+   *  + column failed parsed info (total failed on this column & example )
+   *
+   *
+   */
+  class ApplySchemaStatistic{
+      private int numColumnExample;
+      public ApplySchemaStatistic(int numColumnExample){
+        this.numColumnExample = numColumnExample;
+      }
+
   }
 }
 

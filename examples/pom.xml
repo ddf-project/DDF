@@ -316,12 +316,6 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>typesafereleases</id>
-            <name>typesafe-releases</name>
-            <url>http://repo.typesafe.com/typesafe/releases/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
             <id>AdataoMvnreposSnapshots</id>
             <name>Adatao Mvnrepos Snapshots</name>
             <url>https://raw.github.com/adatao/mvnrepos/master/snapshots/</url>

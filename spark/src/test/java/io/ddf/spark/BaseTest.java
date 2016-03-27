@@ -8,6 +8,8 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+
 public class BaseTest {
     public static DDFManager manager;
 

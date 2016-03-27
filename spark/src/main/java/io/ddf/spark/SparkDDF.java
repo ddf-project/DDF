@@ -8,6 +8,8 @@ import io.ddf.content.RepresentationHandler.GetResult;
 import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.util.SparkUtils;
+
+import org.apache.commons.math3.util.Pair;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
@@ -15,7 +17,11 @@ import org.apache.spark.sql.hive.HiveContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import scala.Tuple1;
+import scala.Tuple2;
 
 /**
  * An Apache-Spark-based implementation of DDF
@@ -138,4 +144,6 @@ public class SparkDDF extends DDF {
 
     return new GetResult(rdd.toJavaRDD(), unitType);
   }
+
+
 }
