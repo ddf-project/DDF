@@ -5,7 +5,7 @@
     <artifactId>ddf_examples_2.10</artifactId>
     <packaging>jar</packaging>
     <description>ddf_examples</description>
-    <version>1.4.13</version>
+    <version>1.4.14-SNAPSHOT</version>
     <name>ddf_examples</name>
     <organization>
         <name>io.ddf</name>
@@ -18,7 +18,7 @@
     <parent>
         <groupId>io</groupId>
         <artifactId>ddf</artifactId>
-        <version>1.4.13</version>
+        <version>1.4.14-SNAPSHOT</version>
     </parent>
     <build>
         <directory>${basedir}/target/scala-2.10</directory>
@@ -217,12 +217,12 @@
         <dependency>
             <groupId>io.ddf</groupId>
             <artifactId>ddf_spark_2.10</artifactId>
-            <version>1.4.13</version>
+            <version>1.4.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.ddf</groupId>
             <artifactId>ddf_core_2.10</artifactId>
-            <version>1.4.13</version>
+            <version>1.4.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
