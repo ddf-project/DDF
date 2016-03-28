@@ -14,7 +14,7 @@ SOURCE_ROOT=$SCRIPT_DIR/..
 $SOURCE_ROOT/bin/sbt clean
 
 sed -e "s/val rootVersion = \".*\"/val rootVersion = \"$version\"/g" \
-    -i '' $SOURCE_ROOT/project/RootBuild.scala
+    -i'' $SOURCE_ROOT/project/RootBuild.scala
 
 $SOURCE_ROOT/bin/make-poms.sh
 
