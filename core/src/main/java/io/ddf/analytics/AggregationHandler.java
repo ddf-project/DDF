@@ -12,8 +12,10 @@ import io.ddf.types.AggregateTypes.AggregateFunction;
 import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.util.Utils;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -22,28 +24,8 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
 
   private List<String> mGroupedColumns;
 
-
   public AggregationHandler(DDF theDDF) {
     super(theDDF);
-  }
-
-
-  public static class FiveNumSumary implements Serializable {
-
-    private static final long serialVersionUID = -2810459228746952242L;
-
-    // private double mMin = Double.MAX_VALUE;
-    // private double mMax = Double.MIN_VALUE;
-    // private double first_quantile;
-    // private double median;
-    // private double third_quantile;
-
-  }
-
-
-  public FiveNumSumary getFiveNumSumary() {
-    // String cmd;
-    return null;
   }
 
   @Override
@@ -69,7 +51,7 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
    *
    * @param fields {@link AggregateField}s representing a list of column specs, some of which may be aggregated, while other
    *               non-aggregated fields are the GROUP BY keys
-   * @return
+   * @return an object of class {@link AggregationResult}
    * @throws DDFException
    */
   @Override
@@ -122,31 +104,48 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     return this.getDDF();
   }
 
+  protected String buildGroupBySQL(List<String> aggregateFunctions) throws DDFException {
+    String groupedColSql = Joiner.on(",").join(mGroupedColumns);
+
+    Set<String> aggregatedColumnNames = new HashSet<>();
+    List<AggregatedColumnExpression> aggregatedColumnExpressions = new ArrayList<>();
+    for (String aggFunc: aggregateFunctions) {
+      AggregatedColumnExpression newExp = AggregatedColumnExpression.fromString(aggFunc);
+      if (newExp.columnName != null) {
+        if (aggregatedColumnNames.contains(newExp.columnName)) {
+          throw new DDFException("Duplicated column name in aggregations: " + newExp.columnName);
+        }
+        if (mGroupedColumns.contains(newExp.columnName)) {
+          throw new DDFException("New column name in aggregation cannot be a group by column: " + newExp.columnName);
+        }
+        aggregatedColumnNames.add(newExp.columnName);
+      }
+      aggregatedColumnExpressions.add(newExp);
+    }
+
+    String selectFuncSql = Joiner.on(", ").join(aggregatedColumnExpressions);
+
+    return String.format("SELECT %s , %s FROM %s GROUP BY %s",
+            selectFuncSql,
+            groupedColSql,
+            "{1}",
+            groupedColSql);
+  }
+
   @Override
   public DDF agg(List<String> aggregateFunctions) throws DDFException {
 
     if (mGroupedColumns.size() > 0) {
       // String tableName = this.getDDF().getTableName();
 
-      String groupedColSql = Joiner.on(",").join(mGroupedColumns);
+      String sqlCmd = buildGroupBySQL(aggregateFunctions);
 
-      String selectFuncSql = convertAggregateFunctionsToSql(aggregateFunctions.get(0));
-      for (int i = 1; i < aggregateFunctions.size(); i++) {
-        selectFuncSql += "," + convertAggregateFunctionsToSql(aggregateFunctions.get(i));
-      }
-
-      String sqlCmd = String.format("SELECT %s , %s FROM %s GROUP BY %s",
-                                    selectFuncSql,
-                                    groupedColSql,
-                                    "{1}",
-                                    groupedColSql);
       mLog.info("SQL Command: " + sqlCmd);
 
       try {
-        DDF resultDDF = this.getManager().sql2ddf(sqlCmd,
+        return this.getManager().sql2ddf(sqlCmd,
                         new SQLDataSourceDescriptor(sqlCmd,
                         null, null,null, this.getDDF().getUUID().toString()));
-        return resultDDF;
 
       } catch (Exception e) {
         e.printStackTrace();
@@ -159,16 +158,46 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
     }
   }
 
-  private String convertAggregateFunctionsToSql(String sql) {
+  private static class AggregatedColumnExpression {
+    public final String columnName;
+    public final String columnExpression;
 
-    if (Strings.isNullOrEmpty(sql)) return null;
-
-    String[] splits = sql.trim().split("=(?![^()]*+\\))");
-    if (splits.length == 2) {
-      return String.format("%s AS %s", splits[1], splits[0]);
-    } else if (splits.length == 1) { // no name for aggregated value
-      return splits[0];
+    public AggregatedColumnExpression(String columnName, String columnExpression) {
+      this.columnName = columnName;
+      this.columnExpression = columnExpression;
     }
-    return sql;
+
+    public AggregatedColumnExpression(String expression) {
+      this(null, expression);
+    }
+
+    // TODO: this function need test
+    public static AggregatedColumnExpression fromString(String exp) throws DDFException {
+      if (Strings.isNullOrEmpty(exp)) {
+        throw new DDFException("Aggregation function cannot be null or empty");
+      }
+
+      // XXX @nhanitvn what is this regexp doing?
+      String[] splits = exp.trim().split("=(?![^()]*+\\))");
+      if (splits.length == 2) {
+        // A new column name is provided
+        String name = splits[0];
+        String value = splits[1];
+        return new AggregatedColumnExpression(name, value);
+      } else if (splits.length == 1) {
+        // no new name for aggregated value
+        return new AggregatedColumnExpression(splits[0]);
+      }
+      return new AggregatedColumnExpression(exp);
+    }
+
+    @Override
+    public String toString() {
+      // format as sql expression
+      if (columnName != null) {
+        return String.format("%s AS %s", columnExpression, columnName);
+      }
+      return columnExpression;
+    }
   }
 }

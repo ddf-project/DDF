@@ -11,7 +11,7 @@ public interface ISupportMLMetrics extends IHandleDDFFunctionalGroup {
 
   public DDF residuals() throws DDFException;
 
-  public RocMetric roc(DDF predictionDDF, int alpha_length) throws DDFException;
+  public RocMetric roc(int alpha_length) throws DDFException;
 
   public double rmse(DDF predictionDDF, boolean implicitPref) throws DDFException;
 }

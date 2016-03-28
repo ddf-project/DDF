@@ -1,10 +1,16 @@
 package io.ddf;
 
 
+import io.ddf.content.Schema;
 import io.ddf.exception.DDFException;
+import io.ddf.misc.Config;
+import io.ddf.util.ConfigHandler;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.sql.Timestamp;
 import java.util.*;
+import com.google.common.base.Optional;
 
 /**
  * A factor is a column vector representing a categorical variable. It is presented as a coding of numeric values, which
@@ -69,6 +75,11 @@ import java.util.*;
  */
 public class Factor<T> extends Vector<T> implements Serializable {
 
+  private Schema.ColumnType mType;
+
+  public static Long getMaxLevelCounts() {
+    return Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.MAX_LEVELS_COUNT));
+  }
   /**
    * Instantiate a new Factor based on an existing DDF, given a column name. The column name is not verified for
    * correctness; any errors would only show up on actual usage.
@@ -76,8 +87,10 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @param theDDF
    * @param theColumnName
    */
-  public Factor(DDF theDDF, String theColumnName) {
-    super(theDDF, theColumnName);
+  private Factor(FactorBuilder builder) {
+    super(builder.getDDF(), builder.getColumnName());
+    this.mType = builder.getType();
+    this.mLevels = builder.getLevels();
   }
 
   /**
@@ -87,8 +100,9 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @param theColumnName
    * @throws DDFException
    */
-  public Factor(String name, T[] data) throws DDFException {
+  public Factor(String name, T[] data, Schema.ColumnType type) throws DDFException {
     super(name, data);
+    this.mType = type;
   }
 
   /**
@@ -99,14 +113,15 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @param engineName
    * @throws DDFException
    */
-  public Factor(String name, T[] data, String engineName) throws DDFException {
+  public Factor(String name, T[] data, String engineName, Schema.ColumnType type) throws DDFException {
     super(name, data, engineName);
+    this.mType= type;
   }
 
 
   private Map<String, Integer> mLevelMap;
-  private List<String> mLevels;
-  private Map<String, Integer> mLevelCounts;
+
+  private List<Object> mLevels;
 
   /**
    * Derived classes should call this to instantiate a synchronized level map for thread safety. Internally, we use
@@ -126,8 +141,28 @@ public class Factor<T> extends Vector<T> implements Serializable {
    */
   public Map<String, Integer> computeLevelMap() throws DDFException {
     // TODO: retrieve the list of levels from the underlying data, e.g.,
+    Iterator<Object> levelIterator;
+    Map<String, Integer> levelMap = new HashMap<String, Integer>();
+    if(this.mLevels != null) {
+      levelIterator = this.mLevels.iterator();
+    } else {
+      List<Object> levels = this.getDDF().getSchemaHandler().computeFactorLevels(this.getDDFColumnName());
+      levelIterator = levels.iterator();
+    }
+    int i = 1;
+    while (levelIterator.hasNext()) {
+      levelMap.put(levelIterator.next().toString(), i);
+      i += 1;
+    }
+    return levelMap;
+  }
 
-    return mLevelMap;
+  /**
+   *
+   * @return type of this factor
+   */
+  public Schema.ColumnType getType() {
+    return this.mType;
   }
 
   /**
@@ -136,8 +171,8 @@ public class Factor<T> extends Vector<T> implements Serializable {
    * @return
    * @throws DDFException
    */
-  public List<String> getLevels() throws DDFException {
-    return this.mLevels;
+  public Optional<List<Object>> getLevels() throws DDFException {
+    return Optional.fromNullable(this.mLevels);
   }
 
   public Map<String, Integer> getLevelMap() throws DDFException {
@@ -154,11 +189,11 @@ public class Factor<T> extends Vector<T> implements Serializable {
    *                  meaning
    * @throws DDFException
    */
-  public void setLevels(List<String> levels, boolean isOrdered) throws DDFException {
+  public void setLevels(List<Object> levels, boolean isOrdered) throws DDFException {
     this.setLevels(levels, null, isOrdered);
   }
 
-  public void setLevels(List<String> levels) throws DDFException {
+  public void setLevels(List<Object> levels) throws DDFException {
     this.setLevels(levels, null, false); // with default values for level codes and isOrdered
   }
 
@@ -171,36 +206,20 @@ public class Factor<T> extends Vector<T> implements Serializable {
    *                  meaning
    * @throws DDFException
    */
-  public void setLevels(List<String> levels, List<Integer> codes, boolean isOrdered) throws DDFException {
+  public void setLevels(List<Object> levels, List<Integer> codes, boolean isOrdered) throws DDFException {
     if (levels == null || levels.isEmpty()) throw new DDFException("Levels cannot be null or empty");
     if (codes != null && codes.size() != levels.size()) throw new DDFException(String.format(
         "The number of levels is %d which does not match the number of codes %d", levels.size(), codes.size()));
-
-    if (mLevelMap == null) mLevelMap = this.instantiateSynchronizedLevelMap();
-
-    if (codes == null) {
-      // Auto-create a 1-based level-code map
-      codes = new ArrayList<Integer>();
-      for (int i = 1; i <= levels.size(); i++) {
-        codes.add(i);
+    if(codes != null) {
+      if (mLevelMap == null) mLevelMap = this.instantiateSynchronizedLevelMap();
+      Iterator<Object> levelIter = levels.iterator();
+      Iterator<Integer> codeIter = codes.iterator();
+      while (levelIter.hasNext()) {
+        mLevelMap.put(levelIter.next().toString(), codeIter.next());
       }
     }
-
-    Iterator<String> levelIter = levels.iterator();
-    Iterator<Integer> codeIter = codes.iterator();
-    while (levelIter.hasNext()) {
-      mLevelMap.put(levelIter.next(), codeIter.next());
-    }
-    this.mLevels = new ArrayList<String>(levels);
+    this.mLevels = new ArrayList<Object>(levels);
     this.setOrdered(isOrdered);
-  }
-
-  public void setLevelCounts(Map<String, Integer> levelCounts) {
-    this.mLevelCounts = Collections.synchronizedMap(levelCounts);
-  }
-
-  public Map<String, Integer> getLevelCounts() throws DDFException {
-    return this.mLevelCounts;
   }
 
   private boolean mIsOrdered = false;
@@ -219,5 +238,84 @@ public class Factor<T> extends Vector<T> implements Serializable {
    */
   public void setOrdered(boolean isOrdered) {
     this.mIsOrdered = isOrdered;
+  }
+
+  public static class FactorBuilder {
+
+    private Schema.ColumnType mType;
+
+    private DDF mDDF;
+
+    private String mColumnName;
+
+    private List<Object> mLevels;
+
+    public Schema.ColumnType getType() {
+      return mType;
+    }
+
+    public FactorBuilder setType(Schema.ColumnType mType) {
+      this.mType = mType;
+      return this;
+    }
+
+    public DDF getDDF() {
+      return mDDF;
+    }
+
+    public FactorBuilder setDDF(DDF mDDF) {
+      this.mDDF = mDDF;
+      return this;
+    }
+
+    public String getColumnName() {
+      return mColumnName;
+    }
+
+    public FactorBuilder setColumnName(String mColumnName) {
+      this.mColumnName = mColumnName;
+      return this;
+    }
+
+    public List<Object> getLevels() {
+      return mLevels;
+    }
+
+    public FactorBuilder setLevels(List<Object> mLevels) {
+      this.mLevels = mLevels;
+      return this;
+    }
+
+    public Factor<?> build() throws DDFException {
+      Factor<?> factor;
+      switch (this.getType()) {
+        case DOUBLE:
+          factor = new Factor<Double>(this);
+          break;
+        case FLOAT:
+          factor = new Factor<Float>(this);
+          break;
+        case INT:
+          factor = new Factor<Integer>(this);
+          break;
+        case BIGINT:
+          factor = new Factor<Long>(this);
+          break;
+        case BOOLEAN:
+          factor = new Factor<Boolean>(this);
+          break;
+        case STRING:
+          factor = new Factor<String>(this);
+          break;
+        case TIMESTAMP:
+          factor = new Factor<Timestamp>(this);
+          break;
+        case BLOB:
+        default:
+          factor = new Factor<Object>(this);
+          break;
+      }
+      return factor;
+    }
   }
 }
