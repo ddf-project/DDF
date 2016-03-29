@@ -17,6 +17,9 @@ import io.ddf.util.PhantomReference;
 public abstract class ADDFFunctionalGroupHandler extends ALoggable implements IHandleDDFFunctionalGroup,
     ISupportPhantomReference {
 
+  protected ADDFFunctionalGroupHandler(){
+  }
+
   public ADDFFunctionalGroupHandler(DDF theDDF) {
     this.setDDF(theDDF);
     PhantomReference.register(this);
