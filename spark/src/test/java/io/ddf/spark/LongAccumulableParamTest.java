@@ -3,6 +3,7 @@ package io.ddf.spark;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.util.LongAccumulableParam;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.spark.Accumulator;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
@@ -13,7 +14,11 @@ import org.junit.Test;
 
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import scala.Boolean;
 import scala.Function1;
@@ -27,7 +32,7 @@ public class LongAccumulableParamTest extends BaseTest implements Serializable{
   public void createTableAirlineAllString() throws DDFException {
     manager.sql("drop table if exists airline", "SparkSQL");
 
-    manager.sql("create table airline (Year string,Month string,DayofMonth string,"
+      manager.sql("create table airline (Year string,Month DECIMAL,DayofMonth string,"
         + "DayOfWeek string,DepTime string,CRSDepTime string,ArrTime string,"
         + "CRSArrTime string,UniqueCarrier string, FlightNum string, "
         + "TailNum string, ActualElapsedTime string, CRSElapsedTime string, "

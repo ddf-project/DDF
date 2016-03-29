@@ -6,6 +6,7 @@ import java.util.{Map => JMap}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonFactory}
 import com.google.common.base.Strings
 import io.ddf.{DDFManager, DDF}
+import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.Row
@@ -29,7 +30,8 @@ import scala.collection.JavaConverters._
 object SparkUtils {
   /**
    * Create custom sharkContext with adatao's spark.kryo.registrator
-   * @param master
+    *
+    * @param master
    * @param jobName
    * @param sparkHome
    * @param jars

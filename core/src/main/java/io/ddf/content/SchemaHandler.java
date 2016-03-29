@@ -11,6 +11,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.util.DDFUtils;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,7 +22,9 @@ import io.ddf.content.Schema.DummyCoding;
 /**
  */
 public class SchemaHandler extends ADDFFunctionalGroupHandler implements
-    IHandleSchema {
+    IHandleSchema,Serializable {
+
+  protected SchemaHandler(){}
 
   public SchemaHandler(DDF theDDF) {
     super(theDDF);
