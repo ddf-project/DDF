@@ -40,10 +40,9 @@ import scala.Tuple3;
 
 public class SchemaHandler extends io.ddf.content.SchemaHandler {
   /**
-   * This default contrustor is only used for Serializable
+   * This default constructor is only used for Serializable
    */
-  public SchemaHandler() {
-    super();
+  protected SchemaHandler() {
   }
 
   public SchemaHandler(DDF theDDF) {

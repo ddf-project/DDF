@@ -42,10 +42,6 @@ public class SchemaHandlerTest extends BaseTest {
   @Test
   public void testApplySchema() throws DDFException {
 
-
-
-
-
     SparkDDF ddf = (SparkDDF) manager.sql2ddf("select * from DataIngestion", "SparkSQL");
     SchemaHandler schemaHandler = (SchemaHandler) ddf.getSchemaHandler();
     List<Schema.Column> columns = new ArrayList<>();
@@ -56,6 +52,7 @@ public class SchemaHandlerTest extends BaseTest {
     columns.add(new Schema.Column("type_decimal", Schema.ColumnType.DECIMAL));
     columns.add(new Schema.Column("type_date", Schema.ColumnType.DATE));
     columns.add(new Schema.Column("type_timestamp", Schema.ColumnType.TIMESTAMP));
+
     Schema schema = new Schema(columns);
     Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema);
     SparkDDF sparkDDF = applySchema._1();
@@ -68,6 +65,5 @@ public class SchemaHandlerTest extends BaseTest {
     });
     assertEquals((long)statistic.getTotalLineProcessed(),2L);
     assertEquals((long)statistic.getTotalLineSuccessed(),1L);
-
   }
 }
