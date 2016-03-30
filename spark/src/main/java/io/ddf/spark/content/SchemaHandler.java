@@ -322,7 +322,7 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
       return statistic;
     }
 
-    class ColumnStatistic implements Serializable {
+    public class ColumnStatistic implements Serializable {
       private Long numConvertedFailed = 0L;
       private final List<String> listSampleData = new ArrayList<>();
 
