@@ -29,7 +29,6 @@ public class S3DDFManagerTests {
 
     @BeforeClass
     public static void startServer() throws Exception {
-        Thread.sleep(1000);
         LOG = LoggerFactory.getLogger(S3DDFManagerTests.class);
         S3DataSourceDescriptor  s3dsd = new S3DataSourceDescriptor(new S3DataSourceURI(""),
             new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY")),
@@ -42,29 +41,19 @@ public class S3DDFManagerTests {
     public void testListing() throws DDFException {
         List<String> buckets = manager.listBuckets();
         LOG.info("========== buckets ==========");
-        for (String bucket: buckets) {
-            LOG.info(bucket);
-        }
         assert(buckets.contains("jing-bucket"));
 
         LOG.info("========== jing-bucket/testFolder/ ==========");
         List<String> keys = manager.listFiles("jing-bucket", "testFolder/");
-        for (String key: keys) {
-            LOG.info(key);
-        }
         assert (keys.size()== 21);
         assert (keys.contains("testFolder/(-_*')!.@&:,$=+?;#.csv"));
 
         LOG.info("========== jing-bucket/testFolder/a.json ==========");
         keys = manager.listFiles("jing-bucket", "testFolder/a.json");
-        for (String key: keys) {
-            LOG.info(key);
-        }
         assert (keys.size()==1);
 
         keys = manager.listFiles("jing-bucket", "testFolder/(-_*')!.@&:,$=+?;#.csv");
         assert (keys.size() == 1);
-
     }
 
     @Test

@@ -211,13 +211,20 @@ public class S3DDFManager extends DDFManager {
     List<String> rows = new ArrayList<String>();
 
     for (int i = 0; i < keys.size() && limit > 0; ++i) {
+      S3Object obj = mConn.getObject(bucket, keys.get(i));
       try (BufferedReader br = new BufferedReader(
-          new InputStreamReader(mConn.getObject(bucket, keys.get(i)).getObjectContent()))) {
+          new InputStreamReader(obj.getObjectContent()))) {
         String line = null;
         while (limit > 0 && ((line = br.readLine()) != null)) {
           rows.add(line);
           --limit;
         }
+      } catch (IOException e) {
+        throw new DDFException(e);
+      }
+
+      try {
+        obj.close();
       } catch (IOException e) {
         throw new DDFException(e);
       }

@@ -77,6 +77,7 @@ public class HDFSDDFManager extends DDFManager {
           int dotIndex = filePath.lastIndexOf('.');
           if (dotIndex != -1) {
             String extension = filePath.substring(dotIndex + 1);
+
             try {
               if (extension.equalsIgnoreCase("parquet")) {
                 extension = "pqt";
