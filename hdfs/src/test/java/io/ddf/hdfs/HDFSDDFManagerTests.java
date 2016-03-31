@@ -66,7 +66,7 @@ public class HDFSDDFManagerTests {
 
         }
 
-        HDFSDDF pqtDDF = manager.newDDF("/test_pe/parquet/sleep.parquet", null, null);
+        HDFSDDF pqtDDF = manager.newDDF("/test_pe/parquet/default", null, null);
         assert (pqtDDF.getIsDir() == true);
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 

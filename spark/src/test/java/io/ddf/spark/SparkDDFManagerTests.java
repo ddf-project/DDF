@@ -262,13 +262,13 @@ public class SparkDDFManagerTests extends BaseTest {
 
 
     LOG.info("========== pqt ==========");
-    HDFSDDF pqtDDF = hdfsDDFManager.newDDF("/test_pe/parquet/", null, null);
+    HDFSDDF pqtDDF = hdfsDDFManager.newDDF("/test_pe/parquet/default", null, null);
     DDF pqtSparkDDF = sparkDDFManager.copyFrom(pqtDDF);
     LOG.info(pqtSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     assert (pqtSparkDDF.getNumRows() > 0);
 
     LOG.info("========== avro ==========");
-    HDFSDDF avroDDF = hdfsDDFManager.newDDF("/test_pe/avro/", null, null);
+    HDFSDDF avroDDF = hdfsDDFManager.newDDF("/test_pe/avro/single", null, null);
     DDF avroSparkDDF = sparkDDFManager.copyFrom(avroDDF);
     LOG.info(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     assert (avroSparkDDF.getNumRows() > 0);

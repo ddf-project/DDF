@@ -75,7 +75,9 @@ public class HDFSDDFManager extends DDFManager {
         for (FileStatus file : files) {
           String filePath = file.getPath().toString();
           int dotIndex = filePath.lastIndexOf('.');
-          if (dotIndex != -1) {
+          int slashIndex = filePath.lastIndexOf('/');
+          // Check for extension.
+          if (dotIndex != -1 && dotIndex > slashIndex) {
             String extension = filePath.substring(dotIndex + 1);
 
             try {
