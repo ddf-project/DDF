@@ -94,7 +94,7 @@ public class S3DDFManagerTests {
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
 
-        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/partition_avro/", null, null);
+        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/partition/", null, null);
         assert (avroDDF.getIsDir() == true);
         assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
 

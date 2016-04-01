@@ -1,5 +1,6 @@
 package io.ddf.s3;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -59,19 +60,19 @@ public class S3DDFManager extends DDFManager {
    * @brief To check whether the ddf is a directory.
    */
   public Boolean isDir(S3DDF s3DDF) throws DDFException {
-    S3Object s3Object = mConn.getObject(s3DDF.getBucket(), s3DDF.getKey());
-    List<String> keys = this.listFiles(s3DDF.getBucket(), s3Object.getKey());
+    try {
+      mConn.getObjectMetadata(s3DDF.getBucket(),s3DDF.getKey());
+    } catch(AmazonServiceException e) {
+      throw new DDFException(e);
+    }
+
+    List<String> keys = this.listFiles(s3DDF.getBucket(),s3DDF.getKey());
     for (String key : keys) {
       if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
         throw new DDFException("This folder contains subfolder, S3 DDF does not support nested folders");
       }
     }
-    Boolean isDir = s3Object.getKey().endsWith("/");
-    try {
-      s3Object.close();
-    } catch (IOException e) {
-      throw new DDFException(e);
-    }
+    Boolean isDir = s3DDF.getKey().endsWith("/");
     return isDir;
   }
 
