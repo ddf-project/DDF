@@ -44,17 +44,47 @@ public class SchemaHandlerTest extends BaseTest {
 
     SparkDDF ddf = (SparkDDF) manager.sql2ddf("select * from DataIngestion", "SparkSQL");
     SchemaHandler schemaHandler = (SchemaHandler) ddf.getSchemaHandler();
-    List<Schema.Column> columns = new ArrayList<>();
-    columns.add(new Schema.Column("type_boolean", Schema.ColumnType.BOOLEAN));
-    columns.add(new Schema.Column("type_short", Schema.ColumnType.SMALLINT));
-    columns.add(new Schema.Column("type_long", Schema.ColumnType.BIGINT));
-    columns.add(new Schema.Column("type_double", Schema.ColumnType.DOUBLE));
-    columns.add(new Schema.Column("type_decimal", Schema.ColumnType.DECIMAL));
-    columns.add(new Schema.Column("type_date", Schema.ColumnType.DATE));
-    columns.add(new Schema.Column("type_timestamp", Schema.ColumnType.TIMESTAMP));
+    List<Schema.Column> applyColumns = new ArrayList<>();
+    applyColumns.add(new Schema.Column("type_string", Schema.ColumnType.STRING));
+    applyColumns.add(new Schema.Column("type_boolean", Schema.ColumnType.BOOLEAN));
+    applyColumns.add(new Schema.Column("type_short", Schema.ColumnType.SMALLINT));
+    applyColumns.add(new Schema.Column("type_long", Schema.ColumnType.BIGINT));
+    applyColumns.add(new Schema.Column("type_double", Schema.ColumnType.DOUBLE));
+    applyColumns.add(new Schema.Column("type_decimal", Schema.ColumnType.DECIMAL));
+    applyColumns.add(new Schema.Column("type_date", Schema.ColumnType.DATE));
+    applyColumns.add(new Schema.Column("type_timestamp", Schema.ColumnType.TIMESTAMP));
 
-    Schema schema = new Schema(columns);
-    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema);
+    Schema applySchema = new Schema(applyColumns);
+
+    testApplyWithDrop(ddf,applySchema);
+    testApplyWithoutDrop(ddf,applySchema);
+
+
+
+  }
+
+  private void testApplyWithoutDrop(SparkDDF ddf, Schema schema) throws DDFException {
+    SchemaHandler schemaHandler = (SchemaHandler) ddf.getSchemaHandler();
+    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema,false);
+    SparkDDF sparkDDF = applySchema._1();
+    SchemaHandler.ApplySchemaStatistic statistic = applySchema._2();
+    statistic.getMapColumnStatistic().forEach( (colName,colStats) -> {
+      System.out.println("column: " + colName);
+      System.out.println("numFailed: " + colStats.getNumConvertedFailed());
+      System.out.println("num sample" + colStats.getNumSampleData());
+      System.out.println("sample" + Arrays.toString(colStats.getSampleData().toArray()));
+    });
+    assertEquals((long)statistic.getTotalLineProcessed(),2L);
+    assertEquals((long)statistic.getTotalLineSuccessed(),2L);
+    List<Schema.Column> newColumn = sparkDDF.getSchema().getColumns();
+    assertEqualColumn(schema.getColumns(),newColumn);
+
+  }
+
+  private void testApplyWithDrop(SparkDDF ddf,Schema schema) throws DDFException {
+
+    SchemaHandler schemaHandler = (SchemaHandler) ddf.getSchemaHandler();
+    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema,true);
     SparkDDF sparkDDF = applySchema._1();
     SchemaHandler.ApplySchemaStatistic statistic = applySchema._2();
     statistic.getMapColumnStatistic().forEach( (colName,colStats) -> {
@@ -65,5 +95,16 @@ public class SchemaHandlerTest extends BaseTest {
     });
     assertEquals((long)statistic.getTotalLineProcessed(),2L);
     assertEquals((long)statistic.getTotalLineSuccessed(),1L);
+    List<Schema.Column> newColumn = sparkDDF.getSchema().getColumns();
+    assertEqualColumn(schema.getColumns(),newColumn);
   }
+  private void assertEqualColumn(List<Schema.Column> expectedColumn, List<Schema.Column> actualColumns){
+    assertEquals(actualColumns.size(), expectedColumn.size());
+    for(int i=0; i < actualColumns.size();++i){
+      assertEquals(expectedColumn.get(i).getName(),actualColumns.get(i).getName());
+      assertEquals(expectedColumn.get(i).getType(),actualColumns.get(i).getType());
+      System.out.println(actualColumns.get(i).getName()+ " : " +actualColumns.get(i).getType());
+    }
+  }
+
 }
