@@ -79,7 +79,6 @@ public class HDFSDDFManager extends DDFManager {
           // Check for extension.
           if (dotIndex != -1 && dotIndex > slashIndex) {
             String extension = filePath.substring(dotIndex + 1);
-
             try {
               if (extension.equalsIgnoreCase("parquet")) {
                 extension = "pqt";
@@ -94,8 +93,11 @@ public class HDFSDDFManager extends DDFManager {
         if (dataFormats.size() > 1) {
           throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: %s", hdfsDDF
               .getPath(), dataFormats.toArray().toString()));
+        } else if (dataFormats.size() == 1) {
+          return dataFormats.iterator().next();
+        } else {
+          return DataFormat.CSV;
         }
-        return dataFormats.iterator().next();
       } catch (IOException e) {
         throw new DDFException(String.format("Can't open directory : %s", hdfsDDF.getPath()));
       }

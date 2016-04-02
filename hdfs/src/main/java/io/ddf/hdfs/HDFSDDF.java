@@ -53,15 +53,16 @@ public class HDFSDDF extends DDF {
         }
         // Check directory or file.
         HDFSDDFManager hdfsDDFManager = this.getManager();
-        mIsDir = hdfsDDFManager.isDir(this);
         // Check dataformat.
         if (options != null && options.containsKey("format")) {
             try {
                 mDataFormat = DataFormat.valueOf(options.get("format"));
             } catch (IllegalArgumentException e) {
+                mIsDir = hdfsDDFManager.isDir(this);
                 mDataFormat = hdfsDDFManager.getDataFormat(this);
             }
         } else {
+            mIsDir = hdfsDDFManager.isDir(this);
             mDataFormat = hdfsDDFManager.getDataFormat(this);
         }
     }

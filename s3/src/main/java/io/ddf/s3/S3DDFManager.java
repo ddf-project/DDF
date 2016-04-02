@@ -60,12 +60,6 @@ public class S3DDFManager extends DDFManager {
    * @brief To check whether the ddf is a directory.
    */
   public Boolean isDir(S3DDF s3DDF) throws DDFException {
-    try {
-      mConn.getObjectMetadata(s3DDF.getBucket(),s3DDF.getKey());
-    } catch(AmazonServiceException e) {
-      throw new DDFException(e);
-    }
-
     List<String> keys = this.listFiles(s3DDF.getBucket(),s3DDF.getKey());
     for (String key : keys) {
       if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
@@ -106,8 +100,11 @@ public class S3DDFManager extends DDFManager {
         if (dataFormats.size() > 1) {
           throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
               "%s", s3DDF.getKey(), dataFormats.toArray().toString()));
+        } else if (dataFormats.size() == 1){
+          return dataFormats.iterator().next();
+        } else {
+          return DataFormat.CSV;
         }
-        return dataFormats.iterator().next();
       }
     } else {
       String key = s3DDF.getKey();

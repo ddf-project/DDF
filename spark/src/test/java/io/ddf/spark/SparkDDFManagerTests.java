@@ -14,13 +14,11 @@ import io.ddf.s3.S3DDFManager;
 
 
 import com.google.common.collect.ImmutableMap;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,78 +62,25 @@ public class SparkDDFManagerTests extends BaseTest {
     Assert.assertEquals(ddf, manager.getDDF(ddf.getUUID()));
   }
 
-  /*
-  public void testBasicCopyForS3(S3DDFManager s3DDFManager) {
 
-  }
-
-  public void testOptions(S3DDFManager s3DDFManager) {
-    testComment(s3DDFManager);
-    testDelim(s3DDFManager);
-    testEscape(s3DDFManager);
-    testQuote(s3DDFManager);
-    testNull(s3DDFManager);
-  }
-
-  public void testDelim(S3DDFManager s3DDFManager) {
-    final Map<String, String> delim2pathMap = ImmutableMap.<String, String>builder()
-        .put("\\x0001", "adatao-sample-data/test/extra/delim/ctra/")
-        .put(" ", "adatao-sample-data/test/extra/delim/space/")
-        .put("|", "adatao-sample-data/test/extra/delim/vertical-bar/")
-        .build();
-
-  }
-
-  public void testQuote(S3DDFManager s3DDFManager) {
-
-  }
-
-  public void testEscape(S3DDFManager s3DDFManager) {
-
-  }
-
-  public void testComment(S3DDFManager s3DDFManager) {
-
-  }
-
-  public void testNull(S3DDFManager s3DDFManager) {
-
-  }
-  */
-
-  @Test
-  public void testCopyFromS3() throws DDFException {
-    LOG = LoggerFactory.getLogger(SparkDDFManagerTests.class);
-    S3DataSourceDescriptor s3dsd = null;
-    try {
-      s3dsd = new S3DataSourceDescriptor(new S3DataSourceURI(""),
-          new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY")),
-          null,
-          null);
-    } catch (URISyntaxException e) {
-      throw new DDFException(e);
-    }
-    S3DDFManager s3DDFManager= (S3DDFManager) DDFManager.get(DDFManager.EngineType.S3, s3dsd);
-    SparkDDFManager sparkDDFManager = (SparkDDFManager) manager;
-
-
+  public void testBasicCopyForS3(S3DDFManager s3DDFManager) throws DDFException {
     // Test copy from a folder, the schema should be given.
     LOG.info("========== testFolder/folder ==========");
     S3DDF folderDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/folder/", "year int, value int", null);
-    DDF folderSparkDDF = sparkDDFManager.copyFrom(folderDDF);
+    DDF folderSparkDDF = manager.copyFrom(folderDDF);
     LOG.info(folderSparkDDF.sql("select * from @this", "error").getRows().toString());
     assert(folderSparkDDF.getNumRows() == 4);
 
     // Test copy from a folder with all json files.
     LOG.info("========== testFolder/allJson ==========");
     S3DDF allJsonDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/allJson/", null, null);
-    DDF allJsonSparkDDF = sparkDDFManager.copyFrom(allJsonDDF);
+    DDF allJsonSparkDDF = manager.copyFrom(allJsonDDF);
     // TODO: is it 6?
     // assert(allJsonSparkDDF.getNumRows() == 4);
 
     LOG.info("========== testFolder/folder/d.json ==========");
     S3DDF jsonDDF = s3DDFManager.newDDF("adatao-test", "json/", null, null);
-    DDF jsonSparkDDF = sparkDDFManager.copyFrom(jsonDDF);
+    DDF jsonSparkDDF = manager.copyFrom(jsonDDF);
     LOG.info(jsonSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
 
 
@@ -144,7 +89,7 @@ public class SparkDDFManagerTests extends BaseTest {
     Map<String, String> options = new HashMap<>() ;
     options.put("header", "true");
     S3DDF csvDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/hasHeader.csv", null, options);
-    DDF csvSparkDDF = sparkDDFManager.copyFrom(csvDDF);
+    DDF csvSparkDDF = manager.copyFrom(csvDDF);
     LOG.info(csvSparkDDF.sql("select * from @this", "error").getRows().toString());
     assert(csvSparkDDF.getNumRows()==2);
 
@@ -152,14 +97,14 @@ public class SparkDDFManagerTests extends BaseTest {
     // Copy From a csv, the schema is not given, and has no header.
     LOG.info("========== testFolder/noHeader.csv ==========");
     S3DDF csvDDF2 = s3DDFManager.newDDF("jing-bucket", "testFolder/noHeader.csv", null, null);
-    DDF csvSparkDDF2= sparkDDFManager.copyFrom(csvDDF2);
+    DDF csvSparkDDF2= manager.copyFrom(csvDDF2);
     LOG.info(csvSparkDDF2.sql("select * from @this", "error").getRows().toString());
     assert(csvSparkDDF2.getNumRows()==2);
 
     // Copy From a csv, the schema is given and has no header.
     LOG.info("========== testFolder/noHeader.csv ==========");
     S3DDF csvDDF3 = s3DDFManager.newDDF("jing-bucket", "testFolder/noHeader.csv", "year int, val string", null);
-    DDF csvSparkDDF3 = sparkDDFManager.copyFrom(csvDDF3);
+    DDF csvSparkDDF3 = manager.copyFrom(csvDDF3);
     LOG.info(csvSparkDDF3.sql("select * from @this", "error").getRows().toString());
     assert (csvSparkDDF3.getNumRows()==2);
 
@@ -172,17 +117,17 @@ public class SparkDDFManagerTests extends BaseTest {
     /*
     DDF tsvSparkDDF = sparkDDFManager.copyFrom(tsvDDF);
     LOG.info(tsvSparkDDF.sql("select * from @this", "error").getRows().toString());
-    assert (tsvSparkDDF.getNumRows()==73);
+    assert (tsvSparkDDF.getNumRows()> 0);
     */
 
     LOG.info("========== pqt ==========");
     S3DDF pqtDDF = s3DDFManager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null, null);
-    DDF pqtSparkDDF = sparkDDFManager.copyFrom(pqtDDF);
+    DDF pqtSparkDDF = manager.copyFrom(pqtDDF);
     LOG.info(pqtSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     LOG.info("========== avro ==========");
-    S3DDF avroDDF = s3DDFManager.newDDF("adatao-sample-data", "test/avro/partition_avro/", null, null);
-    DDF avroSparkDDF = sparkDDFManager.copyFrom(avroDDF);
-    LOG.info(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
+    //S3DDF avroDDF = s3DDFManager.newDDF("adatao-sample-data", "test/avro/partition/", null, null);
+    //DDF avroSparkDDF = manager.copyFrom(avroDDF);
+    //LOG.info(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
 
     // s3 doesn't work with orc now
     /*
@@ -201,6 +146,75 @@ public class SparkDDFManagerTests extends BaseTest {
     DDF emptySparkDDF = sparkDDFManager.copyFrom(emptyDDF);
     LOG.info(emptySparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     */
+  }
+
+  public void testOptions(S3DDFManager s3DDFManager) throws DDFException {
+    testComment(s3DDFManager);
+    testDelim(s3DDFManager);
+    testEscape(s3DDFManager);
+    testQuote(s3DDFManager);
+    testNull(s3DDFManager);
+  }
+
+  public void testDelim(S3DDFManager s3DDFManager) throws DDFException {
+    final Map<String, String> delim2pathMap = ImmutableMap.<String, String>builder()
+        .put(" ", "adatao-sample-data/test/extra/delim/space/")
+        .put("|", "adatao-sample-data/test/extra/delim/vertical-bar/")
+        .put("\u0001", "adatao-sample-data/test/extra/delim/ctra/")
+        .build();
+    Map<String, String> options = new HashMap<>();
+    for (Map.Entry<String, String> entry: delim2pathMap.entrySet()) {
+      options.clear();
+      options.put("delimiter", entry.getKey());
+      S3DDF s3DDF = s3DDFManager.newDDF(entry.getValue(), options);
+      DDF sparkDDF = manager.copyFrom(s3DDF);
+      assert (sparkDDF.getNumColumns() == 3);
+    }
+  }
+
+  public void testQuote(S3DDFManager s3DDFManager) {
+
+  }
+
+  public void testEscape(S3DDFManager s3DDFManager) {
+
+  }
+
+  public void testComment(S3DDFManager s3DDFManager) {
+  }
+
+  public void testNull(S3DDFManager s3DDFManager) throws DDFException {
+    final Map<String, String> nullvalue2pathMap = ImmutableMap.<String, String>builder()
+        .put("<null>", "adatao-sample-data/test/extra/nullvalue/null-using-null/null-using-flashn")
+        .put("/N", "adatao-sample-data/test/extra/nullvalue/null-using-fslashn/null-using-flashn")
+        .put("\\n", "adatao-sample-data/test/extra/nullvalue/null-using-newline/null-using-flashn")
+        .build();
+    Map<String, String> options = new HashMap<>();
+    for (Map.Entry<String, String> entry: nullvalue2pathMap.entrySet()) {
+      options.clear();
+      options.put("nullvalue", entry.getKey());
+      S3DDF s3DDF = s3DDFManager.newDDF(entry.getValue(), options);
+      DDF sparkDDF = manager.copyFrom(s3DDF);
+      assert (sparkDDF.getNumRows() > 0);
+    }
+  }
+
+
+  @Test
+  public void testCopyFromS3() throws DDFException {
+    LOG = LoggerFactory.getLogger(SparkDDFManagerTests.class);
+    S3DataSourceDescriptor s3dsd = null;
+    try {
+      s3dsd = new S3DataSourceDescriptor(new S3DataSourceURI(""),
+          new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY")),
+          null,
+          null);
+    } catch (URISyntaxException e) {
+      throw new DDFException(e);
+    }
+    S3DDFManager s3DDFManager= (S3DDFManager) DDFManager.get(DDFManager.EngineType.S3, s3dsd);
+    //testBasicCopyForS3(s3DDFManager);
+    testOptions(s3DDFManager);
   }
 
   @Test

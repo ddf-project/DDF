@@ -99,15 +99,16 @@ public class S3DDF extends DDF {
         mLog.info(String.format("init s3 ddf: %s %s", mBucket, mKey));
         // Check directory or file.
         S3DDFManager s3DDFManager = this.getManager();
-        mIsDir = s3DDFManager.isDir(this);
         // Check dataformat.
         if (options != null && options.containsKey("format")) {
             try {
                 mDataFormat = DataFormat.valueOf(options.get("format"));
             } catch (IllegalArgumentException e) {
+                mIsDir = s3DDFManager.isDir(this);
                 mDataFormat = s3DDFManager.getDataFormat(this);
             }
         } else {
+            mIsDir = s3DDFManager.isDir(this);
             mDataFormat = s3DDFManager.getDataFormat(this);
         }
     }

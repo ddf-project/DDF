@@ -74,19 +74,6 @@ public class S3DDFManagerTests {
         assert(csvDDF.getIsDir() == false);
         assert(jsonDDF.getDataFormat().equals(DataFormat.JSON));
         assert(csvDDF.getDataFormat().equals(DataFormat.CSV));
-        try {
-            // Test on non-exist folder/file. Should throw exception.
-            S3DDF nonExistDDF = manager.newDDF("jing-bucket", "nonexist.csv", null, null);
-            assert (false);
-        } catch (Exception e) {
-
-        }
-        try {
-            S3DDF nonExistDDF2 = manager.newDDF("jing-bucket", "nonexist/", null, null);
-            assert (false);
-        } catch (Exception e) {
-
-        }
 
         // PQT, AVRO and ORC
         S3DDF pqtDDF = manager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null, null);
@@ -94,8 +81,9 @@ public class S3DDFManagerTests {
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
 
-        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/partition/", null, null);
-        assert (avroDDF.getIsDir() == true);
+
+        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/single/episodes.avro", null, null);
+        assert (avroDDF.getIsDir() == false);
         assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
 
         S3DDF orcDDF = manager.newDDF("adatao-test", "orc/", null, null);
