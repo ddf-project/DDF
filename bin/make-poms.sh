@@ -8,7 +8,7 @@
 BINDIR="`dirname $0`"
 cd "$BINDIR"/..
 
-SBT="sbt"
+SBT="bin/sbt"
 $SBT make-pom
 
 TARGET_DIR=target
