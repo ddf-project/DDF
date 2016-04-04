@@ -226,6 +226,16 @@
             <version>1.4.14-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>io.ddf</groupId>
+            <artifactId>ddf_s3_2.10</artifactId>
+            <version>1.4.13-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ddf</groupId>
+            <artifactId>ddf_hdfs_2.10</artifactId>
+            <version>1.4.13-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.2</version>
@@ -323,6 +333,16 @@
             <groupId>net.rforge</groupId>
             <artifactId>Rserve</artifactId>
             <version>1.8.2.compiled</version>
+        </dependency>
+        <dependency>
+            <groupId>com.databricks</groupId>
+            <artifactId>spark-csv_2.10</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.databricks</groupId>
+            <artifactId>spark-avro_2.10</artifactId>
+            <version>2.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -424,6 +444,12 @@
         </dependency>
     </dependencies>
     <repositories>
+        <repository>
+            <id>typesafereleases</id>
+            <name>typesafe-releases</name>
+            <url>http://repo.typesafe.com/typesafe/releases/</url>
+            <layout>default</layout>
+        </repository>
         <repository>
             <id>AdataoMvnreposSnapshots</id>
             <name>Adatao Mvnrepos Snapshots</name>
