@@ -245,16 +245,6 @@ public class SparkDDFManagerTests extends BaseTest {
     // assert (allJsonSparkDDF.getNumRows() > 0);
     */
 
-    // Copy From a csv, the schema is not given.
-    LOG.info("========== test_pe/csv/withheader/crime.csv ==========");
-
-    Map<String, String> options = new HashMap<>() ;
-    options.put("header", "true");
-    HDFSDDF csvDDF = hdfsDDFManager.newDDF("/test_pe/csv/withheader/crime.csv", null, options);
-    DDF csvSparkDDF = sparkDDFManager.copyFrom(csvDDF);
-    LOG.info(csvSparkDDF.sql("select * from @this", "error").getRows().toString());
-    assert(csvSparkDDF.getNumRows() > 0);
-
 
     // Copy From a csv, the schema is not given, and has no header.
     LOG.info("========== test_pe/csv/noheader/crime.csv ==========");
