@@ -60,9 +60,7 @@
 	<modules>
 	  	<module>core</module>
 	  	<module>spark</module>
-	  	<module>s3</module>
-		<module>hdfs</module>
-		<module>examples</module>
+	  	<module>examples</module>
 		<module>ddf-test</module>
 	</modules>
 

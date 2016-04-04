@@ -2,21 +2,14 @@ package io.ddf.spark;
 
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
-import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
-import io.ddf.datasource.S3DataSourceCredentials;
-import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
-import io.ddf.hdfs.HDFSDDF;
-import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.ds.DataSource;
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
@@ -27,10 +20,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.DataFrameReader;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
@@ -38,9 +27,8 @@ import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.*;
 
-import org.apache.spark.sql.types.StructType;
-
-import io.ddf.s3.S3DDF;
+//import shark.SharkEnv;
+//import shark.api.JavaSharkContext;
 
 /**
  * An Apache-Spark-based implementation of DDFManager
@@ -66,7 +54,7 @@ public class SparkDDFManager extends DDFManager {
           DDFException {
 
     mLog.info("Get the engine " + fromEngine + " to transfer table : " +
-        tableName);
+            tableName);
     DDFManager fromManager = this.getDDFCoordinator().getEngine(fromEngine);
     DataSourceDescriptor dataSourceDescriptor = fromManager
             .getDataSourceDescriptor();
@@ -86,11 +74,6 @@ public class SparkDDFManager extends DDFManager {
         } catch (URISyntaxException e) {
           throw new DDFException(e);
         }
-      } else if (dataSourceDescriptor instanceof S3DataSourceDescriptor) {
-        // Load from s3.
-        // Load data into spark. If has schema and doesn't has schema?
-        // Create ddf over it. Take care about persistence & lineage.
-        throw new DDFException("Unsupported operation");
       } else {
         JDBCDataSourceDescriptor loadDS
                 = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(),
@@ -102,6 +85,34 @@ public class SparkDDFManager extends DDFManager {
                 + ", " + loadDS.getDbTable());
         return this.load(loadDS);
       }
+      // TODO
+      /*
+      if (fromManager.getEngine().equals("sfdc")) {
+        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri
+                ().toString());
+        mLog.info("sfdc uri: " + jdbcDataSourceDescriptor.getDataSourceUri()
+                .getUri().toString());
+      } else {
+        options.put("url", jdbcDataSourceDescriptor.getDataSourceUri().getUri()
+                .toString() + "?user=" + jdbcCredential.getUsername() +
+                "&password="+jdbcCredential.getPassword());
+
+      }
+
+
+      // TODO: Pay attention here. Some maybe username?
+      // options.put("user", jdbcCredential.getUserName());
+      // options.put("password", jdbcCredential.getPassword());
+      // TODO: What if sfdc.
+      DataFrame rdd = mHiveContext.load("jdbc", options);
+      if (rdd == null) {
+        throw new DDFException("fail use spark datasource api");
+      }
+      Schema schema = SchemaHandler.getSchemaFromDataFrame(rdd);
+      DDF ddf = this.newDDF(this, rdd, new Class<?>[]
+              {DataFrame.class}, null, null, null, schema);
+      ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+      */
     } else {
       throw new DDFException("Currently no other DataSourceDescriptor is " +
               "supported");
@@ -118,96 +129,8 @@ public class SparkDDFManager extends DDFManager {
       throw new DDFException("There is no ddf with uri : " + ddfUUID.toString()
           + " in another engine");
     }
-
     String fromTableName = fromDDF.getTableName();
     return this.transferByTable(fromEngine, fromTableName);
-  }
-
-
-
-  @Override
-  public DDF copyFrom(DDF ddf) throws DDFException {
-    if (ddf instanceof S3DDF || ddf instanceof HDFSDDF) {
-      DataFormat dataFormat = null;
-      String uri = null;
-      StructType schema = null;
-      Map<String, String> options = null;
-      final Map<DataFormat, String> formatMapping = ImmutableMap.<DataFormat, String>builder()
-          .put(DataFormat.CSV, "com.databricks.spark.csv")
-          .put(DataFormat.JSON, "json")
-          .put(DataFormat.TSV, "com.databricks.spark.csv")
-          .put(DataFormat.PQT, "parquet")
-          .put(DataFormat.ORC, "orc")
-          .put(DataFormat.AVRO, "com.databricks.spark.avro").build();
-
-      final Set<DataFormat> flattenFormat = ImmutableSet.<DataFormat>builder()
-          .add(DataFormat.JSON, DataFormat.ORC, DataFormat.AVRO).build();
-
-      if (ddf instanceof S3DDF) {
-        S3DDF s3DDF = (S3DDF)ddf;
-        S3DataSourceCredentials cred = s3DDF.getManager().getCredential();
-        uri = String.format("s3n://%s:%s@%s/%s", cred.getAwsKeyID(), cred.getAwsScretKey(),
-            s3DDF.getBucket(), s3DDF.getKey());
-        dataFormat = s3DDF.getDataFormat();
-        if (s3DDF.getSchemaString() != null) {
-          schema = SparkUtils.str2SparkSchema(s3DDF.getSchemaString());
-        }
-        options = s3DDF.getOptions();
-      } else {
-        HDFSDDF hdfsDDF = (HDFSDDF) ddf;
-        uri = String.format("%s%s", hdfsDDF.getManager().getSourceUri(), hdfsDDF.getPath());
-        dataFormat = hdfsDDF.getDataFormat();
-        if (hdfsDDF.getSchemaString() != null) {
-          schema = SparkUtils.str2SparkSchema(hdfsDDF.getSchemaString());
-        }
-        options = hdfsDDF.getOptions();
-      }
-
-      DataFrameReader dfr =  this.getHiveContext().read().format(formatMapping.get(dataFormat));
-      DataFrame df = null;
-      switch (dataFormat) {
-        case TSV:
-          if (options == null || !options.containsKey("delimiter")) {
-            dfr = dfr.option("delimiter", "\t");
-          }
-          // fall through
-        case CSV:
-          // TODO: reuse ddf schema.
-          if (schema == null) {
-            dfr = dfr.option("inferSchema", "true");
-          } else {
-            dfr = dfr.schema(schema);
-          }
-          break;
-      }
-      if (options != null) {
-        dfr = dfr.options(options);
-      }
-      mLog.info(String.format(">>>>>>>> Load data from uri: %s", uri));
-      try {
-        df = dfr.load(uri);
-      } catch (Exception e) {
-        throw new DDFException(e);
-      }
-      mLog.info(String.format(">>>>>>>> Finish loading for uri: %s", uri));
-      if (ddf.getSchema() == null) {
-        ddf.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
-      }
-      DDF newDDF = this.newDDF(this, df, new Class<?>[] {DataFrame.class}, null,
-          null, ddf.getSchema());
-      newDDF.getRepresentationHandler().cache(false);
-      newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
-
-      if (flattenFormat.contains(dataFormat)
-          && options != null
-          && options.get("flatten") != null
-          && options.get("flatten").equals("true")) {
-        newDDF = newDDF.getFlattenedDDF();
-      }
-      return newDDF;
-    } else {
-      throw new DDFException(new UnsupportedOperationException());
-    }
   }
 
   /**
