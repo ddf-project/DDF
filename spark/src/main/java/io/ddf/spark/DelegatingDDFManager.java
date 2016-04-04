@@ -64,6 +64,11 @@ public class DelegatingDDFManager extends DDFManager {
   }
 
   @Override
+  public DDF copyFrom(DDF fromDDF) throws DDFException {
+    return null;
+  }
+
+  @Override
   public DDF createDDF(Map<Object, Object> options) throws DDFException {
     // clone the options so that we can add our new field for source uri
     options = new HashMap<>(options);

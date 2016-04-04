@@ -18,8 +18,8 @@ public class DataSourceResolver {
 
   public static DataSourceDescriptor resolve(String source,
                         Map<String, String> options) throws DDFException, URISyntaxException {
-    switch (source) {
-      case "S3": {
+    switch (source.toLowerCase()) {
+      case "s3": {
         return resolveS3(options);
       }
       case "hdfs": {
@@ -48,12 +48,13 @@ public class DataSourceResolver {
       LOG.info("Loading from S3 with options: {}", sourceOptions);
     }
 
-    String uri = options.get("uri");
-    String awsKeyID = getOrDefault(options,"awsKeyID", "");
+    String uri = getOrDefault(options, "uri", "");
+    String awsKeyID = getOrDefault(options, "awsKeyID", "");
     String awsSecretKey = getOrDefault(options,"awsSecretKey", "");
-    String schema = options.get("schema");
-    // TODO format null?
-    DataFormat format = DataFormat.fromInt(Integer.parseInt(options.get("dataFormat")));
+    String schema = getOrDefault(options, "schema", null);
+    DataFormat format = options.containsKey("dataFormat")?
+        DataFormat.fromInt(Integer.parseInt(options.get("dataFormat"))) :
+        DataFormat.CSV;
     if (options.get("serde") != null) {
       String serde = options.get("serde");
       return new S3DataSourceDescriptor(uri, awsKeyID, awsSecretKey, schema, serde, format);
@@ -69,9 +70,11 @@ public class DataSourceResolver {
 
   public static HDFSDataSourceDescriptor resolveHDFS(Map<String, String> options) throws DDFException, URISyntaxException {
     String uri = options.get("uri");
-    String schema = getOrDefault(options,"schema", null);
+    String schema = getOrDefault(options, "schema", null);
     String originalSource = getOrDefault(options,"originalSource", "hdfs");
-    DataFormat format = DataFormat.fromInt(Integer.parseInt(options.get("dataFormat")));
+    DataFormat format = options.containsKey("dataFormat")?
+        DataFormat.fromInt(Integer.parseInt(options.get("dataFormat"))) :
+        DataFormat.CSV;
     LOG.info("Loading from HDFS with options: {}", options);
     if(options.containsKey("serde")) {
       String serde = options.get("serde");

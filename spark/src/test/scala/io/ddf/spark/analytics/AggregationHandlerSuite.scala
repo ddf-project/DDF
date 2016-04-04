@@ -49,10 +49,10 @@ class AggregationHandlerSuite extends ATestSuite {
     val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
 
     val thrown1 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("substring('aaaa')").asJava)}
-    assert(thrown1.getMessage === "No matching method for class org.apache.hadoop.hive.ql.udf.UDFSubstr with (string). Possible choices: _FUNC_(binary, int)  _FUNC_(binary, int, int)  _FUNC_(string, int)  _FUNC_(string, int, int)")
+    assert(thrown1.getMessage.contains("No matching method for class org.apache.hadoop.hive.ql.udf.UDFSubstr with (string). Possible choices: _FUNC_(binary, int)  _FUNC_(binary, int, int)  _FUNC_(string, int)  _FUNC_(string, int, int)"))
 
     val thrown2 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("to_utc_timestamp(1,1,1)").asJava)}
-    assert(thrown2.getMessage === "The function to_utc_timestamp requires two argument, got 3")
+    assert(thrown2.getMessage.contains("The function to_utc_timestamp requires two argument, got 3"))
   }
 
   test("Proper error message for expressions or columns that contain invalid characters") {
