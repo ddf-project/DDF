@@ -59,10 +59,23 @@ object SparkUtils {
     val cols: ArrayList[Column] = Lists.newArrayList();
     for(field <- schema.fields) {
       val colType = spark2DDFType(field.dataType)
-      val colName = field.name
+      val colName = field.name.trim
       cols.add(new Column(colName, colType))
     }
     new Schema(null, cols)
+  }
+
+
+  def str2SparkSchema(schema: String): StructType = {
+    StructType(
+      schema.split(",").map(
+        attr => {
+          val nameAndType = attr.trim.split(" ")
+          StructField(nameAndType(0), str2SparkType(nameAndType(1)), true )
+        }
+
+      )
+    )
   }
 
   /**
@@ -122,10 +135,6 @@ object SparkUtils {
     }
 
   }
-//
-//  def jsonForComplexType(df: DataFrame, sep: String): Array[String] = {
-//    df2txt(df, sep)
-//  }
 
   /**
    *
@@ -252,6 +261,8 @@ object SparkUtils {
     df.select(colNames :_*)
   }
 
+
+
   def spark2DDFType(colType: DataType): Schema.ColumnType = {
     //println(colType)
     colType match {
@@ -270,6 +281,21 @@ object SparkUtils {
       case StructType(_) => Schema.ColumnType.STRUCT
       case ArrayType(_, _) => Schema.ColumnType.ARRAY
       case MapType(_, _, _) => Schema.ColumnType.MAP
+      case x => throw new DDFException(s"Type not support $x")
+    }
+  }
+
+  def str2SparkType(str: String): DataType = {
+    // TODO, add more type here
+    str.toLowerCase match {
+      case "string" => StringType
+      case "int" => IntegerType
+      case "long" => LongType
+      case "double" => DoubleType
+      case "float" => FloatType
+      case "timestamp" => TimestampType
+      case "datetype" => DateType
+      case "boolean" => BooleanType
       case x => throw new DDFException(s"Type not support $x")
     }
   }
