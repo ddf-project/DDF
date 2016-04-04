@@ -272,7 +272,7 @@ public class SparkDDFManagerTests extends BaseTest {
     assert (pqtSparkDDF.getNumRows() > 0);
 
     LOG.info("========== avro ==========");
-    HDFSDDF avroDDF = hdfsDDFManager.newDDF("/test_pe/avro/single", null, null);
+    HDFSDDF avroDDF = hdfsDDFManager.newDDF("/test_pe/avro/partition", null, null);
     DDF avroSparkDDF = sparkDDFManager.copyFrom(avroDDF);
     LOG.info(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     assert (avroSparkDDF.getNumRows() > 0);
