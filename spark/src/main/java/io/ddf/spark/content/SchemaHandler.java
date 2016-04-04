@@ -18,6 +18,7 @@ import io.ddf.spark.util.SparkUtils;
 import org.apache.spark.Accumulator;
 import org.apache.spark.AccumulatorParam;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
@@ -156,7 +157,11 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
       JavaRDD<Row> rdd = ((SparkDDF) this.getDDF()).getRDD(Row.class).toJavaRDD();
 
 
-      JavaRDD<Row> appliedRdd = rdd.map(row -> convertRowType(row, listConvertColumns, statisticAccumulator, newSchema,isDropRow));
+//      JavaRDD<Row> appliedRdd = rdd.map(row -> convertRowType(row, listConvertColumns, statisticAccumulator, newSchema,isDropRow));
+      JavaRDD<Row> appliedRdd =rdd.map(row -> {
+        ApplySchemaUtils utils = new ApplySchemaUtils();
+        return utils.convertRowType(row, listConvertColumns, statisticAccumulator, newSchema,isDropRow);
+      });
       if (isDropRow) appliedRdd = appliedRdd.filter(row -> {
         return row != null;
       });
@@ -187,98 +192,101 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
 
   }
 
-  /**
-   * Convert Row Data To Given Type
-   *
-   * @param row                  which hold multiple columns to convert
-   * @param listConvertColumns   given columnIndex & columnName &  type to convert to
-   * @param statisticAccumulator statistic accumulator
-   */
-  private Row convertRowType(Row row, List<Tuple2<Integer, Column>> listConvertColumns,
-                             Accumulator<ApplySchemaStatistic> statisticAccumulator, StructType newSchema, boolean isDropRow) {
-    statisticAccumulator.localValue().increaseLineProcessed();
+  static class ApplySchemaUtils {
+    /**
+     * Convert Row Data To Given Type
+     *
+     * @param row                  which hold multiple columns to convert
+     * @param listConvertColumns   given columnIndex & columnName &  type to convert to
+     * @param statisticAccumulator statistic accumulator
+     */
+    private Row convertRowType(Row row, List<Tuple2<Integer, Column>> listConvertColumns,
+                               Accumulator<ApplySchemaStatistic> statisticAccumulator, StructType newSchema, boolean isDropRow) {
+      statisticAccumulator.localValue().increaseLineProcessed();
 
-    Object[] rowData = toArray(row);
+      Object[] rowData = toArray(row);
 
-    boolean isFail = false;
-    for (Tuple2<Integer, Column> convertColumn : listConvertColumns) {
-      int colIndex = convertColumn._1();
-      Schema.ColumnType toType = convertColumn._2().getType();
-      Object colValue = rowData[colIndex];
-      if (colValue != null) {
-        String columnData = colValue.toString().trim();
-        Object newColData = cast(columnData, toType);
-        if (newColData == null) {
-          statisticAccumulator.localValue().addColumnFailed(convertColumn._2().getName(), columnData);
-          isFail = true;
+      boolean isFail = false;
+      for (Tuple2<Integer, Column> convertColumn : listConvertColumns) {
+        int colIndex = convertColumn._1();
+        Schema.ColumnType toType = convertColumn._2().getType();
+        Object colValue = rowData[colIndex];
+        if (colValue != null) {
+          String columnData = colValue.toString().trim();
+          Object newColData = cast(columnData, toType);
+          if (newColData == null) {
+            statisticAccumulator.localValue().addColumnFailed(convertColumn._2().getName(), columnData);
+            isFail = true;
+          }
+          rowData[colIndex] = newColData;
         }
-        rowData[colIndex] = newColData;
+      }
+      if (isFail && isDropRow) {
+        return null;
+      } else {
+        return new GenericRowWithSchema(rowData, newSchema);
       }
     }
-    if (isFail && isDropRow) {
+
+    private Object[] toArray(Row row) {
+      Object[] values = new Object[row.size()];
+      for (int i = 0; i < row.size(); ++i) {
+        values[i] = row.get(i);
+      }
+      return values;
+    }
+
+    /**
+     * Check whether we could convert data at row[index] requiredType @see Schema.ColumnType
+     *
+     * @param data:         Data to convert to requiredType
+     * @param requiredType: type we need to convert to
+     * @return newData in required type, null if couldn't convert
+     */
+    private Object cast(String data, Schema.ColumnType requiredType) {
+      try {
+        switch (requiredType) {
+          case TINYINT:
+            return Byte.valueOf(data);
+          case SMALLINT:
+            return Short.valueOf(data);
+          case INT:
+            return Integer.valueOf(data);
+          case BIGINT:
+            return Long.valueOf(data);
+          case FLOAT:
+            return Float.valueOf(data);
+          case DOUBLE:
+            return Double.valueOf(data);
+          case DECIMAL:
+            return new BigDecimal(data);
+          case STRING:
+            return true;
+          case BINARY:
+            return data.getBytes();
+          case BOOLEAN:
+            UTF8String tmp=UTF8String.fromString(data);
+            if(StringUtils.isTrueString(tmp)) return true;
+            else if(StringUtils.isFalseString(tmp)) return false;
+            return null;
+          case TIMESTAMP:
+            return Timestamp.valueOf(data);
+          case DATE:
+            return Date.valueOf(data);
+          case ARRAY:
+          case ANY:
+          case BLOB:
+          case STRUCT:
+          case MAP:
+            return null; //need more info to parse
+        }
+      } catch (ClassCastException | NullPointerException | IllegalArgumentException nfe) {
+        //mLog.debug(nfe.getMessage());
+      }
       return null;
-    } else {
-      return new GenericRowWithSchema(rowData, newSchema);
     }
   }
 
-  private Object[] toArray(Row row) {
-    Object[] values = new Object[row.size()];
-    for (int i = 0; i < row.size(); ++i) {
-      values[i] = row.get(i);
-    }
-    return values;
-  }
-
-  /**
-   * Check whether we could convert data at row[index] requiredType @see Schema.ColumnType
-   *
-   * @param data:         Data to convert to requiredType
-   * @param requiredType: type we need to convert to
-   * @return newData in required type, null if couldn't convert
-   */
-  private Object cast(String data, Schema.ColumnType requiredType) {
-    try {
-      switch (requiredType) {
-        case TINYINT:
-          return Byte.valueOf(data);
-        case SMALLINT:
-          return Short.valueOf(data);
-        case INT:
-          return Integer.valueOf(data);
-        case BIGINT:
-          return Long.valueOf(data);
-        case FLOAT:
-          return Float.valueOf(data);
-        case DOUBLE:
-          return Double.valueOf(data);
-        case DECIMAL:
-          return new BigDecimal(data);
-        case STRING:
-          return true;
-        case BINARY:
-          return data.getBytes();
-        case BOOLEAN:
-          UTF8String tmp=UTF8String.fromString(data);
-          if(StringUtils.isTrueString(tmp)) return true;
-          else if(StringUtils.isFalseString(tmp)) return false;
-          return null;
-        case TIMESTAMP:
-          return Timestamp.valueOf(data);
-        case DATE:
-          return Date.valueOf(data);
-        case ARRAY:
-        case ANY:
-        case BLOB:
-        case STRUCT:
-        case MAP:
-          return null; //need more info to parse
-      }
-    } catch (ClassCastException | NullPointerException | IllegalArgumentException nfe) {
-      mLog.debug(nfe.getMessage());
-    }
-    return null;
-  }
 
   /**
    * Return necessary info to do converting from schema to new schema
