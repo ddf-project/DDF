@@ -23,11 +23,6 @@ public interface IDDFManager {
    */
   String getEngine();
 
-  String getNamespace() throws DDFException;
-
-  void setNamespace(String namespace);
-
-
   public interface IGloballyAddressableObjectRegistry {
     boolean contains(String namespace, String name);
 

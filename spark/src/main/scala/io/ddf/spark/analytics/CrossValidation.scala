@@ -117,7 +117,7 @@ object CrossValidation {
     if (splits == null) {
       throw new DDFException("Error getting cross validation for DDF")
     }
-    return getDDFCVSetsFromRDDs(splits, ddf.getManager, ddf.getSchema, ddf.getNamespace, unitType)
+    return getDDFCVSetsFromRDDs(splits, ddf.getManager, ddf.getSchema, unitType)
   }
 
   def DDFKFoldSplit(ddf: DDF, numSplits: Int, seed: Long): JList[CrossValidationSet] = {
@@ -149,7 +149,7 @@ object CrossValidation {
     if (splits == null) {
       throw new DDFException("Error getting cross validation for DDF")
     }
-    return getDDFCVSetsFromRDDs(splits, ddf.getManager, ddf.getSchema, ddf.getNamespace, unitType)
+    return getDDFCVSetsFromRDDs(splits, ddf.getManager, ddf.getSchema, unitType)
   }
 
   /**
@@ -158,7 +158,7 @@ object CrossValidation {
    * @param unitType unitType of returned DDF
    * @return List of Cross Validation sets
    */
-  private def getDDFCVSetsFromRDDs(splits: Iterator[(RDD[_], RDD[_])], manager: DDFManager, schema: Schema, nameSpace: String, unitType: Class[_]): JList[CrossValidationSet] = {
+  private def getDDFCVSetsFromRDDs(splits: Iterator[(RDD[_], RDD[_])], manager: DDFManager, schema: Schema, unitType: Class[_]): JList[CrossValidationSet] = {
     val cvSets: JList[CrossValidationSet] = new util.ArrayList[CrossValidationSet]()
 
     for ((train, test) <- splits) {
@@ -168,11 +168,11 @@ object CrossValidation {
 
       // TODO check here.
       val trainDDF = manager.newDDF(manager, train, Array(classOf[RDD[_]],
-        unitType), nameSpace, null, trainSchema)
+        unitType), null, trainSchema)
 
       val testSchema = new Schema(null, schema.getColumns)
       val testDDF = manager.newDDF(manager, test, Array(classOf[RDD[_]],
-        unitType), nameSpace, null, testSchema)
+        unitType), null, testSchema)
       val cvSet = new CrossValidationSet(trainDDF, testDDF)
       cvSets.add(cvSet)
     }

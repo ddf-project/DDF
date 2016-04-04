@@ -8,16 +8,23 @@ import com.google.gson.Gson;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.content.Schema;
+<<<<<<< HEAD
 import io.ddf.datasource.DataFormat;
+=======
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
 import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
+<<<<<<< HEAD
 import io.ddf.hdfs.HDFSDDF;
 import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.ds.DataSource;
+=======
+import io.ddf.spark.datasource.SparkDataSourceManager;
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
 import io.ddf.spark.etl.DateParseUDF;
 import io.ddf.spark.etl.DateTimeExtractUDF;
 import io.ddf.spark.etl.DateUDF;
@@ -27,20 +34,25 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+<<<<<<< HEAD
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Row;
+=======
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.*;
 
+<<<<<<< HEAD
 import org.apache.spark.sql.types.StructType;
 
 import io.ddf.s3.S3DDF;
+=======
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
 
 /**
  * An Apache-Spark-based implementation of DDFManager
@@ -61,6 +73,7 @@ public class SparkDDFManager extends DDFManager {
     this.initialize(sparkContext, null);
   }
 
+<<<<<<< HEAD
   @Override
   public DDF transferByTable(UUID fromEngine, String tableName) throws
           DDFException {
@@ -210,6 +223,8 @@ public class SparkDDFManager extends DDFManager {
     }
   }
 
+=======
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
   /**
    * Use system environment variables to configure the SparkContext creation.
    *
@@ -237,6 +252,7 @@ public class SparkDDFManager extends DDFManager {
 
     // register SparkSQL UDFs
     this.registerUDFs();
+    this.mDataSourceManager = new SparkDataSourceManager(this);
   }
   // TODO: Dynamically load UDFs
   private void registerUDFs() {
@@ -245,19 +261,16 @@ public class SparkDDFManager extends DDFManager {
     DateUDF.registerUDFs(this.mHiveContext);
   }
 
-
-
-  public String getDDFEngine() {
-    return "spark";
-  }
-
-
   private SparkContext mSparkContext;
 
   private JavaSparkContext mJavaSparkContext;
 
   public SparkContext getSparkContext() {
     return mSparkContext;
+  }
+
+  public JavaSparkContext getJavaSparkContext() {
+    return mJavaSparkContext;
   }
 
   private void setSparkContext(SparkContext sparkContext) {
@@ -281,34 +294,6 @@ public class SparkDDFManager extends DDFManager {
   public HiveContext getHiveContext() {
     return mHiveContext;
   }
-  //  private SparkUtils.createSharkContext mSharkContext;
-  //
-  //
-  //  public SharkContext getSharkContext() {
-  //    return mSharkContext;
-  //  }
-
-  //  private JavaSharkContext mJavaSharkContext;
-  //
-  //
-  //  public JavaSharkContext getJavaSharkContext() {
-  //    return mJavaSharkContext;
-  //  }
-
-  //  public void setJavaSharkContext(JavaSharkContext javaSharkContext) {
-  //    this.mJavaSharkContext = javaSharkContext;
-  //  }
-
-  /**
-   * Also calls setSparkContext() to the same sharkContext
-   *
-   * @param sharkContext
-   */
-  //  private void setSharkContext(SharkContext sharkContext) {
-  //    this.mSharkContext = sharkContext;
-  //    this.setSparkContext(sharkContext);
-  //  }
-
 
   private Map<String, String> mSparkContextParams;
 
@@ -320,6 +305,7 @@ public class SparkDDFManager extends DDFManager {
   private void setSparkContextParams(Map<String, String> mSparkContextParams) {
     this.mSparkContextParams = mSparkContextParams;
   }
+
    /* merge priority is as follows: (1) already set in params, (2) in system properties (e.g., -Dspark.home=xxx), (3) in
    * environment variables (e.g., export SPARK_HOME=xxx)
    *
@@ -401,47 +387,54 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
-  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-      String namespace, String name, Schema
-                              schema)
+  public DDF newDDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String name, Schema schema)
           throws DDFException {
-    DDF ddf = super.newDDF(manager, data, typeSpecs, namespace,
-            name, schema);
+    DDF ddf = super.newDDF(manager, data, typeSpecs, name, schema);
     ((SparkDDF) ddf).saveAsTable();
     return ddf;
   }
 
   @Override
-  public DDF newDDF(Object data, Class<?>[] typeSpecs,
-                    String namespace, String name, Schema schema)
+  public DDF newDDF(Object data, Class<?>[] typeSpecs, String name, Schema schema)
           throws DDFException {
-    DDF ddf = super.newDDF(data, typeSpecs, namespace, name,
-            schema);
+    DDF ddf = super.newDDF(data, typeSpecs, name, schema);
     ((SparkDDF) ddf).saveAsTable();
     return ddf;
   }
 
-  public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
+  public DDF loadFile(String fileURL, String fieldSeparator) throws DDFException {
     JavaRDD<String> fileRDD = mJavaSparkContext.textFile(fileURL);
     String[] metaInfos = getMetaInfo(fileRDD, fieldSeparator);
     SecureRandom rand = new SecureRandom();
     String tableName = "tbl" + String.valueOf(Math.abs(rand.nextLong()));
     String cmd = "CREATE TABLE " + tableName + "(" + StringUtils.join(metaInfos, ", ")
         + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY '" + fieldSeparator + "'";
-    sql(cmd, "SparkSQL");
+    sql(cmd, false);
     sql("LOAD DATA LOCAL INPATH '" + fileURL + "' " +
-        "INTO TABLE " + tableName, "SparkSQL");
-    return sql2ddf("SELECT * FROM " + tableName, "SparkSQL");
+        "INTO TABLE " + tableName, false);
+    return sql2ddf("SELECT * FROM " + tableName, false);
   }
 
   @Override
-  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-    return this.mDDFCache.getDDFByUri(ddfURI);
+  public DDF copyFrom(DDF ddf, String tgtname) throws DDFException {
+    mLog.info(String.format(">>> Copy new ddf %s from ddf %s", tgtname, ddf.getName()));
+    DDFManager fromManager = ddf.getManager();
+    DataSourceDescriptor dataSourceDescriptor = fromManager.getDataSourceDescriptor();
+    if (dataSourceDescriptor instanceof JDBCDataSourceDescriptor) {
+      // It's a jdbc ddf.
+      JDBCDataSourceDescriptor jdbcDS = (JDBCDataSourceDescriptor) dataSourceDescriptor;
+      JDBCDataSourceDescriptor loadDS = new JDBCDataSourceDescriptor(jdbcDS.getDataSourceUri(), jdbcDS.getCredentials(), ddf.getTableName());
+      DDF tgtddf = this.load(loadDS);
+      this.setDDFName(tgtddf, tgtname);
+      return tgtddf;
+    } else {
+      throw new DDFException("Unsupported operation in copyFrom");
+    }
   }
 
   @Override
-  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-    return this.mDDFCache.getDDF(uuid);
+  public DDF copyFrom(DDFManager manager, String ddfname, String tgtname) throws DDFException {
+    return this.copyFrom(manager.getDDFByName(ddfname), tgtname);
   }
 
   @Override

@@ -21,7 +21,7 @@ public class AggregationHandlerTest extends BaseTest {
     ddf = manager
         .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, " +
                 "distance, arrdelay, depdelay, carrierdelay, weatherdelay, " +
-                "nasdelay, securitydelay, lateaircraftdelay from airline", "SparkSQL");
+                "nasdelay, securitydelay, lateaircraftdelay from airline",  false);
   }
 
 

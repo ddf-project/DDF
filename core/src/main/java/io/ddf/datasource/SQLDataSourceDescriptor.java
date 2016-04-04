@@ -12,10 +12,11 @@ import java.util.List;
 
 public class SQLDataSourceDescriptor extends DataSourceDescriptor {
   private String sqlCmd;
-  private String dataSource;
+  private Boolean queryOnDDF;
   private String  namespace;
   private List<String> uriList;
   private List<String> uuidList;
+
 
   public SQLDataSourceDescriptor(DataSourceURI uri, IDataSourceCredentials credentials,
                                  DataSourceSchema schema, FileFormat format) {
@@ -27,13 +28,13 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
                                  DataSourceSchema schema,
                                  FileFormat format,
                                  String sqlcmd,
-                                 String dataSource,
+                                 Boolean queryOnDDF,
                                  String namespace,
                                  List<String> uriList,
                                  List<String> uuidList) {
     super(uri, credentials, schema, format);
     this.sqlCmd = sqlcmd;
-    this.dataSource = dataSource;
+    this.queryOnDDF = queryOnDDF;
     this.namespace = namespace;
     this.uriList = uriList;
     this.uuidList = uuidList;
@@ -44,13 +45,13 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
   }
 
   public SQLDataSourceDescriptor(String sqlCommand,
-                                 String dataSource,
+                                 Boolean queryOnDDF,
                                  String namespace,
                                  String uriListStr,
                                  String uuidListStr) {
     super(null, null, null, null);
     this.sqlCmd = sqlCommand;
-    this.dataSource = dataSource;
+    this.queryOnDDF = queryOnDDF;
     this.namespace = namespace;
     if (uriListStr != null ) {
       String[] splitArray = uriListStr.split("\t");
@@ -69,12 +70,12 @@ public class SQLDataSourceDescriptor extends DataSourceDescriptor {
     this.sqlCmd = sqlCommand;
   }
 
-  public String getDataSource() {
-    return dataSource;
+  public Boolean getQueryOnDDF() {
+    return queryOnDDF;
   }
 
-  public void setDataSource(String dataSource) {
-    this.dataSource = dataSource;
+  public void setQueryOnDDF(Boolean queryOnDDF) {
+    this.queryOnDDF = queryOnDDF;
   }
 
   public String getNamespace() {

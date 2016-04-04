@@ -30,8 +30,7 @@ public class BasicDDFTests {
     String namespace = "random"; // use default
     String name = this.getClass().getSimpleName();
     Schema schema = new Schema(name, "name string, value string");
-    DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[]
-            .class, namespace, name, schema);
+    DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[].class, name, schema);
     return ddf;
   }
 
@@ -42,7 +41,6 @@ public class BasicDDFTests {
     DDF ddf = this.getDDFManager().newDDF();
     Assert.assertNotNull("DDF cannot be null", ddf);
 
-    Assert.assertNotNull(ddf.getNamespace());
     Assert.assertNotNull(ddf.getUUID());
 
     DDF ddf2 = this.getTestDDF();
@@ -86,7 +84,7 @@ public class BasicDDFTests {
     UUID newUUID = UUID.randomUUID();
     manager.setDDFUUID(ddf, newUUID);
 
-    DDF ddf1 = manager.getDDFByURI(ddf.getUri());
+    DDF ddf1 = manager.getDDFByName(ddf.getName());
     Assert.assertEquals(ddf1.getUUID(), ddf.getUUID());
     Assert.assertEquals(ddf1.getUUID(), newUUID);
   }
@@ -97,16 +95,18 @@ public class BasicDDFTests {
     DDFManager manager = this.getDDFManager();
     manager.setDDFName(ddf, "myddf1");
 
-    String uri1 = ddf.getUri();
+    String name1 = ddf.getName();
     manager.setDDFName(ddf, "myddf2");
     
-    manager.getDDFByURI(uri1);
+    manager.getDDFByName(name1);
   }
+
   @Test(expected = DDFException.class)
   public void testDuplicatedColumn() throws DDFException {
 
     String columns = "row Int, \n\tprice double, \n\t lotsize int, \n\t bedrooms int,\n\tbathrms int, row Int";
     Schema schema = new Schema(null, columns);
+<<<<<<< HEAD
     Schema.validateSchema(schema);
   }
 
@@ -118,5 +118,8 @@ public class BasicDDFTests {
     Schema.validateSchema(schema);
     List<String> columnNames = Arrays.asList("row", "price", "lotsize", "bedrooms", "bathrms", "row");
     schema.setColumnNames(columnNames);
+=======
+    DDF ddf = ((BasicDDFManager) this.getDDFManager()).newDDF(list, Object[].class,  name, schema);
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
   }
 }

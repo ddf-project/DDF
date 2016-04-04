@@ -60,7 +60,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
         sqlCmd = dropNARowSQL(numcols, columns);
       }
 
-      newddf = this.getManager().sql2ddf(String.format(sqlCmd, this.getDDF().getTableName()),this.getEngine());
+      newddf = this.getManager().sql2ddf(String.format(sqlCmd, this.getDDF().getTableName()), false);
 
     } else if (axis == Axis.COLUMN) { // drop column with NA
       List<String> cols = Lists.newArrayList();
@@ -137,7 +137,6 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
    * @param function        aggregate function to generate the filled value for a column
    * @param columnsToValues = a map to provide different values to fill for different columns
    * @param columns         = only consider NA filling on the given columns, set to null for all columns of the DDF
-   * @param inplace         = false: result in new DDF, true: update on the same DDF
    * @return a DDF with NAs filled
    */
   @Override
@@ -153,7 +152,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
     if (method == null) {
       String sqlCmd = fillNAWithValueSQL(value, function, columnsToValues, columns);
       mLog.info("FillNA sql command: " + sqlCmd);
-      newddf = this.getManager().sql2ddf(String.format(sqlCmd, this.getDDF().getTableName()), this.getEngine());
+      newddf = this.getManager().sql2ddf(String.format(sqlCmd, this.getDDF().getTableName()), false);
 
     } else { // interpolation methods 'ffill' or 'bfill'
       // TODO:

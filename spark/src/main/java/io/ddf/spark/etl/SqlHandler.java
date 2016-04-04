@@ -78,29 +78,10 @@ public class SqlHandler extends ASqlHandler {
     //    TableRDD tableRdd = null;
     //    RDD<Row> rddRow = null;
 
-    DataFrame rdd = null;
-    // TODO: handle other dataSources and dataFormats
-    if (dataSource != null) {
-      SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
-      if (sqlDataSourceDescriptor != null) {
-        if (sqlDataSourceDescriptor.getDataSource() != null
-            && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
-            && !sqlDataSourceDescriptor.getDataSource().equals("Spark")
-            && !sqlDataSourceDescriptor.getDataSource().equals("spark")) {
-          throw new DDFException("Incorrect datasource");
-        }
-      }
-    }
-    //else {
-    //  throw new DDFException("No availabe datasource information");
-    //}
-
-
-    rdd = this.getHiveContext().sql(command);
+    DataFrame rdd = this.getHiveContext().sql(command);
     if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
     DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[]
-                    {DataFrame.class}, null,
-        null, schema);
+                    {DataFrame.class}, null, schema);
     ddf.getRepresentationHandler().cache(false);
     ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
     return ddf;
@@ -128,25 +109,7 @@ public class SqlHandler extends ASqlHandler {
   @Override
   public SqlResult sql(String command, Integer maxRows, DataSourceDescriptor dataSource) throws DDFException {
     // TODO: handle other dataSources and dataFormats
-    DataFrame rdd = null;
-    if (dataSource != null) {
-      SQLDataSourceDescriptor sqlDataSourceDescriptor = (SQLDataSourceDescriptor)dataSource;
-      if (sqlDataSourceDescriptor != null) {
-        if (sqlDataSourceDescriptor.getDataSource() != null
-                && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
-            && !sqlDataSourceDescriptor.getDataSource().equals("SparkSQL")
-                && !sqlDataSourceDescriptor.getDataSource().equals("Spark")
-                && !sqlDataSourceDescriptor.getDataSource().equals("spark")) {
-          throw new DDFException("Incorrect datasource");
-        }
-      }
-    }
-    //else {
-    //  throw new DDFException("No availabe datasource information");
-    //}
-
-
-    rdd = this.getHiveContext().sql(command);
+    DataFrame  rdd = this.getHiveContext().sql(command);
     Schema schema = SparkUtils.schemaFromDataFrame(rdd);
 
     String[] strResult = SparkUtils.df2txt(rdd, "\t");

@@ -23,7 +23,7 @@ public class TransformationHandlerTest extends BaseTest {
     createTableAirline();
     createTableAirlineBigInt();
     ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, " +
-            "distance, arrdelay, depdelay from airline", "SparkSQL");
+            "distance, arrdelay, depdelay from airline", false);
   }
 
   @Test

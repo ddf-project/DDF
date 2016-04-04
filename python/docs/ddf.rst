@@ -41,4 +41,12 @@ ddf.gateway module
     :undoc-members:
     :show-inheritance:
 
+ddf.util module
+---------------
+
+.. automodule:: ddf.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 

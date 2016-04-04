@@ -111,10 +111,18 @@ public class DataSourceResolver {
     String namespace = getOrDefault(options,"namespace", null);
     String uriListStr = getOrDefault(options,"uriListStr", null);
     String uuidListStr = getOrDefault(options,"uuidListStr", null);
-    String dataSource = getOrDefault(options,"dataSource", null);
+    String queryOnDDFStr = getOrDefault(options,"queryOnDDF", null);
+    Boolean queryOnDDF = true;
+    if (queryOnDDFStr != null) {
+      queryOnDDF = !queryOnDDFStr.equalsIgnoreCase("false");
+    }
     // val ddfList = options("ddfList")
+<<<<<<< HEAD
     LOG.info("Loading from SQL with options: {}", options);
     return new SQLDataSourceDescriptor(sql, dataSource, namespace, uriListStr, uuidListStr);
+=======
+    return new SQLDataSourceDescriptor(sql, queryOnDDF, namespace, uriListStr, uuidListStr);
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
   }
 
 }

@@ -77,12 +77,27 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
   }
 
   override def getRandomSample(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
+<<<<<<< HEAD
     if (!withReplacement && (fraction > 1 || fraction < 0)) {
       throw new IllegalArgumentException("Sampling fraction must be from 0 to 1 in sampling without replacement")
     }
 
     if (withReplacement && (fraction < 0)) {
       throw new IllegalArgumentException("Sampling fraction must be larger or equal to 0 in sampling with replacement")
+=======
+    if (fraction > 1 || fraction < 0) {
+      throw new IllegalArgumentException("Sampling fraction must be from 0 to 1")
+    } else {
+      val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+      val sample_df = df.sample(withReplacement, fraction, seed)
+      val schema = SchemaHandler.getSchemaFromDataFrame(sample_df)
+      schema.setTableName(mDDF.getSchemaHandler.newTableName())
+      val manager = this.getManager
+      val sampleDDF = manager.newDDF(manager, sample_df, Array(classOf[DataFrame]), null, schema)
+      mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
+      sampleDDF.getMetaDataHandler.copyFactor(this.getDDF)
+      sampleDDF
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
     }
 
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]

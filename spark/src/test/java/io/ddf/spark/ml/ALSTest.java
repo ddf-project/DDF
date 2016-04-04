@@ -13,7 +13,7 @@ public class ALSTest extends BaseTest {
   public void TestALS() throws DDFException {
     createTableRatings();
 
-    DDF ratings = manager.sql2ddf("select userid, movieid, score from ratings", "SparkSQL");
+    DDF ratings = manager.sql2ddf("select userid, movieid, score from ratings", false);
     int rank = 3;
     double lambda = 10;
     int iterNum = 15;

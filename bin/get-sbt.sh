@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VERSION=0.13.1
-URL=http://repo.scala-sbt.org/scalasbt/sbt-native-packages/org/scala-sbt/sbt/$VERSION/sbt.zip
+URL=https://dl.bintray.com/sbt/native-packages/sbt/$VERSION/sbt-$VERSION.zip
 
 function usage {
 	echo ""

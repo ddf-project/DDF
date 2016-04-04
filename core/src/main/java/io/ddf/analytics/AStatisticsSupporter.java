@@ -88,7 +88,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
         for(String column: numericColumns) {
           String sql = buildPostgresFiveNumSql(column, this.getDDF().getTableName());
 
-          String[] ret = this.getDDF().getManager().sql(sql, this.getDDF().getEngineType().toString()).getRows().get(0).split("\t");
+          String[] ret = this.getDDF().getManager().sql(sql, false).getRows().get(0).split("\t");
           System.arraycopy(ret, 0, rs, k, 5);
           k += 5;
         }

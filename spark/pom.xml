@@ -5,7 +5,11 @@
     <artifactId>ddf_spark_2.10</artifactId>
     <packaging>jar</packaging>
     <description>ddf_spark</description>
+<<<<<<< HEAD
     <version>1.4.14-SNAPSHOT</version>
+=======
+    <version>1.5.0-SNAPSHOT</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
     <name>ddf_spark</name>
     <organization>
         <name>io.ddf</name>
@@ -18,7 +22,11 @@
     <parent>
         <groupId>io</groupId>
         <artifactId>ddf</artifactId>
+<<<<<<< HEAD
         <version>1.4.14-SNAPSHOT</version>
+=======
+        <version>1.5.0-SNAPSHOT</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
     </parent>
     <build>
         <directory>${basedir}/target/scala-2.10</directory>
@@ -216,6 +224,7 @@
         </dependency>
         <dependency>
             <groupId>io.ddf</groupId>
+<<<<<<< HEAD
             <artifactId>ddf_test_2.10</artifactId>
             <version>1.4.14-SNAPSHOT</version>
             <scope>test</scope>
@@ -234,6 +243,10 @@
             <groupId>io.ddf</groupId>
             <artifactId>ddf_hdfs_2.10</artifactId>
             <version>1.4.13-SNAPSHOT</version>
+=======
+            <artifactId>ddf_core_2.10</artifactId>
+            <version>1.5.0-SNAPSHOT</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -291,7 +304,11 @@
         <dependency>
             <groupId>net.sf</groupId>
             <artifactId>jsqlparser</artifactId>
+<<<<<<< HEAD
             <version>0.9.8.8</version>
+=======
+            <version>0.9.8.5</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -335,6 +352,7 @@
             <version>1.8.2.compiled</version>
         </dependency>
         <dependency>
+<<<<<<< HEAD
             <groupId>com.databricks</groupId>
             <artifactId>spark-csv_2.10</artifactId>
             <version>1.4.0</version>
@@ -348,6 +366,11 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
             <version>1.6.0-adatao-hd2.7.2</version>
+=======
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.10</artifactId>
+            <version>1.3.1-adatao</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
             <exclusions>
                 <exclusion>
                     <groupId>net.java.dev.jets3t</groupId>
@@ -358,10 +381,13 @@
                     <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
+<<<<<<< HEAD
                     <groupId>com.google.code.findbugs</groupId>
                     <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
+=======
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
                     <groupId>org.jboss.netty</groupId>
                     <artifactId>netty</artifactId>
                 </exclusion>
@@ -374,7 +400,11 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-mllib_2.10</artifactId>
+<<<<<<< HEAD
             <version>1.6.0-adatao-hd2.7.2</version>
+=======
+            <version>1.3.1-adatao</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.spark</groupId>
@@ -389,7 +419,11 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.10</artifactId>
+<<<<<<< HEAD
             <version>1.6.0-adatao-hd2.7.2</version>
+=======
+            <version>1.3.1-adatao</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>
@@ -408,17 +442,24 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_2.10</artifactId>
+<<<<<<< HEAD
             <version>1.6.0-adatao-hd2.7.2</version>
+=======
+            <version>1.3.1-adatao</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>netty-all</artifactId>
                 </exclusion>
                 <exclusion>
+<<<<<<< HEAD
                     <groupId>com.google.code.findbugs</groupId>
                     <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
+=======
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
                     <groupId>org.jboss.netty</groupId>
                     <artifactId>netty</artifactId>
                 </exclusion>
@@ -437,6 +478,7 @@
             <artifactId>protobuf-java</artifactId>
             <version>2.5.0</version>
         </dependency>
+<<<<<<< HEAD
         <dependency>
             <groupId>com.databricks</groupId>
             <artifactId>spark-csv_2.10</artifactId>
@@ -451,6 +493,11 @@
             <layout>default</layout>
         </repository>
         <repository>
+=======
+    </dependencies>
+    <repositories>
+        <repository>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
             <id>AdataoMvnreposSnapshots</id>
             <name>Adatao Mvnrepos Snapshots</name>
             <url>https://raw.github.com/adatao/mvnrepos/master/snapshots/</url>
@@ -481,4 +528,8 @@
             <layout>default</layout>
         </repository>
     </repositories>
+<<<<<<< HEAD
 </project>
+=======
+</project>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2

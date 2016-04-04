@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 import sys
 import signal
@@ -7,10 +9,29 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from conf import DDF_HOME, SCALA_VERSION
 
+
+__gateway_server_port = None
+
+
 def pre_exec_func():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
+
+def compute_classpath(root_path):
+
+    lib_jars = list_jar_files('{}/spark/target/scala-{}/lib'.format(root_path, SCALA_VERSION))
+    spark_jars = list_jar_files('{}/spark/target/scala-{}'.format(root_path, SCALA_VERSION))
+
+    return '{}:{}:{}/spark/conf/local'.format(lib_jars, spark_jars, DDF_HOME)
+
+
+def list_jar_files(path):
+    jar_files = [(path + "/" + f) for f in os.listdir(path) if f.endswith('.jar')]
+    return ':'.join(map(str, jar_files))
+
+
 def start_gateway_server():
+
     classpath = compute_classpath(DDF_HOME)
 
     java_opts = os.getenv('JAVA_OPTS')
@@ -49,21 +70,17 @@ def start_gateway_server():
                 sys.stderr.write(line)
 
     JavaOutputThread(process.stdout).start()
+    return port
+
+
+def new_gateway_client():
+    global __gateway_server_port
+
+    if __gateway_server_port is None:
+        __gateway_server_port = start_gateway_server()
 
     # connect to the gateway server
-    gateway = JavaGateway(GatewayClient(port=port), auto_convert=False)
+    gateway = JavaGateway(GatewayClient(port=__gateway_server_port), auto_convert=False)
     java_import(gateway.jvm, 'io.ddf.*')
     java_import(gateway.jvm, 'io.ddf.spark.*')
     return gateway
-
-def compute_classpath(root_path):
-
-    lib_jars = list_jar_files('{}/spark/target/scala-{}/lib'.format(root_path, SCALA_VERSION))
-    spark_jars = list_jar_files('{}/spark/target/scala-{}'.format(root_path, SCALA_VERSION))
-
-    return '{}:{}:{}/spark/conf/local'.format(lib_jars, spark_jars, DDF_HOME)
-
-def list_jar_files(path):
-    jar_files = [(path + "/" + f) for f in os.listdir(path) if f.endswith('.jar')]
-    return ':'.join(map(str, jar_files))
-

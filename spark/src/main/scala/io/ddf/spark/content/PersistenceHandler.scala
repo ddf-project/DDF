@@ -34,7 +34,8 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
       }
     }
 
-    val folderPath = this.getFolderPath(ddf.getNamespace, ddf.getName, "")
+    // TODO
+    val folderPath = this.getFolderPath("adatao", ddf.getName, "")
     Utils.writeToFile(schemaFile, JsonSerDes.serialize(this.getDDF.getSchema) + "\n")
     val schemaRDD = ddf.getRepresentationHandler.get(classOf[SchemaRDD]).asInstanceOf[SchemaRDD]
     schemaRDD.saveAsParquetFile(dataFile)
@@ -42,11 +43,11 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
   }
 
   override def getDataFileName(): String = {
-    this.getFolderPath(ddf.getNamespace, ddf.getName, "data")
+    this.getFolderPath("adatao", ddf.getName, "data")
   }
 
   override def getSchemaFileName(): String = {
-    this.getFolderPath(ddf.getNamespace, ddf.getName, "schema")
+    this.getFolderPath("adatao", ddf.getName, "schema")
   }
 
   def getFolderPath(namespace: String, name: String, subfolder: String) = {
@@ -65,19 +66,18 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
     val schemaRDD = ctx.parquetFile(dataPath)
     val schema = JsonSerDes.loadFromFile(schemaPath).asInstanceOf[Schema]
 
-    val ddf = manager.newDDF(manager, schemaRDD, Array(classOf[SchemaRDD]),
-      manager.getNamespace, null, schema)
+    val ddf = manager.newDDF(manager, schemaRDD, Array(classOf[SchemaRDD]),null, schema)
     ddf
   }
 
   def listPersistedDDFUris(): List[String] = {
-    val persistenceDirectory = this.locateOrCreatePersistenceSubdirectory(this.ddf.getNamespace)
+    val persistenceDirectory = this.locateOrCreatePersistenceSubdirectory("adatao")
     val listDDFs = Utils.listHDFSSubDirectory(persistenceDirectory).map{
       directory => new Path(directory).getName
     }
     listDDFs.map {
       ddfName => {
-        val folderPath = this.getFolderPath(ddf.getNamespace, ddfName, "")
+        val folderPath = this.getFolderPath("adatao", ddfName, "")
         new PersistenceUri(ddf.getEngine, folderPath).toString
       }
     }.toList

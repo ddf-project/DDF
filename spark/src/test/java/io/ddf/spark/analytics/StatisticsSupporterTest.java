@@ -27,8 +27,8 @@ public class StatisticsSupporterTest extends BaseTest {
         .sql2ddf("select year, month, dayofweek, deptime, arrtime," +
                 "origin, distance, arrdelay, depdelay, carrierdelay," +
                 " weatherdelay, nasdelay, securitydelay, " +
-                "lateaircraftdelay from airline", "SparkSQL");
-    ddf1 = manager.sql2ddf("select year, month, dayofweek, deptime, arrdelay from airline", "SparkSQL");
+                "lateaircraftdelay from airline", false);
+    ddf1 = manager.sql2ddf("select year, month, dayofweek, deptime, arrdelay from airline", false);
   }
 
   @Test
@@ -36,7 +36,7 @@ public class StatisticsSupporterTest extends BaseTest {
     Assert.assertEquals(14, ddf.getSummary().length);
     Assert.assertEquals(31, ddf.getNumRows());
     createTableSmiths2();
-    DDF ddf3 = manager.sql2ddf("select * from smiths2", "SparkSQL");
+    DDF ddf3 = manager.sql2ddf("select * from smiths2", false);
     Summary[] summary = ddf3.getSummary();
     Assert.assertEquals(summary[2].NACount(), 4);
   }
@@ -44,7 +44,7 @@ public class StatisticsSupporterTest extends BaseTest {
   @Test
   public void testSummaryBigInt() throws DDFException {
     DDF ddf4 = manager.sql2ddf("select floor(deptime/100) as dephour, cast(arrdelay as " +
-            "bigint) as arrdelay1 from airline", "SparkSQL");
+            "bigint) as arrdelay1 from airline", false);
     Summary[] summary = ddf4.getSummary();
     Assert.assertTrue(summary[0].min() != Double.NaN);
     Assert.assertTrue(summary[0].count() > 0);
@@ -60,7 +60,7 @@ public class StatisticsSupporterTest extends BaseTest {
 
   @Test
   public void testSampling() throws DDFException {
-    DDF ddf2 = manager.sql2ddf("select * from airline", "SparkSQL");
+    DDF ddf2 = manager.sql2ddf("select * from airline", false);
     Assert.assertEquals(25, ddf2.VIEWS.getRandomSample(25).size());
     SparkDDF sampleDDF = (SparkDDF) ddf2.VIEWS.getRandomSample(0.5, false, 1);
     Assert.assertEquals(25, ddf2.VIEWS.getRandomSample(25).size());
@@ -69,7 +69,7 @@ public class StatisticsSupporterTest extends BaseTest {
 
   @Test
   public void testVectorVariance() throws DDFException {
-    DDF ddf2 = manager.sql2ddf("select * from airline", "SparkSQL");
+    DDF ddf2 = manager.sql2ddf("select * from airline", false);
     Double[] a = ddf2.getVectorVariance("year");
     assert (a != null);
     assert (a.length == 2);
@@ -77,7 +77,7 @@ public class StatisticsSupporterTest extends BaseTest {
 
   @Test
   public void testVectorMean() throws DDFException {
-    DDF ddf2 = manager.sql2ddf("select * from airline", "SparkSQL");
+    DDF ddf2 = manager.sql2ddf("select * from airline", false);
     Double a = ddf2.getVectorMean("year");
     assert (a != null);
     System.out.println(">>>>> testVectorMean = " + a);
@@ -114,7 +114,7 @@ public class StatisticsSupporterTest extends BaseTest {
     System.out.println(">>>>> testVectorQuantiles with ApproxQuantile for Decimal columns");
 
     createTableMtcars();
-    DDF ddf_movie = manager.sql2ddf("select * from mtcars", "SparkSQL");
+    DDF ddf_movie = manager.sql2ddf("select * from mtcars", false);
 
     Double[] pArray = { 0.0, 0.3, 0.5, 0.3, 1.0};
     Double[] quantiles = ddf_movie.getVectorQuantiles("mpg", pArray);

@@ -8,6 +8,10 @@ class SampleSuite extends ATestSuite {
   createTableMtcars()
   val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
   test("test sample with numrows") {
+<<<<<<< HEAD
+=======
+    val ddf = manager.sql2ddf("select * from mtcars", false)
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
     val sample = ddf.VIEWS.getRandomSample(10)
     assert(sample(0)(0).asInstanceOf[Double] != sample(1)(0).asInstanceOf[Double])
     assert(sample(1)(0).asInstanceOf[Double] != sample(2)(0).asInstanceOf[Double])
@@ -16,6 +20,10 @@ class SampleSuite extends ATestSuite {
   }
 
   test("test sample with percentage") {
+<<<<<<< HEAD
+=======
+    val ddf = manager.sql2ddf("select * from mtcars", false)
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
     val sample = ddf.VIEWS.getRandomSample(0.5, false, 1)
     //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
     println("sample: ")
@@ -24,6 +32,10 @@ class SampleSuite extends ATestSuite {
 
   test("test sample with percentage when percentage is invalid") {
     try {
+<<<<<<< HEAD
+=======
+      val ddf = manager.sql2ddf("select * from mtcars", false)
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
       val sample = ddf.VIEWS.getRandomSample(5.0, false, 1)
       //sample.getSchema.getColumns.foreach(c => {println(c.getName + " - " + c.getType)})
       println("sample: ")

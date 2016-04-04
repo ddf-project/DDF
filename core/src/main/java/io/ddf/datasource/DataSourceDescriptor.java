@@ -8,7 +8,7 @@ import io.ddf.exception.DDFException;
 /**
  */
 
-abstract public class DataSourceDescriptor {
+public abstract class DataSourceDescriptor {
 
   private DataSourceSchema mDataSourceSchema;
 

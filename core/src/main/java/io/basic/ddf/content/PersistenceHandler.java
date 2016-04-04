@@ -63,8 +63,10 @@ public class PersistenceHandler extends APersistenceHandler {
     return result;
   }
 
+  // TODO (what's the namespace here)
   protected String getDataFileName() throws DDFException {
-    return this.getFilePath(this.getDDF().getNamespace(), this.getDDF().getName(), ".dat");
+    // return this.getFilePath(this.getDDF().getNamespace(), this.getDDF().getName(), ".dat");
+    return this.getFilePath("adatao", this.getDDF().getName(), ".dat");
   }
 
   protected String getDataFileName(String namespace, String name) throws DDFException {
@@ -72,7 +74,8 @@ public class PersistenceHandler extends APersistenceHandler {
   }
 
   protected String getSchemaFileName() throws DDFException {
-    return this.getFilePath(this.getDDF().getNamespace(), this.getDDF().getName(), ".sch");
+    // return this.getFilePath(this.getDDF().getNamespace(), this.getDDF().getName(), ".sch");
+    return this.getFilePath("adatao", this.getDDF().getName(), ".sch");
   }
 
   protected String getSchemaFileName(String namespace, String name) throws DDFException {
@@ -158,7 +161,7 @@ public class PersistenceHandler extends APersistenceHandler {
     IPersistible from = this.load(fromNamespace, fromName);
     if (from instanceof DDF) {
       DDF to = (DDF) from;
-      to.setNamespace(toNamespace);
+      // to.setNamespace(toNamespace);
       to.getManager().setDDFName(to, toName);
       to.persist();
 
@@ -238,8 +241,7 @@ public class PersistenceHandler extends APersistenceHandler {
       List<Object[]> list = Lists.newArrayList();
       list.add(new Object[] { this, this.getClass().getName() });
       Schema schema = new Schema(this.getName(), "object BLOB, objectClass STRING");
-      BasicDDF ddf = new BasicDDF(list, Object[].class,
-              this.getNamespace(), this.getName(), schema);
+      BasicDDF ddf = new BasicDDF(list, Object[].class, this.getName(), schema);
 
       return ddf;
     }

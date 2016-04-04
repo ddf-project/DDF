@@ -109,14 +109,13 @@ public class MLMetricsSupporter extends AMLMetricsSupporter {
     if (result == null) mLog.error(">> javaRDD result of MetricMapper residuals is null");
     if (predictionDDF.getManager() == null) mLog.error(">> predictionDDF.getManager() is null");
     if (result.rdd() == null) mLog.error(">> result.rdd() is null");
-    if (predictionDDF.getNamespace() == null) mLog.error(">> predictionDDF.getNamespace() is null");
     if (predictionDDF.getSchema() == null) mLog.error(">> predictionDDF.getSchema() is null");
     if (predictionDDF.getName() == null) mLog.error(">> predictionDDF.getName() is null");
 
     Schema schema = new Schema("residuals double");
     DDFManager manager = this.getDDF().getManager();
     DDF residualDDF = manager
-        .newDDF(manager, result.rdd(), new Class<?>[] { RDD.class, double[].class }, predictionDDF.getNamespace(), null,
+        .newDDF(manager, result.rdd(), new Class<?>[] { RDD.class, double[].class }, null,
             schema);
 
     if (residualDDF == null) mLog.error(">>>>>>>>>>>.residualDDF is null");

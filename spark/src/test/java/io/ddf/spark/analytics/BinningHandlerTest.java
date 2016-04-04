@@ -24,7 +24,7 @@ public class BinningHandlerTest extends BaseTest {
     DDF ddf = manager
         .sql2ddf("select year, month, dayofweek, deptime, arrtime,origin, " +
                 "distance, arrdelay, depdelay, carrierdelay, weatherdelay, " +
-                "nasdelay, securitydelay, lateaircraftdelay from airline", "SparkSQL");
+                "nasdelay, securitydelay, lateaircraftdelay from airline", false);
 
     DDF newddf = ddf.binning("dayofweek", "EQUALINTERVAL", 2, null, true, true);
 
@@ -37,6 +37,12 @@ public class BinningHandlerTest extends BaseTest {
     Assert.assertEquals(ColumnClass.FACTOR, newddf2.getSchemaHandler().getColumn("dayofweek").getColumnClass());
 
     Assert.assertEquals(2, newddf2.getSchemaHandler().getColumn("dayofweek").getOptionalFactor().getLevels().get().size());
+
+    DDF newddf2 = ddf.binning("dayofweek", "EQUAlFREQ", 2, null, true, true);
+
+    Assert.assertEquals(ColumnClass.FACTOR, newddf2.getSchemaHandler().getColumn("dayofweek").getColumnClass());
+
+    Assert.assertEquals(2, newddf2.getSchemaHandler().getColumn("dayofweek").getOptionalFactor().getLevelMap().size());
 
 
     DDF ddf1 = ddf.binning("month", "custom", 0, new double[] { 2, 4, 6, 8 }, true, true);

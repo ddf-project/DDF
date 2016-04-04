@@ -188,11 +188,9 @@ public abstract class APersistenceHandler extends ADDFFunctionalGroupHandler imp
           this.getClass(), this.getNamespace(), this.getName()));
 
       // Make sure we have a namespace and name
-      if (Strings.isNullOrEmpty(this.getNamespace())) this.setNamespace(ddf.getNamespace());
       if (Strings.isNullOrEmpty(this.getName())) this.setName(ddf.getSchemaHandler().newTableName(this));
 
       // Make sure the DDF's names match ours
-      ddf.setNamespace(this.getNamespace());
       ddf.getManager().setDDFName(ddf, this.getName());
 
       return ddf;

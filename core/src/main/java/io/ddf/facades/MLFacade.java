@@ -76,6 +76,26 @@ public class MLFacade implements ISupportML {
     return this.train("kmeans", numCentroids, maxIters, runs);
   }
 
+  public IModel LinearRegressionWithSGD(int numIters) throws DDFException {
+    return this.train("linearRegressionWithSGD", numIters);
+  }
+
+  public IModel LinearRegressionWithSGD(int numIters, double stepSize) throws DDFException {
+    return this.train("linearRegressionWithSGD", numIters, stepSize);
+  }
+
+  public IModel LinearRegressionWithSGD(int numIters, double stepSize, double miniBatchFraction) throws DDFException {
+    return this.train("linearRegressionWithSGD", numIters, stepSize, miniBatchFraction);
+  }
+
+  public IModel LinearRegressionWithSGD(int numIters, double stepSize, double miniBatchFraction, double[] initialWeights) throws DDFException {
+    return this.train("linearRegressionWithSGD", numIters, stepSize, miniBatchFraction, initialWeights);
+  }
+
+  public IModel LogisticRegressionWithSGD(double[] initialWeights) throws DDFException {
+    return this.train("logisticRegressionWithSGD", initialWeights);
+  }
+
   public long[][] getConfusionMatrix(IModel model, double threshold) throws DDFException {
     return this.getMLSupporter().getConfusionMatrix(model, threshold);
   }

@@ -16,4 +16,9 @@ Describe how this PR is tested. In case manual testing is required, describe how
 ### PR Progress
 Make sure all checkboxes below are checked before merged
 - [ ] Branch is in format `prefix/description` (see [this](http://www.guyroutledge.co.uk/blog/git-branch-naming-conventions/))
+<<<<<<< HEAD
 - [ ] Code review is done. Merge check has no conflicts. PR checks passed.
+=======
+- [ ] Merge check has no conflicts. PR checks passed.
+- [ ] Code review is done. 
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2

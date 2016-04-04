@@ -10,7 +10,7 @@ import scala.collection.JavaConversions._
 class SimpleSummarySuite extends ATestSuite {
   createTableAirline()
   test("simple summary") {
-    val ddf = manager.sql2ddf("select * from airline", "SparkSQL")
+    val ddf = manager.sql2ddf("select * from airline", false)
     val sqlContext = manager.getHiveContext
     Array("year", "month", "dayofmonth", "uniquecarrier").map{col => ddf.getSchemaHandler.setAsFactor(col)}
     val simpleSummary = ddf.getStatisticsSupporter.getSimpleSummary

@@ -40,7 +40,6 @@ import io.ddf.facades.*;
 import io.ddf.misc.*;
 import io.ddf.ml.ISupportML;
 import io.ddf.ml.ISupportMLMetrics;
-import io.ddf.types.AGloballyAddressable;
 import io.ddf.types.AggregateTypes.AggregateField;
 import io.ddf.types.AggregateTypes.AggregationResult;
 import io.ddf.types.IGloballyAddressable;
@@ -66,11 +65,10 @@ import java.util.regex.Pattern;
  * </p>
  */
 public abstract class DDF extends ALoggable //
-    implements IGloballyAddressable, IPersistible, ISupportPhantomReference, ISerializable {
+    implements IPersistible, ISupportPhantomReference, ISerializable {
 
   private static final long serialVersionUID = -2198317495102277825L;
 
-  private Date mCreatedTime;
 
   //  Whether the ddf acts as a view for the database table.
   private boolean mIsDDFView = false;
@@ -87,8 +85,6 @@ public abstract class DDF extends ALoggable //
    *
    * @param data
    *          The DDF data
-   * @param namespace
-   *          The namespace to place this DDF in. If null, it will be picked up from the DDFManager's current namespace.
    * @param name
    *          The name for this DDF. If null, it will come from the given schema. If that's null, a UUID-based name will
    *          be generated.
@@ -96,19 +92,16 @@ public abstract class DDF extends ALoggable //
    *          The {@link Schema} of the new DDF
    * @throws DDFException
    */
-  public DDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-      String namespace, String name, Schema schema)
+  public DDF(DDFManager manager, Object data, Class<?>[] typeSpecs, String name, Schema schema)
       throws DDFException {
 
-    this.initialize(manager, data, typeSpecs, namespace, name,
-            schema);
+    this.initialize(manager, data, typeSpecs, name, schema);
   }
 
   abstract public DDF copy() throws DDFException;
 
   protected DDF(DDFManager manager, DDFManager defaultManagerIfNull) throws DDFException {
-    this(manager != null ? manager : defaultManagerIfNull, null, null,
-            null, null, null);
+    this(manager != null ? manager : defaultManagerIfNull, null, null, null, null);
   }
 
   /**
@@ -166,10 +159,16 @@ public abstract class DDF extends ALoggable //
   /**
    * Initialization to be done after constructor assignments, such as setting of the all-important DDFManager.
    */
+<<<<<<< HEAD
   protected void initialize(DDFManager manager, Object data, Class<?>[]
           typeSpecs, String namespace, String name,
       Schema schema) throws DDFException {
     Schema.validateSchema(schema);
+=======
+  protected void initialize(DDFManager manager, Object data, Class<?>[] typeSpecs, String name, Schema schema)
+      throws DDFException {
+    this.validateSchema(schema);
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
     if (typeSpecs != null) {
@@ -182,9 +181,6 @@ public abstract class DDF extends ALoggable //
       schema.setTableName(tableName);
     }
 
-    if (Strings.isNullOrEmpty(namespace)) namespace = this.getManager().getNamespace();
-    this.setNamespace(namespace);
-
     manager.setDDFUUID(this, UUID.randomUUID());
 
     if(!Strings.isNullOrEmpty(name)) manager.setDDFName(this, name);
@@ -194,7 +190,6 @@ public abstract class DDF extends ALoggable //
     this.VIEWS = new ViewsFacade(this, this.getViewHandler());
     this.Transform = new TransformFacade(this, this.getTransformationHandler());
     this.R = new RFacade(this, this.getAggregationHandler());
-    this.mCreatedTime = new Date();
   }
 
   /**
@@ -212,7 +207,7 @@ public abstract class DDF extends ALoggable //
           typeSpecs, String namespace, String name,
       Schema schema, String tableName) throws DDFException {
 
-    initialize(manager, data, typeSpecs, namespace, name, schema);
+    initialize(manager, data, typeSpecs, name, schema);
 
     if(schema != null && tableName != null) {
       schema.setTableName(tableName);
@@ -224,40 +219,14 @@ public abstract class DDF extends ALoggable //
 
 
   // //// IGloballyAddressable //////
-  @Expose private String mNamespace;
 
   @Expose private String mName;
 
   @Expose private UUID uuid;
-  /**
-   * @return the namespace this DDF belongs in
-   * @throws DDFException
-   */
-  @Override
-  public String getNamespace() {
-    if (mNamespace == null) {
-      try {
-        mNamespace = this.getManager().getNamespace();
-      } catch (Exception e) {
-        mLog.warn("Cannot retrieve namespace for DDF " + this.getName(), e);
-      }
-    }
-    return mNamespace;
-  }
-
-
-  /**
-   * @param namespace the namespace to place this DDF in
-   */
-  @Override
-  public void setNamespace(String namespace) {
-    this.mNamespace = namespace;
-  }
 
   /**
    * @return the name of this DDF
    */
-  @Override
   public String getName() {
     return mName;
   }
@@ -272,10 +241,12 @@ public abstract class DDF extends ALoggable //
     this.mName = name;
   }
 
+  public UUID getUUID() {return uuid;}
+
+  protected void setUUID(UUID uuid) {this.uuid = uuid;}
+
   //Ensure name is unique
   //Also only allow alphanumberic and dash "-" and underscore "_"
-  // TODO: What's current namespace? Should we allow same name among
-  // different engines?
   private void validateName(String name) throws DDFException {
     Boolean isNameExisted;
     try {
@@ -291,11 +262,12 @@ public abstract class DDF extends ALoggable //
     Pattern p = Pattern.compile("^[a-zA-Z0-9_-]*$");
     Matcher m = p.matcher(name);
     if(!m.find()) {
-      throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, numbers 0-9) " +
-              "and dash (\"-\") and underscore (\"_\")", name));
+      throw new DDFException(String.format("Invalid name %s, only allow alphanumeric (uppercase and lowercase a-z, " +
+          "numbers 0-9) and dash (\"-\") and underscore (\"_\")", name));
     }
   }
 
+<<<<<<< HEAD
   @Override
   public String getGlobalObjectType() {
     return "ddf";
@@ -305,6 +277,8 @@ public abstract class DDF extends ALoggable //
 
   public void setUUID(UUID uuid) {this.uuid = uuid;}
 
+=======
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
   /**
    * We provide a "dummy" DDF Manager in case our manager is not set for some reason. (This may lead to nothing good).
    */
@@ -366,14 +340,6 @@ public abstract class DDF extends ALoggable //
 
   public int getNumColumns() {
     return this.getSchemaHandler().getNumColumns();
-  }
-
-  public Date getCreatedTime() {
-    return this.mCreatedTime;
-  }
-
-  public void setCreatedTime(Date createdTime) {
-    this.mCreatedTime = createdTime;
   }
 
   // ///// Execute a sqlcmd
@@ -890,16 +856,9 @@ public abstract class DDF extends ALoggable //
 
 
   @Override
-  public String getUri() {
-    return AGloballyAddressable.getUri(this);
-  }
-
-
-  @Override
   public String toString() {
-    return this.getUri();
+    return this.getName();
   }
-
 
   public void setMutable(boolean isMutable) {
     this.getMutabilityHandler().setMutable(isMutable);
@@ -972,25 +931,6 @@ public abstract class DDF extends ALoggable //
   // //// IHandleViews //////
 
   public ViewsFacade VIEWS;
-
-
-  // public <T> Iterator<T> getRowIterator(Class<T> dataType) {
-  // return this.getViewHandler().getRowIterator(dataType);
-  // }
-  //
-  // public Iterator<?> getRowIterator() {
-  // return this.getViewHandler().getRowIterator();
-  // }
-  //
-  // public <D, C> Iterator<C> getElementIterator(Class<D> dataType, Class<C> columnType, String columnName) {
-  // return this.getViewHandler().getElementIterator(dataType, columnType, columnName);
-  // }
-  //
-  // public Iterator<?> getElementIterator(String columnName) {
-  // return this.getViewHandler().getElementIterator(columnName);
-  // }
-
-
 
   // //// ISupportStatistics //////
 
@@ -1102,7 +1042,7 @@ public abstract class DDF extends ALoggable //
 
   @Override
   public void unpersist() throws DDFException {
-    this.getManager().unpersist(this.getNamespace(), this.getName());
+    // this.getManager().unpersist(this.getNamespace(), this.getName());
   }
 
 
@@ -1142,6 +1082,11 @@ public abstract class DDF extends ALoggable //
   public ISerializable afterDeserialization(ISerializable deserializedObject, Object serializationData)
       throws DDFException {
     return deserializedObject;
+  }
+
+
+  public void export2csv(String fileURL, String fieldSeparator, Boolean hasHead) throws DDFException {
+    this.getManager().export2csv(this, fileURL, fieldSeparator, hasHead);
   }
 
 }

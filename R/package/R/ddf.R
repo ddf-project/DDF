@@ -48,6 +48,19 @@ setMethod("colnames",
           }
 )
 
+#' @export
+setGeneric("coltypes",
+           function(x){
+             standardGeneric("coltypes")
+           })
+
+setMethod("coltypes",
+          signature("DDF"),
+          function(x) {
+  col.names <- colnames(ddf)
+  sapply(col.names, function(cn) {ddf@jddf$getColumn(cn)$getType()$toString()})
+})
+
 #' Get a DistributedDataFrame's number of rows
 #' 
 #' @param x a DDF object
@@ -154,7 +167,7 @@ setMethod("head",
                 res <- t(sapply(res, function(x){x$split("\t")}))
             else
                 res <- as.matrix(sapply(res, function(x){x$split("\t")}))
-            get.data.frame(x, res)
+            get.data.frame(colnames(x), coltypes(x), res)
           }
 )
 
@@ -186,7 +199,7 @@ setMethod("sample",
             ncols <- ncol(x)
             parsed.res <- t(sapply(res, 
                           function(x) {sapply(1:ncols, function(y){.jarray(x)[[y]]$toString()})}))
-            get.data.frame(x, parsed.res)
+            get.data.frame(colnames(ddf), coltypes(ddf), parsed.res)
           }
 )
 
@@ -215,20 +228,14 @@ setMethod("sample2ddf",
 #' 
 #' Splits a Distributed Data Frame into subsets, computes summary statistics for each, 
 #' and returns the result in a convenient form.
-#' @rdname daggr
-daggr <- function(x, ...)
-  UseMethod("daggr")
-
-
-#' @details \code{daggr.formula} is a standard formula interface to \code{daggr}.
+#' @details \code{aggregate.formula} is a standard formula interface to \code{daggr}.
 #' @param formula in format, \code{y ~ x1 + x2} or \code{cbind(y1,y2) ~ x1 + x2} where \code{x1, x2} are group-by variables and \code{y,y1,y2} are variables to aggregate on.
 #' @param data a Distributed Data Frame
 #' @param FUN the aggregate function, currently support mean, median, var, sum.
 #' @return a data frame with columns corresponding to the grouping variables in by followed by aggregated columns from data.
-#' @S3method daggr formula
 #' @export
-#' @rdname daggr
-daggr.formula <- function(formula, data, FUN) {
+#' @rdname ddf-aggregate
+aggregate.formula <- function(formula, data, FUN) {
   # parse formula's left hand side expression
   left.vars <- formula[[2]]
   if (length(left.vars) == 1)
@@ -267,9 +274,8 @@ daggr.formula <- function(formula, data, FUN) {
   if (identical(fname,"var"))
     fname <- "variance"
   
-  # build the query string
-  cols_str <- paste(paste0(right.vars, collapse=","), paste0(sapply(left.vars, function(var) {paste0(fname, "(", var, ")")}), collapse=","), sep=",")
-  res <- .daggr(data, cols_str)
+  
+  res <- .aggregate(data, sapply(left.vars, function(var) {paste0(fname, "(", var, ")")}), right.vars)
   colnames(res) <- c(right.vars, sapply(left.vars, function(var) {paste0(fname, "(", var, ")")}))
   res
 }
@@ -277,23 +283,21 @@ daggr.formula <- function(formula, data, FUN) {
 #' @param x a Distributed Data Frame
 #' @param agg.cols a list of columns to calculate summary statistics
 #' @param by a list of grouping columns
-#' @method daggr DDF
+#' @method aggregate DDF
 #' @export
-#' @rdname daggr
-setMethod("daggr",
+#' @rdname ddf-aggregate
+setMethod("aggregate",
           signature("DDF"),
           function(x, agg.cols, by) {
-            print(agg.cols)
-            print(by)
-            full_str <- paste(by, agg.cols, sep=",")
-            print(full_str)
-            .daggr(x, full_str)
+            .aggregate(x, str_trim(unlist(strsplit(agg.cols,","))), str_trim(unlist(strsplit(by,","))))
           }
 )
 
-.daggr <- function(x, cols_str) {
+.aggregate <- function(x, agg.cols, by) {
+  cols_str <- paste(c(by, agg.cols), collapse=",")
+  
   jres <- x@jddf$aggregate(cols_str)
-  #agg_res <- as.data.frame(sapply(jres$keySet(), function(k) {unlist(sapply(jres$get(k), function(x) {.jarray(x)[[1]]$doubleValue()}))}))
+  
   agg_vals <- sapply(jres$keySet(), function(k) {jres$get(k)})
   if (is.vector(agg_vals)) {
     agg_res <- as.data.frame(agg_vals)
@@ -301,7 +305,7 @@ setMethod("daggr",
     agg_res <- as.data.frame(t(agg_vals))
   }
   
-  group_vals <- sapply(jres$keySet(), function(x) {x$split(",")})
+  group_vals <- sapply(jres$keySet(), function(x) {x$split("\t")})
   if (is.vector(group_vals)) {
     group_res <- as.data.frame(group_vals, stringsAsFactors=F)
   } else {
@@ -309,7 +313,10 @@ setMethod("daggr",
   }
   
   res <- cbind(group_res, agg_res)
-  colnames(res) <- sapply(unlist(strsplit(cols_str, ",")), function(x) {str_trim(x)})
+  colnames(res) <- c(by,agg.cols)
+  lapply(by, function(col) {
+    res[,col] <<- .set.type(res[,col], coltypes(x)[col])
+  })
   res
   
 }
@@ -419,21 +426,87 @@ setMethod("mean",
         }
 )
 
+#' @export
+setGeneric("sql",
+           function(x, sql, ...) {
+             standardGeneric("sql")
+           }
+)
+
+setMethod("sql",
+          signature("DDF"),
+          function(x, sql) {
+            sql <- str_trim(sql)
+            jddf <- x@jddf
+            java.ret <- jddf$sql(sql, "")
+            parse.sql.result(java.ret)
+          })
+
+
+#' @export
+setGeneric("sql2ddf",
+           function(x, sql, ...) {
+             standardGeneric("sql2ddf")
+           }
+)
+
+setMethod("sql2ddf",
+          signature("DDF"),
+          function(x, sql) {
+            sql <- str_trim(sql)
+            jddf <- x@jddf
+            new("DDF", jddf$sql2ddf(sql))
+          })
+
+#' Merge two DDFs
+setMethod("merge",
+          signature("DDF","DDF"),
+          function(x, y, by = intersect(colnames(x), colnames(y)),
+                   by.x = by, by.y = by, type=c("inner", "left", "right", "full", "left.semi")) {
+            jddf <- x@jddf
+            type <- match.arg(type)
+            
+            jjtype <- switch(type,
+                             inner=J("io.ddf.etl.Types$JoinType")$INNER,
+                             left=J("io.ddf.etl.Types$JoinType")$LEFT,
+                             right=J("io.ddf.etl.Types$JoinType")$RIGHT,
+                             full=J("io.ddf.etl.Types$JoinType")$FULL,
+                             left.semi=J("io.ddf.etl.Types$JoinType")$LEFTSEMI)
+            
+            new("DDF", jddf$join(y@jddf, jjtype, to.jlist(by), to.jlist(by.x), to.jlist(by.y)))
+          })
+
 #----------------------- Helper methods ----------------------------------------------
-get.data.frame <- function(ddf, res) {
+to.jlist <- function(v) {
+  jArrayList <- .jnew("java/util/ArrayList")
+  lapply(v, function(x){
+    if (is.character(x)) {
+      jArrayList$add(.jnew("java/lang/String",x))
+    }
+  })
+  jArrayList
+}
+
+parse.sql.result <- function(java.ret) {
+  res <- java.ret$getRows()
+  col.types <- sapply(java.ret$getSchema()$getColumns(), function(x) x$getType()$toString())
+  col.names <- sapply(java.ret$getSchema()$getColumns(), function(x) x$getName())
+  
+  if(length(col.names)>1)
+    res <- t(sapply(res, function(x){x$split("\t")}))
+  else
+    res <- as.matrix(sapply(res, function(x){x$split("\t")}))
+  get.data.frame(col.names, col.types, res)
+}
+
+get.data.frame <- function(col.names, col.types, res) {
   df <- as.data.frame(res, stringsAsFactors=F)
   
   # set types
-  coltypes <- .coltypes(ddf)
-  sapply(1:ncol(df), function(idx) {coltype <- coltypes[idx];
-                                    df[,idx] <<- .set.type(df[,idx], coltype)})
-  colnames(df) <- colnames(ddf)
+  sapply(1:ncol(df), function(idx) {col.type <- col.types[idx];
+                                    df[,idx] <<- .set.type(df[,idx], col.type)})
+  colnames(df) <- col.names
   df
-}
-
-.coltypes <- function(ddf) {
-  col.names <- colnames(ddf)
-  sapply(col.names, function(cn) {ddf@jddf$getColumn(cn)$getType()$toString()})
 }
 
 .set.type <- function(v, type) {

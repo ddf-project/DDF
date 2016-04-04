@@ -5,7 +5,11 @@
     <artifactId>ddf_core_2.10</artifactId>
     <packaging>jar</packaging>
     <description>ddf_core</description>
+<<<<<<< HEAD
     <version>1.4.14-SNAPSHOT</version>
+=======
+    <version>1.5.0-SNAPSHOT</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
     <name>ddf_core</name>
     <organization>
         <name>io.ddf</name>
@@ -18,7 +22,11 @@
     <parent>
         <groupId>io</groupId>
         <artifactId>ddf</artifactId>
+<<<<<<< HEAD
         <version>1.4.14-SNAPSHOT</version>
+=======
+        <version>1.5.0-SNAPSHOT</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
     </parent>
     <build>
         <directory>${basedir}/target/scala-2.10</directory>
@@ -275,7 +283,11 @@
         <dependency>
             <groupId>net.sf</groupId>
             <artifactId>jsqlparser</artifactId>
+<<<<<<< HEAD
             <version>0.9.8.8</version>
+=======
+            <version>0.9.8.5</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -314,6 +326,7 @@
             <version>3.7.2</version>
         </dependency>
         <dependency>
+<<<<<<< HEAD
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>2.0.1</version>
@@ -322,6 +335,11 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>2.7.0</version>
+=======
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>2.2.0</version>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
             <exclusions>
                 <exclusion>
                     <groupId>org.mortbay.jetty</groupId>
@@ -381,4 +399,8 @@
             <layout>default</layout>
         </repository>
     </repositories>
+<<<<<<< HEAD
 </project>
+=======
+</project>
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2

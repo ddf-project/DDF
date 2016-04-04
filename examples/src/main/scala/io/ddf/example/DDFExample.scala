@@ -7,13 +7,13 @@ object DDFExample {
 
 	def run() = {
 		val manager = DDFManager.get(DDFManager.EngineType.SPARK)
-		manager.sql("drop TABLE if exists mtcars", "SparkSQL")
+		manager.sql("drop TABLE if exists mtcars", false)
 		manager.sql("CREATE TABLE mtcars ("
 			+ "mpg double,cyl int, disp double, hp int, drat double, wt double, qsec double, vs int, am int, gear int, carb int"
-			+ ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '", "SparkSQL")
-		manager.sql("LOAD DATA LOCAL INPATH 'resources/test/mtcars' INTO TABLE mtcars", "SparkSQL")
+			+ ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '", false)
+		manager.sql("LOAD DATA LOCAL INPATH 'resources/test/mtcars' INTO TABLE mtcars", false)
 
-		val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
+		val ddf = manager.sql2ddf("select * from mtcars", false)
 		ddf.getNumRows
 		ddf.getNumColumns
 		ddf.getColumnNames

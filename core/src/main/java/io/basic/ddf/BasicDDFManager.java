@@ -24,44 +24,35 @@ public class BasicDDFManager extends DDFManager {
     return "basic";
   }
 
+  public BasicDDFManager() {}
 
-  @Override
-  public DDF transfer(UUID fromEngine, UUID ddfUUID) {
-    return null;
-  }
-
-  @Override
-  public DDF transferByTable(UUID fromEngine, String tableName) throws DDFException {
-    return null;
-  }
-
-  public BasicDDFManager() {
-  }
-
-
-  public <T> DDF newDDF(List<T> rows, Class<T> unitType, String namespace, String name, Schema schema)
+  public <T> DDF newDDF(List<T> rows, Class<T> unitType, String name, Schema schema)
       throws DDFException {
 
     if (rows == null || rows.isEmpty()) {
       throw new DDFException("Non-null/zero-length List is required to instantiate a new BasicDDF");
     }
 
+<<<<<<< HEAD
     return this.newDDF(this, rows, new Class[]{List.class, unitType},
         namespace, name, schema);
+=======
+    return this.newDDF(this, rows, new Class[] { List.class, unitType }, name, schema);
+>>>>>>> 6ab8241fdb1d1ab371de77dd68da96fa5d4a31e2
   }
 
-  public DDF loadTable(String fileURL, String fieldSeparator) throws DDFException {
+  public DDF loadFile(String fileURL, String fieldSeparator) throws DDFException {
     throw new DDFException("Load DDF from file is not supported!");
   }
 
   @Override
-  public DDF getOrRestoreDDFUri(String ddfURI) throws DDFException {
-    return null;
+  public DDF copyFrom(DDF ddf, String tgtname) throws DDFException {
+    throw new DDFException("Unsupported operation");
   }
 
   @Override
-  public DDF getOrRestoreDDF(UUID uuid) throws DDFException {
-    return null;
+  public DDF copyFrom(DDFManager manager, String ddfname, String tgtname) throws DDFException {
+    throw new DDFException("Unsupported operation");
   }
 
   @Override
