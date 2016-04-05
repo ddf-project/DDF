@@ -2,11 +2,11 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.ddf</groupId>
-    <artifactId>ddf_spark_2.10</artifactId>
+    <artifactId>ddf_hdfs_2.10</artifactId>
     <packaging>jar</packaging>
-    <description>ddf_spark</description>
+    <description>ddf_hdfs</description>
     <version>1.4.14-SNAPSHOT</version>
-    <name>ddf_spark</name>
+    <name>ddf_hdfs</name>
     <organization>
         <name>io.ddf</name>
     </organization>
@@ -216,23 +216,7 @@
         </dependency>
         <dependency>
             <groupId>io.ddf</groupId>
-            <artifactId>ddf_test_2.10</artifactId>
-            <version>1.4.14-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.ddf</groupId>
             <artifactId>ddf_core_2.10</artifactId>
-            <version>1.4.14-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ddf</groupId>
-            <artifactId>ddf_s3_2.10</artifactId>
-            <version>1.4.14-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ddf</groupId>
-            <artifactId>ddf_hdfs_2.10</artifactId>
             <version>1.4.14-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -325,122 +309,9 @@
             <version>1.7</version>
         </dependency>
         <dependency>
-            <groupId>net.rforge</groupId>
-            <artifactId>REngine</artifactId>
-            <version>2.1.1.compiled</version>
-        </dependency>
-        <dependency>
-            <groupId>net.rforge</groupId>
-            <artifactId>Rserve</artifactId>
-            <version>1.8.2.compiled</version>
-        </dependency>
-        <dependency>
-            <groupId>com.databricks</groupId>
-            <artifactId>spark-csv_2.10</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.databricks</groupId>
-            <artifactId>spark-avro_2.10</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.10</artifactId>
-            <version>1.6.0-adatao-hd2.7.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.java.dev.jets3t</groupId>
-                    <artifactId>jets3t</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.protobuf</groupId>
-                    <artifactId>protobuf-java</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>jsr305</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jboss.netty</groupId>
-                    <artifactId>netty</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>jetty</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-mllib_2.10</artifactId>
-            <version>1.6.0-adatao-hd2.7.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.spark</groupId>
-                    <artifactId>spark-core_2.10</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-all</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.10</artifactId>
-            <version>1.6.0-adatao-hd2.7.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-all</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jboss.netty</groupId>
-                    <artifactId>netty</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>jetty</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-hive_2.10</artifactId>
-            <version>1.6.0-adatao-hd2.7.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-all</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>jsr305</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jboss.netty</groupId>
-                    <artifactId>netty</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>jetty</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>2.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.databricks</groupId>
-            <artifactId>spark-csv_2.10</artifactId>
-            <version>1.3.0</version>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>2.2.0</version>
         </dependency>
     </dependencies>
     <repositories>
