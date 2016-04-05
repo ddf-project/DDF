@@ -58,7 +58,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     for (int i = 0; i < columns.size(); i++) {
       Column col = columns.get(i);
       if (!col.isNumeric() || col.getColumnClass() == ColumnClass.FACTOR) {
-        sqlCmdBuffer.append(col.getName());
+        sqlCmdBuffer.append(col.getName()).append(" ");
       } else {
         // subtract mean, divide by stdev
         sqlCmdBuffer.append(String.format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[i].mean(),
