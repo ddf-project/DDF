@@ -26,64 +26,64 @@ import org.scalatest.Matchers
 
 trait JoinSpec extends BaseSpec with Matchers {
 
-  ignore("Join") {
+  feature("Join") {
     scenario("inner join tables") {
       val ddf: DDF = loadAirlineDDF()
       val ddf2: DDF = loadYearNamesDDF()
-      val joinedDDF = ddf.join(ddf2, null, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
+      val joinedDDF = ddf.join(ddf2, JoinType.INNER, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"), null, null)
       val colNames = joinedDDF.getSchema.getColumnNames
       colNames.contains("Year") || colNames.contains("year") should be(true)
       //check if the names from second ddf have been added to the schema
-      colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(true)
-      joinedDDF.getNumRows should be(2)
+      colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(true)
+      joinedDDF.getNumRows should be(30)
       joinedDDF.getNumColumns should be(31)
     }
 
     scenario("left semi join tables") {
       val ddf: DDF = loadAirlineDDF()
       val ddf2: DDF = loadYearNamesDDF()
-      val joinedDDF = ddf.join(ddf2, JoinType.LEFTSEMI, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
+      val joinedDDF = ddf.join(ddf2, JoinType.LEFTSEMI, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"), null, null)
       val colNames = joinedDDF.getSchema.getColumnNames
       colNames.contains("Year") || colNames.contains("year") should be(true)
       //check if the names from second ddf have been added to the schema
-      colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(false)
-      joinedDDF.getNumRows should be(2)
+      colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(false)
+      joinedDDF.getNumRows should be(30)
       joinedDDF.getNumColumns should be(29)
     }
 
     scenario("left outer join tables") {
       val ddf: DDF = loadAirlineDDF()
       val ddf2: DDF = loadYearNamesDDF()
-      val joinedDDF = ddf.join(ddf2, JoinType.LEFT, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
+      val joinedDDF = ddf.join(ddf2, JoinType.LEFT, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"), null, null)
       val colNames = joinedDDF.getSchema.getColumnNames
       colNames.contains("Year") || colNames.contains("year") should be(true)
       //check if the names from second ddf have been added to the schema
-      colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(true)
-      joinedDDF.getNumRows should be(3)
+      colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(true)
+      joinedDDF.getNumRows should be(31)
       joinedDDF.getNumColumns should be(31)
     }
 
     scenario("right outer join tables") {
       val ddf: DDF = loadAirlineDDF()
       val ddf2: DDF = loadYearNamesDDF()
-      val joinedDDF = ddf.join(ddf2, JoinType.RIGHT, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
+      val joinedDDF = ddf.join(ddf2, JoinType.RIGHT, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"), null, null)
       val colNames = joinedDDF.getSchema.getColumnNames
       colNames.contains("Year") || colNames.contains("year") should be(true)
       //check if the names from second ddf have been added to the schema
-      colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(true)
-      joinedDDF.getNumRows should be(4)
+      colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(true)
+      joinedDDF.getNumRows should be(32)
       joinedDDF.getNumColumns should be(31)
     }
 
     scenario("full outer join tables") {
       val ddf: DDF = loadAirlineDDF()
       val ddf2: DDF = loadYearNamesDDF()
-      val joinedDDF = ddf.join(ddf2, JoinType.FULL, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
+      val joinedDDF = ddf.join(ddf2, JoinType.FULL, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"), null, null)
       val colNames = joinedDDF.getSchema.getColumnNames
       colNames.contains("Year") || colNames.contains("year") should be(true)
       //check if the names from second ddf have been added to the schema
-      colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(true)
-      joinedDDF.getNumRows should be(5)
+      colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(true)
+      joinedDDF.getNumRows should be(33)
       joinedDDF.getNumColumns should be(31)
     }
   }
