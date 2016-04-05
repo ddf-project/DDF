@@ -228,12 +228,12 @@
         <dependency>
             <groupId>io.ddf</groupId>
             <artifactId>ddf_s3_2.10</artifactId>
-            <version>1.4.13-SNAPSHOT</version>
+            <version>1.4.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.ddf</groupId>
             <artifactId>ddf_hdfs_2.10</artifactId>
-            <version>1.4.13-SNAPSHOT</version>
+            <version>1.4.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
