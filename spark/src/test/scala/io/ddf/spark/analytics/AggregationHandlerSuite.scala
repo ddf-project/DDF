@@ -94,7 +94,10 @@ class AggregationHandlerSuite extends ATestSuite {
     val thrown1 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("Year=avg(arrdelay)").asJava)}
     assert(thrown1.getMessage === "New column name in aggregation cannot be a group by column: Year")
 
-    val thrown2 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("foo=avg(arrdelay)", "foo=sum(arrdelay)").asJava)}
-    assert(thrown2.getMessage === "Duplicated column name in aggregations: foo")
+    val thrown2 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("Year = avg(arrdelay)").asJava)}
+    assert(thrown2.getMessage === "New column name in aggregation cannot be a group by column: Year")
+
+    val thrown3 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("foo=avg(arrdelay)", "foo=sum(arrdelay)").asJava)}
+    assert(thrown3.getMessage === "Duplicated column name in aggregations: foo")
   }
 }

@@ -181,8 +181,8 @@ public class AggregationHandler extends ADDFFunctionalGroupHandler implements IH
       String[] splits = exp.trim().split("=(?![^()]*+\\))");
       if (splits.length == 2) {
         // A new column name is provided
-        String name = splits[0];
-        String value = splits[1];
+        String name = splits[0].trim();
+        String value = splits[1].trim();
         return new AggregatedColumnExpression(name, value);
       } else if (splits.length == 1) {
         // no new name for aggregated value
