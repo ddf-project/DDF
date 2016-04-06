@@ -1,7 +1,7 @@
 package io.ddf.etl;
 
 
-import com.google.common.base.Joiner;
+
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.analytics.Summary;
@@ -11,7 +11,10 @@ import io.ddf.content.Schema.ColumnType;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
 
@@ -20,8 +23,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     // TODO Auto-generated constructor stub
   }
 
-  @Override
-  public DDF transformScaleMinMax() throws DDFException {
+  @Override public DDF transformScaleMinMax() throws DDFException {
     Summary[] summaryArr = this.getDDF().getSummary();
     List<Column> columns = this.getDDF().getSchema().getColumns();
 
@@ -47,8 +49,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return newddf;
   }
 
-  @Override
-  public DDF transformScaleStandard() throws DDFException {
+  @Override public DDF transformScaleStandard() throws DDFException {
     Summary[] summaryArr = this.getDDF().getSummary();
     List<Column> columns = this.getDDF().getSchema().getColumns();
 
@@ -61,8 +62,9 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
         sqlCmdBuffer.append(col.getName()).append(" ");
       } else {
         // subtract mean, divide by stdev
-        sqlCmdBuffer.append(String.format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[i].mean(),
-            summaryArr[i].stdev(), col.getName()));
+        sqlCmdBuffer.append(String
+            .format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[i].mean(), summaryArr[i].stdev(),
+                col.getName()));
       }
       sqlCmdBuffer.append(",");
     }
@@ -84,25 +86,22 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return null;
   }
 
-  public DDF transformPython(String[] transformFuctions, String[] functionNames,
-      String[] destColumns, String[][] sourceColumns) {
+  public DDF transformPython(String[] transformFuctions, String[] functionNames, String[] destColumns,
+      String[][] sourceColumns) {
     // TODO Auto-generated method stub
     return null;
   }
 
-  @Override
-  public DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) {
+  @Override public DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) {
     // TODO Auto-generated method stub
     return null;
   }
 
-  @Override
-  public DDF flattenDDF(String[] columns) {
+  @Override public DDF flattenDDF(String[] columns) {
     return null;
   }
 
-  @Override
-  public DDF flattenDDF() {
+  @Override public DDF flattenDDF() {
     return flattenDDF(null);
   }
 
@@ -113,10 +112,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     if (arrCol.getType() != ColumnType.ARRAY) {
       throw new DDFException("Column to be flattened must be an array");
     }
-    String arrSizeStr = this
-        .getDDF()
-        .sql(String.format("SELECT size(%s) FROM @this LIMIT 1", colName),
-            "Unable to fetch the first value of the requested column").getRows().get(0);
+    String arrSizeStr = this.getDDF().sql(String.format("SELECT size(%s) FROM @this LIMIT 1", colName),
+        "Unable to fetch the first value of the requested column").getRows().get(0);
 
     int arrSize = Integer.parseInt(arrSizeStr);
     for (int i = 0; i < arrSize; i++) {
@@ -147,11 +144,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   public synchronized DDF transformUDF(List<String> RExps, List<String> columns) throws DDFException {
-    String sqlCmd = String.format("SELECT %s FROM %s",
-        RToSqlUdf(RExps, columns, this.getDDF().getSchema().getColumns()), "{1}");
+    String sqlCmd =
+        String.format("SELECT %s FROM %s", RToSqlUdf(RExps, columns, this.getDDF().getSchema().getColumns()), "{1}");
 
-    DDF newddf = this.getManager().sql2ddf(sqlCmd,
-        new SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF().getUUID().toString()));
+    DDF newddf = this.getManager()
+        .sql2ddf(sqlCmd, new SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF().getUUID().toString()));
 
     if (this.getDDF().isMutable()) {
       return this.getDDF().updateInplace(newddf);
@@ -168,8 +165,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   /**
    * Parse R transform expression to Hive equivalent
    *
-   * @param transformExpr
-   *          : e.g: "foobar = arrtime - crsarrtime, speed = distance / airtime"
+   * @param RExps : e.g: "foobar = arrtime - crsarrtime, speed = distance / airtime"
    * @return "(arrtime - crsarrtime) as foobar, (distance / airtime) as speed
    */
 
@@ -222,12 +218,129 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     String selectStr = "";
     for (String udf : udfs) {
-      String exp = newColToDef.containsKey(udf) ? String.format("%s as %s", newColToDef.get(udf), udf) : String.format(
-          "%s", udf);
+      String exp = newColToDef.containsKey(udf) ?
+          String.format("%s as %s", newColToDef.get(udf), udf) :
+          String.format("%s", udf);
       selectStr += (exp + ",");
     }
 
     return selectStr.substring(0, selectStr.length() - 1);
+  }
+
+  /**
+   * Create new columns or overwrite existing ones
+   *
+   * @param newColumnNames       Array of new column names.
+   * @param transformExpressions array of transform expressions. Has to have the same length
+   *                             with newColumnNames.
+   * @param selectedColumns      list of column names to be included in the result DDF.
+   *                             If null or empty, all existing columns will be included.
+   * @return current DDF if it is mutable, or a new DDF otherwise.
+   * @throws DDFException
+   */
+  public synchronized DDF transformUDFWithNames(String[] newColumnNames, String[] transformExpressions,
+      String[] selectedColumns) throws DDFException {
+
+    if (newColumnNames == null || newColumnNames.length == 0 || transformExpressions == null
+        || transformExpressions.length == 0) {
+      return this.getDDF();
+    }
+
+    if (newColumnNames.length != transformExpressions.length) {
+      throw new DDFException(String
+          .format("newColumnNames and transformExpressions must" + " have the same length. Got %d and %d",
+              newColumnNames.length, transformExpressions.length));
+    }
+
+    List<String> lsExistingColumns = this.getDDF().getSchema().getColumns().stream()
+        .map(Column::getName).collect(Collectors.toList());
+
+    // make up new names for entries with null or empty in `newColumnNames`
+    List<String> lsNewColumnNamesTrimmed = new ArrayList<>();
+    int iNewColIdx = 0;
+    for (String sCol: newColumnNames) {
+      String sColTrimmed = null;
+      if (sCol != null && sCol.length() > 0) {
+        sColTrimmed = sCol.replaceAll("\\W", "").trim();
+      }
+
+      if (sColTrimmed != null && sColTrimmed.length() > 0) {
+        lsNewColumnNamesTrimmed.add(sColTrimmed);
+      } else {
+        String sNewColName = String.format("c%d", iNewColIdx);
+        while (lsExistingColumns.contains(sNewColName)
+            || lsNewColumnNamesTrimmed.contains(sNewColName)) {
+          iNewColIdx++;
+          sNewColName = String.format("c%d", iNewColIdx);
+        }
+        lsNewColumnNamesTrimmed.add(sNewColName);
+      }
+    }
+
+    // check for duplicates in new column names
+    Set<String> setNewColumnNamesTrimmed = lsNewColumnNamesTrimmed.stream().collect(Collectors.toSet());
+    if (setNewColumnNamesTrimmed.size() < lsNewColumnNamesTrimmed.size()) {
+      throw new DDFException("There were duplicated new column names");
+    }
+
+    // added transform expressions first
+    List<String> newColumns = new ArrayList<>();
+    for (int i = lsNewColumnNamesTrimmed.size() - 1; i >= 0; --i) {
+      if (transformExpressions[i] == null || transformExpressions[i].length() == 0) {
+        throw new DDFException(String.format("Got empty transform expression at index %d", i));
+      }
+      newColumns.add(0, String.format(" (%s) AS %s", transformExpressions[i].trim(), lsNewColumnNamesTrimmed.get(i)));
+    }
+
+    // messy logic here. Following transformUDF(), this is the explanation in English:
+    // - If `selectedColumns` is null or empty, we include all existing columns,
+    //   but `newColumnNames` take priority if conflicts happen (no exception thrown).
+    // - If `selectedColumns` is not null, we only include names in `selectedColumns`,
+    //   and throw exception if conflicts happen
+    // Maybe we should simplify this and throw exception anytime there are conflicts?
+
+    if (selectedColumns == null || selectedColumns.length == 0) {
+      for (int i = lsExistingColumns.size() - 1; i >= 0; --i) {
+        String sCol = lsExistingColumns.get(i);
+        if (!setNewColumnNamesTrimmed.contains(sCol)) {
+          newColumns.add(0, sCol);
+        }
+      }
+    } else {
+      for (int i = selectedColumns.length - 1; i >= 0; --i) {
+        String sCol = selectedColumns[i];
+        if (!lsExistingColumns.contains(sCol)) {
+          throw new DDFException(String.format("Selected column '%s' doesn't exist in the DDF", sCol));
+        }
+        if (setNewColumnNamesTrimmed.contains(sCol)) {
+          throw new DDFException(String.format("Duplicated columns: %s", sCol));
+        }
+        newColumns.add(0, sCol);
+      }
+    }
+
+    // build the SQL command
+    StringBuilder sqlCmdBuilder = new StringBuilder("SELECT");
+
+    for (int i = 0; i < newColumns.size(); ++i) {
+      sqlCmdBuilder.append(" ").append(newColumns.get(i));
+      if (i != newColumns.size() - 1) {
+        sqlCmdBuilder.append(",");
+      }
+    }
+    sqlCmdBuilder.append(" FROM {1}");
+
+    String sqlCmd = sqlCmdBuilder.toString();
+
+    DDF newddf = this.getManager()
+        .sql2ddf(sqlCmd, new SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF().getUUID().toString()));
+
+    if (this.getDDF().isMutable()) {
+      return this.getDDF().updateInplace(newddf);
+    } else {
+      newddf.getMetaDataHandler().copyFactor(this.getDDF());
+      return newddf;
+    }
   }
 
   public static String RToSqlUdf(List<String> RExp) {
@@ -240,13 +353,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return RToSqlUdf(RExps, null, null);
   }
 
-  @Override
-  public DDF factorIndexer(List<String> columns) throws DDFException {
+  @Override public DDF factorIndexer(List<String> columns) throws DDFException {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public DDF inverseFactorIndexer(List<String> columns) throws DDFException {
+  @Override public DDF inverseFactorIndexer(List<String> columns) throws DDFException {
     throw new UnsupportedOperationException();
   }
 }
