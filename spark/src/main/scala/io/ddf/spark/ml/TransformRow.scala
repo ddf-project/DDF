@@ -1,6 +1,6 @@
 package io.ddf.spark.ml
 
-import java.util.{HashMap => JMap}
+import java.util.{Map => JMap}
 import org.jblas.DoubleMatrix
 import io.ddf.types.Matrix
 import io.ddf.types.Vector

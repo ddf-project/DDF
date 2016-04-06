@@ -526,26 +526,17 @@ public class Schema implements Serializable {
   }
 
   public static class DummyCoding implements Serializable {
-    private HashMap<Integer, HashMap<String, java.lang.Double>> mapping = new HashMap<Integer, HashMap<String, java.lang.Double>>();
+    private Map<Integer, Map<String, java.lang.Double>> mapping = new HashMap<Integer, Map<String, java.lang.Double>>();
     private Map<String, Map<String, java.lang.Double>> mColNameMapping = null;
     private Integer numDummyCoding;
     public int[] xCols;
     private Integer numberFeatures = 0;
 
-    public void toPrint() {
-
-      Iterator it = mapping.keySet().iterator();
-      while (it.hasNext()) {
-        HashMap<String, Double> a = getMapping().get(it.next());
-        Iterator<String> b = a.keySet().iterator();
-      }
-    }
-
-    public HashMap<Integer, HashMap<String, java.lang.Double>> getMapping() {
+    public Map<Integer, Map<String, java.lang.Double>> getMapping() {
       return mapping;
     }
 
-    public void setMapping(HashMap<Integer, HashMap<String, java.lang.Double>> mapping) {
+    public void setMapping(Map<Integer, Map<String, java.lang.Double>> mapping) {
       this.mapping = mapping;
     }
     
