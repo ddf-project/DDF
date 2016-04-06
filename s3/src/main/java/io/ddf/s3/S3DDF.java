@@ -1,6 +1,5 @@
 package io.ddf.s3;
 
-import com.amazonaws.services.s3.model.S3DataSource;
 import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.datasource.DataFormat;

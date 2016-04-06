@@ -20,8 +20,8 @@ object RootBuild extends Build {
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
   // Target JVM version
-  val SCALAC_JVM_VERSION = "jvm-1.6"
-  val JAVAC_JVM_VERSION = "1.6"
+  val SCALAC_JVM_VERSION = "jvm-1.8"
+  val JAVAC_JVM_VERSION = "1.8"
   val theScalaVersion = "2.10.3"
         val majorScalaVersion = theScalaVersion.split(".[0-9]+$")(0)
   val targetDir = "target/scala-" + majorScalaVersion // to help mvn and sbt share the same target dir
@@ -118,6 +118,7 @@ object RootBuild extends Build {
   val scalaDependencies = scalaArtifacts.map( artifactId => "org.scala-lang" % artifactId % theScalaVersion)
 
   val spark_dependencies = Seq(
+    "io.ddf" % "ddf_hdfs_2.10" % rootVersion exclude("javax.servlet", "servlet-api"),
     "com.databricks" % "spark-csv_2.10" % "1.4.0",
     "com.databricks" % "spark-avro_2.10" % "2.0.1",
     "commons-configuration" % "commons-configuration" % "1.6",
@@ -136,11 +137,15 @@ object RootBuild extends Build {
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
-    "com.google.protobuf" % "protobuf-java" % "2.5.0"
+    "com.google.protobuf" % "protobuf-java" % "2.5.0",
+    "org.apache.hadoop" % "hadoop-aws" % "2.7.2" exclude("com.amazonaws", "aws-java-sdk") exclude("com.fasterxml.jackson.core", "jackson-annotations"),
+    "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4"
   )
   
   val s3_dependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk" % "1.10.8"
+    "com.amazonaws" % "aws-java-sdk" % "1.10.8",
+    "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api") exclude("commons-httpclient", "commons-httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
+   "org.apache.httpcomponents" % "httpcore" % "4.4.1"
   )
 
   val hdfs_dependencies = Seq(
