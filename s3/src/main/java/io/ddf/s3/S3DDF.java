@@ -7,7 +7,7 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 
-import org.apache.hadoop.fs.s3.S3Credentials;
+//import org.apache.hadoop.fs.s3.S3Credentials;
 
 import java.util.Map;
 
