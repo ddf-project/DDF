@@ -128,7 +128,7 @@ object RootBuild extends Build {
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
-      exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
+      exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty"),
     //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
     "org.apache.spark" % "spark-sql_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
@@ -144,7 +144,7 @@ object RootBuild extends Build {
   )
 
   val hdfs_dependencies = Seq(
-    "org.apache.hadoop" % "hadoop-hdfs" % "2.2.0"
+    "org.apache.hadoop" % "hadoop-hdfs" % "2.7.2"
   )
 
   val test_dependencies = Seq(
@@ -271,6 +271,7 @@ object RootBuild extends Build {
     dependencyOverrides += "io.dropwizard.metrics" % "metrics-json" % "3.1.2",
     dependencyOverrides += "io.dropwizard.metrics" % "metrics-jvm" % "3.1.2",
     dependencyOverrides += "org.apache.commons" % "commons-lang3" % "3.1",
+    dependencyOverrides += "org.apache.curator" % "curator-recipes" % "2.7.1",
       pomExtra := (
       <!--
       **************************************************************************************************
@@ -466,7 +467,7 @@ object RootBuild extends Build {
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch core/" + targetDir + "/*timestamp") },
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.7.2",
-    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "2.0.1",
+    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.0",
     libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api")
       exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
