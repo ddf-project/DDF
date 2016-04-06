@@ -38,6 +38,8 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
    * Create new columns or overwrite existing ones
    *
    * @param newColumnNames Array of new column names.
+   *                       Empty or null entries in this array
+   *                       will be set to c0, c1, c2, etc..
    * @param transformExpressions array of transform expressions. Has to have the same length
    *                             with newColumnNames.
    * @param selectedColumns list of column names to be included in the result DDF.
