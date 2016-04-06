@@ -141,7 +141,9 @@ object RootBuild extends Build {
   )
   
   val s3_dependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk" % "1.10.8"
+    "com.amazonaws" % "aws-java-sdk" % "1.10.8",
+    "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api") exclude("commons-httpclient", "commons-httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
+   "org.apache.httpcomponents" % "httpcore" % "4.4.1"
   )
 
   val hdfs_dependencies = Seq(
