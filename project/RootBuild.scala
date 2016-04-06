@@ -137,7 +137,8 @@ object RootBuild extends Build {
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
-    "com.google.protobuf" % "protobuf-java" % "2.5.0"
+    "com.google.protobuf" % "protobuf-java" % "2.5.0",
+    "org.apache.hadoop" % "hadoop-aws" % "2.7.2" exclude("com.amazonaws", "aws-java-sdk")
   )
   
   val s3_dependencies = Seq(
