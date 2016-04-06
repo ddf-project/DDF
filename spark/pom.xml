@@ -234,6 +234,12 @@
             <groupId>io.ddf</groupId>
             <artifactId>ddf_hdfs_2.10</artifactId>
             <version>1.4.14-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

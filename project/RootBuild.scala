@@ -20,8 +20,8 @@ object RootBuild extends Build {
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
   // Target JVM version
-  val SCALAC_JVM_VERSION = "jvm-1.6"
-  val JAVAC_JVM_VERSION = "1.6"
+  val SCALAC_JVM_VERSION = "jvm-1.8"
+  val JAVAC_JVM_VERSION = "1.8"
   val theScalaVersion = "2.10.3"
         val majorScalaVersion = theScalaVersion.split(".[0-9]+$")(0)
   val targetDir = "target/scala-" + majorScalaVersion // to help mvn and sbt share the same target dir
@@ -118,6 +118,7 @@ object RootBuild extends Build {
   val scalaDependencies = scalaArtifacts.map( artifactId => "org.scala-lang" % artifactId % theScalaVersion)
 
   val spark_dependencies = Seq(
+    "io.ddf" % "ddf_hdfs_2.10" % rootVersion exclude("javax.servlet", "servlet-api"),
     "com.databricks" % "spark-csv_2.10" % "1.4.0",
     "com.databricks" % "spark-avro_2.10" % "2.0.1",
     "commons-configuration" % "commons-configuration" % "1.6",
