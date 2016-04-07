@@ -468,11 +468,6 @@ public abstract class DDF extends ALoggable //
     return this.getJoinsHandler().join(anotherDDF, joinType, byColumns, byLeftColumns, byRightColumns);
   }
 
-  public DDF join(DDF anotherDDF, JoinType joinType, List<String> byColumns, List<String> byLeftColumns,
-                  List<String> byRightColumns, String leftSuffix, String rightSuffix) throws DDFException {
-    return this.getJoinsHandler().join(anotherDDF, joinType, byColumns, byLeftColumns, byRightColumns, leftSuffix, rightSuffix);
-  }
-
   public DDF groupBy(List<String> groupedColumns, List<String> aggregateFunctions) throws DDFException {
     return this.getAggregationHandler().groupBy(groupedColumns, aggregateFunctions);
   }
