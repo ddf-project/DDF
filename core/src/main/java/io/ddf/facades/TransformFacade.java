@@ -101,6 +101,22 @@ public class TransformFacade implements IHandleTransformations {
     return transformUDF(transformExpression, null);
   }
 
+  /**
+   * Create new columns or overwrite existing ones
+   *
+   * @param newColumnNames Array of new column names.
+   * @param transformExpressions array of transform expressions. Has to have the same length
+   *                             with newColumnNames.
+   * @param selectedColumns list of column names to be included in the result DDF.
+   *                        If null or empty, all existing columns will be included.
+   * @return current DDF if it is mutable, or a new DDF otherwise.
+   * @throws DDFException
+   */
+  public DDF transformUDFWithNames(String[] newColumnNames, String[] transformExpressions,
+      String[] selectedColumns) throws DDFException {
+    return mTransformationHandler.transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns);
+  }
+
   public DDF flattenDDF(String[] columns) throws DDFException {
     return flattenDDF(columns);
   }

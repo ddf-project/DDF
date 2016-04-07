@@ -231,6 +231,29 @@ public class TransformationHandlerTest extends BaseTest {
         TransformationHandler.RToSqlUdf("dt=regexp_extract('hh:mm:ss', '.*\\\\+([^+])+', 1)"));
   }
 
+  @Test
+  public void  testTransformSqlWithNames() throws DDFException {
+    ddf.setMutable(true);
+    ddf = ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"round(distance/2, 2)"}, null);
+
+    Assert.assertEquals(31, ddf.getNumRows());
+    Assert.assertEquals(9, ddf.getNumColumns());
+    Assert.assertEquals("dist", ddf.getColumnName(8));
+    Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
+
+    ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"}, null);
+    Assert.assertEquals(31, ddf.getNumRows());
+    Assert.assertEquals(10, ddf.getNumColumns());
+    Assert.assertEquals(10, ddf.getSummary().length);
+
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"},
+          new String[]{"notexistedColumn"});
+      Assert.fail("Should throw exception when selecting non-existing columns");
+    } catch (DDFException ex) {
+    }
+  }
+
   @Test(expected = RuntimeException.class)
   public void testConflictingColumnDefinitions() throws DDFException {
     ddf.setMutable(true);
