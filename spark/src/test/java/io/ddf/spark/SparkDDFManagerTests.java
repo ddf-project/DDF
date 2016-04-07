@@ -181,6 +181,7 @@ public class SparkDDFManagerTests extends BaseTest {
   }
 
   public void testComment(S3DDFManager s3DDFManager) throws DDFException {
+    /*
     final Map<String, String> comment2pathMap = ImmutableMap.<String, String>builder()
         .put("//", "adatao-sample-data/test/extra/comment/double_fslash_csv/")
         .put("#", "adatao-sample-data/test/extra/comment/num_sign_json/")
@@ -194,6 +195,7 @@ public class SparkDDFManagerTests extends BaseTest {
       DDF sparkDDF = manager.copyFrom(s3DDF);
       assert (sparkDDF.getNumRows() > 0);
     }
+    */
   }
 
   public void testNull(S3DDFManager s3DDFManager) throws DDFException {
