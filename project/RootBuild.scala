@@ -137,11 +137,15 @@ object RootBuild extends Build {
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
-    "com.google.protobuf" % "protobuf-java" % "2.5.0"
+    "com.google.protobuf" % "protobuf-java" % "2.5.0",
+    "org.apache.hadoop" % "hadoop-aws" % "2.7.2" exclude("com.amazonaws", "aws-java-sdk") exclude("com.fasterxml.jackson.core", "jackson-annotations"),
+    "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4"
   )
   
   val s3_dependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk" % "1.10.8"
+    "com.amazonaws" % "aws-java-sdk" % "1.10.8",
+    "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api") exclude("commons-httpclient", "commons-httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
+   "org.apache.httpcomponents" % "httpcore" % "4.4.1"
   )
 
   val hdfs_dependencies = Seq(
