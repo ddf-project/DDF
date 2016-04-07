@@ -81,20 +81,10 @@ public class S3DDFManager extends DDFManager {
       } else {
         HashSet<DataFormat> dataFormats = new HashSet<>();
         for (String key : keys) {
-          int dotIndex = key.lastIndexOf('.');
-          int slashIndex = key.lastIndexOf('/');
           // Check for extension.
-          if (dotIndex != -1 && dotIndex > slashIndex) {
-            String extension = key.substring(dotIndex + 1);
-            try {
-              if (extension.equalsIgnoreCase("parquet")) {
-                extension = "pqt";
-              }
-              DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
-              dataFormats.add(dataFormat);
-            } catch (Exception e) {
-              throw new DDFException(String.format("Unsupported dataformat: %s", extension));
-            }
+          DataFormat dataFormat = this.getDataFormatFromPath(key);
+          if (!dataFormat.equals(DataFormat.UNDEF)) {
+            dataFormats.add(dataFormat);
           }
         }
         if (dataFormats.size() > 1) {
@@ -108,13 +98,28 @@ public class S3DDFManager extends DDFManager {
       }
     } else {
       String key = s3DDF.getKey();
-      int dotIndex = key.lastIndexOf('.');
-      if (dotIndex != -1) {
-        return DataFormat.valueOf(key.substring(dotIndex + 1).toUpperCase());
-      } else {
-        // CSV by default
-        return DataFormat.CSV;
+      DataFormat dataFormat = this.getDataFormatFromPath(key);
+      return dataFormat.equals(DataFormat.UNDEF) ? DataFormat.CSV : dataFormat;
+    }
+  }
+
+  private DataFormat getDataFormatFromPath(String path) throws DDFException {
+    int dotIndex = path.lastIndexOf('.');
+    int slashIndex = path.lastIndexOf('/');
+    // Check for extension.
+    if (dotIndex != -1 && dotIndex > slashIndex) {
+      String extension = path.substring(dotIndex + 1);
+      try {
+        if (extension.equalsIgnoreCase("parquet")) {
+          extension = "pqt";
+        }
+        DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
+        return dataFormat;
+      } catch (Exception e) {
+        throw new DDFException(String.format("Unsupported dataformat: %s", extension));
       }
+    } else {
+      return DataFormat.UNDEF;
     }
   }
 
