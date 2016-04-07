@@ -17,7 +17,7 @@ import io.ddf.content.Schema
 import scala.collection.Map
 import scala.collection.mutable.ArrayBuffer
 import java.util.{List => JList}
-import io.ddf.content.Schema.Column
+import io.ddf.content.Schema.{ColumnType, Column}
 import com.google.common.collect.Lists
 import java.util.ArrayList
 import io.ddf.exception.DDFException
@@ -29,7 +29,8 @@ import scala.collection.JavaConverters._
 object SparkUtils {
   /**
    * Create custom sharkContext with adatao's spark.kryo.registrator
-   * @param master
+    *
+    * @param master
    * @param jobName
    * @param sparkHome
    * @param jars

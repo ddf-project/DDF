@@ -1,13 +1,12 @@
 package io.ddf.s3;
 
-import com.amazonaws.services.s3.model.S3DataSource;
 import com.google.common.base.Strings;
 import io.ddf.DDF;
 import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 
-import org.apache.hadoop.fs.s3.S3Credentials;
+//import org.apache.hadoop.fs.s3.S3Credentials;
 
 import java.util.Map;
 

@@ -15,13 +15,20 @@ import io.ddf.spark.SparkDDFManager;
 import io.ddf.spark.analytics.FactorIndexer;
 import io.ddf.spark.util.SparkUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.spark.Accumulator;
 import org.apache.spark.AccumulatorParam;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
+import org.apache.spark.sql.catalyst.util.StringUtils;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
+import org.apache.spark.unsafe.types.UTF8String;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -35,7 +42,6 @@ import java.util.Map;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import scala.Tuple2;
-import scala.Tuple3;
 
 
 public class SchemaHandler extends io.ddf.content.SchemaHandler {
@@ -132,40 +138,48 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
    * applySchema(Schema newSchema) will do apply change column type from current to new data type. This function return
    * new DDF and also statistic when its applied new schema
    *
-   * @param schema will use to apply for current DDF
+   * @param schema    will use to apply for current DDF
+   * @param isDropRow flag is true, we will drop row which contains any column couldn't parse to new type
    * @return Tuple2<SparkDDF,ApplySchemaStatistic> +SparkDDF: new sparkddf which applied new schema already
    * +ApplySchemaStatistic:  applied schema statistic @see ApplySchemaStatistic
    */
-  public Tuple2<SparkDDF, ApplySchemaStatistic> applySchema(Schema schema) throws DDFException {
+  public Tuple2<SparkDDF, ApplySchemaStatistic> applySchema(Schema schema, boolean isDropRow) throws DDFException {
     long startApplySchema = System.currentTimeMillis();
     // Keep info to Convert column at <pos> to <ColumnType>
-    List<Tuple3<Integer, String, Schema.ColumnType>> listConvertColumns = getListConvertColumn(this.getSchema(), schema);
-
+    Tuple2<List<Tuple2<Integer, Column>>, StructType> convertInfo = getConvertInfo(this.getSchema(), schema);
+    List<Tuple2<Integer, Column>> listConvertColumns = convertInfo._1();
+    StructType newSchema =convertInfo._2();
     try {
       SparkDDFManager manager = (SparkDDFManager) this.getManager();
-//      SparkContext sparkContext = manager.getSparkContext();
       Accumulator<ApplySchemaStatistic> statisticAccumulator = manager.getSparkContext().accumulator(new ApplySchemaStatistic(), ApplySchemaStatisticParam.getInstance());
 
       JavaRDD<Row> rdd = ((SparkDDF) this.getDDF()).getRDD(Row.class).toJavaRDD();
-      JavaRDD<Row> filteredRdd = rdd.filter(row -> convertRowType(row, listConvertColumns, statisticAccumulator));
-      long totalLineSuccess = filteredRdd.count();
+
+
+      JavaRDD<Row> appliedRdd =rdd.map(row -> {
+        return ApplySchemaUtils.convertRowType(row, listConvertColumns, statisticAccumulator, newSchema, isDropRow);
+      });
+      if (isDropRow) appliedRdd = appliedRdd.filter(row -> {
+        return row != null;
+      });
+      long totalLineSuccess = appliedRdd.count();
       ApplySchemaStatistic statistic = statisticAccumulator.value();
       statistic.setTotalLineSuccessed(totalLineSuccess);
-      if(mLog.isDebugEnabled()){
+      if (mLog.isDebugEnabled()) {
         mLog.debug("ApplySchema in " + (System.currentTimeMillis() - startApplySchema) + " ms");
         mLog.debug("Total Line Processed: " + statistic.getTotalLineProcessed());
         mLog.debug("Total Line Succeed: " + statistic.getTotalLineSuccessed());
-        if(mLog.isTraceEnabled()){
-          statistic.getMapColumnStatistic().forEach( (name,columnStatistic) ->{
+        if (mLog.isTraceEnabled()) {
+          statistic.getMapColumnStatistic().forEach((name, columnStatistic) -> {
             mLog.trace("column: " + name + " fail in: " + columnStatistic.getNumConvertedFailed());
-            mLog.trace("sample: " + StringUtils.join(columnStatistic.getSampleData(),','));
+            mLog.trace("sample: " + org.apache.commons.lang.StringUtils.join(columnStatistic.getSampleData(), ','));
           });
         }
       }
-      if(statistic.getTotalLineSuccessed() >0) {
-        DataFrame dataFrame = manager.getHiveContext().createDataFrame(filteredRdd.rdd(), filteredRdd.first().schema());
+      if (statistic.getTotalLineSuccessed() > 0) {
+        DataFrame dataFrame = manager.getHiveContext().createDataFrame(appliedRdd.rdd(), appliedRdd.first().schema());
         return new Tuple2<>((SparkDDF) SparkUtils.df2ddf(dataFrame, manager), statistic);
-      }else{
+      } else {
         return new Tuple2<>(null, statistic);
       }
     } catch (ClassCastException cce) {
@@ -176,95 +190,157 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
   }
 
   /**
-   * Convert Row Data To Given Type If failed, store data to statistic
+   * Return necessary info to do converting from schema to new schema
    *
-   * @param row                  which hold multiple columns to convert
-   * @param listConvertColumns   given columnIndex & columnName &  type to convert to
-   * @param statisticAccumulator statistic
+   * @param fromSchema:   origin schema, which required all string type
+   * @param changeSchema: contain which column to change to new type
+   * @return Tuple2<List<Tuple2<Integer, Column>>,StructType>: List<Tuple2<Int,Column> list of column to change,
+   * StructType: the final schema after applySchema.
    */
-  private Boolean convertRowType(Row row, List<Tuple3<Integer, String, Schema.ColumnType>> listConvertColumns, Accumulator<ApplySchemaStatistic> statisticAccumulator) {
-    boolean result = true;
-    statisticAccumulator.localValue().increaseLineProcessed();
-    for (Tuple3<Integer, String, Schema.ColumnType> tuple3 : listConvertColumns) {
-      if (!isConvertible(row, tuple3._1(), tuple3._3())) {
-        statisticAccumulator.localValue().addColumnFailed(tuple3._2(), row.getString(tuple3._1()));
-        result = false;
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Check whether we could convert data at row[index] requiredType @see Schema.ColumnType
-   *
-   * @param row:          Which row to convert
-   * @param index:        index of column in row to convert
-   * @param requiredType: type we need to convert to
-   * @return whether we could convert row[index] to requiredType
-   */
-  private boolean isConvertible(Row row, Integer index, Schema.ColumnType requiredType) {
-
-    try {
-      if(row.get(index) == null) return false;
-      String columnData = row.get(index).toString().trim();
-      if (columnData == null) return false;
-      switch (requiredType) {
-        case TINYINT:
-          return Byte.valueOf(columnData) != null;
-        case SMALLINT:
-          return Short.valueOf(columnData) != null;
-        case INT:
-          return Integer.valueOf(columnData) != null;
-        case BIGINT:
-          return Long.valueOf(columnData) != null;
-        case FLOAT:
-          return Float.valueOf(columnData) != null;
-        case DOUBLE:
-          return Double.valueOf(columnData) != null;
-        case DECIMAL:
-          return new BigDecimal(columnData) != null;
-        case STRING:
-          return true;
-        case BINARY:
-          return columnData.getBytes() != null;
-        case BOOLEAN:
-          return Boolean.valueOf(columnData) != null;
-        case TIMESTAMP:
-          return Timestamp.valueOf(columnData) != null;
-        case DATE:
-          return Date.valueOf(columnData) != null;
-        case ARRAY:
-        case ANY:
-        case BLOB:
-          return true;
-        case STRUCT:
-        case MAP:
-          return false; //need more info to parse
-      }
-    } catch (ClassCastException | NullPointerException | IllegalArgumentException nfe) {
-      mLog.debug(nfe.getMessage());
-    }
-    return false;
-  }
-
-  /**
-   * get list column need to be convert
-   *
-   * @return List<Tuple3<Integer,String,ColumnType>> = ColumnIndex,ColumnName,ColumnType
-   */
-  protected List<Tuple3<Integer, String, Schema.ColumnType>> getListConvertColumn(Schema fromSchema, Schema toSchema) throws DDFException {
-    List<Tuple3<Integer, String, Schema.ColumnType>> listConvertColumn = new ArrayList<>();
+  protected Tuple2<List<Tuple2<Integer, Column>>, StructType> getConvertInfo(Schema fromSchema, Schema changeSchema) throws DDFException {
+    List<Tuple2<Integer, Column>> listConvertColumn = new ArrayList<>();
+    StructField[] structFields = new StructField[fromSchema.getNumColumns()];
     Map<String, Integer> mapNameIndex = new HashMap<>();
     List<String> columnNames = fromSchema.getColumnNames();
     int i = 0;
     for (String name : columnNames) {
+      structFields[i] = new StructField(name, DataTypes.StringType, true, Metadata.empty());
       mapNameIndex.put(name, i++);
     }
-    for (Column column : toSchema.getColumns()) {
-      if (!mapNameIndex.containsKey(column.getName())) throw new DDFException("Unknown column: " + column.getName());
-      listConvertColumn.add(new Tuple3(mapNameIndex.get(column.getName()), column.getName(), column.getType()));
+    for (Column column : changeSchema.getColumns()) {
+      if (!mapNameIndex.containsKey(column.getName()))
+        throw new DDFException("Unknown column: " + column.getName());
+      listConvertColumn.add(new Tuple2(mapNameIndex.get(column.getName()), column));
+      StructField newField = new StructField(column.getName(), toSparkType(column.getType()), true, Metadata.empty());
+      structFields[mapNameIndex.get(column.getName())] = newField;
     }
-    return listConvertColumn;
+    return new Tuple2<>(listConvertColumn, new StructType(structFields));
+  }
+
+  private DataType toSparkType(Schema.ColumnType columnType) {
+    switch (columnType) {
+      case TINYINT:
+        return DataTypes.ByteType;
+      case SMALLINT:
+        return DataTypes.ShortType;
+      case INT:
+        return DataTypes.IntegerType;
+      case BIGINT:
+        return DataTypes.LongType;
+      case FLOAT:
+        return DataTypes.FloatType;
+      case DOUBLE:
+        return DataTypes.DoubleType;
+      case DECIMAL:
+        return DataTypes.createDecimalType();
+      case STRING:
+        return DataTypes.StringType;
+      case BOOLEAN:
+        return DataTypes.BooleanType;
+      case BINARY:
+        return DataTypes.BinaryType;
+      case TIMESTAMP:
+        return DataTypes.TimestampType;
+      case DATE:
+        return DataTypes.DateType;
+      default:
+        return null;
+    }
+  }
+
+  static class ApplySchemaUtils {
+    /**
+     * Convert Row Data To Given Type
+     *
+     * @param row                  which hold multiple columns to convert
+     * @param listConvertColumns   given columnIndex & columnName &  type to convert to
+     * @param statisticAccumulator statistic accumulator
+     */
+    private static Row convertRowType(Row row, List<Tuple2<Integer, Column>> listConvertColumns,
+                                      Accumulator<ApplySchemaStatistic> statisticAccumulator, StructType newSchema, boolean isDropRow) {
+      statisticAccumulator.localValue().increaseLineProcessed();
+
+      Object[] rowData = toArray(row);
+
+      boolean isFail = false;
+      for (Tuple2<Integer, Column> convertColumn : listConvertColumns) {
+        int colIndex = convertColumn._1();
+        Schema.ColumnType toType = convertColumn._2().getType();
+        Object colValue = rowData[colIndex];
+        if (colValue != null) {
+          String columnData = colValue.toString().trim();
+          Object newColData = cast(columnData, toType);
+          if (newColData == null) {
+            statisticAccumulator.localValue().addColumnFailed(convertColumn._2().getName(), columnData);
+            isFail = true;
+          }
+          rowData[colIndex] = newColData;
+        }
+      }
+      if (isFail && isDropRow) {
+        return null;
+      } else {
+        return new GenericRowWithSchema(rowData, newSchema);
+      }
+    }
+
+    private static Object[] toArray(Row row) {
+      Object[] values = new Object[row.size()];
+      for (int i = 0; i < row.size(); ++i) {
+        values[i] = row.get(i);
+      }
+      return values;
+    }
+
+    /**
+     * Check whether we could convert data at row[index] requiredType @see Schema.ColumnType
+     *
+     * @param data:         Data to convert to requiredType
+     * @param requiredType: type we need to convert to
+     * @return newData in required type, null if couldn't convert
+     */
+    private static Object cast(String data, Schema.ColumnType requiredType) {
+      try {
+        switch (requiredType) {
+          case TINYINT:
+            return Byte.valueOf(data);
+          case SMALLINT:
+            return Short.valueOf(data);
+          case INT:
+            return Integer.valueOf(data);
+          case BIGINT:
+            return Long.valueOf(data);
+          case FLOAT:
+            return Float.valueOf(data);
+          case DOUBLE:
+            return Double.valueOf(data);
+          case DECIMAL:
+            return new BigDecimal(data);
+          case STRING:
+            return true;
+          case BINARY:
+            return data.getBytes();
+          case BOOLEAN:
+            UTF8String tmp = UTF8String.fromString(data);
+            if (StringUtils.isTrueString(tmp)) return true;
+            else if (StringUtils.isFalseString(tmp)) return false;
+            return null;
+          case TIMESTAMP:
+            return Timestamp.valueOf(data);
+          case DATE:
+            return Date.valueOf(data);
+          case ARRAY:
+          case ANY:
+          case BLOB:
+          case STRUCT:
+          case MAP:
+            return null; //need more info to parse
+        }
+      } catch (ClassCastException | NullPointerException | IllegalArgumentException nfe) {
+        //mLog.debug(nfe.getMessage());
+      }
+      return null;
+    }
   }
 
   /**
@@ -274,17 +350,24 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
   @NotThreadSafe
   public static class ApplySchemaStatistic implements Serializable {
     private final int NUM_EXAMPLE_DATA = 10;
+    private final HashMap</*Column Name*/String, ColumnStatistic> mapColumnStatistic = new HashMap();
     private Long totalLineProcessed = 0L;
     private Long totalLineSuccessed = 0L;
 
-    private final HashMap</*Column Name*/String, ColumnStatistic> mapColumnStatistic = new HashMap();
+    public static ApplySchemaStatistic add(ApplySchemaStatistic s1, ApplySchemaStatistic s2) {
+      ApplySchemaStatistic statistic = new ApplySchemaStatistic();
+      statistic.totalLineProcessed = s1.totalLineProcessed + s2.totalLineProcessed;
+      s1.mapColumnStatistic.forEach((colName, columnStatistic) -> {
+        for (String data : columnStatistic.getSampleData()) statistic.addColumnFailed(colName, data);
+      });
+      s2.mapColumnStatistic.forEach((colName, columnStatistic) -> {
+        for (String data : columnStatistic.getSampleData()) statistic.addColumnFailed(colName, data);
+      });
+      return statistic;
+    }
 
     public void increaseLineProcessed() {
       ++totalLineProcessed;
-    }
-
-    public void setTotalLineSuccessed(Long totalLineSuccessed) {
-      this.totalLineSuccessed = totalLineSuccessed;
     }
 
     public void addColumnFailed(String colName, String data) {
@@ -306,25 +389,17 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
       return totalLineSuccessed;
     }
 
+    public void setTotalLineSuccessed(Long totalLineSuccessed) {
+      this.totalLineSuccessed = totalLineSuccessed;
+    }
+
     public Map<String, ColumnStatistic> getMapColumnStatistic() {
       return mapColumnStatistic;
     }
 
-    public static ApplySchemaStatistic add(ApplySchemaStatistic s1, ApplySchemaStatistic s2) {
-      ApplySchemaStatistic statistic = new ApplySchemaStatistic();
-      statistic.totalLineProcessed = s1.totalLineProcessed + s2.totalLineProcessed;
-      s1.mapColumnStatistic.forEach((colName, columnStatistic) -> {
-        for (String data : columnStatistic.getSampleData()) statistic.addColumnFailed(colName, data);
-      });
-      s2.mapColumnStatistic.forEach((colName, columnStatistic) -> {
-        for (String data : columnStatistic.getSampleData()) statistic.addColumnFailed(colName, data);
-      });
-      return statistic;
-    }
-
     public class ColumnStatistic implements Serializable {
-      private Long numConvertedFailed = 0L;
       private final List<String> listSampleData = new ArrayList<>();
+      private Long numConvertedFailed = 0L;
 
       public void addSample(String sample) {
         listSampleData.add(sample);

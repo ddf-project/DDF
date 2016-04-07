@@ -15,13 +15,13 @@ object RootBuild extends Build {
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
-  val SPARK_VERSION = "1.6.0-adatao-1.7.0"
+  val SPARK_VERSION = "1.6.0-adatao-hd2.7.2"
 
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
   // Target JVM version
-  val SCALAC_JVM_VERSION = "jvm-1.6"
-  val JAVAC_JVM_VERSION = "1.6"
+  val SCALAC_JVM_VERSION = "jvm-1.8"
+  val JAVAC_JVM_VERSION = "1.8"
   val theScalaVersion = "2.10.3"
         val majorScalaVersion = theScalaVersion.split(".[0-9]+$")(0)
   val targetDir = "target/scala-" + majorScalaVersion // to help mvn and sbt share the same target dir
@@ -118,6 +118,7 @@ object RootBuild extends Build {
   val scalaDependencies = scalaArtifacts.map( artifactId => "org.scala-lang" % artifactId % theScalaVersion)
 
   val spark_dependencies = Seq(
+    "io.ddf" % "ddf_hdfs_2.10" % rootVersion exclude("javax.servlet", "servlet-api"),
     "com.databricks" % "spark-csv_2.10" % "1.4.0",
     "com.databricks" % "spark-avro_2.10" % "2.0.1",
     "commons-configuration" % "commons-configuration" % "1.6",
@@ -128,7 +129,7 @@ object RootBuild extends Build {
     //"org.apache.derby" % "derby" % "10.4.2.0",
    // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
-      exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
+      exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty"),
     //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
     "org.apache.spark" % "spark-sql_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
@@ -136,15 +137,19 @@ object RootBuild extends Build {
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
-    "com.google.protobuf" % "protobuf-java" % "2.5.0"
+    "com.google.protobuf" % "protobuf-java" % "2.5.0",
+    "org.apache.hadoop" % "hadoop-aws" % "2.7.2" exclude("com.amazonaws", "aws-java-sdk") exclude("com.fasterxml.jackson.core", "jackson-annotations"),
+    "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4"
   )
   
   val s3_dependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk" % "1.10.8"
+    "com.amazonaws" % "aws-java-sdk" % "1.10.8",
+    "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api") exclude("commons-httpclient", "commons-httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
+   "org.apache.httpcomponents" % "httpcore" % "4.4.1"
   )
 
   val hdfs_dependencies = Seq(
-    "org.apache.hadoop" % "hadoop-hdfs" % "2.2.0"
+    "org.apache.hadoop" % "hadoop-hdfs" % "2.7.2"
   )
 
   val test_dependencies = Seq(
@@ -271,6 +276,7 @@ object RootBuild extends Build {
     dependencyOverrides += "io.dropwizard.metrics" % "metrics-json" % "3.1.2",
     dependencyOverrides += "io.dropwizard.metrics" % "metrics-jvm" % "3.1.2",
     dependencyOverrides += "org.apache.commons" % "commons-lang3" % "3.1",
+    dependencyOverrides += "org.apache.curator" % "curator-recipes" % "2.7.1",
       pomExtra := (
       <!--
       **************************************************************************************************
@@ -466,8 +472,8 @@ object RootBuild extends Build {
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally { List("sh", "-c", "touch core/" + targetDir + "/*timestamp") },
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.7.2",
-    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "2.0.1",
-    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.2.0" exclude("org.mortbay.jetty", "servlet-api")
+    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.0",
+    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api")
       exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
     libraryDependencies ++= scalaDependencies,
