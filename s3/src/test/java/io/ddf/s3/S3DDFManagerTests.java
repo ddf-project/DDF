@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +81,11 @@ public class S3DDFManagerTests {
         assert (pqtDDF.getIsDir() == true);
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
+        Map<String, String> options = new HashMap<>();
+        options.put("format", "parquet");
+        S3DDF pqtDDFWithOpts = manager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null, options);
+        assert (pqtDDFWithOpts.getIsDir() == true);
+        assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
 
         S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/single/episodes.avro", null, null);
@@ -89,6 +95,26 @@ public class S3DDFManagerTests {
         S3DDF orcDDF = manager.newDDF("adatao-test", "orc/", null, null);
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
+
+        S3DDF noExtensionDDF = manager.newDDF("adatao-sample-data/test/csv/hasHeader");
+
+        assert (noExtensionDDF.getIsDir() == false);
+        assert (noExtensionDDF.getDataFormat().equals(DataFormat.CSV));
+
+        S3DDF emptyDDF = manager.newDDF("adatao-sample-data/empty_folder/");
+        assert (emptyDDF.getIsDir() == true);
+        assert (emptyDDF.getDataFormat().equals(DataFormat.CSV));
+
+        try {
+            S3DDF nestedFolderDDF = manager.newDDF("adatao-sample-data/test/csv/");
+            assert false;
+        } catch (Exception e) {}
+
+        try {
+            S3DDF mixedDDF = manager.newDDF("adatao-sample-data/test/extra/format/mixed-csv-tsv/");
+        } catch (Exception e) {
+            assert (e.getMessage().contains("more than 1"));
+        }
     }
 
 

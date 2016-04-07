@@ -68,11 +68,14 @@ public class HDFSDDFManager extends DDFManager {
     if (hdfsDDF.getIsDir()) {
       try {
         FileStatus[] files = this.fs.listStatus(new Path(hdfsDDF.getPath()));
-        if (files.length == 0) {
-          throw new DDFException(String.format("There is no file under %s", hdfsDDF.getPath()));
-        }
+        // if (files.length == 0) {
+        //  throw new DDFException(String.format("There is no file under %s", hdfsDDF.getPath()));
+        //}
         HashSet<DataFormat> dataFormats = new HashSet<>();
         for (FileStatus file : files) {
+          if (file.isDirectory()) {
+            throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
+          }
           String filePath = file.getPath().toString();
           int dotIndex = filePath.lastIndexOf('.');
           int slashIndex = filePath.lastIndexOf('/');

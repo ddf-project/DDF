@@ -95,12 +95,14 @@ public class S3DDF extends DDF {
             throw new DDFException("The key of s3ddf is null");
         }
 
-        mLog.info(String.format("init s3 ddf: %s %s", mBucket, mKey));
+        mLog.info(String.format("Initialize s3 ddf: %s %s", mBucket, mKey));
         // Check directory or file.
         S3DDFManager s3DDFManager = this.getManager();
         // Check dataformat.
         if (options != null && options.containsKey("format")) {
             try {
+                String format = options.get("format").toUpperCase();
+                format = format.equals("PARQUET") ? "PQT" : format;
                 mDataFormat = DataFormat.valueOf(options.get("format"));
             } catch (IllegalArgumentException e) {
                 mIsDir = s3DDFManager.isDir(this);

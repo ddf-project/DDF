@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class S3DDFManager extends DDFManager {
     List<String> keys = this.listFiles(s3DDF.getBucket(),s3DDF.getKey());
     for (String key : keys) {
       if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
-        throw new DDFException("This folder contains subfolder, S3 DDF does not support nested folders");
+        throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
       }
     }
     Boolean isDir = s3DDF.getKey().endsWith("/");
@@ -77,7 +78,8 @@ public class S3DDFManager extends DDFManager {
     if (s3DDF.getIsDir()) {
       List<String> keys = this.fileKeys(s3DDF);
       if (keys.isEmpty()) {
-        throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
+        // throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
+        return DataFormat.CSV;
       } else {
         HashSet<DataFormat> dataFormats = new HashSet<>();
         for (String key : keys) {
@@ -89,7 +91,7 @@ public class S3DDFManager extends DDFManager {
         }
         if (dataFormats.size() > 1) {
           throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
-              "%s", s3DDF.getKey(), dataFormats.toArray().toString()));
+              "%s", s3DDF.getKey(), Arrays.toString(dataFormats.toArray())));
         } else if (dataFormats.size() == 1){
           return dataFormats.iterator().next();
         } else {
