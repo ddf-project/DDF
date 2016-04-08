@@ -8,7 +8,6 @@ import org.python.util.PythonInterpreter
 import scala.collection.JavaConverters._
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.JavaConversions.seqAsJavaList
-
 import org.apache.spark.rdd.RDD
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.REXPDouble
@@ -19,14 +18,15 @@ import org.rosuda.REngine.REXPString
 import org.rosuda.REngine.RList
 import org.rosuda.REngine.Rserve.RConnection
 import org.rosuda.REngine.Rserve.StartRserve
-
 import _root_.io.ddf.DDF
 import _root_.io.ddf.content.Schema
 import _root_.io.ddf.content.Schema.Column
-import _root_.io.ddf.etl.{TransformationHandler ⇒ CoreTransformationHandler}
+import _root_.io.ddf.etl.{TransformationHandler => CoreTransformationHandler}
 import _root_.io.ddf.exception.DDFException
 import _root_.io.ddf.spark.util.SparkUtils
-import java.util.{Properties, ArrayList, List}
+import java.util.{ArrayList, List, Properties}
+
+import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
@@ -210,6 +210,21 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
         " source columns and transform functions must have the same length")
     }
 
+    val setExistingColumns = mDDF.getColumnNames.toSet
+    val newNamedColumns = destColumns.filter(s => s != null && s.trim.nonEmpty).toSet
+    val newDestColumns = destColumns.map {
+      case colName if colName == null || colName.trim.isEmpty =>
+        @tailrec
+        def getNewColName(c: Int): Int = {
+          val cn = s"c$c"
+          if (!setExistingColumns.contains(cn) && !newNamedColumns.contains(cn)) {
+            return c
+          }
+          getNewColName(c+1)
+        }
+        s"c${getNewColName(0)}"
+      case colName => colName
+    }
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[PyObject]).asInstanceOf[RDD[PyObject]]
 
     // process each DF partition in Python
@@ -235,7 +250,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
           interpreter.set("transform_codes", transformFunctions)
           interpreter.set("function_names", functionNames)
           interpreter.set("src_cols", sourceColumns)
-          interpreter.set("dest_cols", destColumns)
+          interpreter.set("dest_cols", newDestColumns)
           interpreter.set("df_part", partdf)
 
           interpreter.exec(

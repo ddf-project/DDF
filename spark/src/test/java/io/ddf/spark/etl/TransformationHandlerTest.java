@@ -40,6 +40,23 @@ public class TransformationHandlerTest extends BaseTest {
   }
 
   @Test
+  public void testTransformPython() throws DDFException {
+    // f = lambda x: x/2.
+    // f = lambda x: x+10
+    DDF newDdf = ddf.Transform.transformPython(
+        new String[] {"ZGVmIHRyYW5zKHgpOgogIHJldHVybiB4LzIuCg==", "ZGVmIHRyYW5zMih4KToKICByZXR1cm4geCsxMAo="},
+        new String[] {"trans", "trans2"},
+        new String[] {null, "col2"},
+        new String[][] { new String[] {"distance"}, new String[] {"month"}});
+
+    Assert.assertFalse(ddf.getUUID().equals(newDdf.getUUID()));
+    Assert.assertNotNull(newDdf);
+    Assert.assertTrue(newDdf.getColumnNames().contains("c0"));
+    Assert.assertTrue(newDdf.getColumnNames().contains("col2"));
+    Assert.assertEquals(10, newDdf.getNumColumns());
+  }
+
+  @Test
   public void testTransformNativeRserveMultipleExpressions() throws DDFException {
     String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
     DDF newddf = ddf.Transform.transformNativeRserve(expressions);
