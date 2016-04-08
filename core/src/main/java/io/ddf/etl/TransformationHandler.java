@@ -259,18 +259,26 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     // make up new names for entries with null or empty in `newColumnNames`
     List<String> lsNewColumnNamesTrimmed = new ArrayList<>();
+
+    // we prioritize the named entries in newColumnNames
+    Set<String> setNamedColumns = Arrays.stream(newColumnNames)
+        .filter(s -> s != null && !s.isEmpty() && !s.replaceAll("\\W", "").trim().isEmpty())
+        .map(s -> s.replaceAll("\\W", "").trim())
+        .collect(Collectors.toSet());
+
     int iNewColIdx = 0;
     for (String sCol: newColumnNames) {
       String sColTrimmed = null;
-      if (sCol != null && sCol.length() > 0) {
+      if (sCol != null && !sCol.isEmpty()) {
         sColTrimmed = sCol.replaceAll("\\W", "").trim();
       }
 
-      if (sColTrimmed != null && sColTrimmed.length() > 0) {
+      if (sColTrimmed != null && !sColTrimmed.isEmpty()) {
         lsNewColumnNamesTrimmed.add(sColTrimmed);
       } else {
         String sNewColName = String.format("c%d", iNewColIdx);
         while (lsExistingColumns.contains(sNewColName)
+            || setNamedColumns.contains(sNewColName)
             || lsNewColumnNamesTrimmed.contains(sNewColName)) {
           iNewColIdx++;
           sNewColName = String.format("c%d", iNewColIdx);
@@ -282,7 +290,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     // check for duplicates in new column names
     Set<String> setNewColumnNamesTrimmed = lsNewColumnNamesTrimmed.stream().collect(Collectors.toSet());
     if (setNewColumnNamesTrimmed.size() < lsNewColumnNamesTrimmed.size()) {
-      throw new DDFException("There were duplicated new column names");
+      throw new DDFException("There are duplicated new column names");
     }
 
     // added transform expressions first
