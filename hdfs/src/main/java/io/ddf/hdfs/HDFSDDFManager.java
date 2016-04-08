@@ -6,6 +6,7 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.HDFSDataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
+import io.ddf.util.Utils;
 
 import com.google.common.base.Strings;
 
@@ -78,20 +79,10 @@ public class HDFSDDFManager extends DDFManager {
             throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
           }
           String filePath = file.getPath().toString();
-          int dotIndex = filePath.lastIndexOf('.');
-          int slashIndex = filePath.lastIndexOf('/');
           // Check for extension.
-          if (dotIndex != -1 && dotIndex > slashIndex) {
-            String extension = filePath.substring(dotIndex + 1);
-            try {
-              if (extension.equalsIgnoreCase("parquet")) {
-                extension = "pqt";
-              }
-              DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
-              dataFormats.add(dataFormat);
-            } catch (Exception e) {
-              throw new DDFException(String.format("Unsupported dataformat: %s", extension));
-            }
+          DataFormat dataFormat = Utils.getDataFormatFromPath(filePath);
+          if (!dataFormat.equals(DataFormat.UNDEF)) {
+            dataFormats.add(dataFormat);
           }
         }
         if (dataFormats.size() > 1) {
@@ -107,24 +98,11 @@ public class HDFSDDFManager extends DDFManager {
       }
     } else {
       String filePath = hdfsDDF.getPath();
-      int dotIndex = filePath.lastIndexOf('.');
-      int slashIndex = filePath.lastIndexOf('/');
-
-      if (dotIndex != -1 && dotIndex > slashIndex) {
-        String extension = filePath.substring(dotIndex + 1);
-        try {
-          DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
-          return dataFormat;
-        } catch (Exception e) {
-          throw new DDFException(String.format("Unsupported dataformat: %s", extension));
-        }
-      } else {
-        return DataFormat.CSV;
-      }
+      // Check for extension.
+      DataFormat dataFormat = Utils.getDataFormatFromPath(filePath);
+      return dataFormat.equals(DataFormat.UNDEF) ? DataFormat.CSV : dataFormat;
     }
   }
-
-
 
   /**
    * @param path The path.

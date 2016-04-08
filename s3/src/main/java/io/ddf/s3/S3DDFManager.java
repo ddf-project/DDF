@@ -14,6 +14,7 @@ import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
+import io.ddf.util.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class S3DDFManager extends DDFManager {
         HashSet<DataFormat> dataFormats = new HashSet<>();
         for (String key : keys) {
           // Check for extension.
-          DataFormat dataFormat = this.getDataFormatFromPath(key);
+          DataFormat dataFormat = Utils.getDataFormatFromPath(key);
           if (!dataFormat.equals(DataFormat.UNDEF)) {
             dataFormats.add(dataFormat);
           }
@@ -100,28 +101,8 @@ public class S3DDFManager extends DDFManager {
       }
     } else {
       String key = s3DDF.getKey();
-      DataFormat dataFormat = this.getDataFormatFromPath(key);
+      DataFormat dataFormat = Utils.getDataFormatFromPath(key);
       return dataFormat.equals(DataFormat.UNDEF) ? DataFormat.CSV : dataFormat;
-    }
-  }
-
-  private DataFormat getDataFormatFromPath(String path) throws DDFException {
-    int dotIndex = path.lastIndexOf('.');
-    int slashIndex = path.lastIndexOf('/');
-    // Check for extension.
-    if (dotIndex != -1 && dotIndex > slashIndex) {
-      String extension = path.substring(dotIndex + 1);
-      try {
-        if (extension.equalsIgnoreCase("parquet")) {
-          extension = "pqt";
-        }
-        DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
-        return dataFormat;
-      } catch (Exception e) {
-        throw new DDFException(String.format("Unsupported dataformat: %s", extension));
-      }
-    } else {
-      return DataFormat.UNDEF;
     }
   }
 

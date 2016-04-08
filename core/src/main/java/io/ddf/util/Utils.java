@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gson.*;
 import io.ddf.content.ISerializable;
+import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -43,6 +44,26 @@ public class Utils {
         configuration.addResource(new Path(hadoopConfDir + "/" + "hdfs-site.xml"));
     }
     return configuration;
+  }
+
+  public static DataFormat getDataFormatFromPath(String path) throws DDFException {
+    int dotIndex = path.lastIndexOf('.');
+    int slashIndex = path.lastIndexOf('/');
+    // Check for extension.
+    if (dotIndex != -1 && dotIndex > slashIndex) {
+      String extension = path.substring(dotIndex + 1);
+      try {
+        if (extension.equalsIgnoreCase("parquet")) {
+          extension = "pqt";
+        }
+        DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
+        return dataFormat;
+      } catch (Exception e) {
+        throw new DDFException(String.format("Unsupported dataformat: %s", extension));
+      }
+    } else {
+      return DataFormat.UNDEF;
+    }
   }
 
   public static List<String> listFiles(String directory) {
