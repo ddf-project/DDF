@@ -1,6 +1,5 @@
 package io.ddf.s3;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -78,26 +77,21 @@ public class S3DDFManager extends DDFManager {
   public DataFormat getDataFormat(S3DDF s3DDF) throws DDFException {
     if (s3DDF.getIsDir()) {
       List<String> keys = this.fileKeys(s3DDF);
-      if (keys.isEmpty()) {
-        // throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
-        return DataFormat.CSV;
+      HashSet<DataFormat> dataFormats = new HashSet<>();
+      for (String key : keys) {
+        // Check for extension.
+        DataFormat dataFormat = Utils.getDataFormatFromPath(key);
+        if (!dataFormat.equals(DataFormat.UNDEF)) {
+          dataFormats.add(dataFormat);
+        }
+      }
+      if (dataFormats.size() > 1) {
+        throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
+            "%s", s3DDF.getKey(), Arrays.toString(dataFormats.toArray())));
+      } else if (dataFormats.size() == 1){
+        return dataFormats.iterator().next();
       } else {
-        HashSet<DataFormat> dataFormats = new HashSet<>();
-        for (String key : keys) {
-          // Check for extension.
-          DataFormat dataFormat = Utils.getDataFormatFromPath(key);
-          if (!dataFormat.equals(DataFormat.UNDEF)) {
-            dataFormats.add(dataFormat);
-          }
-        }
-        if (dataFormats.size() > 1) {
-          throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
-              "%s", s3DDF.getKey(), Arrays.toString(dataFormats.toArray())));
-        } else if (dataFormats.size() == 1){
-          return dataFormats.iterator().next();
-        } else {
-          return DataFormat.CSV;
-        }
+        return DataFormat.CSV;
       }
     } else {
       String key = s3DDF.getKey();
