@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +96,7 @@ public class HDFSDDFManager extends DDFManager {
         }
         if (dataFormats.size() > 1) {
           throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: %s", hdfsDDF
-              .getPath(), dataFormats.toArray().toString()));
+              .getPath(), Arrays.toString(dataFormats.toArray())));
         } else if (dataFormats.size() == 1) {
           return dataFormats.iterator().next();
         } else {
@@ -107,14 +108,23 @@ public class HDFSDDFManager extends DDFManager {
     } else {
       String filePath = hdfsDDF.getPath();
       int dotIndex = filePath.lastIndexOf('.');
-      if (dotIndex != -1) {
-        return DataFormat.valueOf(filePath.substring(dotIndex + 1).toUpperCase());
+      int slashIndex = filePath.lastIndexOf('/');
+
+      if (dotIndex != -1 && dotIndex > slashIndex) {
+        String extension = filePath.substring(dotIndex + 1);
+        try {
+          DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
+          return dataFormat;
+        } catch (Exception e) {
+          throw new DDFException(String.format("Unsupported dataformat: %s", extension));
+        }
       } else {
-        // CSV by default
         return DataFormat.CSV;
       }
     }
   }
+
+
 
   /**
    * @param path The path.
