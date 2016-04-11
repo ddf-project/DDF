@@ -56,6 +56,8 @@ public class HDFSDDF extends DDF {
         // Check dataformat.
         if (options != null && options.containsKey("format")) {
             try {
+                String format = options.get("format").toUpperCase();
+                format = format.equals("PARQUET") ? "PQT" : format;
                 mDataFormat = DataFormat.valueOf(options.get("format"));
             } catch (IllegalArgumentException e) {
                 mIsDir = hdfsDDFManager.isDir(this);

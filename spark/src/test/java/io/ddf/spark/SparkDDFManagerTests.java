@@ -180,8 +180,7 @@ public class SparkDDFManagerTests extends BaseTest {
 
   }
 
-  public void testComment(S3DDFManager s3DDFManager) {
-  }
+  public void testComment(S3DDFManager s3DDFManager) throws DDFException {}
 
   public void testNull(S3DDFManager s3DDFManager) throws DDFException {
     final Map<String, String> nullvalue2pathMap = ImmutableMap.<String, String>builder()
@@ -213,7 +212,7 @@ public class SparkDDFManagerTests extends BaseTest {
       throw new DDFException(e);
     }
     S3DDFManager s3DDFManager= (S3DDFManager) DDFManager.get(DDFManager.EngineType.S3, s3dsd);
-    //testBasicCopyForS3(s3DDFManager);
+    testBasicCopyForS3(s3DDFManager);
     testOptions(s3DDFManager);
   }
 

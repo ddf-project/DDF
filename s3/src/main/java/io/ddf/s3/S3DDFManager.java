@@ -1,6 +1,5 @@
 package io.ddf.s3;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -14,11 +13,13 @@ import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
+import io.ddf.util.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class S3DDFManager extends DDFManager {
     List<String> keys = this.listFiles(s3DDF.getBucket(),s3DDF.getKey());
     for (String key : keys) {
       if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
-        throw new DDFException("This folder contains subfolder, S3 DDF does not support nested folders");
+        throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
       }
     }
     Boolean isDir = s3DDF.getKey().endsWith("/");
@@ -76,45 +77,26 @@ public class S3DDFManager extends DDFManager {
   public DataFormat getDataFormat(S3DDF s3DDF) throws DDFException {
     if (s3DDF.getIsDir()) {
       List<String> keys = this.fileKeys(s3DDF);
-      if (keys.isEmpty()) {
-        throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
+      HashSet<DataFormat> dataFormats = new HashSet<>();
+      for (String key : keys) {
+        // Check for extension.
+        DataFormat dataFormat = Utils.getDataFormatFromPath(key);
+        if (!dataFormat.equals(DataFormat.UNDEF)) {
+          dataFormats.add(dataFormat);
+        }
+      }
+      if (dataFormats.size() > 1) {
+        throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
+            "%s", s3DDF.getKey(), Arrays.toString(dataFormats.toArray())));
+      } else if (dataFormats.size() == 1){
+        return dataFormats.iterator().next();
       } else {
-        HashSet<DataFormat> dataFormats = new HashSet<>();
-        for (String key : keys) {
-          int dotIndex = key.lastIndexOf('.');
-          int slashIndex = key.lastIndexOf('/');
-          // Check for extension.
-          if (dotIndex != -1 && dotIndex > slashIndex) {
-            String extension = key.substring(dotIndex + 1);
-            try {
-              if (extension.equalsIgnoreCase("parquet")) {
-                extension = "pqt";
-              }
-              DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
-              dataFormats.add(dataFormat);
-            } catch (Exception e) {
-              throw new DDFException(String.format("Unsupported dataformat: %s", extension));
-            }
-          }
-        }
-        if (dataFormats.size() > 1) {
-          throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
-              "%s", s3DDF.getKey(), dataFormats.toArray().toString()));
-        } else if (dataFormats.size() == 1){
-          return dataFormats.iterator().next();
-        } else {
-          return DataFormat.CSV;
-        }
+        return DataFormat.CSV;
       }
     } else {
       String key = s3DDF.getKey();
-      int dotIndex = key.lastIndexOf('.');
-      if (dotIndex != -1) {
-        return DataFormat.valueOf(key.substring(dotIndex + 1).toUpperCase());
-      } else {
-        // CSV by default
-        return DataFormat.CSV;
-      }
+      DataFormat dataFormat = Utils.getDataFormatFromPath(key);
+      return dataFormat.equals(DataFormat.UNDEF) ? DataFormat.CSV : dataFormat;
     }
   }
 

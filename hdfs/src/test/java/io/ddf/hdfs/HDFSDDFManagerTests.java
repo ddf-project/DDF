@@ -37,19 +37,13 @@ public class HDFSDDFManagerTests {
 
     @Test
     public void testCreateDDF() throws DDFException {
-        try {
-            HDFSDDF folderDDF = manager.newDDF("/test_pe/", null, null);
-            assert false;
-        } catch (Exception e) {
-
-        }
 
         HDFSDDF cleanFolderDDF = manager.newDDF("/test_pe/csv/multiple", null, null);
         HDFSDDF jsonDDF = manager.newDDF("/test_pe/json/noheader", null, null);
         HDFSDDF csvDDF = manager.newDDF("/test_pe/csv/noheader", null, null);
         assert (cleanFolderDDF.getIsDir() == true);
-        assert(jsonDDF.getIsDir() == false);
-        assert(csvDDF.getIsDir() == false);
+        assert(jsonDDF.getIsDir() == true);
+        assert(csvDDF.getIsDir() == true);
         assert(jsonDDF.getDataFormat().equals(DataFormat.JSON));
         assert(csvDDF.getDataFormat().equals(DataFormat.CSV));
         try {
@@ -78,6 +72,27 @@ public class HDFSDDFManagerTests {
         HDFSDDF orcDDF = manager.newDDF("/test_pe/orc/default", null, null);
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
+
+        HDFSDDF noExtensionDDF = manager.newDDF("/test_pe/extra/schema/lines-with-different-cols/lines-with-different-cols", null, null);
+        assert (noExtensionDDF.getIsDir() == false);
+        assert (noExtensionDDF.getDataFormat().equals(DataFormat.CSV));
+
+        HDFSDDF emptyDDF = manager.newDDF("/test_pe/extra/empty-folder/", null, null);
+        assert (emptyDDF.getIsDir() == true);
+        assert (emptyDDF.getDataFormat().equals(DataFormat.CSV));
+
+        try {
+            HDFSDDF folderDDF = manager.newDDF("/test_pe/", null, null);
+            assert false;
+        } catch (Exception e) {
+        }
+
+        try {
+            HDFSDDF mixedDDF = manager.newDDF("/test_pe/extra/format/mixed-csv-tsv/", null, null);
+            assert (false);
+        } catch (Exception e) {
+            assert (e.getMessage().contains("more than 1"));
+        }
     }
 
 

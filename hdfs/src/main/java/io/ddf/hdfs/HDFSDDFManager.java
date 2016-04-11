@@ -6,6 +6,7 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.HDFSDataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
+import io.ddf.util.Utils;
 
 import com.google.common.base.Strings;
 
@@ -13,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -68,31 +70,21 @@ public class HDFSDDFManager extends DDFManager {
     if (hdfsDDF.getIsDir()) {
       try {
         FileStatus[] files = this.fs.listStatus(new Path(hdfsDDF.getPath()));
-        if (files.length == 0) {
-          throw new DDFException(String.format("There is no file under %s", hdfsDDF.getPath()));
-        }
         HashSet<DataFormat> dataFormats = new HashSet<>();
         for (FileStatus file : files) {
+          if (file.isDirectory()) {
+            throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
+          }
           String filePath = file.getPath().toString();
-          int dotIndex = filePath.lastIndexOf('.');
-          int slashIndex = filePath.lastIndexOf('/');
           // Check for extension.
-          if (dotIndex != -1 && dotIndex > slashIndex) {
-            String extension = filePath.substring(dotIndex + 1);
-            try {
-              if (extension.equalsIgnoreCase("parquet")) {
-                extension = "pqt";
-              }
-              DataFormat dataFormat = DataFormat.valueOf(extension.toUpperCase());
-              dataFormats.add(dataFormat);
-            } catch (Exception e) {
-              throw new DDFException(String.format("Unsupported dataformat: %s", extension));
-            }
+          DataFormat dataFormat = Utils.getDataFormatFromPath(filePath);
+          if (!dataFormat.equals(DataFormat.UNDEF)) {
+            dataFormats.add(dataFormat);
           }
         }
         if (dataFormats.size() > 1) {
           throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: %s", hdfsDDF
-              .getPath(), dataFormats.toArray().toString()));
+              .getPath(), Arrays.toString(dataFormats.toArray())));
         } else if (dataFormats.size() == 1) {
           return dataFormats.iterator().next();
         } else {
@@ -103,13 +95,9 @@ public class HDFSDDFManager extends DDFManager {
       }
     } else {
       String filePath = hdfsDDF.getPath();
-      int dotIndex = filePath.lastIndexOf('.');
-      if (dotIndex != -1) {
-        return DataFormat.valueOf(filePath.substring(dotIndex + 1).toUpperCase());
-      } else {
-        // CSV by default
-        return DataFormat.CSV;
-      }
+      // Check for extension.
+      DataFormat dataFormat = Utils.getDataFormatFromPath(filePath);
+      return dataFormat.equals(DataFormat.UNDEF) ? DataFormat.CSV : dataFormat;
     }
   }
 
