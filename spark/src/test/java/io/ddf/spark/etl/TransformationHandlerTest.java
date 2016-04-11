@@ -40,6 +40,23 @@ public class TransformationHandlerTest extends BaseTest {
   }
 
   @Test
+  public void testTransformPython() throws DDFException {
+    // f = lambda x: x/2.
+    // f = lambda x: x+10
+    DDF newDdf = ddf.Transform.transformPython(
+        new String[] {"ZGVmIHRyYW5zKHgpOgogIHJldHVybiB4LzIuCg==", "ZGVmIHRyYW5zMih4KToKICByZXR1cm4geCsxMAo="},
+        new String[] {"trans", "trans2"},
+        new String[] {null, "col2"},
+        new String[][] { new String[] {"distance"}, new String[] {"month"}});
+
+    Assert.assertFalse(ddf.getUUID().equals(newDdf.getUUID()));
+    Assert.assertNotNull(newDdf);
+    Assert.assertTrue(newDdf.getColumnNames().contains("c0"));
+    Assert.assertTrue(newDdf.getColumnNames().contains("col2"));
+    Assert.assertEquals(10, newDdf.getNumColumns());
+  }
+
+  @Test
   public void testTransformNativeRserveMultipleExpressions() throws DDFException {
     String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
     DDF newddf = ddf.Transform.transformNativeRserve(expressions);
@@ -233,18 +250,25 @@ public class TransformationHandlerTest extends BaseTest {
 
   @Test
   public void  testTransformSqlWithNames() throws DDFException {
-    ddf.setMutable(true);
-    ddf = ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"round(distance/2, 2)"}, null);
+    ddf.setMutable(false);
 
-    Assert.assertEquals(31, ddf.getNumRows());
-    Assert.assertEquals(9, ddf.getNumColumns());
-    Assert.assertEquals("dist", ddf.getColumnName(8));
-    Assert.assertEquals(9, ddf.VIEWS.head(1).get(0).split("\\t").length);
+    DDF ddf2 = ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"round(distance/2, 2)"}, null);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(9, ddf2.getNumColumns());
+    Assert.assertEquals("dist", ddf2.getColumnName(8));
+    Assert.assertEquals(9, ddf2.VIEWS.head(1).get(0).split("\\t").length);
 
-    ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"}, null);
-    Assert.assertEquals(31, ddf.getNumRows());
-    Assert.assertEquals(10, ddf.getNumColumns());
-    Assert.assertEquals(10, ddf.getSummary().length);
+    ddf2 = ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"}, null);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(9, ddf2.getNumColumns());
+    Assert.assertEquals(9, ddf2.getSummary().length);
+
+    // mixed transform with duplicated name
+    ddf2 = ddf.Transform.transformUDFWithNames(new String[] {null, "c0"},
+        new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(10, ddf2.getNumColumns());
+    Assert.assertEquals(10, ddf2.getSummary().length);
 
     try {
       ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"},
