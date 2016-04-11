@@ -7,12 +7,12 @@ import io.ddf.exception.DDFException
 
 /**
   */
-class ArrayObject2ArrayDouble(@transient ddf: DDF) extends ConvertFunction(ddf) with ObjectToDoubleMapper {
+class ArrayObject2ArrayDouble(@transient ddf: DDF) extends ConvertFunction(ddf) {
 
   override def apply(representation: Representation): Representation = {
     representation.getValue match {
       case rdd: RDD[Array[Object]] => {
-        val mappers = getMapper(ddf.getSchemaHandler.getColumns)
+        val mappers = ObjectToDoubleMapper.getAny2DoubleMappers(ddf.getSchemaHandler.getColumns)
         val rddArrDouble = rdd.map {
           array => {
             val arr = new Array[Double](array.size)

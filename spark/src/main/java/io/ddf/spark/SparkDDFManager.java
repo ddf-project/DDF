@@ -210,6 +210,11 @@ public class SparkDDFManager extends DDFManager {
     }
   }
 
+  public DDF newDDFFromSparkDataFrame(DataFrame df) throws DDFException {
+    Schema schema = SparkUtils.schemaFromDataFrame(df);
+    return newDDF(this, df, new Class<?>[]{DataFrame.class}, null, null, schema);
+  }
+
   /**
    * Use system environment variables to configure the SparkContext creation.
    *

@@ -6,6 +6,7 @@ import java.util.{Map => JMap}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonFactory}
 import com.google.common.base.Strings
 import io.ddf.{DDFManager, DDF}
+import org.apache.spark.mllib.linalg.VectorUDT
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.Row
@@ -279,6 +280,7 @@ object SparkUtils {
       case BinaryType => Schema.ColumnType.BINARY
       case TimestampType => Schema.ColumnType.TIMESTAMP
       case DateType => Schema.ColumnType.DATE
+      case vector: VectorUDT => Schema.ColumnType.VECTOR
       case StructType(_) => Schema.ColumnType.STRUCT
       case ArrayType(_, _) => Schema.ColumnType.ARRAY
       case MapType(_, _, _) => Schema.ColumnType.MAP

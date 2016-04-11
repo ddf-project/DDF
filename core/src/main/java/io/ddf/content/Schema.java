@@ -375,9 +375,9 @@ public class Schema implements Serializable {
     TIMESTAMP(java.sql.Timestamp.class),
     DATE(java.sql.Date.class),
     ARRAY(scala.collection.Seq.class),
-    STRUCT(Objects.class),
-    //STRUCT(org.apache.spark.sql.Row.class), // TODO review
+    STRUCT(Objects.class), // TODO review
     MAP(scala.collection.Map.class),
+    VECTOR(),
     BLOB(Object.class), //
     ANY(/* for ColumnClass.Factor */) //
     ;
@@ -443,6 +443,7 @@ public class Schema implements Serializable {
         case DOUBLE:
         case FLOAT:
         case DECIMAL:
+        case VECTOR:
           return true;
 
         default:

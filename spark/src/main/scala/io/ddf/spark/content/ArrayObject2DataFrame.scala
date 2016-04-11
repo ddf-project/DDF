@@ -1,7 +1,7 @@
 package io.ddf.spark.content
 
 import io.ddf.DDF
-import io.ddf.content.{Representation, ConvertFunction}
+import io.ddf.content.{Schema, Representation, ConvertFunction}
 import org.apache.spark.rdd.RDD
 import io.ddf.spark.{SparkDDFManager, SparkDDF}
 import org.apache.spark.sql.Row
@@ -10,7 +10,7 @@ import scala.collection.JavaConversions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.types.ArrayType
 import scala.collection.mutable.ArrayBuffer
-
+import org.apache.spark.mllib.linalg.VectorUDT
 /**
   */
 class ArrayObject2DataFrame(@transient ddf: DDF) extends ConvertFunction(ddf) {
@@ -46,6 +46,7 @@ object ArrayObject2DataFrame {
       case ColumnType.BINARY => StructField(column.getName, BinaryType, true)
       case ColumnType.TIMESTAMP => StructField(column.getName, TimestampType, true)
       case ColumnType.DATE => StructField(column.getName, DateType, true)
+      case ColumnType.VECTOR => StructField(column.getName, new VectorUDT, true)
 //      case ColumnType.STRUCT => StructField(column.getName, StructType(_), true) // @huan
 //      case ColumnType.ARRAY => StructField(column.getName, ArrayType(_, _), true)
 //      case ColumnType.MAP => StructField(column.getName, MapType(_, _, _), true)

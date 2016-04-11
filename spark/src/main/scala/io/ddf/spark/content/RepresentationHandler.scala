@@ -48,6 +48,7 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   this.addConvertFunction(RDD_INT, RDD_ROW, new RDDInt2RDDRow(this.mDDF))
   this.addConvertFunction(RDD_DOUBLE, RDD_ROW, new RDDDouble2RDDRow(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_STRING, new RDDRow2String(this.mDDF))
+  this.addConvertFunction(RDD_ROW, RDD_LABELED_POINT, new Row2LabeledPoint(this.mDDF))
 
   override def getDefaultDataType: Array[Class[_]] = Array(classOf[RDD[_]], classOf[Array[Object]])
 
