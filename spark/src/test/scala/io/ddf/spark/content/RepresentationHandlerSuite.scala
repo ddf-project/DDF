@@ -21,7 +21,7 @@ import io.ddf.etl.IHandleMissingData.Axis
 class RepresentationHandlerSuite extends ATestSuite {
   createTableAirline()
 
-  ignore("Can get SchemaRDD and RDD[Vector]") {
+  test("Can get SchemaRDD and RDD[Vector]") {
     val ddf = manager.newDDF().getSqlHandler.sql2ddf("select month, year, dayofmonth from airline").asInstanceOf[SparkDDF]
     val rddVector = ddf.getRDD(classOf[Vector])
     assert(rddVector != null, "Can get RDD[Vector]")
@@ -31,7 +31,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(schemaRDD != null, "Can get SchemaRDD")
   }
 
-  ignore("Can get RDD[LabeledPoint]") {
+  test("Can get RDD[LabeledPoint]") {
     manager.sql("drop table if exists airline_delayed", "SparkSQL")
     manager.sql("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline", "SparkSQL")
     val ddf = manager.sql2ddf("select " +
@@ -46,7 +46,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(rddLabeledPoint2.count() === 295)
   }
 
-  ignore("Can get RDD[Array[Double]] and RDD[Array[Object]]") {
+  test("Can get RDD[Array[Double]] and RDD[Array[Object]]") {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
     val rddArrObj = ddf.getRDD(classOf[Array[Object]])
 
@@ -58,7 +58,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(rddArrObj.count() === 301)
   }
 
-  ignore("Can get RDD[Array[Object]] & RDD[LabeledPoint] from RDD[Array[Double]]") {
+  test("Can get RDD[Array[Object]] & RDD[LabeledPoint] from RDD[Array[Double]]") {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
     val repHandler = ddf.getRepresentationHandler
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
@@ -75,7 +75,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(arrLP.count == 295)
   }
 
-  ignore("Has representation after creating it") {
+  test("Has representation after creating it") {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
     val repHandler = ddf.getRepresentationHandler
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
@@ -91,7 +91,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(repHandler.has(classOf[RDD[_]], classOf[LabeledPoint]))
   }
 
-  ignore("Can handle null value") {
+  test("Can handle null value") {
     val ddf = manager.sql2ddf("select year, month, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
 
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
@@ -108,7 +108,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assertEquals(295, count)
   }
 
-  ignore("Can do sql queries after CrossValidation ") {
+  test("Can do sql queries after CrossValidation ") {
     val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
     for (split <- ddf.ML.CVKFold(5, 10)) {
       val train = split.getTrainSet.asInstanceOf[SparkDDF]
@@ -123,13 +123,13 @@ class RepresentationHandlerSuite extends ATestSuite {
     }
   }
 
-  ignore("Handle empty DDF") {
+  test("Handle empty DDF") {
     val ddf = manager.newDDF();
     val rdd = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row])
     assert(rdd == null)
   }
 
-  ignore("Can do sql queries after Transform Rserve") {
+  test("Can do sql queries after Transform Rserve") {
     createTableMtcars()
     val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
     val newDDF = ddf.Transform.transformNativeRserve("z1 = mpg / cyl, " +
@@ -144,7 +144,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(ddf1 != null)
   }
   
-  ignore("Can get RDD(Array[String])") {
+  test("Can get RDD(Array[String])") {
     createTableText8Sample 
     val ddf = manager.sql2ddf("select * from text8sample","SparkSQL")
     val doc = ddf.asInstanceOf[SparkDDF].getRDD(classOf[Array[String]])
@@ -182,6 +182,18 @@ class RepresentationHandlerSuite extends ATestSuite {
     val localArr = rddLabeledPoint.collect()
     localArr.foreach {
       row => assert(row.features.size == 12)
+    }
+  }
+
+  test("creating Array[Double]") {
+    val airline = manager.sql2ddf("select * from airline", "SparkSQL")
+    val transformedDF = airline.getTransformationHandler.factorIndexer(util.Arrays.asList("month"))
+    val encodedDF = transformedDF.getTransformationHandler.oneHotEncoding("month", "vector").VIEWS.project(
+      "year", "arrdelay", "vector", "depdelay")
+    val arrDouble = encodedDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[Array[Double]]).
+      asInstanceOf[RDD[Array[Double]]].collect()
+    arrDouble.foreach {
+      row => assert(row.size == 13)
     }
   }
 }
