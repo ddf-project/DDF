@@ -23,8 +23,10 @@ class Row2LabeledPoint(@transient ddf: DDF) extends ConvertFunction(ddf) {
         val features = row.toSeq.take(numCols - 1)
         makeVector(features) match {
           case Some(featureVector) =>
-            val label = doubleGetter(row.get(numCols - 1)).getOrElse(Double.NaN)
-            new LabeledPoint(label, featureVector)
+            doubleGetter(row.get(numCols - 1)) match {
+              case Some(label) => new LabeledPoint(label, featureVector)
+              case None => null
+            }
           case None => null
         }
       }
