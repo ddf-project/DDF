@@ -50,7 +50,7 @@ object ObjectToDoubleMapper {
         case _ ⇒ throw new DDFException("Cannot convert string to double")
       }
 
-      case e ⇒ throw new DDFException("Cannot convert to double")
+      case someType ⇒ throw new DDFException(s"Cannot convert ${someType.toString} to double")
     }
   }
 

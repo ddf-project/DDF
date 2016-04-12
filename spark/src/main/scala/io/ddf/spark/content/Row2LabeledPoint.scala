@@ -14,7 +14,6 @@ import scala.collection.mutable
 class Row2LabeledPoint(@transient ddf: DDF) extends ConvertFunction(ddf) {
 
   override def apply(representation: Representation): Representation = {
-    //val mappers = getAny2DoubleMappers(ddf.getSchemaHandler.getColumns)
     val numCols = ddf.getSchemaHandler.getColumns.size
     val rddRow = representation.getValue.asInstanceOf[RDD[Row]]
     val doubleGetter = ObjectToDoubleMapper.getAny2DoubleMapper(ddf.getSchema.getColumns.last.getType)

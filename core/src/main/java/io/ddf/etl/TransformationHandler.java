@@ -362,4 +362,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   @Override public DDF inverseFactorIndexer(List<String> columns) throws DDFException {
     throw new UnsupportedOperationException();
   }
+
+  @Override public DDF oneHotEncoding(String inputColumn, String outputColumnName) throws DDFException {
+    throw new UnsupportedOperationException();
+  }
 }

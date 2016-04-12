@@ -8,8 +8,6 @@ import org.apache.spark.sql.Row
 import io.ddf.content.Schema.{ColumnType, Column}
 import scala.collection.JavaConversions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.types.ArrayType
-import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.mllib.linalg.VectorUDT
 /**
   */

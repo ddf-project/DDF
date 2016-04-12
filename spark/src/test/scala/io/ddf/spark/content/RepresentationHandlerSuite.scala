@@ -3,13 +3,15 @@ package io.ddf.spark.content
 //import shark.api.Row
 //import shark.memstore2.TablePartition
 
+import java.util
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.junit.Assert.assertEquals
 import scala.collection.JavaConversions._
 import io.ddf.spark.{ATestSuite, SparkDDF}
 import org.apache.spark.sql.Row
-import org.apache.spark.mllib.linalg.Vector
+import org.apache.spark.mllib.linalg.{SparseVector, DenseVector, Vectors, Vector}
 import org.apache.spark.sql.{DataFrame}
 import org.rosuda.REngine.REXP
 import io.ddf.etl.IHandleMissingData.Axis
@@ -19,7 +21,7 @@ import io.ddf.etl.IHandleMissingData.Axis
 class RepresentationHandlerSuite extends ATestSuite {
   createTableAirline()
 
-  test("Can get SchemaRDD and RDD[Vector]") {
+  ignore("Can get SchemaRDD and RDD[Vector]") {
     val ddf = manager.newDDF().getSqlHandler.sql2ddf("select month, year, dayofmonth from airline").asInstanceOf[SparkDDF]
     val rddVector = ddf.getRDD(classOf[Vector])
     assert(rddVector != null, "Can get RDD[Vector]")
@@ -29,7 +31,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(schemaRDD != null, "Can get SchemaRDD")
   }
 
-  test("Can get RDD[LabeledPoint]") {
+  ignore("Can get RDD[LabeledPoint]") {
     manager.sql("drop table if exists airline_delayed", "SparkSQL")
     manager.sql("create table airline_delayed as SELECT *, if(abs(arrdelay)>10,1,0) as delayed FROM airline", "SparkSQL")
     val ddf = manager.sql2ddf("select " +
@@ -44,7 +46,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(rddLabeledPoint2.count() === 295)
   }
 
-  test("Can get RDD[Array[Double]] and RDD[Array[Object]]") {
+  ignore("Can get RDD[Array[Double]] and RDD[Array[Object]]") {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
     val rddArrObj = ddf.getRDD(classOf[Array[Object]])
 
@@ -56,7 +58,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(rddArrObj.count() === 301)
   }
 
-  test("Can get RDD[Array[Object]] & RDD[LabeledPoint] from RDD[Array[Double]]") {
+  ignore("Can get RDD[Array[Object]] & RDD[LabeledPoint] from RDD[Array[Double]]") {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
     val repHandler = ddf.getRepresentationHandler
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
@@ -73,7 +75,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(arrLP.count == 295)
   }
 
-  test("Has representation after creating it") {
+  ignore("Has representation after creating it") {
     val ddf = manager.sql2ddf("select month, year, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
     val repHandler = ddf.getRepresentationHandler
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
@@ -89,7 +91,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(repHandler.has(classOf[RDD[_]], classOf[LabeledPoint]))
   }
 
-  test("Can handle null value") {
+  ignore("Can handle null value") {
     val ddf = manager.sql2ddf("select year, month, dayofmonth from airline", "SparkSQL").asInstanceOf[SparkDDF]
 
     val rddArrDouble = ddf.getRDD(classOf[Array[Double]])
@@ -106,7 +108,7 @@ class RepresentationHandlerSuite extends ATestSuite {
     assertEquals(295, count)
   }
 
-  test("Can do sql queries after CrossValidation ") {
+  ignore("Can do sql queries after CrossValidation ") {
     val ddf = manager.sql2ddf("select * from airline", "SparkSQL").asInstanceOf[SparkDDF]
     for (split <- ddf.ML.CVKFold(5, 10)) {
       val train = split.getTrainSet.asInstanceOf[SparkDDF]
@@ -121,13 +123,13 @@ class RepresentationHandlerSuite extends ATestSuite {
     }
   }
 
-  test("Handle empty DDF") {
+  ignore("Handle empty DDF") {
     val ddf = manager.newDDF();
     val rdd = ddf.getRepresentationHandler.get(classOf[RDD[_]], classOf[Row])
     assert(rdd == null)
   }
 
-  test("Can do sql queries after Transform Rserve") {
+  ignore("Can do sql queries after Transform Rserve") {
     createTableMtcars()
     val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
     val newDDF = ddf.Transform.transformNativeRserve("z1 = mpg / cyl, " +
@@ -142,12 +144,44 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(ddf1 != null)
   }
   
-  test("Can get RDD(Array[String])") {
+  ignore("Can get RDD(Array[String])") {
     createTableText8Sample 
     val ddf = manager.sql2ddf("select * from text8sample","SparkSQL")
     val doc = ddf.asInstanceOf[SparkDDF].getRDD(classOf[Array[String]])
     val repHandler = ddf.getRepresentationHandler
     assert(doc != null)        
     assert(repHandler.has(classOf[RDD[_]], classOf[Array[String]]))
+  }
+
+  test("Make Vector") {
+    val v = Vectors.sparse(10, Array(1, 5, 6), Array(2.0, 10.0, 5.0))
+    val elements = Array(1.0, 2.0, 3.0, v)
+    val converter = new Row2LabeledPoint(null)
+    val vector = converter.makeVector(elements).get
+    assert(vector.isInstanceOf[SparseVector])
+    assert(vector.size == 13)
+    assert(vector.apply(0) == 1.0)
+    assert(vector.apply(1) == 2.0)
+    assert(vector.apply(2) == 3.0)
+    assert(vector.apply(3) == 0.0)
+    assert(vector.apply(4) == 2.0)
+    assert(vector.apply(5) == 0.0)
+    assert(vector.apply(6) == 0.0)
+    assert(vector.apply(7) == 0.0)
+    assert(vector.apply(8) == 10.0)
+    assert(vector.apply(9) == 5.0)
+  }
+
+  test("creating LabeledPoint") {
+    val airline = manager.sql2ddf("select * from airline", "SparkSQL")
+    val transformedDF = airline.getTransformationHandler.factorIndexer(util.Arrays.asList("month"))
+    val encodedDF = transformedDF.getTransformationHandler.oneHotEncoding("month", "vector").VIEWS.project(
+      "year", "arrdelay", "vector", "depdelay")
+    val rddLabeledPoint = encodedDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[LabeledPoint]).
+      asInstanceOf[RDD[LabeledPoint]]
+    val localArr = rddLabeledPoint.collect()
+    localArr.foreach {
+      row => assert(row.features.size == 12)
+    }
   }
 }

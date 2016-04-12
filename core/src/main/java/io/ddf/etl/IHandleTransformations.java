@@ -59,4 +59,6 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
   DDF factorIndexer(List<String> columns) throws DDFException;
 
   DDF inverseFactorIndexer(List<String> columns) throws DDFException;
+
+  DDF oneHotEncoding(String inputColumn, String outputColumnName) throws DDFException;
 }
