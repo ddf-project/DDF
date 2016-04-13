@@ -1,6 +1,8 @@
 package io.ddf.spark.etl
 
+import _root_.io.ddf.spark.SparkDDFManager
 import _root_.io.ddf.spark.analytics.{FactorIndexer, FactorIndexerModel}
+import org.apache.spark.ml.feature.OneHotEncoder
 import org.apache.spark.sql.DataFrame
 import org.python.core._
 import org.python.util.PythonInterpreter
@@ -300,6 +302,16 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val factorIndexerModel = FactorIndexerModel.buildModelFromFactorColumns(cols.toArray)
     factorIndexerModel.inversedTransform(this.getDDF)
+  }
+
+
+  override def oneHotEncoding(inputColumn: String, outputColumnName: String): DDF = {
+    val df = this.mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    val encoder = new OneHotEncoder()
+    encoder.setInputCol(inputColumn)
+    encoder.setOutputCol(outputColumnName)
+    val encodedDF = encoder.transform(df)
+    this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(encodedDF)
   }
 }
 

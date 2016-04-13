@@ -136,4 +136,8 @@ public class TransformFacade implements IHandleTransformations {
   public DDF inverseFactorIndexer(List<String> columns) throws DDFException {
     return mTransformationHandler.inverseFactorIndexer(columns);
   }
+
+  public DDF oneHotEncoding(String inputColumn, String outputColumnName) throws DDFException {
+    return mTransformationHandler.oneHotEncoding(inputColumn, outputColumnName);
+  }
 }

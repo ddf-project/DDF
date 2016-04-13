@@ -3,14 +3,16 @@ package io.ddf.spark.content
 //import shark.api.Row
 //import shark.memstore2.TablePartition
 
+import java.util
+
+import io.ddf.content.Schema.{ColumnType, Column}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.junit.Assert.assertEquals
 import scala.collection.JavaConversions._
 import io.ddf.spark.{ATestSuite, SparkDDF}
-import org.apache.spark.sql.Row
-import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.sql.{DataFrame}
+import org.apache.spark.sql.{Row, DataFrame}
+import org.apache.spark.mllib.linalg.{SparseVector, DenseVector, Vectors, Vector}
 import org.rosuda.REngine.REXP
 import io.ddf.etl.IHandleMissingData.Axis
 
@@ -149,5 +151,72 @@ class RepresentationHandlerSuite extends ATestSuite {
     val repHandler = ddf.getRepresentationHandler
     assert(doc != null)        
     assert(repHandler.has(classOf[RDD[_]], classOf[Array[String]]))
+  }
+
+  test("Make Vector") {
+    val v = Vectors.sparse(10, Array(1, 5, 6), Array(2.0, 10.0, 5.0))
+    val elements = Array(1.0, 2.0, 3.0, v)
+    val converter = new Row2LabeledPoint(null)
+    val vector = converter.makeVector(elements).get
+    assert(vector.isInstanceOf[SparseVector])
+    assert(vector.size == 13)
+    assert(vector.apply(0) == 1.0)
+    assert(vector.apply(1) == 2.0)
+    assert(vector.apply(2) == 3.0)
+    assert(vector.apply(3) == 0.0)
+    assert(vector.apply(4) == 2.0)
+    assert(vector.apply(5) == 0.0)
+    assert(vector.apply(6) == 0.0)
+    assert(vector.apply(7) == 0.0)
+    assert(vector.apply(8) == 10.0)
+    assert(vector.apply(9) == 5.0)
+  }
+
+  test("rowToArrayDouble") {
+    val v = Vectors.sparse(10, Array(1, 5, 6), Array(2.0, 10.0, 5.0))
+    val elements = Array(1.0, 2.0, 3, v)
+    val row = Row.fromSeq(elements)
+    val columns = Array(
+      new Column("c1", ColumnType.DOUBLE),
+      new Column("c2", ColumnType.DOUBLE),
+      new Column("c3", ColumnType.INT),
+      new Column("c4", ColumnType.VECTOR)
+    )
+    val arrDouble = RDDRow2ArrayDouble.rowToArrayDouble(row, columns)
+    assert(arrDouble.apply(0) == 1.0)
+    assert(arrDouble.apply(1) == 2.0)
+    assert(arrDouble.apply(2) == 3)
+    assert(arrDouble.apply(3) == 0.0)
+    assert(arrDouble.apply(4) == 2.0)
+    assert(arrDouble.apply(5) == 0.0)
+    assert(arrDouble.apply(6) == 0.0)
+    assert(arrDouble.apply(7) == 0.0)
+    assert(arrDouble.apply(8) == 10.0)
+    assert(arrDouble.apply(9) == 5.0)
+  }
+
+  test("creating LabeledPoint") {
+    val airline = manager.sql2ddf("select * from airline", "SparkSQL")
+    val transformedDF = airline.getTransformationHandler.factorIndexer(util.Arrays.asList("month"))
+    val encodedDF = transformedDF.getTransformationHandler.oneHotEncoding("month", "vector").VIEWS.project(
+      "year", "arrdelay", "vector", "depdelay")
+    val rddLabeledPoint = encodedDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[LabeledPoint]).
+      asInstanceOf[RDD[LabeledPoint]]
+    val localArr = rddLabeledPoint.collect()
+    localArr.foreach {
+      row => assert(row.features.size == 12)
+    }
+  }
+
+  test("creating Array[Double]") {
+    val airline = manager.sql2ddf("select * from airline", "SparkSQL")
+    val transformedDF = airline.getTransformationHandler.factorIndexer(util.Arrays.asList("month"))
+    val encodedDF = transformedDF.getTransformationHandler.oneHotEncoding("month", "vector").VIEWS.project(
+      "year", "arrdelay", "vector", "depdelay")
+    val arrDouble = encodedDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[Array[Double]]).
+      asInstanceOf[RDD[Array[Double]]].collect()
+    arrDouble.foreach {
+      row => assert(row.size == 13)
+    }
   }
 }
