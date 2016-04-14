@@ -9,14 +9,14 @@ import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.FileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-  import java.lang.reflect.Method;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -235,38 +235,24 @@ public class Utils {
   }
 
   public static String readFromFile(String fileName) throws IOException {
-    Reader reader = null;
     Configuration configuration = getConfiguration();
-    try {
-      FileSystem hdfs = FileSystem.get(configuration);
-      FSDataInputStream inputStream = hdfs.open(new Path(fileName));
-      reader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
+    FileSystem hdfs = FileSystem.get(configuration);
+    FSDataInputStream inputStream = hdfs.open(new Path(fileName));
+    try (Reader reader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"))) {
       return IOUtils.toString(reader);
-
     } catch (IOException ex) {
-      throw new IOException(String.format("Cannot read from file %s", fileName, ex));
-
-    } finally {
-      reader.close();
+      throw new IOException(String.format("Cannot read from file %s", fileName), ex);
     }
   }
 
   public static void writeToFile(String fileName, String contents) throws IOException {
-    Writer writer = null;
     Configuration configuration =  getConfiguration();
-    try {
-      FileSystem hdfs = FileSystem.get(configuration);
-      FSDataOutputStream outputStream = hdfs.create(new Path(fileName));
-
-      writer = new BufferedWriter(new OutputStreamWriter(outputStream, "utf-8"));
+    FileSystem hdfs = FileSystem.get(configuration);
+    FSDataOutputStream outputStream = hdfs.create(new Path(fileName));
+    try (Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, "utf-8"))) {
       writer.write(contents);
-      writer.close();
-      hdfs.close();
     } catch (IOException ex) {
-      throw new IOException(String.format("Cannot write to file %s", fileName, ex));
-
-    } finally {
-      writer.close();
+      throw new IOException(String.format("Cannot write to file %s", fileName), ex);
     }
   }
 
