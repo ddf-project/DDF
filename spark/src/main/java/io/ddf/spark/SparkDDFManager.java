@@ -23,6 +23,7 @@ import io.ddf.spark.etl.DateTimeExtractUDF;
 import io.ddf.spark.etl.DateUDF;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
@@ -31,6 +32,7 @@ import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
@@ -41,6 +43,7 @@ import java.util.*;
 import org.apache.spark.sql.types.StructType;
 
 import io.ddf.s3.S3DDF;
+import scala.Tuple2;
 
 /**
  * An Apache-Spark-based implementation of DDFManager
@@ -591,7 +594,28 @@ public class SparkDDFManager extends DDFManager {
       metaInfoArray[i] = headers[i] + " " + determineType(vector, doPreferDouble);
     }
 
-    return metaInfoArray;
-  }
-}  
+        return metaInfoArray;
+    }
 
+
+    /**
+     * A special function to createDDF & get creation statistic for Data Ingestion
+     * @param source : datasource uri
+     * @param requiredSchema : required schema for return ddf
+     * @param csvOptions : https://github.com/databricks/spark-csv
+     * @param isDropRow : if true, Row will drop if any column fail to cast to required data type
+     * @return SparkDDF & Statistic
+     */
+    public Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> newDDFWithStatistic(
+            String source,
+            Schema requiredSchema,
+            Map csvOptions,
+            boolean isDropRow
+    ) throws DDFException {
+        String tmpStringSchema=StringUtils.join(requiredSchema.getColumnNames()," String,") + " String";
+        StructType stringSchema = SparkUtils.str2SparkSchema(tmpStringSchema);
+        DataFrame load = getHiveContext().read().format("com.databricks.spark.csv").schema(stringSchema).options(csvOptions).load(source);
+        SparkDDF tmpStringDDF = new SparkDDF(this, load, null, null);
+        return ((SchemaHandler)tmpStringDDF.getSchemaHandler()).applySchema(requiredSchema,isDropRow);
+    }
+}
