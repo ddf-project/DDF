@@ -329,7 +329,9 @@ object SparkUtils {
     val InvalidExpressionJSQLParser = ".*Encountered \" \".\" \". \"\" at line 1, column (\\d+).*".r
 
     // Invalid expression SparkSQL
-    val InvalidExpression = ".*cannot recognize input near .+ in expression specification; line 1 pos (\\d+).*".r
+    // cannot recognize input near 'AS' '_dist' 'FROM' in selection target; line 1 pos 103
+    // cannot recognize input near ',' '<EOF>' '<EOF>' in expression specification; line 1 pos 9
+    val InvalidExpression = ".*cannot recognize input near .+; line 1 pos (\\d+).*".r
 
     // Invalid character SparkSQL
     val InvalidCharacter1 = ".*character '(.)' not supported here\n.*".r
@@ -345,9 +347,17 @@ object SparkUtils {
     }
 
     def handleInvalidExpression(sqlError: String, pos: Int): String = {
-      // Find the expression right before the position
-      val exprPos = expressions.map(exp => sql.substring(0, pos).indexOf(exp)).zipWithIndex.maxBy(_._1)
-      s"Column or Expression with invalid syntax: '${expressions(exprPos._2)}'"
+      // Find the expression that appear at that position
+      // For each expression, search for it in the sql string, get the start/end positions of the expression
+      // the erroneous one is the one that satisfies this condition: start <= pos <= end
+      val exprPos = expressions.zipWithIndex.filter(x => {
+        val start = sql.indexOf(x._1)
+        if (start == -1) false
+        else {
+          start <= pos && pos <= start + x._1.length
+        }
+      })
+      s"Column or Expression with invalid syntax: '${expressions(exprPos(0)._2)}'"
     }
 
     def handleGeneralSQLError(sqlError: String): String = {

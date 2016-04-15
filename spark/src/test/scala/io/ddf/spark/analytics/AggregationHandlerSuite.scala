@@ -67,6 +67,9 @@ class AggregationHandlerSuite extends ATestSuite {
     val thrown3 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("avg(arrdelay @)").asJava)}
     assert(thrown3.getMessage === "Column or Expression with invalid syntax: 'avg(arrdelay @)'")
 
+    val thrown31 = intercept[DDFException]{ddf.groupBy(List("Year").asJava, List("@avg(arrdelay)").asJava)}
+    assert(thrown31.getMessage === "Column or Expression with invalid syntax: '@avg(arrdelay)'")
+
     val thrown4 = intercept[DDFException]{ddf.groupBy(List("Year @").asJava, List("avg(arrdelay)").asJava)}
     assert(thrown4.getMessage === "Column or Expression with invalid syntax: 'Year @'")
 
