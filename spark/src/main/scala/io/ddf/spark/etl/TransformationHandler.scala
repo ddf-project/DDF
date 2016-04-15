@@ -34,6 +34,10 @@ import scala.collection.JavaConversions._
 class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
 
+  override def flattenDDF(): DDF = {
+    flattenDDF(null)
+  }
+
   override def flattenDDF(selectedColumns: Array[String]): DDF = {
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     val flattenedColumns: Array[String] = SparkUtils.flattenColumnNamesFromDataFrame(df, selectedColumns)
@@ -41,9 +45,9 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val selectColumns: Array[String] = new Array[String](flattenedColumns.length)
     // update hive-invalid column names
 
-    for(i <- flattenedColumns.indices) {
+    for (i <- flattenedColumns.indices) {
       selectColumns(i) = flattenedColumns(i).replaceAll("->", "_")
-      if(selectColumns(i).charAt(0) == '_') {
+      if (selectColumns(i).charAt(0) == '_') {
         selectColumns(i) = selectColumns(i).substring(1)
       }
       selectColumns(i) = s"${flattenedColumns(i)} as ${selectColumns(i)}"
@@ -60,8 +64,19 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     result
   }
 
-  override def flattenDDF(): DDF = {
-    flattenDDF(null)
+  override def transformUDFWithNames(newColumnNames: Array[String], transformExpressions: Array[String], selectedColumns: Array[String]): DDF = {
+    try {
+      super.transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns)
+    } catch {
+      case ddfException: DDFException =>
+        var expressions = transformExpressions.toList
+        if (newColumnNames != null) expressions = expressions ::: newColumnNames.toList
+        if (selectedColumns != null) expressions = expressions ::: selectedColumns.toList
+
+        throw new DDFException(SparkUtils.sqlErrorToDDFError(ddfException.getMessage,
+          buildTransformUDFWithNamesSQL(newColumnNames, transformExpressions, selectedColumns),
+          expressions))
+    }
   }
 
   override def transformMapReduceNative(mapFuncDef: String, reduceFuncDef: String, mapsideCombine: Boolean = true): DDF = {
@@ -222,7 +237,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
           if (!setExistingColumns.contains(cn) && !newNamedColumns.contains(cn)) {
             return c
           }
-          getNewColName(c+1)
+          getNewColName(c + 1)
         }
         s"c${getNewColName(0)}"
       case colName => colName
@@ -285,7 +300,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
     val manager = this.getManager
     val ddf = manager.newDDF(manager, rMapped, Array(classOf[RDD[_]], classOf[PyObject]),
-       manager.getNamespace, null, newSchema)
+      manager.getNamespace, null, newSchema)
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
     ddf.getMetaDataHandler.copyFactor(this.getDDF)
     ddf
@@ -298,7 +313,7 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
   }
 
   override def inverseFactorIndexer(columns: java.util.List[String]): DDF = {
-    val cols = columns.map{col => this.getDDF.getColumn(col)}
+    val cols = columns.map { col => this.getDDF.getColumn(col) }
 
     val factorIndexerModel = FactorIndexerModel.buildModelFromFactorColumns(cols.toArray)
     factorIndexerModel.inversedTransform(this.getDDF)
@@ -322,17 +337,6 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 }
 
 object TransformationHandler {
-
-  /**
-   * Eval the expr in rconn, if succeeds return null (like rconn.voidEval),
-   * if fails raise AdataoException with captured R error message.
-   * See: http://rforge.net/Rserve/faq.html#errors
-   */
-  def tryEval(rconn: RConnection, expr: String, errMsgHeader: String) {
-    rconn.assign(".tmp.", expr)
-    val r = rconn.eval("r <- try(eval(parse(text=.tmp.)), silent=TRUE); if (inherits(r, 'try-error')) r else NULL")
-    if (r.inherits("try-error")) throw new DDFException(errMsgHeader + ": " + r.asString())
-  }
 
   /**
    * eval the R expr and return all captured output
@@ -421,7 +425,7 @@ object TransformationHandler {
             case v: java.lang.Boolean => "BOOLEAN"
             case x =>
               throw new DDFException(s"Only support atomic vectors of type int|float|string|boolean, " +
-                  s"got type ${x.getClass.getCanonicalName}")
+                s"got type ${x.getClass.getCanonicalName}")
           }
         }
         j += 1
@@ -559,6 +563,17 @@ object TransformationHandler {
     rconn.close()
 
     result
+  }
+
+  /**
+   * Eval the expr in rconn, if succeeds return null (like rconn.voidEval),
+   * if fails raise AdataoException with captured R error message.
+   * See: http://rforge.net/Rserve/faq.html#errors
+   */
+  def tryEval(rconn: RConnection, expr: String, errMsgHeader: String) {
+    rconn.assign(".tmp.", expr)
+    val r = rconn.eval("r <- try(eval(parse(text=.tmp.)), silent=TRUE); if (inherits(r, 'try-error')) r else NULL")
+    if (r.inherits("try-error")) throw new DDFException(errMsgHeader + ": " + r.asString())
   }
 
   /**

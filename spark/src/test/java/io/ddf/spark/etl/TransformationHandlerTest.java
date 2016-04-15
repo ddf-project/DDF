@@ -10,6 +10,8 @@ import io.ddf.etl.TransformationHandler;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.BaseTest;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -285,8 +287,8 @@ public class TransformationHandlerTest extends BaseTest {
   @Test
   public void  testTransformSqlWithNamesMutable() throws DDFException {
 
-    DDF ddf2 = ddf.Transform.transformUDFWithNames(new String[] {"dist"},
-        new String[] {"round(distance/2, 2)"}, null, true);
+    DDF ddf2 = ddf.Transform
+        .transformUDFWithNames(new String[] { "dist" }, new String[] { "round(distance/2, 2)" }, null, true);
     Assert.assertEquals(ddf, ddf2);
     Assert.assertEquals(ddf.getNumColumns(), ddf2.getNumColumns());
     Assert.assertEquals(31, ddf2.getNumRows());
@@ -294,7 +296,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals("dist", ddf2.getColumnName(8));
     Assert.assertEquals(9, ddf2.VIEWS.head(1).get(0).split("\\t").length);
 
-    ddf2 = ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"}, null, true);
+    ddf2 = ddf.Transform.transformUDFWithNames(new String[] { null }, new String[] { "arrtime-deptime" }, null, true);
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(ddf, ddf2);
     Assert.assertEquals(ddf.getNumColumns(), ddf2.getNumColumns());
@@ -302,17 +304,61 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(10, ddf2.getSummary().length);
 
     // mixed transform with duplicated name
-    ddf2 = ddf.Transform.transformUDFWithNames(new String[] {null, "c0"},
-        new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null, true);
+    ddf2 = ddf.Transform
+        .transformUDFWithNames(new String[] { null, "c0" }, new String[] { "round(distance/2, 2)", "arrtime-deptime" },
+            null, true);
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(11, ddf2.getNumColumns());
     Assert.assertEquals(11, ddf2.getSummary().length);
 
     try {
-      ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"},
-          new String[]{"notexistedColumn"});
+      ddf.Transform.transformUDFWithNames(new String[] { null }, new String[] { "arrtime-deptime" },
+          new String[] { "notexistedColumn" });
       Assert.fail("Should throw exception when selecting non-existing columns");
     } catch (DDFException ex) {
+      
+    }
+  }
+
+  public void testTransformSqlWithNamesForProperErrorMessages() throws DDFException {
+    ddf.setMutable(false);
+
+    // Invalid expression
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"=round(distance/2, 2)"}, null);
+      Assert.fail("Should throw exception");
+    } catch (DDFException ex) {
+      Assert.assertEquals(ex.getMessage(), "Column or Expression with invalid syntax: '=round(distance/2, 2)'");
+    }
+
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"distance@"}, null);
+      Assert.fail("Should throw exception");
+    } catch (DDFException ex) {
+      Assert.assertEquals(ex.getMessage(), "Expressions or columns containing invalid character @: distance@");
+    }
+
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"distance @"}, null);
+      Assert.fail("Should throw exception");
+    } catch (DDFException ex) {
+      Assert.assertEquals(ex.getMessage(), "Column or Expression with invalid syntax: 'distance @'");
+    }
+
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"@distance"}, null);
+      Assert.fail("Should throw exception");
+    } catch (DDFException ex) {
+      Assert.assertEquals(ex.getMessage(), "Expressions or columns containing invalid character @: @distance");
+    }
+
+    // Invalid new column name
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {"_dist"}, new String[] {"round(distance/2, 2)"}, null);
+      Assert.fail("Should throw exception");
+    } catch (DDFException ex) {
+      Assert.assertEquals(ex.getMessage(), "Column or Expression with invalid syntax: '_dist'");
+
     }
   }
 

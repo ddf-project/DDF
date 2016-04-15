@@ -222,44 +222,29 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return selectStr.substring(0, selectStr.length() - 1);
   }
 
+
   /**
-   * Create new columns or overwrite existing ones
-   *
-   * @param newColumnNames       Array of new column names.
-   *                             Empty or null entries in this array
-   *                             will be set to c0, c1, c2, etc..
-   * @param transformExpressions array of transform expressions. Has to have the same length
-   *                             with newColumnNames.
-   * @param selectedColumns      list of column names to be included in the result DDF.
-   *                             If null or empty, all existing columns will be included.
-   * @return current DDF if it is mutable, or a new DDF otherwise.
+   * Build the SQL from the list of new columns, transformation expression and selected columns
+   * @param newColumnNames new column names for transformation expressions
+   * @param transformExpressions transformation expressions
+   * @param selectedColumns selected existing columns
+   * @return the SQL
    * @throws DDFException
    */
-  public synchronized DDF transformUDFWithNames(String[] newColumnNames, String[] transformExpressions,
-      String[] selectedColumns) throws DDFException {
-
-    if (newColumnNames == null || newColumnNames.length == 0 || transformExpressions == null
-        || transformExpressions.length == 0) {
-      return this.getDDF();
-    }
-
-    if (newColumnNames.length != transformExpressions.length) {
-      throw new DDFException(String
-          .format("newColumnNames and transformExpressions must" + " have the same length. Got %d and %d",
-              newColumnNames.length, transformExpressions.length));
-    }
+  protected String buildTransformUDFWithNamesSQL(String[] newColumnNames, String[] transformExpressions,
+                                                 String[] selectedColumns) throws DDFException {
 
     List<String> lsExistingColumns = this.getDDF().getSchema().getColumns().stream()
-        .map(Column::getName).collect(Collectors.toList());
+            .map(Column::getName).collect(Collectors.toList());
 
     // make up new names for entries with null or empty in `newColumnNames`
     List<String> lsNewColumnNamesTrimmed = new ArrayList<>();
 
     // we prioritize the named entries in newColumnNames
     Set<String> setNamedColumns = Arrays.stream(newColumnNames)
-        .filter(s -> s != null && !s.isEmpty() && !s.replaceAll("\\W", "").trim().isEmpty())
-        .map(s -> s.replaceAll("\\W", "").trim())
-        .collect(Collectors.toSet());
+            .filter(s -> s != null && !s.isEmpty() && !s.replaceAll("\\W", "").trim().isEmpty())
+            .map(s -> s.replaceAll("\\W", "").trim())
+            .collect(Collectors.toSet());
 
     int iNewColIdx = 0;
     for (String sCol: newColumnNames) {
@@ -273,8 +258,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       } else {
         String sNewColName = String.format("c%d", iNewColIdx);
         while (lsExistingColumns.contains(sNewColName)
-            || setNamedColumns.contains(sNewColName)
-            || lsNewColumnNamesTrimmed.contains(sNewColName)) {
+                || setNamedColumns.contains(sNewColName)
+                || lsNewColumnNamesTrimmed.contains(sNewColName)) {
           iNewColIdx++;
           sNewColName = String.format("c%d", iNewColIdx);
         }
@@ -294,7 +279,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       if (transformExpressions[i] == null || transformExpressions[i].length() == 0) {
         throw new DDFException(String.format("Got empty transform expression at index %d", i));
       }
-      newColumns.add(0, String.format(" (%s) AS %s", transformExpressions[i].trim(), lsNewColumnNamesTrimmed.get(i)));
+      newColumns.add(0, String.format("%s AS %s", transformExpressions[i].trim(), lsNewColumnNamesTrimmed.get(i)));
     }
 
     // messy logic here. Following transformUDF(), this is the explanation in English:
@@ -335,7 +320,39 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     }
     sqlCmdBuilder.append(" FROM {1}");
 
-    String sqlCmd = sqlCmdBuilder.toString();
+    return sqlCmdBuilder.toString();
+
+  }
+
+  /**
+   * Create new columns or overwrite existing ones
+   *
+   * @param newColumnNames       Array of new column names.
+   *                             Empty or null entries in this array
+   *                             will be set to c0, c1, c2, etc..
+   * @param transformExpressions array of transform expressions. Has to have the same length
+   *                             with newColumnNames.
+   * @param selectedColumns      list of column names to be included in the result DDF.
+   *                             If null or empty, all existing columns will be included.
+   * @return current DDF if it is mutable, or a new DDF otherwise.
+   * @throws DDFException
+   */
+  public synchronized DDF transformUDFWithNames(String[] newColumnNames, String[] transformExpressions,
+      String[] selectedColumns) throws DDFException {
+
+    if (newColumnNames == null || newColumnNames.length == 0 || transformExpressions == null
+        || transformExpressions.length == 0) {
+      return this.getDDF();
+    }
+
+    if (newColumnNames.length != transformExpressions.length) {
+      throw new DDFException(String
+          .format("newColumnNames and transformExpressions must" + " have the same length. Got %d and %d",
+              newColumnNames.length, transformExpressions.length));
+    }
+
+
+    String sqlCmd = buildTransformUDFWithNamesSQL(newColumnNames, transformExpressions, selectedColumns);
 
     DDF newddf = this.getManager()
         .sql2ddf(sqlCmd, new SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF().getUUID().toString()));
