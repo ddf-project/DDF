@@ -174,9 +174,8 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
                     });
                 }
             }
-
             DataFrame dataFrame = manager.getHiveContext().createDataFrame(appliedRdd.rdd(), newSchema);
-            return new Tuple2<>((SparkDDF) SparkUtils.df2ddf(dataFrame, manager), statistic);
+            return new Tuple2<>((SparkDDF)SparkUtils.df2ddf(dataFrame,manager), statistic);
 
         } catch (ClassCastException cce) {
             mLog.error("Exception when down cast from DDFManager to SparkDDFManager", cce);
@@ -313,7 +312,7 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
                     case DECIMAL:
                         return new BigDecimal(data);
                     case STRING:
-                        return true;
+                        return data;
                     case BINARY:
                         return data.getBytes();
                     case BOOLEAN:

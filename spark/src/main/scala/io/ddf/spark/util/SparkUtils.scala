@@ -67,7 +67,6 @@ object SparkUtils {
     new Schema(null, cols)
   }
 
-
   def str2SparkSchema(schema: String): StructType = {
     StructType(
       schema.split(",").map(
@@ -385,5 +384,11 @@ object SparkUtils {
       case _ => handleGeneralSQLError(sqlError)
 
     }
+  }
+
+  def schemaFromStructType(structType: StructType): Schema ={
+    val cols: ArrayList[Column] = Lists.newArrayList()
+    structType.foreach(f => cols.add(new Column(f.name.trim,spark2DDFType(f.dataType))))
+    new Schema(null,cols)
   }
 }
