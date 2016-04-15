@@ -4,6 +4,8 @@ import _root_.io.ddf.spark.SparkDDFManager
 import _root_.io.ddf.spark.analytics.{FactorIndexer, FactorIndexerModel}
 import org.apache.spark.ml.feature.OneHotEncoder
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.execution.columnar.ColumnType
+import org.apache.spark.sql.types.DoubleType
 import org.python.core._
 import org.python.util.PythonInterpreter
 
@@ -322,10 +324,17 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
   override def oneHotEncoding(inputColumn: String, outputColumnName: String): DDF = {
     val df = this.mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    val newCol = this.mDDF.getColumn(inputColumn) match {
+      case x if(x.getType == Schema.ColumnType.DOUBLE) => df.col(inputColumn)
+      case x if(x.getType != Schema.ColumnType.VECTOR && x.isNumeric)
+        => df.col(inputColumn).cast(DoubleType)
+      case someType => throw new DDFException(s"Column type ${someType.toString} not supported for oneHotEncoding")
+    }
+    val newDF = df.withColumn(inputColumn, newCol)
     val encoder = new OneHotEncoder()
     encoder.setInputCol(inputColumn)
     encoder.setOutputCol(outputColumnName)
-    val encodedDF = encoder.transform(df)
+    val encodedDF = encoder.transform(newDF)
     this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(encodedDF)
   }
 }
