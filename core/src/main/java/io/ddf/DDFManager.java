@@ -433,9 +433,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       return ddf;
 
     } catch (Exception e) {
-      throw new  DDFException(String.format(
-          "While instantiating a new %s DDF of class %s with argTypes %s and argValues %s", this.getEngine(),
-          className, Arrays.toString(argTypes), Arrays.toString(argValues)), e);
+      throw new  DDFException(e);
     }
   }
 

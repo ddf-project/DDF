@@ -1,12 +1,15 @@
 package io.ddf.util;
 
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gson.*;
 import io.ddf.content.ISerializable;
 import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
+
+import org.apache.avro.generic.GenericData;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -64,6 +67,46 @@ public class Utils {
     } else {
       return DataFormat.UNDEF;
     }
+  }
+
+
+  public static List<String> sanitizeColumnName(List<String> columnNames) throws DDFException {
+    Preconditions.checkArgument(columnNames.size() > 0);
+    List<String> ret = new ArrayList<>();
+    for (String name : columnNames) {
+      Preconditions.checkArgument(name.length() > 0);
+      String dashName = name.trim().replaceAll("![0-9a-zA-Z]|\\s", "_");
+      int i;
+      for (i = 0; i < dashName.length(); ++i) {
+        char c = name.charAt(i);
+        boolean isAlpha = ((c >= 'a' && c <= 'z') || (c >= 'A' && c <='Z'));
+        if (isAlpha) {
+          ret.add(dashName.substring(i));
+          break;
+        }
+      }
+      if (i == dashName.length()) {
+        // TODO: get some random name
+        throw new DDFException(String.format("Not valid column name: %s", name));
+      }
+    }
+    HashSet<String> nameSet = new HashSet<>();
+    for (int i = 0; i < ret.size(); ++i) {
+      String validName = ret.get(i);
+      String attemptName = new String(validName);
+      int j = 0;
+      while (true) {
+        if (!nameSet.contains(attemptName)) {
+          nameSet.add(attemptName);
+          ret.set(i, attemptName);
+          break;
+        } else {
+          attemptName = String.format("%s%s%s", validName, "_", String.valueOf(j));
+          ++j;
+        }
+      }
+    }
+    return ret;
   }
 
   public static List<String> listFiles(String directory) {
