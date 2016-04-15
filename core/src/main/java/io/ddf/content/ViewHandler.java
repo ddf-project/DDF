@@ -128,7 +128,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
     List<String> columns = this.getDDF().getColumnNames();
 
-    for (String columnName : columnNames) {
+    for (String columnName : currentColumnNames) {
       for (Iterator<String> it = columns.iterator();it.hasNext();) {
         if (it.next().equals(columnName)) {
           it.remove();
@@ -137,13 +137,8 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
 
     DDF newddf = this.project(columns);
-    if(this.getDDF().isMutable()) {
-      this.getDDF().updateInplace(newddf);
-      return this.getDDF();
-    } else {
-      newddf.getMetaDataHandler().copyFactor(this.getDDF());
-      return newddf;
-    }
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+    return newddf;
   }
 
   // ///// Execute SQL command on the DDF ///////

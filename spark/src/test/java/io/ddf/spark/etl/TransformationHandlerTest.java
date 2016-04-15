@@ -252,7 +252,10 @@ public class TransformationHandlerTest extends BaseTest {
   public void  testTransformSqlWithNames() throws DDFException {
     ddf.setMutable(false);
 
-    DDF ddf2 = ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"round(distance/2, 2)"}, null);
+    DDF ddf2 = ddf.Transform.transformUDFWithNames(new String[] {"dist"},
+        new String[] {"round(distance/2, 2)"}, null);
+    Assert.assertEquals(ddf.getNumColumns() + 1, ddf2.getNumColumns());
+    Assert.assertNotSame(ddf.getUUID(), ddf2.getUUID());
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(9, ddf2.getNumColumns());
     Assert.assertEquals("dist", ddf2.getColumnName(8));
@@ -260,6 +263,7 @@ public class TransformationHandlerTest extends BaseTest {
 
     ddf2 = ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"}, null);
     Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(ddf.getNumColumns() + 1, ddf2.getNumColumns());
     Assert.assertEquals(9, ddf2.getNumColumns());
     Assert.assertEquals(9, ddf2.getSummary().length);
 
@@ -269,6 +273,40 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(10, ddf2.getNumColumns());
     Assert.assertEquals(10, ddf2.getSummary().length);
+
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"},
+          new String[]{"notexistedColumn"});
+      Assert.fail("Should throw exception when selecting non-existing columns");
+    } catch (DDFException ex) {
+    }
+  }
+
+  @Test
+  public void  testTransformSqlWithNamesMutable() throws DDFException {
+
+    DDF ddf2 = ddf.Transform.transformUDFWithNames(new String[] {"dist"},
+        new String[] {"round(distance/2, 2)"}, null, true);
+    Assert.assertEquals(ddf, ddf2);
+    Assert.assertEquals(ddf.getNumColumns(), ddf2.getNumColumns());
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(9, ddf2.getNumColumns());
+    Assert.assertEquals("dist", ddf2.getColumnName(8));
+    Assert.assertEquals(9, ddf2.VIEWS.head(1).get(0).split("\\t").length);
+
+    ddf2 = ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"}, null, true);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(ddf, ddf2);
+    Assert.assertEquals(ddf.getNumColumns(), ddf2.getNumColumns());
+    Assert.assertEquals(10, ddf2.getNumColumns());
+    Assert.assertEquals(10, ddf2.getSummary().length);
+
+    // mixed transform with duplicated name
+    ddf2 = ddf.Transform.transformUDFWithNames(new String[] {null, "c0"},
+        new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null, true);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(11, ddf2.getNumColumns());
+    Assert.assertEquals(11, ddf2.getSummary().length);
 
     try {
       ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"},
@@ -300,5 +338,20 @@ public class TransformationHandlerTest extends BaseTest {
     manager.setDDFName(ddf, "ddf_testMutableDDFBug");
     ddf.Transform.transformUDF("col1 = (arrtime - deptime)");
     ddf.Transform.transformUDF("col2 = (arrtime - arrdelay)");
+  }
+
+  @Test
+  public void testCastType() throws DDFException {
+    DDF newDDF = ddf.Transform.castType("year", "string");
+    assert(newDDF.getUUID() != ddf.getUUID());
+    assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
+    assert(ddf.getColumn("year").getType() == ColumnType.STRING);
+  }
+
+  @Test
+  public void testCastTypeMutable() throws DDFException {
+    DDF newDDF = ddf.Transform.castType("year", "string", true);
+    assert(newDDF.getUUID() == ddf.getUUID());
+    assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
   }
 }

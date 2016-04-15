@@ -124,13 +124,8 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     newCols.setLength(newCols.length() - 1);
     String sqlCmd = String.format("SELECT *, %s FROM @this", newCols.toString());
     DDF newddf = this.getDDF().sql2ddf(sqlCmd);
-
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      newddf.getMetaDataHandler().copyFactor(this.getDDF());
-      return newddf;
-    }
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+    return newddf;
   }
 
   public synchronized DDF transformUDF(String RExprs, List<String> columns) throws DDFException {
@@ -344,15 +339,19 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     DDF newddf = this.getManager()
         .sql2ddf(sqlCmd, new SQLDataSourceDescriptor(sqlCmd, null, null, null, this.getDDF().getUUID().toString()));
-
-    if (this.getDDF().isMutable()) {
-      return this.getDDF().updateInplace(newddf);
-    } else {
-      newddf.getMetaDataHandler().copyFactor(this.getDDF());
-      return newddf;
-    }
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+    return newddf;
   }
 
+  public DDF transformUDFWithNames(String[] newColumnNames, String[] transformExpressions,
+      String[] selectedColumns, Boolean inPlace) throws DDFException {
+    if(inPlace) {
+      DDF newDDF = transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns);
+      return this.getDDF().updateInplace(newDDF);
+    } else {
+      return transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns);
+    }
+  }
   public static String RToSqlUdf(List<String> RExp) {
     return RToSqlUdf(RExp, null, null);
   }
@@ -373,5 +372,18 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
   @Override public DDF oneHotEncoding(String inputColumn, String outputColumnName) throws DDFException {
     throw new UnsupportedOperationException();
+  }
+
+  @Override public DDF castType(String column, String newType) throws DDFException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override public DDF castType(String column, String newType, Boolean inPlace) throws DDFException {
+    if (inPlace) {
+      DDF ddf = castType(column, newType);
+      return this.getDDF().updateInplace(ddf);
+    } else {
+      return castType(column, newType);
+    }
   }
 }

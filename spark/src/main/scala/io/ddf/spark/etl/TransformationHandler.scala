@@ -313,6 +313,12 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     val encodedDF = encoder.transform(df)
     this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(encodedDF)
   }
+
+  override def castType(column: String, newType: String): DDF = {
+    val df = this.mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    val newDF = df.withColumn(column , df.col(column).cast(newType))
+    this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(newDF)
+  }
 }
 
 object TransformationHandler {
