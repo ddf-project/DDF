@@ -4,7 +4,6 @@ import _root_.io.ddf.spark.SparkDDFManager
 import _root_.io.ddf.spark.analytics.{FactorIndexer, FactorIndexerModel}
 import org.apache.spark.ml.feature.OneHotEncoder
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.execution.columnar.ColumnType
 import org.apache.spark.sql.types.DoubleType
 import org.python.core._
 import org.python.util.PythonInterpreter
