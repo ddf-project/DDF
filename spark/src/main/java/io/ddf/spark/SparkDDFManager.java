@@ -622,7 +622,6 @@ public class SparkDDFManager extends DDFManager {
 
     DataFrame dataFrame = getHiveContext().read().format("com.databricks.spark.csv")
         .schema(stringSchema).options(csvOptions).load(source).limit(nHeadRow);
-
-    return new SparkDDF(this, dataFrame, null, null);
+    return (SparkDDF) SparkUtils.df2ddf(dataFrame, this);
   }
 }
