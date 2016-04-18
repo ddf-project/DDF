@@ -24,14 +24,12 @@ import java.util.Arrays;
  * Created by jing on 6/30/15.
  */
 public class TableNameReplacerTests {
-
-
-    public static DDFManager manager;
-    public static CCJSqlParserManager parser;
+    private static DDFManager manager;
+    private static CCJSqlParserManager parser;
+    private static TableNameReplacer tableNameReplacer;
 
     @Test
     public void testUnion() {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         String sqlcmd = "select * from ddf://adatao/a union select * from " +
                 "ddf://adatao/b";
         try {
@@ -45,7 +43,6 @@ public class TableNameReplacerTests {
 
     @Test
     public void testAlias() {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         String sqlcmd = "select T0.id from (select tmp.id from ddf://adatao/a" +
                 " " +
                 "tmp) T0";
@@ -62,7 +59,6 @@ public class TableNameReplacerTests {
     
     @Test
     public void testRealQuery() {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         String sqlcmd = "SELECT from_unixtime(round(timestamp) - 7*3600, 'HH') hour,\n" +
                 "        count(1) count,\n" +
                 "        avg(observationnum_temp) avgTemp, \n" +
@@ -120,7 +116,6 @@ public class TableNameReplacerTests {
      */
     @Test
     public void testComplexQuery() throws  DDFException {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         String sqlcmd =
                 "With p as " +
                 "(Select * from ddf://adatao/a) " +
@@ -155,7 +150,6 @@ public class TableNameReplacerTests {
      */
     @Test
     public  void testFullURI() throws  DDFException {
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         String sqlcmd = "select SUM(ddf://adatao/a.b) from ddf://adatao/a group by ddf://adatao/a.a";
         Statement statement = null;
         try {
@@ -175,7 +169,6 @@ public class TableNameReplacerTests {
     }
 
     public Statement testFullURISingle(String sqlcmd) throws Exception {
-        Statement statement = parser.parse(new StringReader(sqlcmd));
         TableNameReplacer tableNameReplacer = new TableNameReplacer(manager);
         return null;
         // return tableNameReplacer.run(statement);
@@ -247,8 +240,6 @@ public class TableNameReplacerTests {
     @Test
     public void testNamespace() throws  DDFException {
         TableNameReplacer tableNameReplacer  = new TableNameReplacer(manager);
-        // TableNameReplacer tableNameReplacer  = new TableNameReplacer
-        //        (manager, "adatao");
 
         String sqlcmd = "select a.b from a";
         Statement statement = null;
@@ -276,10 +267,7 @@ public class TableNameReplacerTests {
     @Test
     public void testList() throws  DDFException {
         String[] uris={"ddf://adatao/a", "ddf://adatao/b"};
-        // TableNameReplacer tableNameReplacer = new TableNameReplacer(manager,
-        //        Arrays.asList(uris));
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager,
-                    null);
+        TableNameReplacer tableNameReplacer = new TableNameReplacer(manager, null);
 
         String sqlcmd = "select {1}.a,{2}.b from {1}";
         Statement statement = null;
@@ -314,8 +302,6 @@ public class TableNameReplacerTests {
                 "log", "pow"
         };
 
-
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(this.manager);
         String sqlcmd = "select %s(ddf://adatao/a.year) from ddf://adatao/a";
         String doubleSqlCmd = "select %s(ddf://adatao/a.year, ddf://adatao/a.rev) from ddf://adatao/a";
         for (String udfname : singleParamUDFs) {
@@ -378,15 +364,12 @@ public class TableNameReplacerTests {
                 + "depdelay, carrierdelay, weatherdelay, nasdelay, securitydelay, lateaircraftdelay from airline",
                 sqlDataSourceDescriptor);
         this.manager.setDDFName(ddf, "airlineDDF");
-        // DDF sql2ddfRet = manager.sql2ddf("select * from " +
-        //        "ddf://adatao/airlineDDF");
     }
 
     @Test
     public void BatchTestArithOps() {
         String[] arithOps = {"+", "-", "*", "/", "%", "&", "|", "^"};
         String sqlcmd = "select ddf://adatao/a.id %s ddf://adatao/a.id2 from ddf://adatao/a";
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(this.manager);
         for (String arithOp : arithOps) {
             String newSqlCmd = String.format(sqlcmd, arithOp);
             Statement statement = null;
@@ -404,7 +387,6 @@ public class TableNameReplacerTests {
     public void BatchTestRelationalOps() {
         String[] relationalOps = {"=", "<=>", "<>", "!=", "<", "<=", ">", ">="};
         String sqlcmd = "select * from ddf://adatao/a where ddf://adatao/a.id %s ddf://adatao/a.id2";
-        TableNameReplacer tableNameReplacer = new TableNameReplacer(this.manager);
         for (String relationalOp : relationalOps) {
             String newSqlCmd = String.format(sqlcmd, relationalOp);
             try {
@@ -447,29 +429,35 @@ public class TableNameReplacerTests {
 
     @Test
     public void testBlankQuotation() {
-        TableNameReplacer tableNameReplacer  = new TableNameReplacer(manager);
-
         String sqlcmd = "select value from a where value = \"\"";
         Statement statement = null;
         try {
             statement = parser.parse(new StringReader(sqlcmd));
         } catch (JSQLParserException e) {
-            e.printStackTrace();
             assert(false);
         }
     }
 
+    @Test
+    public void testSelectOne() {
+      String sqlcmd = "select 1";
+      try {
+        tableNameReplacer.run(parser.parse(new StringReader(sqlcmd)));
+      } catch (Exception e) {
+        assert false;
+      }
+    }
 
     @BeforeClass
     public static void startServer() throws Exception {
         Thread.sleep(1000);
         manager = DDFManager.get(DDFManager.EngineType.SPARK);
         parser = new CCJSqlParserManager();
+        tableNameReplacer = new TableNameReplacer(manager);
     }
 
     @AfterClass
     public static void stopServer() throws Exception {
-
         manager.shutdown();
     }
 

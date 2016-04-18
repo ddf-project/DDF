@@ -152,12 +152,10 @@ public class TableNameReplacer extends TableVisitor {
             ((DescribeTable)statement).accept(this);
         }
 
-        if (mHasLocalTbl && !mHasRemoteTbl) {
+        if (!mHasRemoteTbl) {
             // Only contains local table, then all the ddfs have already be
             // handled.
             return statement;
-        } else if (!mHasLocalTbl && !mHasRemoteTbl) {
-            throw new DDFException("ERROR in handle SQL query");
         } else {
             if (!this.mDDFManager.getEngine().equals("spark")) {
                 throw new DDFException("For this engine, only local table " +
