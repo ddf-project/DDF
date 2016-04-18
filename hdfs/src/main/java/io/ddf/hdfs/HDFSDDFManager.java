@@ -111,7 +111,7 @@ public class HDFSDDFManager extends DDFManager {
     try {
       FileStatus[] status = fs.listStatus(new Path(path));
       for (int i = 0; i < status.length; i++) {
-        ret.add(status[i].getPath().toString());
+        ret.add(status[i].getPath().getName().toString());
       }
     } catch (IOException e) {
       throw new DDFException(e);

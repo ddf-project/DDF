@@ -32,7 +32,6 @@ public class HDFSDDFManagerTests {
     public void testListing() throws DDFException {
         List<String> files = manager.listFiles("/test_pe");
         assert (files.size() > 0);
-
     }
 
     @Test
