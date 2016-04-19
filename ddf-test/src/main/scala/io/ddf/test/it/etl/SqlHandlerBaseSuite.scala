@@ -22,7 +22,7 @@ import io.ddf.DDF
 import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 
-trait SqlHandlerSuite extends BaseSuite with Matchers {
+trait SqlHandlerBaseSuite extends BaseSuite with Matchers {
 
   test("create table and load data from file") {
     val ddf = loadAirlineDDF()

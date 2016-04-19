@@ -24,7 +24,7 @@ import org.scalatest.Matchers
 
 import scala.collection.JavaConverters._
 
-trait SchemaHandlerSuite extends BaseSuite with Matchers {
+trait SchemaHandlerBaseSuite extends BaseSuite with Matchers {
 
   test("get schema") {
     val ddf = loadAirlineDDF()

@@ -28,6 +28,11 @@ trait SparkBaseSuite extends BaseSuite {
       config.getValue("schema", "mtcars"), " ")
   }
 
+  override def loadCarOwnersDDF(): DDF = {
+    loadTestDataFromFile(getClass.getResource("/carowner.txt").getPath, "carowner",
+      config.getValue("schema", "carowner"), " ")
+  }
+
   override def loadAirlineDDF(): DDF = {
     loadTestDataFromFile(getClass.getResource("/airline.csv").getPath, "airline",
       config.getValue("schema", "airline"), ",")

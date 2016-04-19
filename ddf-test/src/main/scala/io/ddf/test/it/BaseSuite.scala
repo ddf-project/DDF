@@ -30,11 +30,13 @@ import org.scalatest.FunSuite
  */
 trait BaseSuite extends FunSuite {
 
-  val config: ConfigHandler = new ConfigHandler("ddf-conf", "ddf_spec.ini")
+  val config: ConfigHandler = new ConfigHandler("ddf-test/src/main/resources", "test_config.ini")
+
   val engineName: String
   val manager: DDFManager
 
   def loadMtCarsDDF(): DDF
+  def loadCarOwnersDDF(): DDF
   def loadAirlineDDF(): DDF
   def loadAirlineDDFWithoutDefault(): DDF
   def loadAirlineDDFWithNA(): DDF

@@ -24,7 +24,7 @@ import org.scalatest.Matchers
 
 import scala.collection.JavaConversions._
 
-trait AggregationHandlerSuite extends BaseSuite with Matchers {
+trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
 
   test("calculate simple aggregates") {
     val ddf = loadAirlineDDF()

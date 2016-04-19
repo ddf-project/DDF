@@ -26,7 +26,7 @@ import org.scalatest.Matchers
 
 import scala.collection.JavaConversions._
 
-trait TransformationHandlerSuite extends BaseSuite with Matchers {
+trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
 
   ignore("transform native Rserve") {
     val relevantData: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")

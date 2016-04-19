@@ -25,7 +25,7 @@ import org.scalatest.Matchers
 
 import scala.collection.JavaConverters._
 
-trait BinningHandlerSuite extends BaseSuite with Matchers {
+trait BinningHandlerBaseSuite extends BaseSuite with Matchers {
 
   ignore("bin by equal interval") {
     val monthColumnLabel = "Month"

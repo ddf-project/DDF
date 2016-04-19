@@ -16,12 +16,12 @@
  * limitations under the License.
  *
  */
-package io.ddf.test.it.content
+package io.ddf.test.it.misc
 
 import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 
-trait MutabilityHandlerSuite extends BaseSuite with Matchers {
+trait MiscellanyHandlerBaseSuite extends BaseSuite with Matchers {
 
   // TODO: add test cases, now this is just a placeholder
 

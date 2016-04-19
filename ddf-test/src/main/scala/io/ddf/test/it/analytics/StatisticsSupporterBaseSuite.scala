@@ -23,7 +23,7 @@ import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 import org.scalautils.TolerantNumerics
 
-trait StatisticsSupporterSuite extends BaseSuite with Matchers {
+trait StatisticsSupporterBaseSuite extends BaseSuite with Matchers {
 
   test("calculate summary") {
     val ddf = loadAirlineDDF()

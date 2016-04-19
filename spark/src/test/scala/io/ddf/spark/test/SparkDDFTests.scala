@@ -19,17 +19,17 @@
 package io.ddf.spark.test
 
 import io.ddf.test.it._
-import io.ddf.test.it.analytics.{StatisticsSupporterSuite, BinningHandlerSuite, AggregationHandlerSuite}
-import io.ddf.test.it.content.{PersistenceHandlerSuite, ViewsHandlerSuite, SchemaHandlerSuite}
-import io.ddf.test.it.etl.{MissingDataHandlerSuite, JoinHandlerSuite, TransformationHandlerSuite, SqlHandlerSuite}
+import io.ddf.test.it.analytics.{StatisticsSupporterBaseSuite, BinningHandlerBaseSuite, AggregationHandlerBaseSuite}
+import io.ddf.test.it.content.{PersistenceHandlerBaseSuite, ViewsHandlerBaseSuite, SchemaHandlerBaseSuite}
+import io.ddf.test.it.etl.{MissingDataHandlerBaseSuite, JoinHandlerBaseSuite, TransformationHandlerBaseSuite, SqlHandlerBaseSuite}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class SparkDDFTests extends SparkBaseSuite with StatisticsSupporterSuite with BinningHandlerSuite
-with AggregationHandlerSuite with JoinHandlerSuite with MissingDataHandlerSuite
-with PersistenceHandlerSuite with SchemaHandlerSuite with SqlHandlerSuite
-with TransformationHandlerSuite with ViewsHandlerSuite {
+class SparkDDFTests extends SparkBaseSuite with StatisticsSupporterBaseSuite with BinningHandlerBaseSuite
+with AggregationHandlerBaseSuite with MissingDataHandlerBaseSuite
+with PersistenceHandlerBaseSuite with SchemaHandlerBaseSuite with SqlHandlerBaseSuite
+with TransformationHandlerBaseSuite with ViewsHandlerBaseSuite {
 
   def runMultiple(names: String) = {
     names.split(",").foreach(name => this.execute(name))

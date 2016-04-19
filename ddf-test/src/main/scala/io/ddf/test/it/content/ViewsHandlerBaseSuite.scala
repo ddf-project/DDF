@@ -22,7 +22,7 @@ import io.ddf.DDF
 import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 
-trait ViewsHandlerSuite extends BaseSuite with Matchers {
+trait ViewsHandlerBaseSuite extends BaseSuite with Matchers {
 
   ignore("project after remove columns ") {
     val ddf1 = loadAirlineDDF()

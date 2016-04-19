@@ -16,12 +16,12 @@
  * limitations under the License.
  *
  */
-package io.ddf.test.it.misc
+package io.ddf.test.it.content
 
 import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 
-trait StreamingDataHandlerSuite extends BaseSuite with Matchers {
+trait RepresentationHandlerBaseSuite extends BaseSuite with Matchers {
 
   // TODO: add test cases, now this is just a placeholder
 

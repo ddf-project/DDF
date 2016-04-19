@@ -27,7 +27,7 @@ import org.scalatest.Matchers
 
 import scala.collection.JavaConversions._
 
-trait MissingDataHandlerSuite extends BaseSuite with Matchers {
+trait MissingDataHandlerBaseSuite extends BaseSuite with Matchers {
 
   test("drop all rows with NA values") {
     val result = loadAirlineDDFWithNA().dropNA()

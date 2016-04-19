@@ -16,12 +16,12 @@
  * limitations under the License.
  *
  */
-package io.ddf.test.it.content
+package io.ddf.test.it.misc
 
 import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 
-trait RepresentationHandlerSuite extends BaseSuite with Matchers {
+trait TimeSeriesHandlerBaseSuite extends BaseSuite with Matchers {
 
   // TODO: add test cases, now this is just a placeholder
 
