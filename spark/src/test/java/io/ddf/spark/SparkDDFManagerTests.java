@@ -157,7 +157,8 @@ public class SparkDDFManagerTests extends BaseTest {
     for (int i = 1; i < nameList.size(); ++i) {
       schema.append(String.format(", %s int", nameList.get(i)));
     }
-    S3DDF ddf = s3DDFManager.newDDF("adatao-sample-data", "test/csv/6col.csv", schema.toString(), null);
+    S3DDF ddf = s3DDFManager.newDDF("adatao-sample-data", "test/pa/sanitize_column_name/6col.csv", schema.toString(),
+        null);
     DDF sparkDDF = manager.copyFrom(ddf);
     assert (sparkDDF.getColumnNames().equals(expectedList));
 
