@@ -47,6 +47,12 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
 
   Map<String, Map<String, Integer>> computeLevelCounts(String[] columnNames) throws DDFException;
 
+  void removeLevelCounts() throws DDFException;
+
+  void setLevelCounts(Map<String, Map<String, Integer>> levelCounts) throws DDFException;
+
+  Map<String, Map<String, Integer>> getLevelCounts() throws DDFException;
+
   List<Object> computeFactorLevels(String columnName) throws DDFException;
 
   Factor<?> setAsFactor(String columnName) throws DDFException;
