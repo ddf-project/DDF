@@ -109,8 +109,8 @@ public class Utils {
       String attemptName = new String(validName);
       int j = 0;
       while (true) {
-        if (!nameSet.contains(attemptName)) {
-          nameSet.add(attemptName);
+        if (!nameSet.contains(attemptName.toLowerCase())) {
+          nameSet.add(attemptName.toLowerCase());
           ret.set(i, attemptName);
           break;
         } else {
