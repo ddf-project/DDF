@@ -67,7 +67,7 @@ public class S3DDFManager extends DDFManager {
         throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
       }
     }
-    Boolean isDir = s3DDF.getKey().endsWith("/");
+    Boolean isDir = s3DDF.getKey().endsWith("/") || keys.size() > 1;
     return isDir;
   }
 

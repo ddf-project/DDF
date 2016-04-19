@@ -67,6 +67,13 @@ public class S3DDFManagerTests {
 
         }
 
+        try {
+            S3DDF mixed = manager.newDDF("adatao-sample-data/test/extra/format/mixed-csv-tsv", null, null);
+            assert (false);
+        } catch (DDFException e) {
+
+        }
+
         S3DDF cleanFolderDDF = manager.newDDF("jing-bucket", "testFolder/folder/", null, null);
         S3DDF jsonDDF = manager.newDDF("jing-bucket", "testFolder/a.json", null, null);
         S3DDF csvDDF = manager.newDDF("jing-bucket", "testFolder/year.csv", null, null);
