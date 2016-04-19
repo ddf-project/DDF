@@ -69,16 +69,28 @@ public class Utils {
     }
   }
 
-
+  /**
+   * Santize the column names (Used when user try to create ddfs with given schema).
+   * Only alpha-num-dash are valid characters. And the name should begin with alpha. There should be no same names.
+   * This function will
+   * (1) replace invalid character with -
+   * (2) remove the beginning character until it's valid
+   * (3) auto-rename column names to avoid same names. 'a, _a' -> 'a, a_0'
+   * @param columnNames The column name list.
+   * @return The new column name list.
+   * @throws DDFException
+   */
   public static List<String> sanitizeColumnName(List<String> columnNames) throws DDFException {
     Preconditions.checkArgument(columnNames.size() > 0);
     List<String> ret = new ArrayList<>();
     for (String name : columnNames) {
       Preconditions.checkArgument(name.length() > 0);
+      // replace invalid characters with dash
       String dashName = name.trim().replaceAll("![0-9a-zA-Z]|\\s", "_");
       int i;
       for (i = 0; i < dashName.length(); ++i) {
         char c = name.charAt(i);
+        // remove invalid beginning character
         boolean isAlpha = ((c >= 'a' && c <= 'z') || (c >= 'A' && c <='Z'));
         if (isAlpha) {
           ret.add(dashName.substring(i));
@@ -90,6 +102,7 @@ public class Utils {
         throw new DDFException(String.format("Not valid column name: %s", name));
       }
     }
+    // rename to avoid duplication
     HashSet<String> nameSet = new HashSet<>();
     for (int i = 0; i < ret.size(); ++i) {
       String validName = ret.get(i);
