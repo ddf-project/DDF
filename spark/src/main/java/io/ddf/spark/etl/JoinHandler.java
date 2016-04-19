@@ -33,7 +33,9 @@ public class JoinHandler extends ADDFFunctionalGroupHandler implements IHandleJo
   @Override
   public DDF join(DDF anotherDDF, JoinType joinType, List<String> byColumns, List<String> byLeftColumns,
                   List<String> byRightColumns, String leftSuffix, String rightSuffix) throws DDFException {
-
+    if (joinType == null) {
+      joinType = JoinType.INNER;
+    }
     String leftTableName = getDDF().getTableName();
     String rightTableName = anotherDDF.getTableName();
     List<String> rightColumns = anotherDDF.getColumnNames();
