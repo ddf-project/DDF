@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class S3DDFManagerTests {
 
         LOG.info("========== jing-bucket/testFolder/ ==========");
         List<String> keys = manager.listFiles("jing-bucket", "testFolder/");
-        assert (keys.size()== 21);
+        assert (keys.size() > 0);
         assert (keys.contains("testFolder/(-_*')!.@&:,$=+?;#.csv"));
 
         LOG.info("========== jing-bucket/testFolder/a.json ==========");
@@ -77,6 +78,9 @@ public class S3DDFManagerTests {
 
         keys = manager.listFiles("jing-bucket", "testFolder/(-_*')!.@&:,$=+?;#.csv");
         assert (keys.size() == 1);
+
+        keys = manager.listFiles("jing-bucket", "non-exist");
+        assert keys.size() == 0;
     }
 
     @Test

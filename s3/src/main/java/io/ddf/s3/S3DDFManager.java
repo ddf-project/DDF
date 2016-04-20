@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -126,9 +128,20 @@ public class S3DDFManager extends DDFManager {
    */
   public List<String> listFiles(String bucket, String key) {
     List<String> files = new ArrayList<String>();
-    ObjectListing objects = mConn.listObjects(bucket, key);
-    for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
-      files.add(objectSummary.getKey());
+    ListObjectsRequest listObjectRequest = new ListObjectsRequest()
+        .withBucketName(bucket)
+        .withPrefix(key)
+        .withDelimiter("/");
+    ObjectListing objects;
+    do {
+      objects = mConn.listObjects(listObjectRequest);
+      files.addAll(objects.getCommonPrefixes());
+      objects.setMarker(objects.getNextMarker());
+    } while (objects.isTruncated());
+    Stream<S3ObjectSummary> s3objects = objects.getObjectSummaries().parallelStream();
+    files.addAll(s3objects.map(s3ObjectSummary -> s3ObjectSummary.getKey()).collect(Collectors.toList()));
+    if(key.endsWith("/")) {
+      files.remove(key);
     }
     return files;
   }
