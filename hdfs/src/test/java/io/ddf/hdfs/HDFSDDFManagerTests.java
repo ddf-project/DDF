@@ -26,6 +26,10 @@ public class HDFSDDFManagerTests {
     public static void startServer() throws Exception {
         LOG = LoggerFactory.getLogger(HDFSDDFManagerTests.class);
         manager = new HDFSDDFManager(System.getenv("HDFS_URI"));
+        try {
+            new HDFSDDFManager("invalidpath");
+            assert false;
+        } catch (Exception e) {}
     }
 
     @Test
@@ -36,7 +40,6 @@ public class HDFSDDFManagerTests {
 
     @Test
     public void testCreateDDF() throws DDFException {
-
         HDFSDDF cleanFolderDDF = manager.newDDF("/test_pe/csv/multiple", null, null);
         HDFSDDF jsonDDF = manager.newDDF("/test_pe/json/noheader", null, null);
         HDFSDDF csvDDF = manager.newDDF("/test_pe/csv/noheader", null, null);
@@ -93,7 +96,6 @@ public class HDFSDDFManagerTests {
             assert (e.getMessage().contains("more than 1"));
         }
     }
-
 
     @Test
     public void testHead() throws DDFException {

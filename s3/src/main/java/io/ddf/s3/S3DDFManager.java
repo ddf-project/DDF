@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+
 /**
  * Created by jing on 12/2/15.
  */
@@ -130,6 +131,11 @@ public class S3DDFManager extends DDFManager {
       files.add(objectSummary.getKey());
     }
     return files;
+  }
+
+  public List<String> listFiles(String path) {
+    List<String> bucketAndPath = getBucketAndKey(path);
+    return this.listFiles(bucketAndPath.get(0), bucketAndPath.get(1));
   }
 
 
@@ -273,5 +279,15 @@ public class S3DDFManager extends DDFManager {
 
   public void stop() {
     // TODO: Does s3 connection has to be closed?
+  }
+
+  /**
+   * @brief Get the bucket and path out of a given uri.
+   * @param path
+   * @return
+   */
+  public static List<String> getBucketAndKey(String path) {
+    int firstSlash = path.indexOf('/');
+    return Arrays.asList(new String[]{path.substring(0, firstSlash), path.substring(firstSlash + 1)});
   }
 }
