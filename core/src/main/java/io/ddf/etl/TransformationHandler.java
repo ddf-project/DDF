@@ -11,6 +11,7 @@ import io.ddf.content.Schema.ColumnType;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
+import io.ddf.util.Utils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -254,12 +255,17 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       }
 
       if (sColTrimmed != null && !sColTrimmed.isEmpty()) {
+        if (Utils.containsIgnoreCase(lsExistingColumns, sColTrimmed)
+            || Utils.containsIgnoreCase(lsNewColumnNamesTrimmed, sColTrimmed)) {
+          throw new DDFException(String.format("Duplicated column name: %s. "
+              + "Please use another name for the column.", sColTrimmed));
+        }
         lsNewColumnNamesTrimmed.add(sColTrimmed);
       } else {
         String sNewColName = String.format("c%d", iNewColIdx);
-        while (lsExistingColumns.contains(sNewColName)
-                || setNamedColumns.contains(sNewColName)
-                || lsNewColumnNamesTrimmed.contains(sNewColName)) {
+        while (Utils.containsIgnoreCase(lsExistingColumns, sNewColName)
+                || Utils.containsIgnoreCase(setNamedColumns, sNewColName)
+                || Utils.containsIgnoreCase(lsNewColumnNamesTrimmed, sNewColName)) {
           iNewColIdx++;
           sNewColName = String.format("c%d", iNewColIdx);
         }
@@ -267,45 +273,24 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       }
     }
 
-    // check for duplicates in new column names
-    Set<String> setNewColumnNamesTrimmed = lsNewColumnNamesTrimmed.stream().collect(Collectors.toSet());
-    if (setNewColumnNamesTrimmed.size() < lsNewColumnNamesTrimmed.size()) {
-      throw new DDFException("There are duplicated new column names");
-    }
-
     // added transform expressions first
     List<String> newColumns = new ArrayList<>();
     for (int i = lsNewColumnNamesTrimmed.size() - 1; i >= 0; --i) {
-      if (transformExpressions[i] == null || transformExpressions[i].length() == 0) {
+      if (transformExpressions[i] == null || transformExpressions[i].isEmpty()) {
         throw new DDFException(String.format("Got empty transform expression at index %d", i));
       }
       newColumns.add(0, String.format("%s AS %s", transformExpressions[i].trim(), lsNewColumnNamesTrimmed.get(i)));
     }
 
-    // messy logic here. Following transformUDF(), this is the explanation in English:
-    // - If `selectedColumns` is null or empty, we include all existing columns,
-    //   but `newColumnNames` take priority if conflicts happen (no exception thrown).
-    // - If `selectedColumns` is not null, we only include names in `selectedColumns`,
-    //   and throw exception if conflicts happen
-    // Maybe we should simplify this and throw exception anytime there are conflicts?
-
+    // at this point, it's sure that newColumns doesn't contain any duplicated columns
     if (selectedColumns == null || selectedColumns.length == 0) {
-      for (int i = lsExistingColumns.size() - 1; i >= 0; --i) {
-        String sCol = lsExistingColumns.get(i);
-        if (!setNewColumnNamesTrimmed.contains(sCol)) {
-          newColumns.add(0, sCol);
-        }
-      }
+      newColumns.addAll(0, lsExistingColumns);
     } else {
-      for (int i = selectedColumns.length - 1; i >= 0; --i) {
-        String sCol = selectedColumns[i];
-        if (!lsExistingColumns.contains(sCol)) {
-          throw new DDFException(String.format("Selected column '%s' doesn't exist in the DDF", sCol));
+      for (String selectedCol: selectedColumns) {
+        if (!Utils.containsIgnoreCase(lsExistingColumns, selectedCol)) {
+          throw new DDFException(String.format("Selected column '%s' does not exist in the DDF", selectedCol));
         }
-        if (setNewColumnNamesTrimmed.contains(sCol)) {
-          throw new DDFException(String.format("Duplicated columns: %s", sCol));
-        }
-        newColumns.add(0, sCol);
+        newColumns.add(0, selectedCol);
       }
     }
 
@@ -347,7 +332,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     if (newColumnNames.length != transformExpressions.length) {
       throw new DDFException(String
-          .format("newColumnNames and transformExpressions must" + " have the same length. Got %d and %d",
+          .format("newColumnNames and transformExpressions must have the same length. Got %d and %d",
               newColumnNames.length, transformExpressions.length));
     }
 
@@ -362,13 +347,15 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
   public DDF transformUDFWithNames(String[] newColumnNames, String[] transformExpressions,
       String[] selectedColumns, Boolean inPlace) throws DDFException {
+
+    DDF newDDF = transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns);
     if(inPlace) {
-      DDF newDDF = transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns);
       return this.getDDF().updateInplace(newDDF);
     } else {
-      return transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns);
+      return newDDF;
     }
   }
+
   public static String RToSqlUdf(List<String> RExp) {
     return RToSqlUdf(RExp, null, null);
   }
