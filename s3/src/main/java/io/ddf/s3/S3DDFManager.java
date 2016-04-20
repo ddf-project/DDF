@@ -140,13 +140,13 @@ public class S3DDFManager extends DDFManager {
     } while (objects.isTruncated());
     Stream<S3ObjectSummary> s3objects = objects.getObjectSummaries().parallelStream();
     files.addAll(s3objects.map(s3ObjectSummary -> s3ObjectSummary.getKey()).collect(Collectors.toList()));
-    if(key.endsWith("/")) {
-      files.remove(key);
+    if (files.size() == 1 && files.get(0).equals(key + "/")) {
+      return listFiles(bucket, key + "/");
     }
     return files;
   }
 
-  public List<String> listFiles(String path) {
+  public List<String> listFiles(String path) throws DDFException {
     List<String> bucketAndPath = getBucketAndKey(path);
     return this.listFiles(bucketAndPath.get(0), bucketAndPath.get(1));
   }
@@ -299,8 +299,11 @@ public class S3DDFManager extends DDFManager {
    * @param path
    * @return
    */
-  public static List<String> getBucketAndKey(String path) {
+  public static List<String> getBucketAndKey(String path) throws DDFException {
     int firstSlash = path.indexOf('/');
+    if (firstSlash == -1 || firstSlash == path.length()) {
+      throw new DDFException(String.format("The path %s is not a valid s3 path", path));
+    }
     return Arrays.asList(new String[]{path.substring(0, firstSlash), path.substring(firstSlash + 1)});
   }
 }

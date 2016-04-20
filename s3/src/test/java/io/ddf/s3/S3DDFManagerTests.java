@@ -68,13 +68,16 @@ public class S3DDFManagerTests {
         assert(buckets.contains("jing-bucket"));
 
         LOG.info("========== jing-bucket/testFolder/ ==========");
-        List<String> keys = manager.listFiles("jing-bucket", "testFolder/");
-        assert (keys.size() > 0);
+        List<String> keys = manager.listFiles("jing-bucket/testFolder/");
+        assert (keys.size() > 1);
         assert (keys.contains("testFolder/(-_*')!.@&:,$=+?;#.csv"));
 
         LOG.info("========== jing-bucket/testFolder/a.json ==========");
         keys = manager.listFiles("jing-bucket", "testFolder/a.json");
         assert (keys.size()==1);
+
+        keys = manager.listFiles("adatao-sample-data/test/extra/format/mixed-csv-tsv");
+        assert keys.size() > 1;
 
         keys = manager.listFiles("jing-bucket", "testFolder/(-_*')!.@&:,$=+?;#.csv");
         assert (keys.size() == 1);
@@ -97,8 +100,9 @@ public class S3DDFManagerTests {
             S3DDF mixed = manager.newDDF("adatao-sample-data/test/extra/format/mixed-csv-tsv", null, null);
             assert (false);
         } catch (DDFException e) {
-
+            assert e.getMessage().contains("more than 1");
         }
+
 
         S3DDF cleanFolderDDF = manager.newDDF("jing-bucket", "testFolder/folder/", null, null);
         S3DDF jsonDDF = manager.newDDF("jing-bucket", "testFolder/a.json", null, null);
