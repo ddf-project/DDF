@@ -47,6 +47,11 @@ public class S3DDFManager extends DDFManager {
     mCredential = s3Credentials;
     AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
     mConn = new AmazonS3Client(credentials);
+    try {
+      mConn.getS3AccountOwner();
+    } catch (AmazonS3Exception e) {
+      throw new DDFException("Credential invalid for s3");
+    }
   }
 
   public S3DDFManager(S3DataSourceDescriptor s3dsd) throws DDFException {

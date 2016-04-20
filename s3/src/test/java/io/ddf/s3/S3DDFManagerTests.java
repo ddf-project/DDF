@@ -32,10 +32,32 @@ public class S3DDFManagerTests {
     public static void startServer() throws Exception {
         LOG = LoggerFactory.getLogger(S3DDFManagerTests.class);
         S3DataSourceDescriptor  s3dsd = new S3DataSourceDescriptor(new S3DataSourceURI(""),
-            new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY")),
+            new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"),
+                System.getenv("AWS_SECRET_ACCESS_KEY")),
             null,
             null);
         manager = (S3DDFManager)DDFManager.get(DDFManager.EngineType.S3, s3dsd);
+
+        try {
+            DDFManager.get(DDFManager.EngineType.S3,
+                new S3DataSourceDescriptor(
+                    new S3DataSourceURI(""),
+                    new S3DataSourceCredentials("invalid", "invalid"),
+                    null,
+                    null));
+            assert (false);
+        } catch (Exception e) {}
+
+        try {
+            DDFManager.get(DDFManager.EngineType.S3,
+                new S3DataSourceDescriptor(
+                    new S3DataSourceURI(""),
+                    new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), "invalid"),
+                    null,
+                    null
+                ));
+            assert (false);
+        } catch (Exception e) {}
     }
 
     @Test
