@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import io.ddf.datasource.DataFormat;
@@ -29,7 +30,7 @@ public class HDFSDDFManagerTests {
         try {
             new HDFSDDFManager("invalidpath");
             assert false;
-        } catch (Exception e) {}
+        } catch (DDFException e) {}
     }
 
     @Test
@@ -86,13 +87,13 @@ public class HDFSDDFManagerTests {
         try {
             HDFSDDF folderDDF = manager.newDDF("/test_pe/", null, null);
             assert false;
-        } catch (Exception e) {
+        } catch (DDFException e) {
         }
 
         try {
             HDFSDDF mixedDDF = manager.newDDF("/test_pe/extra/format/mixed-csv-tsv/", null, null);
             assert (false);
-        } catch (Exception e) {
+        } catch (DDFException e) {
             assert (e.getMessage().contains("more than 1"));
         }
     }
