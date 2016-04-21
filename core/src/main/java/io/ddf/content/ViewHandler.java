@@ -107,6 +107,17 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   }
 
   @Override
+  public DDF removeColumn(String columnName, Boolean inPlace) throws DDFException {
+    DDF newDDF = this.removeColumn(columnName);
+    if(inPlace) {
+      this.getDDF().getMutabilityHandler().updateInplace(newDDF);
+      return this.getDDF();
+    } else {
+      return newDDF;
+    }
+  }
+
+  @Override
   public DDF removeColumns(String... columnNames) throws DDFException {
     if (columnNames == null || columnNames.length == 0) throw new DDFException("columnNames must be specified");
 
@@ -126,19 +137,29 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
         throw new DDFException(String.format("Column %s does not exists", columnName));
       }
     }
-    List<String> columns = this.getDDF().getColumnNames();
 
-    for (String columnName : currentColumnNames) {
-      for (Iterator<String> it = columns.iterator();it.hasNext();) {
+    for (String columnName : columnNames) {
+      for (Iterator<String> it = currentColumnNames.iterator();it.hasNext();) {
         if (it.next().equals(columnName)) {
           it.remove();
         }
       }
     }
 
-    DDF newddf = this.project(columns);
+    DDF newddf = this.project(currentColumnNames);
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
     return newddf;
+  }
+
+  @Override
+  public DDF removeColumns(List<String> columnNames, Boolean inPlace) throws DDFException {
+    DDF newDDF = this.removeColumns(columnNames);
+    if(inPlace) {
+      this.getDDF().getMutabilityHandler().updateInplace(newDDF);
+      return this.getDDF();
+    } else {
+      return newDDF;
+    }
   }
 
   // ///// Execute SQL command on the DDF ///////
