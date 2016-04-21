@@ -4,11 +4,8 @@ import java.io.CharArrayWriter
 import java.util
 import java.util.{Map => JMap}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonFactory}
-import com.google.common.base.Strings
 import io.ddf.{DDFManager, DDF}
 import org.apache.spark.mllib.linalg.VectorUDT
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 import org.apache.spark.{SparkConf, SparkContext}
@@ -17,8 +14,7 @@ import org.apache.spark.sql.{Column => DFColumn}
 import io.ddf.content.Schema
 import scala.collection.Map
 import scala.collection.mutable.ArrayBuffer
-import java.util.{List => JList}
-import io.ddf.content.Schema.{ColumnType, Column}
+import io.ddf.content.Schema.{Column}
 import com.google.common.collect.Lists
 import java.util.ArrayList
 import io.ddf.exception.DDFException
@@ -69,16 +65,25 @@ object SparkUtils {
 
 
   def str2SparkSchema(schema: String): StructType = {
-    StructType(
-      schema.split(",").map(
-        attr => {
-          val nameAndType = attr.trim.split(" ")
-          StructField(nameAndType(0), str2SparkType(nameAndType(1)), true )
-        }
+    val nameList: java.util.List[String] = new util.ArrayList[String]()
+    val typeList: java.util.List[String] = new util.ArrayList[String]()
+    schema.split(",").map(
+      attr => {
+        val trimedAttr = attr.trim
+        val lastSpaceIndex = trimedAttr.lastIndexOf(" ")
+        nameList.add(trimedAttr.substring(0, lastSpaceIndex))
+        typeList.add(trimedAttr.substring(lastSpaceIndex + 1))
+      })
 
-      )
-    )
+    val sanitizedNameList = io.ddf.util.Utils.sanitizeColumnName(nameList)
+
+    val structFieldList: java.util.List[StructField] = new util.ArrayList[StructField]()
+    for (i <- 0 to sanitizedNameList.size() - 1) {
+      structFieldList.add(new StructField(sanitizedNameList.get(i), str2SparkType(typeList.get(i)), true))
+    }
+    return StructType(structFieldList)
   }
+
 
   /**
    *
