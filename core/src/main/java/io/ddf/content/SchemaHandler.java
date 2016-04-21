@@ -32,6 +32,8 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
 
   private Schema mSchema;
 
+  private Map<String, Map<String, Integer>> mLevelCounts = new HashMap<String, Map<String, Integer>>();
+
   @Override
   public Schema getSchema() {
     return mSchema;
@@ -133,6 +135,22 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   @Override
   public Map<String, Map<String, Integer>> computeLevelCounts(String[] columnNames) throws DDFException {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setLevelCounts(Map<String, Map<String, Integer>> levelCounts) throws DDFException {
+    Map<String, Map<String, Integer>> currentLevelCounts = this.getLevelCounts();
+    currentLevelCounts.putAll(levelCounts);
+  }
+
+  @Override
+  public void removeLevelCounts() throws DDFException {
+    this.mLevelCounts = new HashMap<String, Map<String, Integer>>();
+  }
+
+  @Override
+  public Map<String, Map<String, Integer>> getLevelCounts() throws DDFException {
+    return this.mLevelCounts;
   }
 
   public List<Object> computeFactorLevels(String columnName) throws DDFException {
