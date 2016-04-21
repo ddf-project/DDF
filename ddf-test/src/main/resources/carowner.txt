@@ -1,4 +1,0 @@
-michael 6 160.0 
-ctn 6 160.0
-long 4 129.0
-nhan  156.0

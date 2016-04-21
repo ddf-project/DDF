@@ -11,18 +11,14 @@ import io.ddf.hdfs.HDFSDDF;
 import io.ddf.hdfs.HDFSDDFManager;
 import io.ddf.s3.S3DDF;
 import io.ddf.s3.S3DDFManager;
-import io.ddf.util.Utils;
 
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,38 +125,9 @@ public class SparkDDFManagerTests extends BaseTest {
     DDF pqtSparkDDF = manager.copyFrom(pqtDDF);
     LOG.info(pqtSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     LOG.info("========== avro ==========");
-    S3DDF avroDDF = s3DDFManager.newDDF("adatao-sample-data", "test/avro/partition/", null, null);
-    DDF avroSparkDDF = manager.copyFrom(avroDDF);
-    assert (avroSparkDDF.getNumRows() > 0);
-
-
-    LOG.info("========== testFolder/folder ==========");
-    final List<String> nameList = new ImmutableList.Builder<String>()
-        .add("dd2_2") // valid
-        .add("_dd2_2") // start with dash
-        .add("2dd2_2") // start with num
-        .add("@dd2_2") // start with others
-        .add("dd 22") // space
-        .add("dd 22 ") // back space
-        .build();
-
-    final List<String> expectedList = new ImmutableList.Builder<String>()
-        .add("dd2_2")
-        .add("dd2_2_0")
-        .add("dd2_2_1")
-        .add("dd2_2_2")
-        .add("dd_22")
-        .add("dd_22_0")
-        .build();
-
-    StringBuilder schema = new StringBuilder(String.format("%s int", nameList.get(0)));
-    for (int i = 1; i < nameList.size(); ++i) {
-      schema.append(String.format(", %s int", nameList.get(i)));
-    }
-    S3DDF ddf = s3DDFManager.newDDF("adatao-sample-data", "test/pa/sanitize_column_name/6col.csv", schema.toString(),
-        null);
-    DDF sparkDDF = manager.copyFrom(ddf);
-    assert (sparkDDF.getColumnNames().equals(expectedList));
+    //S3DDF avroDDF = s3DDFManager.newDDF("adatao-sample-data", "test/avro/partition/", null, null);
+    //DDF avroSparkDDF = manager.copyFrom(avroDDF);
+    //LOG.info(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
 
     // s3 doesn't work with orc now
     /*
