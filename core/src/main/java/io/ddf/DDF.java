@@ -66,7 +66,7 @@ import java.util.regex.Pattern;
  * </p>
  */
 public abstract class DDF extends ALoggable //
-    implements IGloballyAddressable, IPersistible, ISupportPhantomReference, ISerializable {
+        implements IGloballyAddressable, IPersistible, ISupportPhantomReference, ISerializable {
 
   private static final long serialVersionUID = -2198317495102277825L;
 
@@ -97,8 +97,8 @@ public abstract class DDF extends ALoggable //
    * @throws DDFException
    */
   public DDF(DDFManager manager, Object data, Class<?>[] typeSpecs,
-      String namespace, String name, Schema schema)
-      throws DDFException {
+             String namespace, String name, Schema schema)
+          throws DDFException {
 
     this.initialize(manager, data, typeSpecs, namespace, name,
             schema);
@@ -168,7 +168,7 @@ public abstract class DDF extends ALoggable //
    */
   protected void initialize(DDFManager manager, Object data, Class<?>[]
           typeSpecs, String namespace, String name,
-      Schema schema) throws DDFException {
+                            Schema schema) throws DDFException {
     Schema.validateSchema(schema);
     this.setManager(manager); // this must be done first in case later stuff needs a manager
 
@@ -210,7 +210,7 @@ public abstract class DDF extends ALoggable //
    */
   protected void initialize(DDFManager manager, Object data, Class<?>[]
           typeSpecs, String namespace, String name,
-      Schema schema, String tableName) throws DDFException {
+                            Schema schema, String tableName) throws DDFException {
 
     initialize(manager, data, typeSpecs, namespace, name, schema);
 
@@ -385,7 +385,7 @@ public abstract class DDF extends ALoggable //
       sqlCommand = sqlCommand.replace("@this", "{1}");
       sqlCommand = String.format(sqlCommand, "{1}");
       SQLDataSourceDescriptor sqlDS = new SQLDataSourceDescriptor(sqlCommand,
-          null, null, null, this.getUUID().toString());
+              null, null, null, this.getUUID().toString());
       return this.getManager().sql(sqlCommand, null, sqlDS);
     } catch (DDFException e) {
       throw e;
@@ -464,8 +464,13 @@ public abstract class DDF extends ALoggable //
   }
 
   public DDF join(DDF anotherDDF, JoinType joinType, List<String> byColumns, List<String> byLeftColumns,
-      List<String> byRightColumns) throws DDFException {
+                  List<String> byRightColumns) throws DDFException {
     return this.getJoinsHandler().join(anotherDDF, joinType, byColumns, byLeftColumns, byRightColumns);
+  }
+
+  public DDF join(DDF anotherDDF, JoinType joinType, List<String> byColumns, List<String> byLeftColumns,
+                  List<String> byRightColumns, String leftSuffix, String rightSuffix) throws DDFException {
+    return this.getJoinsHandler().join(anotherDDF, joinType, byColumns, byLeftColumns, byRightColumns, leftSuffix, rightSuffix);
   }
 
   public DDF groupBy(List<String> groupedColumns, List<String> aggregateFunctions) throws DDFException {
@@ -482,7 +487,7 @@ public abstract class DDF extends ALoggable //
 
   // ///// binning
   public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
-      boolean right) throws DDFException {
+                     boolean right) throws DDFException {
     return this.getBinningHandler().binning(column, binningType, numBins, breaks, includeLowest, right);
   }
 
@@ -852,7 +857,7 @@ public abstract class DDF extends ALoggable //
       mLog.info(">>> className = " + className);
       if (Strings.isNullOrEmpty(className)) {
         mLog.error(String.format("Cannot determine classname for %s from configuration source [%s] %s",
-            theInterface.getSimpleName(), Config.getConfigHandler().getSource(), this.getEngine()));
+                theInterface.getSimpleName(), Config.getConfigHandler().getSource(), this.getEngine()));
         return null;
       }
 
@@ -863,7 +868,7 @@ public abstract class DDF extends ALoggable //
       }
 
       Constructor<ADDFFunctionalGroupHandler> cons = (Constructor<ADDFFunctionalGroupHandler>) clazz
-          .getDeclaredConstructor(new Class<?>[] { DDF.class });
+              .getDeclaredConstructor(new Class<?>[] { DDF.class });
 
       if (cons != null) cons.setAccessible(true);
 
@@ -871,19 +876,19 @@ public abstract class DDF extends ALoggable //
 
     } catch (ClassNotFoundException cnfe) {
       mLog.error(String.format("Cannot instantiate handler for [%s] %s/%s", this.getEngine(),
-          theInterface.getSimpleName(), className), cnfe);
+              theInterface.getSimpleName(), className), cnfe);
     } catch (NoSuchMethodException nsme) {
       mLog.error(String.format("Cannot instantiate handler for [%s] %s/%s", this.getEngine(),
-          theInterface.getSimpleName(), className), nsme);
+              theInterface.getSimpleName(), className), nsme);
     } catch (IllegalAccessException iae) {
       mLog.error(String.format("Cannot instantiate handler for [%s] %s/%s", this.getEngine(),
-          theInterface.getSimpleName(), className), iae);
+              theInterface.getSimpleName(), className), iae);
     } catch (InstantiationException ie) {
       mLog.error(String.format("Cannot instantiate handler for [%s] %s/%s", this.getEngine(),
-          theInterface.getSimpleName(), className), ie);
+              theInterface.getSimpleName(), className), ie);
     } catch (InvocationTargetException ite) {
       mLog.error(String.format("Cannot instantiate handler for [%s] %s/%s", this.getEngine(),
-          theInterface.getSimpleName(), className), ite);
+              theInterface.getSimpleName(), className), ite);
     }
     return null;
   }
@@ -917,22 +922,22 @@ public abstract class DDF extends ALoggable //
   public void cleanup() {
     // @formatter:off
     this
-      .setMLSupporter(null)
-      .setStatisticsSupporter(null)
-      .setIndexingHandler(null)
-      .setJoinsHandler(null)
-      .setMetaDataHandler(null)
-      .setMiscellanyHandler(null)
-      .setMissingDataHandler(null)
-      .setMutabilityHandler(null)
-      .setSqlHandler(null)
-      .setPersistenceHandler(null)
-      .setRepresentationHandler(null)
-      .setReshapingHandler(null)
-      .setSchemaHandler(null)
-      .setStreamingDataHandler(null)
-      .setTimeSeriesHandler(null)
-      ;
+            .setMLSupporter(null)
+            .setStatisticsSupporter(null)
+            .setIndexingHandler(null)
+            .setJoinsHandler(null)
+            .setMetaDataHandler(null)
+            .setMiscellanyHandler(null)
+            .setMissingDataHandler(null)
+            .setMutabilityHandler(null)
+            .setSqlHandler(null)
+            .setPersistenceHandler(null)
+            .setRepresentationHandler(null)
+            .setReshapingHandler(null)
+            .setSchemaHandler(null)
+            .setStreamingDataHandler(null)
+            .setTimeSeriesHandler(null)
+    ;
     // @formatter:on
   }
 
@@ -1140,7 +1145,7 @@ public abstract class DDF extends ALoggable //
 
   @Override
   public ISerializable afterDeserialization(ISerializable deserializedObject, Object serializationData)
-      throws DDFException {
+          throws DDFException {
     return deserializedObject;
   }
 
