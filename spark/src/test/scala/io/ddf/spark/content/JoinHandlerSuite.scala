@@ -1,9 +1,7 @@
 package io.ddf.spark.content
 
 import java.util
-import java.util.Collections
 
-import io.ddf.etl.Types.JoinType
 import io.ddf.spark.etl.JoinHandler
 import io.ddf.test.it.SparkBaseSuite
 import io.ddf.test.it.etl.JoinHandlerBaseSuite
@@ -12,17 +10,6 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class JoinHandlerSuite extends SparkBaseSuite with JoinHandlerBaseSuite {
-  test("inner join suffix") {
-    val left_ddf = loadMtCarsDDF()
-    val right_ddf = loadCarOwnersDDF()
-    val ddf = left_ddf.join(right_ddf, JoinType.INNER, Collections.singletonList("cyl"),null,null, "_left", "_right")
-    val colNames = ddf.getSchema.getColumnNames
-    colNames.contains("cyl_left") should be(true)
-    colNames.contains("cyl_right") should be(true)
-    colNames.contains("disp_left") should be(true)
-    colNames.contains("disp_right") should be(true)
-  }
-
   test("test join handler generate select columns") {
     val left_ddf = loadMtCarsDDF()
     val columnId = "lt"
