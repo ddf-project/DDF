@@ -16,39 +16,13 @@
  * limitations under the License.
  *
  */
-package io.ddf.test.it
+package io.ddf.test.it.ml
 
-import java.io.File
-
-import io.ddf.DDF
-import io.ddf.content.APersistenceHandler.PersistenceUri
+import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 
-import scala.collection.JavaConverters._
+trait MLMetricsSupporterBaseSuite extends BaseSuite with Matchers {
 
-trait PersistenceSpec extends BaseSpec with Matchers {
-
-  feature("Persistence") {
-    scenario("hold namespaces correctly") {
-      val ddf: DDF = manager.newDDF
-
-      val namespaces = ddf.getPersistenceHandler.listNamespaces
-
-      namespaces should not be null
-      for (namespace <- namespaces.asScala) {
-        val ddfs = ddf.getPersistenceHandler.listItems(namespace)
-        ddfs should not be null
-      }
-
-    }
-
-    scenario("persist and unpersist a DDF") {
-      val ddf: DDF = manager.newDDF
-      val uri: PersistenceUri = ddf.persist
-      uri.getEngine.toLowerCase() should be(engineName)
-      new File(uri.getPath).exists should be (true)
-      ddf.unpersist()
-    }
-  }
+  // TODO: add test cases, now this is just a placeholder
 
 }
