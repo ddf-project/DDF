@@ -78,23 +78,25 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
   }
 
-  public DDF transformNativeRserve(String transformExpression) {
-    // TODO Auto-generated method stub
+  @Override public DDF transformNativeRserve(String transformExpression) {
     return null;
   }
 
-  public DDF transformNativeRserve(String[] transformExpressions) {
+  @Override public DDF transformNativeRserve(String[] transformExpressions) {
     return null;
   }
 
-  public DDF transformPython(String[] transformFuctions, String[] functionNames, String[] destColumns,
-      String[][] sourceColumns) {
-    // TODO Auto-generated method stub
+  @Override public DDF transformPython(String[] transformFuctions, String[] functionNames, String[] destColumns,
+      String[][] sourceColumns) throws DDFException {
+    return null;
+  }
+
+  @Override public DDF transformPython(String[] transformFuctions, String[] functionNames, String[] destColumns,
+      String[][] sourceColumns, Boolean inPlace) throws DDFException {
     return null;
   }
 
   @Override public DDF transformMapReduceNative(String mapFuncDef, String reduceFuncDef, boolean mapsideCombine) {
-    // TODO Auto-generated method stub
     return null;
   }
 

@@ -60,8 +60,15 @@ public class TransformFacade implements IHandleTransformations {
 
   @Override
   public DDF transformPython(String[] transformFunctions, String[] functionNames,
-      String[] destColumns, String[][] sourceColumns) {
+      String[] destColumns, String[][] sourceColumns) throws DDFException {
     return mTransformationHandler.transformPython(transformFunctions, functionNames, destColumns, sourceColumns);
+  }
+
+  @Override
+  public DDF transformPython(String[] transformFunctions, String[] functionNames,
+      String[] destColumns, String[][] sourceColumns, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.transformPython(transformFunctions, functionNames, destColumns,
+        sourceColumns, inPlace);
   }
 
   @Override

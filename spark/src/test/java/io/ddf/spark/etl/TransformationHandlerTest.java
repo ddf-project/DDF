@@ -56,6 +56,45 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertTrue(newDdf.getColumnNames().contains("c0"));
     Assert.assertTrue(newDdf.getColumnNames().contains("col2"));
     Assert.assertEquals(10, newDdf.getNumColumns());
+
+    try {
+      newDdf.Transform.transformPython(
+          new String[] {"ZGVmIHRyYW5zKHgpOgogIHJldHVybiB4LzIuCg==", "ZGVmIHRyYW5zMih4KToKICByZXR1cm4geCsxMAo="},
+          new String[] {"trans", "TrAnS2"}, new String[] {null, "col2"},
+          new String[][] {new String[] {"distance"}, new String[] {"month"}});
+      Assert.fail("Should throw error for duplicated column");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
+    }
+  }
+
+  @Test
+  public void testTransformPythonInPlace() throws DDFException {
+    // f = lambda x: x/2.
+    // f = lambda x: x+10
+    DDF newDdf = ddf.copy();
+    DDF newDdf2 = newDdf.Transform.transformPython(
+        new String[] {"ZGVmIHRyYW5zKHgpOgogIHJldHVybiB4LzIuCg==", "ZGVmIHRyYW5zMih4KToKICByZXR1cm4geCsxMAo="},
+        new String[] {"trans", "trans2"},
+        new String[] {null, "col2"},
+        new String[][] { new String[] {"distance"}, new String[] {"month"}},
+        Boolean.TRUE);
+
+    Assert.assertTrue(newDdf.getUUID().equals(newDdf2.getUUID()));
+    Assert.assertNotNull(newDdf2);
+    Assert.assertTrue(newDdf2.getColumnNames().contains("c0"));
+    Assert.assertTrue(newDdf2.getColumnNames().contains("col2"));
+    Assert.assertEquals(10, newDdf2.getNumColumns());
+
+    try {
+      newDdf.Transform.transformPython(
+          new String[] {"ZGVmIHRyYW5zKHgpOgogIHJldHVybiB4LzIuCg==", "ZGVmIHRyYW5zMih4KToKICByZXR1cm4geCsxMAo="},
+          new String[] {"trans", "TrAnS2"}, new String[] {null, "col2"},
+          new String[][] {new String[] {"distance"}, new String[] {"month"}}, true);
+      Assert.fail("Should throw error for duplicated column");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
+    }
   }
 
   @Test
