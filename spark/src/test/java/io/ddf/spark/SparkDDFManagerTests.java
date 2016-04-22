@@ -65,9 +65,9 @@ public class SparkDDFManagerTests extends BaseTest {
 
   public void testBasicCopyForS3(S3DDFManager s3DDFManager) throws DDFException {
     LOG.info("========== non-exist========");
-    S3DDF nonExistDDF = s3DDFManager.newDDF("jing-bucket", "non-exist", null, null);
     try {
-      DDF nonExistSparkDDF = manager.copyFrom(nonExistDDF);
+      S3DDF nonExistDDF = s3DDFManager.newDDF("jing-bucket", "non-exist", null, null);
+      assert (false);
     } catch (DDFException e) {
       assert (e.getMessage().equals("java.io.FileNotFoundException: File does not exist"));
     }
