@@ -82,8 +82,12 @@ public class S3DDFManagerTests {
         keys = manager.listFiles("jing-bucket", "testFolder/(-_*')!.@&:,$=+?;#.csv");
         assert (keys.size() == 1);
 
-        keys = manager.listFiles("jing-bucket", "non-exist");
-        assert keys.size() == 0;
+        try {
+            keys = manager.listFiles("jing-bucket", "non-exist");
+            assert (false);
+        } catch (DDFException e) {
+            assert (e.getMessage().equals("java.io.FileNotFoundException: File does not exist"));
+        }
     }
 
     @Test

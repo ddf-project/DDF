@@ -16,6 +16,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.util.Utils;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public class S3DDFManager extends DDFManager {
    * @return The list of file names (TODO: should we return more info here.)
    * @brief List all the files (including directories under one path)
    */
-  public List<String> listFiles(String bucket, String key) {
+  public List<String> listFiles(String bucket, String key) throws DDFException {
     List<String> files = new ArrayList<String>();
     ListObjectsRequest listObjectRequest = new ListObjectsRequest()
         .withBucketName(bucket)
@@ -142,6 +143,9 @@ public class S3DDFManager extends DDFManager {
     files.addAll(s3objects.map(s3ObjectSummary -> s3ObjectSummary.getKey()).collect(Collectors.toList()));
     if (files.size() == 1 && files.get(0).equals(key + "/")) {
       return listFiles(bucket, key + "/");
+    }
+    if (files.size() == 0) {
+      throw new DDFException(new FileNotFoundException("File does not exist"));
     }
     return files;
   }
