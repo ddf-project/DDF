@@ -18,12 +18,10 @@
  */
 package io.ddf.test.it.etl
 
-import java.util
 import java.util.Collections
 
 import io.ddf.DDF
 import io.ddf.etl.Types.JoinType
-import io.ddf.spark.etl.JoinHandler
 import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 
