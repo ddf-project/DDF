@@ -16,7 +16,7 @@ object RootBuild extends Build {
   val DEFAULT_HADOOP_VERSION = "2.2.0"
 
   val SPARK_VERSION = "1.6.0-adatao-hd2.7.2"
-
+  val SPARK_CSV_VERSION = "arimo-1.4.0"
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
 
   // Target JVM version
@@ -119,7 +119,7 @@ object RootBuild extends Build {
 
   val spark_dependencies = Seq(
     "io.ddf" % "ddf_hdfs_2.10" % rootVersion exclude("javax.servlet", "servlet-api"),
-    "com.databricks" % "spark-csv_2.10" % "1.4.0",
+    "com.databricks" % "spark-csv_2.11" % SPARK_CSV_VERSION excludeAll(excludeSpark),
     "com.databricks" % "spark-avro_2.10" % "2.0.1",
     "commons-configuration" % "commons-configuration" % "1.6",
     "com.google.code.gson"% "gson" % "2.2.2",

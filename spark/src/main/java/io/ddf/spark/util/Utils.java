@@ -12,8 +12,15 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import scala.Predef;
+import scala.Tuple2;
+import scala.collection.JavaConverters;
+import scala.collection.JavaConverters$;
 
 public class Utils {
   public static ArrayList<String> listJars(String directory) {
@@ -124,6 +131,12 @@ public class Utils {
       }
     }
     return null;
+  }
+
+  public static <A, B> scala.collection.immutable.Map<A, B> toScalaMap(Map<A, B> m) {
+    return JavaConverters.mapAsScalaMapConverter(m).asScala().toMap(
+        Predef.<Tuple2<A, B>>conforms()
+    );
   }
 }
 

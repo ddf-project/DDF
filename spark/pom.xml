@@ -342,8 +342,14 @@
         </dependency>
         <dependency>
             <groupId>com.databricks</groupId>
-            <artifactId>spark-csv_2.10</artifactId>
-            <version>1.4.0</version>
+            <artifactId>spark-csv_2.11</artifactId>
+            <version>arimo-1.4.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-core_2.10</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.databricks</groupId>

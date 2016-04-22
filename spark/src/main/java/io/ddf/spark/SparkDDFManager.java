@@ -21,6 +21,8 @@ import io.ddf.spark.etl.DateUDF;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 
+import com.databricks.spark.csv.CsvParser;
+import com.databricks.spark.csv.CsvRelation;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -34,8 +36,10 @@ import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.execution.ScalaBigDecimalSerializer;
 import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.StructType;
+import org.python.indexer.Builtins;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -48,6 +52,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import scala.Tuple2;
+import scala.collection.JavaConversions;
+import scala.collection.convert.WrapAsJava;
 
 /**
  * An Apache-Spark-based implementation of DDFManager
@@ -623,5 +629,25 @@ public class SparkDDFManager extends DDFManager {
     DataFrame dataFrame = getHiveContext().read().format("com.databricks.spark.csv")
         .schema(stringSchema).options(csvOptions).load(source).limit(nHeadRow);
     return (SparkDDF) SparkUtils.df2ddf(dataFrame, this);
+  }
+  /**
+   * A special function to createSampleDDF for Data Ingestion
+   *
+   * @param source     : datasource uri
+   * @param csvOptions : https://github.com/databricks/spark-csv
+   * @param nHeadRow   : num row will be used for sample ddf
+   * @return SparkDDF & Statistic
+   */
+  public Tuple2<SparkDDF,CsvRelation.ParsingStatistic> newSampleDDFWithStats(
+      String source,
+      Map<String,String> csvOptions,
+      int nHeadRow
+  ) throws DDFException {
+
+    CsvParser csvParser = new CsvParser().withOptions(Utils.<String,String>toScalaMap(csvOptions));
+    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfWithStats = csvParser.csvFileWithStats(getHiveContext(), source);
+    SparkDDF ddf = (SparkDDF) SparkUtils.df2ddf(dfWithStats._1().limit(nHeadRow),this);
+    return new Tuple2<>(ddf, dfWithStats._2);
+
   }
 }

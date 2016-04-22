@@ -1,0 +1,5 @@
+tstring, tbool, tshort, tlong, tfloat, tdouble, tdate, ttimestamp
+sangdn, true, 0, 100000000, 4.2, 1000.00,2014-04-28, 2010-03-08 14:59:30.252
+sangdn, a, a, a, 4.2a, 1000x.00,2014x-04-28, 2010x-03-08 14x:59:30.252
+sangdn, a, a, a, 4.2a, 1000x.00,2014x-04-28
+sangdn, a, a, a, 4.2a, 1000x.00,2014x-04-28, 2010x-03-08 14x:59:30.252, x

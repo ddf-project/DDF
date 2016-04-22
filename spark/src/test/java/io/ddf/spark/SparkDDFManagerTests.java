@@ -13,16 +13,20 @@ import io.ddf.s3.S3DDF;
 import io.ddf.s3.S3DDFManager;
 
 
+import com.databricks.spark.csv.CsvRelation;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import scala.Tuple2;
 
 public class SparkDDFManagerTests extends BaseTest {
 
@@ -280,6 +284,24 @@ public class SparkDDFManagerTests extends BaseTest {
     HDFSDDF orcDDF = hdfsDDFManager.newDDF("/test_pe/orc/default/", null, null);
     DDF orcSparkDDF = sparkDDFManager.copyFrom(orcDDF);
     assert (orcSparkDDF.getNumRows() > 0);
+  }
+
+  @Test
+  public void TestNewSampleDDFWithStats() throws DDFException {
+    SparkDDFManager ddfManager = (SparkDDFManager) manager;
+    String source = "resources/test/parsing_statistic.csv";
+    System.out.println("Create DDF From "+ (new File(source)).getAbsolutePath());
+    Map<String,String> options = new HashMap();
+    options.put("header","false");
+    options.put("delimiter",",");
+    options.put("mode","PERMISSIVE");
+
+
+    Tuple2<SparkDDF, CsvRelation.ParsingStatistic> ddfAndStats = ddfManager.newSampleDDFWithStats(source, options, 10);
+    ddfAndStats._1().VIEWS.head(10).forEach(s -> System.out.println(s));
+    ddfAndStats._2().debugPrint();
+
+    Assert.assertEquals(ddfAndStats._2().getNumMalformedRows(),2);
   }
 
 }
