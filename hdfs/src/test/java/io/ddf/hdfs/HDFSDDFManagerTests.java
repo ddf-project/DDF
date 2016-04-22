@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import io.ddf.datasource.DataFormat;
@@ -27,6 +26,10 @@ public class HDFSDDFManagerTests {
     public static void startServer() throws Exception {
         LOG = LoggerFactory.getLogger(HDFSDDFManagerTests.class);
         manager = new HDFSDDFManager(System.getenv("HDFS_URI"));
+    }
+
+    @Test
+    public void testValidation() {
         try {
             new HDFSDDFManager("invalidpath");
             assert false;

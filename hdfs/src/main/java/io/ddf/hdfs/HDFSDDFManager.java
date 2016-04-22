@@ -45,7 +45,7 @@ public class HDFSDDFManager extends DDFManager {
       Configuration conf = new Configuration();
       conf.set("fs.defaultFS", fsUri);
       this.fs = FileSystem.get(conf);
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new DDFException(e);
     }
   }
