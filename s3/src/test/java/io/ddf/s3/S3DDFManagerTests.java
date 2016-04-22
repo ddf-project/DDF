@@ -129,7 +129,7 @@ public class S3DDFManagerTests {
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
 
-        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/single/episodes.avro", null, null);
+        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/single/twitter.avro", null, null);
         assert (avroDDF.getIsDir() == false);
         assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
 
@@ -137,14 +137,10 @@ public class S3DDFManagerTests {
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
 
-        S3DDF noExtensionDDF = manager.newDDF("adatao-sample-data/test/csv/hasHeader");
+        S3DDF noExtensionDDF = manager.newDDF("adatao-sample-data/test/csv/withheader");
 
         assert (noExtensionDDF.getIsDir() == false);
         assert (noExtensionDDF.getDataFormat().equals(DataFormat.CSV));
-
-        S3DDF emptyDDF = manager.newDDF("adatao-sample-data/empty_folder/");
-        assert (emptyDDF.getIsDir() == true);
-        assert (emptyDDF.getDataFormat().equals(DataFormat.CSV));
 
         try {
             S3DDF nestedFolderDDF = manager.newDDF("adatao-sample-data/test/csv/");
