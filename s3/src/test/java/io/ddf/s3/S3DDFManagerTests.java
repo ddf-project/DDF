@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +33,32 @@ public class S3DDFManagerTests {
     public static void startServer() throws Exception {
         LOG = LoggerFactory.getLogger(S3DDFManagerTests.class);
         S3DataSourceDescriptor  s3dsd = new S3DataSourceDescriptor(new S3DataSourceURI(""),
-            new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY")),
+            new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"),
+                System.getenv("AWS_SECRET_ACCESS_KEY")),
             null,
             null);
         manager = (S3DDFManager)DDFManager.get(DDFManager.EngineType.S3, s3dsd);
+
+        try {
+            DDFManager.get(DDFManager.EngineType.S3,
+                new S3DataSourceDescriptor(
+                    new S3DataSourceURI(""),
+                    new S3DataSourceCredentials("invalid", "invalid"),
+                    null,
+                    null));
+            assert (false);
+        } catch (Exception e) {}
+
+        try {
+            DDFManager.get(DDFManager.EngineType.S3,
+                new S3DataSourceDescriptor(
+                    new S3DataSourceURI(""),
+                    new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), "invalid"),
+                    null,
+                    null
+                ));
+            assert (false);
+        } catch (Exception e) {}
     }
 
     @Test
@@ -45,16 +68,26 @@ public class S3DDFManagerTests {
         assert(buckets.contains("jing-bucket"));
 
         LOG.info("========== jing-bucket/testFolder/ ==========");
-        List<String> keys = manager.listFiles("jing-bucket", "testFolder/");
-        assert (keys.size()== 21);
+        List<String> keys = manager.listFiles("jing-bucket/testFolder/");
+        assert (keys.size() > 1);
         assert (keys.contains("testFolder/(-_*')!.@&:,$=+?;#.csv"));
 
         LOG.info("========== jing-bucket/testFolder/a.json ==========");
         keys = manager.listFiles("jing-bucket", "testFolder/a.json");
         assert (keys.size()==1);
 
+        keys = manager.listFiles("adatao-sample-data/test/extra/format/mixed-csv-tsv");
+        assert keys.size() > 1;
+
         keys = manager.listFiles("jing-bucket", "testFolder/(-_*')!.@&:,$=+?;#.csv");
         assert (keys.size() == 1);
+
+        try {
+            keys = manager.listFiles("jing-bucket", "non-exist");
+            assert (false);
+        } catch (DDFException e) {
+            assert (e.getMessage().equals("java.io.FileNotFoundException: File does not exist"));
+        }
     }
 
     @Test
@@ -66,6 +99,14 @@ public class S3DDFManagerTests {
         } catch (Exception e) {
 
         }
+
+        try {
+            S3DDF mixed = manager.newDDF("adatao-sample-data/test/extra/format/mixed-csv-tsv", null, null);
+            assert (false);
+        } catch (DDFException e) {
+            assert e.getMessage().contains("more than 1");
+        }
+
 
         S3DDF cleanFolderDDF = manager.newDDF("jing-bucket", "testFolder/folder/", null, null);
         S3DDF jsonDDF = manager.newDDF("jing-bucket", "testFolder/a.json", null, null);
@@ -88,7 +129,7 @@ public class S3DDFManagerTests {
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
 
-        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/single/episodes.avro", null, null);
+        S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/single/twitter.avro", null, null);
         assert (avroDDF.getIsDir() == false);
         assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
 
@@ -96,14 +137,10 @@ public class S3DDFManagerTests {
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
 
-        S3DDF noExtensionDDF = manager.newDDF("adatao-sample-data/test/csv/hasHeader");
+        S3DDF noExtensionDDF = manager.newDDF("adatao-sample-data/test/csv/withheader");
 
         assert (noExtensionDDF.getIsDir() == false);
         assert (noExtensionDDF.getDataFormat().equals(DataFormat.CSV));
-
-        S3DDF emptyDDF = manager.newDDF("adatao-sample-data/empty_folder/");
-        assert (emptyDDF.getIsDir() == true);
-        assert (emptyDDF.getDataFormat().equals(DataFormat.CSV));
 
         try {
             S3DDF nestedFolderDDF = manager.newDDF("adatao-sample-data/test/csv/");

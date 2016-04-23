@@ -1,6 +1,5 @@
 package io.ddf.spark;
 
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -24,6 +23,7 @@ import io.ddf.spark.etl.DateUDF;
 import io.ddf.spark.util.SparkUtils;
 import io.ddf.spark.util.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.mapred.InvalidInputException;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -34,6 +34,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.*;
@@ -187,7 +188,11 @@ public class SparkDDFManager extends DDFManager {
       try {
         df = dfr.load(uri);
       } catch (Exception e) {
-        throw new DDFException(e);
+        if (e instanceof InvalidInputException) {
+          throw new DDFException(new FileNotFoundException("File does not exist"));
+        } else {
+          throw new DDFException(e);
+        }
       }
       mLog.info(String.format(">>>>>>>> Finish loading for uri: %s", uri));
       if (ddf.getSchema() == null) {

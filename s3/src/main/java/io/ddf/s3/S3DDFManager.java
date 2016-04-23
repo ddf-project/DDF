@@ -16,6 +16,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.util.Utils;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -24,6 +25,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 /**
  * Created by jing on 12/2/15.
@@ -47,6 +51,11 @@ public class S3DDFManager extends DDFManager {
     mCredential = s3Credentials;
     AWSCredentials credentials = new BasicAWSCredentials(mCredential.getAwsKeyID(), mCredential.getAwsScretKey());
     mConn = new AmazonS3Client(credentials);
+    try {
+      mConn.getS3AccountOwner();
+    } catch (AmazonS3Exception e) {
+      throw new DDFException("Credential invalid for s3");
+    }
   }
 
   public S3DDFManager(S3DataSourceDescriptor s3dsd) throws DDFException {
@@ -67,7 +76,7 @@ public class S3DDFManager extends DDFManager {
         throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
       }
     }
-    Boolean isDir = s3DDF.getKey().endsWith("/");
+    Boolean isDir = s3DDF.getKey().endsWith("/") || keys.size() > 1;
     return isDir;
   }
 
@@ -118,13 +127,32 @@ public class S3DDFManager extends DDFManager {
    * @return The list of file names (TODO: should we return more info here.)
    * @brief List all the files (including directories under one path)
    */
-  public List<String> listFiles(String bucket, String key) {
+  public List<String> listFiles(String bucket, String key) throws DDFException {
     List<String> files = new ArrayList<String>();
-    ObjectListing objects = mConn.listObjects(bucket, key);
-    for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
-      files.add(objectSummary.getKey());
+    ListObjectsRequest listObjectRequest = new ListObjectsRequest()
+        .withBucketName(bucket)
+        .withPrefix(key)
+        .withDelimiter("/");
+    ObjectListing objects;
+    do {
+      objects = mConn.listObjects(listObjectRequest);
+      files.addAll(objects.getCommonPrefixes());
+      objects.setMarker(objects.getNextMarker());
+    } while (objects.isTruncated());
+    Stream<S3ObjectSummary> s3objects = objects.getObjectSummaries().parallelStream();
+    files.addAll(s3objects.map(s3ObjectSummary -> s3ObjectSummary.getKey()).collect(Collectors.toList()));
+    if (files.size() == 1 && files.get(0).equals(key + "/")) {
+      return listFiles(bucket, key + "/");
+    }
+    if (files.size() == 0) {
+      throw new DDFException(new FileNotFoundException("File does not exist"));
     }
     return files;
+  }
+
+  public List<String> listFiles(String path) throws DDFException {
+    List<String> bucketAndPath = getBucketAndKey(path);
+    return this.listFiles(bucketAndPath.get(0), bucketAndPath.get(1));
   }
 
 
@@ -268,5 +296,18 @@ public class S3DDFManager extends DDFManager {
 
   public void stop() {
     // TODO: Does s3 connection has to be closed?
+  }
+
+  /**
+   * @brief Get the bucket and path out of a given uri.
+   * @param path
+   * @return
+   */
+  public static List<String> getBucketAndKey(String path) throws DDFException {
+    int firstSlash = path.indexOf('/');
+    if (firstSlash == -1 || firstSlash == path.length()) {
+      throw new DDFException(String.format("The path %s is not a valid s3 path", path));
+    }
+    return Arrays.asList(new String[]{path.substring(0, firstSlash), path.substring(firstSlash + 1)});
   }
 }
