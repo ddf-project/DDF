@@ -151,8 +151,12 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
 
   @Override
   public synchronized void unsetAsFactor(int columnIndex) {
-    if (this.getSchema() != null)
-      this.getSchema().getColumn(columnIndex).unsetAsFactor();
+
+    if (this.getSchema() != null) {
+      Column column = this.getSchema().getColumn(columnIndex);
+      column.unsetAsFactor();
+      this.getDDF().getMetaDataHandler().removeLevelCountsForColumn(column.getName());
+    }
   }
 
   @Override

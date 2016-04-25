@@ -44,7 +44,7 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
   private String mLastModifiedUser;
   private Date mLastPersistedTime;
   private DataSourceDescriptor mSnapshotDescriptor;
-
+  private Map<String, Map<String, Integer>> mLevelCounts = new HashMap<String, Map<String, Integer>>();
   /**
    * Each implementation needs to come up with its own way to compute the row
    * count.
@@ -83,20 +83,6 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
     } catch (Exception e) {
       throw new DDFException("Error getting NRow", e);
     }
-  }
-
-  @Override
-  public boolean inUse() {
-    if(useCount > 1) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public synchronized void increaseUseCount() {
-    this.useCount += 1;
   }
 
   /**
@@ -223,5 +209,27 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
 
   public DataSourceDescriptor getSnapshotDescriptor() {
     return this.mSnapshotDescriptor;
+  }
+
+
+  @Override
+  public void setLevelCounts(Map<String, Map<String, Integer>> levelCounts) throws DDFException {
+    Map<String, Map<String, Integer>> currentLevelCounts = this.getLevelCounts();
+    currentLevelCounts.putAll(levelCounts);
+  }
+
+  @Override
+  public void removeLevelCounts() throws DDFException {
+    this.mLevelCounts = new HashMap<String, Map<String, Integer>>();
+  }
+
+  @Override
+  public void removeLevelCountsForColumn(String columnName) {
+    this.mLevelCounts.remove(columnName);
+  }
+
+  @Override
+  public Map<String, Map<String, Integer>> getLevelCounts() throws DDFException {
+    return this.mLevelCounts;
   }
 }
