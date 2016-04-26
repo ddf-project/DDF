@@ -42,12 +42,7 @@ public interface IHandleViews extends IHandleDDFFunctionalGroup {
 
   public DDF removeColumn(String columnName) throws DDFException;
 
-  public DDF removeColumn(String columnName, Boolean inPlace) throws DDFException;
-
   public DDF removeColumns(String... columnNames) throws DDFException;
 
-
   public DDF removeColumns(List<String> columnNames) throws DDFException;
-
-  public DDF removeColumns(List<String> columnNames, Boolean inPlace) throws DDFException;
 }
