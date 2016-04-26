@@ -56,6 +56,45 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertTrue(newDdf.getColumnNames().contains("c0"));
     Assert.assertTrue(newDdf.getColumnNames().contains("col2"));
     Assert.assertEquals(10, newDdf.getNumColumns());
+
+    try {
+      newDdf.Transform.transformPython(
+          new String[] {"ZGVmIHRyYW5zKHgpOgogIHJldHVybiB4LzIuCg==", "ZGVmIHRyYW5zMih4KToKICByZXR1cm4geCsxMAo="},
+          new String[] {"trans", "TrAnS2"}, new String[] {null, "col2"},
+          new String[][] {new String[] {"distance"}, new String[] {"month"}});
+      Assert.fail("Should throw error for duplicated column");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
+    }
+  }
+
+  @Test
+  public void testTransformPythonInPlace() throws DDFException {
+    // f = lambda x: x/2.
+    // f = lambda x: x+10
+    DDF newDdf = ddf.copy();
+    DDF newDdf2 = newDdf.Transform.transformPython(
+        new String[] {"ZGVmIHRyYW5zKHgpOgogIHJldHVybiB4LzIuCg==", "ZGVmIHRyYW5zMih4KToKICByZXR1cm4geCsxMAo="},
+        new String[] {"trans", "trans2"},
+        new String[] {null, "col2"},
+        new String[][] { new String[] {"distance"}, new String[] {"month"}},
+        Boolean.TRUE);
+
+    Assert.assertTrue(newDdf.getUUID().equals(newDdf2.getUUID()));
+    Assert.assertNotNull(newDdf2);
+    Assert.assertTrue(newDdf2.getColumnNames().contains("c0"));
+    Assert.assertTrue(newDdf2.getColumnNames().contains("col2"));
+    Assert.assertEquals(10, newDdf2.getNumColumns());
+
+    try {
+      newDdf.Transform.transformPython(
+          new String[] {"ZGVmIHRyYW5zKHgpOgogIHJldHVybiB4LzIuCg==", "ZGVmIHRyYW5zMih4KToKICByZXR1cm4geCsxMAo="},
+          new String[] {"trans", "TrAnS2"}, new String[] {null, "col2"},
+          new String[][] {new String[] {"distance"}, new String[] {"month"}}, true);
+      Assert.fail("Should throw error for duplicated column");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
+    }
   }
 
   @Test
@@ -254,7 +293,10 @@ public class TransformationHandlerTest extends BaseTest {
   public void  testTransformSqlWithNames() throws DDFException {
     ddf.setMutable(false);
 
-    DDF ddf2 = ddf.Transform.transformUDFWithNames(new String[] {"dist"}, new String[] {"round(distance/2, 2)"}, null);
+    DDF ddf2 = ddf.Transform.transformUDFWithNames(new String[] {"dist"},
+        new String[] {"round(distance/2, 2)"}, null);
+    Assert.assertEquals(ddf.getNumColumns() + 1, ddf2.getNumColumns());
+    Assert.assertNotSame(ddf.getUUID(), ddf2.getUUID());
     Assert.assertEquals(31, ddf2.getNumRows());
     Assert.assertEquals(9, ddf2.getNumColumns());
     Assert.assertEquals("dist", ddf2.getColumnName(8));
@@ -262,6 +304,7 @@ public class TransformationHandlerTest extends BaseTest {
 
     ddf2 = ddf.Transform.transformUDFWithNames(new String[] {null}, new String[] {"arrtime-deptime"}, null);
     Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(ddf.getNumColumns() + 1, ddf2.getNumColumns());
     Assert.assertEquals(9, ddf2.getNumColumns());
     Assert.assertEquals(9, ddf2.getSummary().length);
 
@@ -277,10 +320,101 @@ public class TransformationHandlerTest extends BaseTest {
           new String[]{"notexistedColumn"});
       Assert.fail("Should throw exception when selecting non-existing columns");
     } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Selected column 'notexistedColumn' does not exist"));
+    }
+
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {"c100", "c100"},
+          new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null);
+      Assert.fail("Should throw exception when transforming with duplicated column name");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name: c100"));
+    }
+
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {"newcolumnname", "newColumnName"},
+          new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null);
+      Assert.fail("Should throw exception when transforming with duplicated column name");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
+    }
+
+    try {
+      ddf.Transform.transformUDFWithNames(new String[] {"ArrTime", "newColumnName"},
+          new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null);
+      Assert.fail("Should throw exception when transforming with duplicated column name");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
     }
   }
 
   @Test
+  public void  testTransformSqlWithNamesMutable() throws DDFException {
+
+    DDF ddf2 = ddf.copy();
+
+    DDF ddf3 = ddf2.Transform
+        .transformUDFWithNames(new String[] { "dist" }, new String[] { "round(distance/2, 2)" }, null, true);
+    Assert.assertEquals(ddf2, ddf3);
+    Assert.assertEquals(ddf2.getNumColumns(), ddf3.getNumColumns());
+    Assert.assertEquals(31, ddf3.getNumRows());
+    Assert.assertEquals(9, ddf3.getNumColumns());
+    Assert.assertEquals("dist", ddf3.getColumnName(8));
+    Assert.assertEquals(9, ddf3.VIEWS.head(1).get(0).split("\\t").length);
+
+    ddf2.Transform.transformUDFWithNames(new String[] { null }, new String[] { "arrtime-deptime" }, null, true);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(10, ddf2.getNumColumns());
+    Assert.assertEquals(10, ddf2.getSummary().length);
+
+    try {
+      ddf2.Transform.transformUDFWithNames(new String[] { null, "c0" },
+          new String[] { "round(distance/2, 2)", "arrtime-deptime" }, null, true);
+      Assert.fail("Should throw exception when transforming with duplicated column name");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
+    }
+
+    // mixed transform with duplicated name
+    ddf2.Transform.transformUDFWithNames(new String[] { null, "c1" },
+        new String[] { "round(distance/2, 2)", "arrtime-deptime" }, null, true);
+    Assert.assertEquals(31, ddf2.getNumRows());
+    Assert.assertEquals(12, ddf2.getNumColumns());
+    Assert.assertEquals(12, ddf2.getSummary().length);
+
+    try {
+      ddf2.Transform.transformUDFWithNames(new String[] { null }, new String[] { "arrtime-deptime" },
+          new String[] { "notexistedColumn" }, true);
+      Assert.fail("Should throw exception when selecting non-existing columns");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Selected column 'notexistedColumn' does not exist"));
+    }
+
+    try {
+      ddf2.Transform.transformUDFWithNames(new String[] {"c100", "c100"},
+          new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null, true);
+      Assert.fail("Should throw exception when transforming with duplicated column name");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name: c100"));
+    }
+
+    try {
+      ddf2.Transform.transformUDFWithNames(new String[] {"newcolumnname", "newColumnName"},
+          new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null, true);
+      Assert.fail("Should throw exception when transforming with duplicated column name");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
+    }
+
+    try {
+      ddf2.Transform.transformUDFWithNames(new String[] {"ArrTime", "newColumnName"},
+          new String[] {"round(distance/2, 2)", "arrtime-deptime"}, null, true);
+      Assert.fail("Should throw exception when transforming with duplicated column name");
+    } catch (DDFException ex) {
+      Assert.assertTrue(ex.getMessage().contains("Duplicated column name"));
+    }
+  }
+
   public void testTransformSqlWithNamesForProperErrorMessages() throws DDFException {
     ddf.setMutable(false);
 
@@ -319,6 +453,7 @@ public class TransformationHandlerTest extends BaseTest {
       Assert.fail("Should throw exception");
     } catch (DDFException ex) {
       Assert.assertEquals(ex.getMessage(), "Column or Expression with invalid syntax: '_dist'");
+
     }
   }
 
@@ -344,5 +479,20 @@ public class TransformationHandlerTest extends BaseTest {
     manager.setDDFName(ddf, "ddf_testMutableDDFBug");
     ddf.Transform.transformUDF("col1 = (arrtime - deptime)");
     ddf.Transform.transformUDF("col2 = (arrtime - arrdelay)");
+  }
+
+  @Test
+  public void testCastType() throws DDFException {
+    DDF newDDF = ddf.Transform.castType("year", "string");
+    assert(newDDF.getUUID() != ddf.getUUID());
+    assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
+    assert(ddf.getColumn("year").getType() == ColumnType.STRING);
+  }
+
+  @Test
+  public void testCastTypeMutable() throws DDFException {
+    DDF newDDF = ddf.Transform.castType("year", "string", true);
+    assert(newDDF.getUUID() == ddf.getUUID());
+    assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
   }
 }

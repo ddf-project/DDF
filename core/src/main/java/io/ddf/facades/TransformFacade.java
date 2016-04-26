@@ -60,8 +60,15 @@ public class TransformFacade implements IHandleTransformations {
 
   @Override
   public DDF transformPython(String[] transformFunctions, String[] functionNames,
-      String[] destColumns, String[][] sourceColumns) {
+      String[] destColumns, String[][] sourceColumns) throws DDFException {
     return mTransformationHandler.transformPython(transformFunctions, functionNames, destColumns, sourceColumns);
+  }
+
+  @Override
+  public DDF transformPython(String[] transformFunctions, String[] functionNames,
+      String[] destColumns, String[][] sourceColumns, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.transformPython(transformFunctions, functionNames, destColumns,
+        sourceColumns, inPlace);
   }
 
   @Override
@@ -117,6 +124,11 @@ public class TransformFacade implements IHandleTransformations {
     return mTransformationHandler.transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns);
   }
 
+  public DDF transformUDFWithNames(String[] newColumnNames, String[] transformExpressions,
+      String[] selectedColumns, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns, inPlace);
+  }
+
   public DDF flattenDDF(String[] columns) throws DDFException {
     return flattenDDF(columns);
   }
@@ -139,5 +151,13 @@ public class TransformFacade implements IHandleTransformations {
 
   public DDF oneHotEncoding(String inputColumn, String outputColumnName) throws DDFException {
     return mTransformationHandler.oneHotEncoding(inputColumn, outputColumnName);
+  }
+
+  public DDF castType(String column, String newType) throws DDFException {
+    return mTransformationHandler.castType(column, newType);
+  }
+
+  public DDF castType(String column, String newType, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.castType(column, newType, inPlace);
   }
 }
