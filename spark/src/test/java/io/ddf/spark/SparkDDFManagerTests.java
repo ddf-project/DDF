@@ -170,6 +170,23 @@ public class SparkDDFManagerTests extends BaseTest {
     DDF sparkDDF = manager.copyFrom(ddf);
     assert (sparkDDF.getColumnNames().equals(expectedList));
 
+    ddf = s3DDFManager.newDDF("adatao-sample-data", "test/pa/sanitize_column_name/6col.csv",
+        "__col1 string, col2__ string, #$@__-col3 string, col3 string, col4__a  string, a@#$@#@#!@$&*^ string",
+        null);
+    sparkDDF = manager.copyFrom(ddf);
+
+    final List<String> expectedList2 = new ImmutableList.Builder<String>()
+        .add("col1")
+        .add("col2__")
+        .add("col3")
+        .add("col3_0")
+        .add("col4__a")
+        .add("a_____________")
+        .build();
+
+    assert (sparkDDF.getColumnNames().equals(expectedList2));
+
+
     // s3 doesn't work with orc now
     /*
     LOG.info("========== orc ==========");
