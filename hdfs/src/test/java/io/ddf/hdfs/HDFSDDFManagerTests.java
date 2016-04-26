@@ -29,6 +29,14 @@ public class HDFSDDFManagerTests {
     }
 
     @Test
+    public void testValidation() {
+        try {
+            new HDFSDDFManager("invalidpath");
+            assert false;
+        } catch (DDFException e) {}
+    }
+
+    @Test
     public void testListing() throws DDFException {
         List<String> files = manager.listFiles("/test_pe");
         assert (files.size() > 0);
@@ -36,7 +44,6 @@ public class HDFSDDFManagerTests {
 
     @Test
     public void testCreateDDF() throws DDFException {
-
         HDFSDDF cleanFolderDDF = manager.newDDF("/test_pe/csv/multiple", null, null);
         HDFSDDF jsonDDF = manager.newDDF("/test_pe/json/noheader", null, null);
         HDFSDDF csvDDF = manager.newDDF("/test_pe/csv/noheader", null, null);
@@ -83,17 +90,16 @@ public class HDFSDDFManagerTests {
         try {
             HDFSDDF folderDDF = manager.newDDF("/test_pe/", null, null);
             assert false;
-        } catch (Exception e) {
+        } catch (DDFException e) {
         }
 
         try {
             HDFSDDF mixedDDF = manager.newDDF("/test_pe/extra/format/mixed-csv-tsv/", null, null);
             assert (false);
-        } catch (Exception e) {
+        } catch (DDFException e) {
             assert (e.getMessage().contains("more than 1"));
         }
     }
-
 
     @Test
     public void testHead() throws DDFException {

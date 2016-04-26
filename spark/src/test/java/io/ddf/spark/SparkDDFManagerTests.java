@@ -72,6 +72,14 @@ public class SparkDDFManagerTests extends BaseTest {
 
 
   public void testBasicCopyForS3(S3DDFManager s3DDFManager) throws DDFException {
+    LOG.info("========== non-exist========");
+    try {
+      S3DDF nonExistDDF = s3DDFManager.newDDF("jing-bucket", "non-exist", null, null);
+      assert (false);
+    } catch (DDFException e) {
+      assert (e.getMessage().equals("java.io.FileNotFoundException: File does not exist"));
+    }
+
     // Test copy from a folder, the schema should be given.
     LOG.info("========== testFolder/folder ==========");
     S3DDF folderDDF = s3DDFManager.newDDF("jing-bucket", "testFolder/folder/", "year int, value int", null);
@@ -165,6 +173,23 @@ public class SparkDDFManagerTests extends BaseTest {
         null);
     DDF sparkDDF = manager.copyFrom(ddf);
     assert (sparkDDF.getColumnNames().equals(expectedList));
+
+    ddf = s3DDFManager.newDDF("adatao-sample-data", "test/pa/sanitize_column_name/6col.csv",
+        "__col1 string, col2__ string, #$@__-col3 string, col3 string, col4__a  string, a@#$@#@#!@$&*^ string",
+        null);
+    sparkDDF = manager.copyFrom(ddf);
+
+    final List<String> expectedList2 = new ImmutableList.Builder<String>()
+        .add("col1")
+        .add("col2__")
+        .add("col3")
+        .add("col3_0")
+        .add("col4__a")
+        .add("a_____________")
+        .build();
+
+    assert (sparkDDF.getColumnNames().equals(expectedList2));
+
 
     // s3 doesn't work with orc now
     /*

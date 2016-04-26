@@ -5,6 +5,7 @@ import io.ddf.DDF;
 import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,7 +49,9 @@ public class S3DDF extends DDF {
      */
     public S3DDF(S3DDFManager manager, String path, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        this.getBucketAndPath(path);
+        List<String> bucketAndKey = S3DDFManager.getBucketAndKey(path);
+        mBucket = bucketAndKey.get(0);
+        mKey = bucketAndKey.get(1);
         this.options = options;
         initialize();
     }
@@ -56,7 +59,9 @@ public class S3DDF extends DDF {
     public S3DDF(S3DDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         mSchemaString = schema;
-        this.getBucketAndPath(path);
+        List<String> bucketAndKey = S3DDFManager.getBucketAndKey(path);
+        mBucket = bucketAndKey.get(0);
+        mKey = bucketAndKey.get(1);
         this.options = options;
         initialize();
     }
@@ -70,17 +75,6 @@ public class S3DDF extends DDF {
         mSchemaString = schema;
         this.options = options;
         initialize();
-    }
-    
-    /**
-     * @brief Get the bucket and path out of a given uri.
-     * @param path
-     * @return
-     */
-    private void getBucketAndPath(String path) {
-        int firstSlash = path.indexOf('/');
-        mBucket = path.substring(0, firstSlash);
-        mKey = path.substring(firstSlash + 1);
     }
 
     private void initialize() throws DDFException {

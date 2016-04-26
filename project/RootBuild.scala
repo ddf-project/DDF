@@ -40,7 +40,13 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-  val rootVersion = "1.4.14-SNAPSHOT"
+  val rootVersion = "1.4.15-SNAPSHOT"
+  //val rootVersion = if(YARN_ENABLED) {
+  //  "1.2-adatao"
+  //} else {
+  //  "1.2-mesos"
+  //}
+
   val projectOrganization = rootOrganization + "." + projectName
   val coreProjectName = "ddf_core"
   val coreVersion = rootVersion
@@ -124,7 +130,7 @@ object RootBuild extends Build {
     "org.apache.hadoop" % "hadoop-aws" % "2.7.2" exclude("com.amazonaws", "aws-java-sdk") exclude("com.fasterxml.jackson.core", "jackson-annotations"),
     "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4"
   )
-  
+
   val s3_dependencies = Seq(
     "com.amazonaws" % "aws-java-sdk" % "1.10.8",
     "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api") exclude("commons-httpclient", "commons-httpclient") exclude ("org.apache.httpcomponents", "httpcore"),

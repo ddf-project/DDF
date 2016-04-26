@@ -86,10 +86,10 @@ public class Utils {
     for (String name : columnNames) {
       Preconditions.checkArgument(name.length() > 0);
       // replace invalid characters with dash
-      String dashName = name.trim().replaceAll("![0-9a-zA-Z]|\\s", "_");
+      String dashName = name.trim().replaceAll("[^0-9a-zA-Z]|\\s", "_");
       int i;
       for (i = 0; i < dashName.length(); ++i) {
-        char c = name.charAt(i);
+        char c = dashName.charAt(i);
         // remove invalid beginning character
         boolean isAlpha = ((c >= 'a' && c <= 'z') || (c >= 'A' && c <='Z'));
         if (isAlpha) {

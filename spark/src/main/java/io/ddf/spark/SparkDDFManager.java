@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.mapred.InvalidInputException;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -42,6 +43,7 @@ import org.apache.spark.sql.types.StructType;
 import org.python.indexer.Builtins;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -300,7 +302,11 @@ public class SparkDDFManager extends DDFManager {
       try {
         df = dfr.load(uri);
       } catch (Exception e) {
-        throw new DDFException(e);
+        if (e instanceof InvalidInputException) {
+          throw new DDFException(new FileNotFoundException("File does not exist"));
+        } else {
+          throw new DDFException(e);
+        }
       }
       mLog.info(String.format(">>>>>>>> Finish loading for uri: %s", uri));
       if (ddf.getSchema() == null) {

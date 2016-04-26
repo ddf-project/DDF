@@ -8,6 +8,7 @@ import io.ddf.misc.IHandleDDFFunctionalGroup;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface IHandleMetaData extends IHandleDDFFunctionalGroup {
@@ -51,10 +52,12 @@ public interface IHandleMetaData extends IHandleDDFFunctionalGroup {
   public void setSnapshotDescriptor(DataSourceDescriptor snapshotDescriptor);
 
   public DataSourceDescriptor getSnapshotDescriptor();
-  // return true if ddf is in use
-  // false otherwise
-  public boolean inUse();
 
-  //increase number of user using ddf
-  public void increaseUseCount();
+  void removeLevelCounts() throws DDFException;
+
+  void removeLevelCountsForColumn(String colName);
+
+  void setLevelCounts(Map<String, Map<String, Integer>> levelCounts) throws DDFException;
+
+  Map<String, Map<String, Integer>> getLevelCounts() throws DDFException;
 }
