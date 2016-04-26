@@ -910,7 +910,6 @@ public abstract class DDF extends ALoggable //
     this.getMutabilityHandler().setMutable(isMutable);
   }
 
-  @Deprecated
   public boolean isMutable() {
     return this.getMutabilityHandler().isMutable();
   }

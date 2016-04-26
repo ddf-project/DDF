@@ -88,11 +88,6 @@ public class ViewsFacade implements IHandleViews {
   }
 
   @Override
-  public DDF removeColumn(String columnName, Boolean inPlace) throws DDFException {
-    return this.getViewHandler().removeColumn(columnName, inPlace);
-  }
-
-  @Override
   public DDF removeColumns(String... columnNames) throws DDFException {
     return this.getViewHandler().removeColumns(columnNames);
   }
@@ -100,10 +95,5 @@ public class ViewsFacade implements IHandleViews {
   @Override
   public DDF removeColumns(List<String> columnNames) throws DDFException {
     return this.getViewHandler().removeColumns(columnNames);
-  }
-
-  @Override
-  public DDF removeColumns(List<String> columnNames, Boolean inPlace) throws DDFException {
-    return this.getViewHandler().removeColumns(columnNames, inPlace);
   }
 }
