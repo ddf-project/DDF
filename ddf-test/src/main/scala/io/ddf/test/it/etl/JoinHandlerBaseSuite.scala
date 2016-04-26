@@ -40,7 +40,7 @@ trait JoinHandlerBaseSuite extends BaseSuite with Matchers {
     val joinedDDF = ddf.join(ddf2, JoinType.INNER, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
     val colNames = joinedDDF.getSchema.getColumnNames
     colNames.contains("Year") || colNames.contains("year") should be(true)
-    colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(true)
+    colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(true)
     joinedDDF.getNumColumns should be(31)
     joinedDDF.getNumRows should be(30)
   }
@@ -51,7 +51,7 @@ trait JoinHandlerBaseSuite extends BaseSuite with Matchers {
     val joinedDDF = ddf.join(ddf2, JoinType.LEFTSEMI, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
     val colNames = joinedDDF.getSchema.getColumnNames
     colNames.contains("Year") || colNames.contains("year") should be(true)
-    colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(false)
+    colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(false)
     joinedDDF.getNumColumns should be(29)
     joinedDDF.getNumRows should be(30)
   }
@@ -62,7 +62,7 @@ trait JoinHandlerBaseSuite extends BaseSuite with Matchers {
     val joinedDDF = ddf.join(ddf2, JoinType.LEFT, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
     val colNames = joinedDDF.getSchema.getColumnNames
     colNames.contains("Year") || colNames.contains("year") should be(true)
-    colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(true)
+    colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(true)
     joinedDDF.getNumColumns should be(31)
     joinedDDF.getNumRows should be(31)
   }
@@ -73,7 +73,7 @@ trait JoinHandlerBaseSuite extends BaseSuite with Matchers {
     val joinedDDF = ddf.join(ddf2, JoinType.RIGHT, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
     val colNames = joinedDDF.getSchema.getColumnNames
     colNames.contains("Year") || colNames.contains("year") should be(true)
-    colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(true)
+    colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(true)
     joinedDDF.getNumColumns should be(31)
     joinedDDF.getNumRows should be(32)
   }
@@ -84,9 +84,19 @@ trait JoinHandlerBaseSuite extends BaseSuite with Matchers {
     val joinedDDF = ddf.join(ddf2, JoinType.FULL, null, Collections.singletonList("Year"), Collections.singletonList("Year_num"))
     val colNames = joinedDDF.getSchema.getColumnNames
     colNames.contains("Year") || colNames.contains("year") should be(true)
-    colNames.contains("Name") || colNames.contains("r_name") || colNames.contains("name") should be(true)
+    colNames.contains("Name") || colNames.contains("name_r") || colNames.contains("name") should be(true)
     joinedDDF.getNumColumns should be(31)
     joinedDDF.getNumRows should be(33)
   }
 
+  test("inner join suffix") {
+    val left_ddf = loadMtCarsDDF()
+    val right_ddf = loadCarOwnersDDF()
+    val ddf = left_ddf.join(right_ddf, JoinType.INNER, Collections.singletonList("cyl"),null,null, "_left", "_right")
+    val colNames = ddf.getSchema.getColumnNames
+    colNames.contains("cyl_left") should be(true)
+    colNames.contains("cyl_right") should be(true)
+    colNames.contains("disp_left") should be(true)
+    colNames.contains("disp_right") should be(true)
+  }
 }
