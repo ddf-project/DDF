@@ -20,7 +20,7 @@ class Row2LabeledPoint(@transient ddf: DDF) extends ConvertFunction(ddf) {
     val rddLabeledPoint = rddRow.map {
       row => {
         val features = row.toSeq.take(numCols - 1)
-        makeVector(features) match {
+        Row2LabeledPoint.makeVector(features) match {
           case Some(featureVector) =>
             doubleGetter(row.get(numCols - 1)) match {
               case Some(label) => new LabeledPoint(label, featureVector)
@@ -34,25 +34,35 @@ class Row2LabeledPoint(@transient ddf: DDF) extends ConvertFunction(ddf) {
     new Representation(rddLabeledPoint, RepresentationHandler.RDD_LABELED_POINT.getTypeSpecsString)
   }
 
+}
+
+object Row2LabeledPoint {
+
+  /**
+    * Make a Vector out of a seq (normally a Row)
+    *
+    * @param elements sequence of elements
+    * @return
+    */
   def makeVector(elements: Seq[Any]): Option[Vector] = {
-    val indices =  mutable.ArrayBuilder.make[Int]
+    val indices = mutable.ArrayBuilder.make[Int]
     val values = mutable.ArrayBuilder.make[Double]
     val iterator = elements.iterator
     var curr = 0
     var isNull = false
-    while(iterator.hasNext) {
+    while (iterator.hasNext) {
       iterator.next() match {
         case null => isNull = true
-        case v: Vector => {
+        case v: Vector =>
           v.foreachActive {
-            case (idx, value) => if(value != 0.0) {
+            case (idx, value) => if (value != 0.0) {
               indices += curr + idx
               values += value
             }
           }
           curr += v.size
-        }
-        case d => {
+
+        case d =>
           val value = d match {
             case d: Double => d
             case i: Int => i.toDouble
@@ -60,18 +70,18 @@ class Row2LabeledPoint(@transient ddf: DDF) extends ConvertFunction(ddf) {
             case s: Short => s.toDouble
             case l: Long => l.toDouble
           }
-          if(value != 0.0) {
+          if (value != 0.0) {
             indices += curr
             values += value
           }
           curr += 1
-        }
       }
     }
-    if(isNull) {
-      return None
+    if (isNull) {
+      None
     } else {
       Some(Vectors.sparse(curr, indices.result(), values.result()).compressed)
     }
   }
+
 }

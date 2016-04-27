@@ -156,8 +156,7 @@ class RepresentationHandlerSuite extends ATestSuite {
   test("Make Vector") {
     val v = Vectors.sparse(10, Array(1, 5, 6), Array(2.0, 10.0, 5.0))
     val elements = Array(1.0, 2.0, 3.0, v)
-    val converter = new Row2LabeledPoint(null)
-    val vector = converter.makeVector(elements).get
+    val vector = Row2LabeledPoint.makeVector(elements).get
     assert(vector.isInstanceOf[SparseVector])
     assert(vector.size == 13)
     assert(vector.apply(0) == 1.0)
