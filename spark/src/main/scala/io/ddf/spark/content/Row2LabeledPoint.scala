@@ -73,9 +73,8 @@ object Row2LabeledPoint {
           if (value != 0.0) {
             indices += curr
             values += value
-
-            curr += 1
           }
+          curr += 1
       }
     }
     if (isNull) {
