@@ -138,7 +138,10 @@ object RootBuild extends Build {
   )
 
   val hdfs_dependencies = Seq(
-    "org.apache.hadoop" % "hadoop-hdfs" % "2.7.2"
+    "org.apache.hadoop" % "hadoop-hdfs" % "2.7.2",
+    "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
+      exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty")
+    //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
   )
 
   val test_dependencies = Seq(
