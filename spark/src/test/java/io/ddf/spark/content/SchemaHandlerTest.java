@@ -15,6 +15,7 @@ import java.util.List;
 import scala.Tuple2;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by sangdn on 27/03/2016.
@@ -35,7 +36,7 @@ public class SchemaHandlerTest extends BaseTest {
                                       + "type_double string,type_decimal string,type_date string,type_timestamp string) "
                                       + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", "SparkSQL");
 
-    manager.sql("load data local inpath '../resources/test/data4ingestion.csv' into table DataIngestion", "SparkSQL");
+    manager.sql("load data local inpath 'resources/test/data4ingestion.csv' into table DataIngestion", "SparkSQL");
   }
 
 
@@ -57,15 +58,16 @@ public class SchemaHandlerTest extends BaseTest {
     Schema applySchema = new Schema(applyColumns);
 
     testApplyWithDrop(ddf,applySchema);
+      testApplyFailFast(ddf, applySchema);
     testApplyWithoutDrop(ddf,applySchema);
-
+    System.out.println("End Test ApplySchemaStatistic");
 
 
   }
 
   private void testApplyWithoutDrop(SparkDDF ddf, Schema schema) throws DDFException {
     SchemaHandler schemaHandler = (SchemaHandler) ddf.getSchemaHandler();
-    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema,false);
+    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema,"SET_NONE");
     SparkDDF sparkDDF = applySchema._1();
     SchemaHandler.ApplySchemaStatistic statistic = applySchema._2();
     statistic.getMapColumnStatistic().forEach( (colName,colStats) -> {
@@ -84,7 +86,7 @@ public class SchemaHandlerTest extends BaseTest {
   private void testApplyWithDrop(SparkDDF ddf,Schema schema) throws DDFException {
 
     SchemaHandler schemaHandler = (SchemaHandler) ddf.getSchemaHandler();
-    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema,true);
+    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema,"DROP_ROW");
     SparkDDF sparkDDF = applySchema._1();
     SchemaHandler.ApplySchemaStatistic statistic = applySchema._2();
     statistic.getMapColumnStatistic().forEach( (colName,colStats) -> {
@@ -97,6 +99,18 @@ public class SchemaHandlerTest extends BaseTest {
     assertEquals((long)statistic.getTotalLineSuccessed(),1L);
     List<Schema.Column> newColumn = sparkDDF.getSchema().getColumns();
     assertEqualColumn(schema.getColumns(),newColumn);
+  }
+  private void testApplyFailFast(SparkDDF ddf,Schema schema) throws DDFException {
+
+    SchemaHandler schemaHandler = (SchemaHandler) ddf.getSchemaHandler();
+    try {
+      Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> applySchema = schemaHandler.applySchema(schema, "FAIL_FAST");
+      assertTrue("Not Reach Here",false);
+    }catch(DDFException ex){
+      assertTrue("Fail exception",ex.getMessage().contains("FailFast"));
+    }
+
+
   }
   private void assertEqualColumn(List<Schema.Column> expectedColumn, List<Schema.Column> actualColumns){
     assertEquals(actualColumns.size(), expectedColumn.size());
