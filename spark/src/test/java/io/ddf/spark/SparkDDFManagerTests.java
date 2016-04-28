@@ -3,6 +3,7 @@ package io.ddf.spark;
 
 import io.ddf.DDF;
 import io.ddf.DDFManager;
+import io.ddf.content.Schema;
 import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.datasource.S3DataSourceURI;
@@ -28,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import scala.Tuple2;
 
@@ -350,16 +350,20 @@ public class SparkDDFManagerTests extends BaseTest {
     String source = "resources/test/parsing_statistic.csv";
     System.out.println("Create DDF From "+ (new File(source)).getAbsolutePath());
     Map<String,String> options = new HashMap();
-    options.put("header","false");
+    options.put("header","true");
     options.put("delimiter",",");
     options.put("mode","PERMISSIVE");
 
+    Schema schema;
+//    tstring, tbool, tshort, tlong, tfloat, tdouble, tdate, ttimestamp
+    schema = new Schema("tstring string, tbool string, tshort string, tlong string," +
+        "tfloat string, tdouble string, tdate string, ttimestamp string");
+    Tuple2<SparkDDF, CsvRelation.ParsingStatistic> ddfAndStats = ddfManager.newDDFFromCsv(source,schema,options,10);
+    Assert.assertEquals(ddfAndStats._2().getNumMalformedRows(),2);
 
-    Tuple2<SparkDDF, CsvRelation.ParsingStatistic> ddfAndStats = ddfManager.newSampleDDFWithStats(source, options, 10);
     ddfAndStats._1().VIEWS.head(10).forEach(s -> System.out.println(s));
     ddfAndStats._2().debugPrint();
 
-    Assert.assertEquals(ddfAndStats._2().getNumMalformedRows(),2);
   }
 
 }
