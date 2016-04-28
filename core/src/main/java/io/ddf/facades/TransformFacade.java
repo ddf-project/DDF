@@ -140,4 +140,9 @@ public class TransformFacade implements IHandleTransformations {
   public DDF oneHotEncoding(String inputColumn, String outputColumnName) throws DDFException {
     return mTransformationHandler.oneHotEncoding(inputColumn, outputColumnName);
   }
+
+  @Override
+  public DDF sort(List<String> columns, List<Boolean> ascending) throws DDFException {
+    return mTransformationHandler.sort(columns, ascending);
+  }
 }
