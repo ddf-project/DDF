@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
+import org.apache.log4j.Logger;
 import org.apache.spark.deploy.SparkHadoopUtil;
 
 /**
@@ -54,6 +55,9 @@ public class HDFSDDFManager extends DDFManager {
     } catch (Exception e) {
       throw new DDFException(e);
     }
+    Logger.getLogger(HDFSDDFManager.class).info("Init HDFSDDFManager( fsUri="+fsUri +")");
+    Logger.getLogger(HDFSDDFManager.class).info("-- FS Scheme:"+fs.getScheme()+")");
+    Logger.getLogger(HDFSDDFManager.class).info("-- FS URI:"+fs.getUri()+")");
   }
 
   /**
@@ -232,7 +236,7 @@ public class HDFSDDFManager extends DDFManager {
 
   @Override
   public String getSourceUri() {
-    return this.fsUri;
+    return fs.getUri().toString();
   }
 
   @Override
