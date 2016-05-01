@@ -697,4 +697,13 @@ public class Utils {
     }
   }
 
+  /**
+   * Find if there exists any element in collection that is equal to item, ignoring character case
+   * @param collection collection of strings
+   * @param item the string to look for
+   * @return true if there is an element equal to item, ignoring case
+   */
+  public static boolean containsIgnoreCase(Collection<String> collection, String item) {
+    return collection.stream().anyMatch(c -> c.equalsIgnoreCase(item));
+  }
 }
