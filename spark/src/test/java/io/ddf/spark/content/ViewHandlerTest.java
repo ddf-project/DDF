@@ -115,20 +115,45 @@ public class ViewHandlerTest extends BaseTest{
       Assert.assertTrue(e.getMessage().contains("Number of samples must be larger than or equal to 0"));
     }
   }
+
+  @Test
+  public void testSampleWithSizeToDDF() throws DDFException {
+    createTableAirline();
+
+    DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+    int sampleSize = 2;
+
+    // sample with replacement
+    DDF randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, true, 123);
+    Assert.assertTrue(randomSample.getNumRows() == sampleSize);
+
+    // sample without replacement
+    randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, false, 123);
+    Assert.assertTrue(randomSample.getNumRows() == sampleSize);
+
+    try {
+      randomSample = ddf.VIEWS.getRandomSampleByNum(-1, false, 123);
+      Assert.fail("Should not be able to oversampling without replacement");
+    } catch (IllegalArgumentException e) {
+      Assert.assertTrue(e.getMessage().contains("Number of samples must be larger than or equal to 0"));
+    }
+  }
+
   @Test
   public void testSampleWithFraction() throws DDFException {
     createTableAirline();
 
     DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+    long numRows = ddf.getNumRows();
 
     // sample with replacement
     // In Spark, size of the sampled DDF is not always equal to size of original DDF * fraction
     DDF ddf2 = ddf.VIEWS.getRandomSample(0.5, true, 123);
-    Assert.assertTrue(ddf2.getNumRows() > 0);
+    Assert.assertTrue(ddf2.getNumRows() == (int)(numRows * 0.5));
 
     // sample without replacement
     ddf2 = ddf.VIEWS.getRandomSample(0.5, false, 123);
-    Assert.assertTrue(ddf2.getNumRows() > 0);
+    Assert.assertTrue(ddf2.getNumRows() == (int)(numRows * 0.5));
 
     try {
       ddf2 = ddf.VIEWS.getRandomSample(-1.0, false, 123);
@@ -145,17 +170,58 @@ public class ViewHandlerTest extends BaseTest{
     }
   }
 
+
+  @Test
+  public void testSampleWithFractionApprox() throws DDFException {
+    createTableAirline();
+
+    DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+
+    // sample with replacement
+    // In Spark, size of the sampled DDF is not always equal to size of original DDF * fraction
+    DDF ddf2 = ddf.VIEWS.getRandomSampleApprox(0.5, true, 123);
+    Assert.assertTrue(ddf2.getNumRows() > 0);
+
+    // sample without replacement
+    ddf2 = ddf.VIEWS.getRandomSampleApprox(0.5, false, 123);
+    Assert.assertTrue(ddf2.getNumRows() > 0);
+
+    try {
+      ddf2 = ddf.VIEWS.getRandomSampleApprox(-1.0, false, 123);
+      Assert.fail("Sample fraction must be >= 0 in sampling without replacement");
+    } catch (IllegalArgumentException e) {
+      Assert.assertTrue(e.getMessage().contains("Sampling fraction must be from 0 to 1 in sampling without replacement"));
+    }
+
+    try {
+      ddf2 = ddf.VIEWS.getRandomSampleApprox(-1.0, true, 123);
+      Assert.fail("Sample fraction must be >= 0 in sampling with replacement");
+    } catch (IllegalArgumentException e) {
+      Assert.assertTrue(e.getMessage().contains("Sampling fraction must be larger or equal to 0 in sampling with replacement"));
+    }
+  }
+
   @Test
   public void testOversampling() throws DDFException {
     createTableAirline();
 
     DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+    long numRows = ddf.getNumRows();
 
-    // sample2ddf
+    // sample2ddf by size
+    DDF ddf2 = ddf.VIEWS.getRandomSampleByNum(numRows * 2, true, 123);
+    Assert.assertTrue(ddf2.getNumRows() == numRows * 2);
 
-    DDF ddf2 = ddf.VIEWS.getRandomSample(2.0, true, 123);
+    // sample2ddf by fraction
 
-    Assert.assertTrue(ddf2.getNumRows() > ddf.getNumRows());
+    ddf2 = ddf.VIEWS.getRandomSample(2.0, true, 123);
+
+    Assert.assertTrue(ddf2.getNumRows() == numRows * 2);
+
+    ddf2 = ddf.VIEWS.getRandomSampleApprox(2.0, true, 123);
+
+    Assert.assertTrue(ddf2.getNumRows() > numRows);
+
 
     try {
       ddf2 = ddf.VIEWS.getRandomSample(2.0, false, 123);

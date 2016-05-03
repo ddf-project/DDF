@@ -5,12 +5,17 @@ package io.ddf.spark.content
 
 import io.ddf.DDF
 import io.ddf.content.IHandleViews
+
 import scala.collection.JavaConverters._
 import io.ddf.content.Schema
-import io.ddf.spark.{SparkDDFManager, SparkDDF}
+import io.ddf.spark.{SparkDDF, SparkDDFManager}
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.rdd.RDD
+
 import scala.collection.JavaConversions._
+import scala.util.Random
+import org.apache.spark.mllib.random.RandomRDDs._
+import org.apache.spark.sql.types.{LongType, StructField, StructType}
 /**
  * RDD-based ViewHandler
  *
@@ -51,10 +56,50 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     this.get(columns, ViewFormat.withName(format))
   }
 
-  override  def getRandomSampleByNum(numSamples: Int, withReplacement: Boolean,
+  override  def getRandomSampleByNum(numSamples: Long, withReplacement: Boolean,
     seed:
   Int): DDF = {
-    null.asInstanceOf[DDF]
+
+    if (numSamples < 0) {
+      throw new IllegalArgumentException("Number of samples must be larger than or equal to 0")
+    }
+
+    if (!withReplacement){
+      mDDF.getSqlHandler.sql2ddf(s"select * from ${mDDF.getSchema.getTableName} order by rand($seed) limit $numSamples")
+    } else {
+      // First, create a Spark DF that contain random numbers from 0 to num_rows - 1
+      val numRows = mDDF.getNumRows
+      val sqlContext = mDDF.getManager.asInstanceOf[SparkDDFManager].getHiveContext
+      val sc = sqlContext.sparkContext
+      val uniRDD = uniformRDD(sc, numSamples, 10, seed).map(x => (((numRows - 1) * x).toLong, ((numRows - 1) * x).toLong))
+
+      // Then join it with the DDF
+      val rddRow: RDD[Row] = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
+      val joinedRDD = uniRDD.leftOuterJoin(rddRow.zipWithIndex().map(x => (x._2, x._1)))
+
+      // Get an RDD of rows, create a new SparkDF and then a DDF
+      val sampledRDD: RDD[Row] = joinedRDD.map(x => x._2._2.get)
+      val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+      val sampledDF = sqlContext.createDataFrame(sampledRDD, df.schema)
+
+
+      val manager = this.getManager
+      val schema = SchemaHandler.getSchemaFromDataFrame(sampledDF)
+      schema.setTableName(mDDF.getSchemaHandler.newTableName())
+      val sampleDDF = manager.newDDF(manager, sampledDF, Array
+      (classOf[DataFrame]), manager.getNamespace,
+        null, schema)
+
+      mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
+      this.getDDF.getSchemaHandler.getColumns.foreach{
+        col => if(col.getOptionalFactor != null) {
+          sampleDDF.getSchemaHandler.setAsFactor(col.getName)
+        }
+      }
+
+      sampleDDF
+    }
+
   }
 
   override def getRandomSample(numSamples: Int, withReplacement: Boolean, seed: Int): java.util.List[Array[Object]] = {
@@ -77,6 +122,19 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
   }
 
   override def getRandomSample(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
+    if (!withReplacement && (fraction > 1 || fraction < 0)) {
+      throw new IllegalArgumentException("Sampling fraction must be from 0 to 1 in sampling without replacement")
+    }
+
+    if (withReplacement && (fraction < 0)) {
+      throw new IllegalArgumentException("Sampling fraction must be larger or equal to 0 in sampling with replacement")
+    }
+
+    getRandomSampleByNum((fraction * mDDF.getNumRows).toLong, withReplacement, seed)
+
+  }
+
+  override def getRandomSampleApprox(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
     if (!withReplacement && (fraction > 1 || fraction < 0)) {
       throw new IllegalArgumentException("Sampling fraction must be from 0 to 1 in sampling without replacement")
     }
