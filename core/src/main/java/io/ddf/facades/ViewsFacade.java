@@ -38,24 +38,19 @@ public class ViewsFacade implements IHandleViews {
   }
 
   @Override
-  public List<Object[]> getRandomSample(int numSamples, boolean withReplacement, int seed) {
-    return mViewHandler.getRandomSample(numSamples, withReplacement, seed);
-  }
-
-  @Override
-  public DDF getRandomSampleByNum(long numSamples, boolean withReplacement,
+  public DDF sample(long numSamples, boolean withReplacement,
                                   int seed) {
-    return mViewHandler.getRandomSampleByNum(numSamples, withReplacement, seed);
+    return mViewHandler.sample(numSamples, withReplacement, seed);
   }
 
   @Override
-  public DDF getRandomSample(double percent, boolean withReplacement, int seed) {
-    return mViewHandler.getRandomSample(percent, withReplacement, seed);
+  public DDF sample(double percent, boolean withReplacement, int seed) {
+    return mViewHandler.sample(percent, withReplacement, seed);
   }
 
   @Override
-  public DDF getRandomSampleApprox(double percent, boolean withReplacement, int seed){
-    return mViewHandler.getRandomSampleApprox(percent, withReplacement, seed);
+  public DDF sampleApprox(double percent, boolean withReplacement, int seed){
+    return mViewHandler.sampleApprox(percent, withReplacement, seed);
   }
 
   @Override
@@ -66,10 +61,6 @@ public class ViewsFacade implements IHandleViews {
   @Override
   public List<String> top(int numRows, String orderedCols, String mode) throws DDFException {
     return mViewHandler.top(numRows, orderedCols, mode);
-  }
-
-  public List<Object[]> getRandomSample(int numSamples) {
-    return getRandomSample(numSamples, false, 1);
   }
 
   @Override
