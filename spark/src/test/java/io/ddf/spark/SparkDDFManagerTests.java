@@ -359,7 +359,7 @@ public class SparkDDFManagerTests extends BaseTest {
     schema = new Schema("tstring string, tbool string, tshort string, tlong string," +
         "tfloat string, tdouble string, tdate string, ttimestamp string");
     Tuple2<SparkDDF, CsvRelation.ParsingStatistic> ddfAndStats = ddfManager.newDDFFromCsv(source,schema,options,10);
-    Assert.assertEquals(ddfAndStats._2().getNumMalformedRows(),2);
+    Assert.assertEquals(ddfAndStats._2().getNumLengthenRows() + ddfAndStats._2().getNumShortenRows(),2);
 
     ddfAndStats._1().VIEWS.head(10).forEach(s -> System.out.println(s));
     ddfAndStats._2().debugPrint();
