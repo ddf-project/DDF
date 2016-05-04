@@ -343,7 +343,7 @@
         <dependency>
             <groupId>com.databricks</groupId>
             <artifactId>spark-csv_2.11</artifactId>
-            <version>arimo-1.4.0.8</version>
+            <version>arimo-1.4.0.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.spark</groupId>
