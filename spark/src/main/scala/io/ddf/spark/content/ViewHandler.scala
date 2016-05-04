@@ -71,7 +71,7 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       val numRows = mDDF.getNumRows
       val rddRow: RDD[Row] = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
       // We use Spark's API to sample twice what we need, then only pick the first numSamples rows.
-      val sampledRDD = rddRow.sample(true, 2.0 * numSamples, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
+      val sampledRDD = rddRow.sample(true, 2.0 * numSamples / numRows, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
 
       val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
       val sqlContext = mDDF.getManager.asInstanceOf[SparkDDFManager].getHiveContext
