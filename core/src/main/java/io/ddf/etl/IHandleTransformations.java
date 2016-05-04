@@ -82,6 +82,8 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
 
   DDF oneHotEncoding(String inputColumn, String outputColumnName) throws DDFException;
 
+  DDF sort(List<String> columns, List<Boolean> ascending) throws DDFException;
+
   /**
    * Cast a column to newType
    * @param column name of column to be casted
@@ -95,7 +97,7 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
    * Cast a column to newType
    * @param column name of column to be casted
    * @param newType type of new column
-   * @param inplace if true modify the DDF, else return new DDF
+   * @param inPlace if true modify the DDF, else return new DDF
    * @return the current DDF if inplace is true, else return new DDF
    * @throws DDFException
    */

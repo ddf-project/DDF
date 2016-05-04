@@ -368,6 +368,38 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return RToSqlUdf(RExps, null, null);
   }
 
+  @Override
+  public DDF sort(List<String> columns, List<Boolean> ascending) throws DDFException {
+    if (columns == null || columns.isEmpty()) {
+      throw new DDFException("List of columns to sort is empty");
+    }
+    List<String> ddfColumns = this.getDDF().getSchema().getColumns().stream()
+            .map(Column::getName).collect(Collectors.toList());
+    for (String col : columns) {
+      if (!ddfColumns.contains(col)) {
+        throw new DDFException(String.format("Column to sort: %s is not in the DDF", col));
+      }
+    }
+
+    if (ascending == null) {
+      ascending = new ArrayList<>();
+    }
+
+    Iterator<String> columnIterator = columns.iterator();
+    Iterator<Boolean> ascendingIterator = ascending.iterator();
+    StringJoiner joiner = new StringJoiner(",", "", "");
+    while (columnIterator.hasNext()) {
+      boolean asc = ascendingIterator.hasNext() ? ascendingIterator.next() : true;
+      joiner.add(String.format("%s %s", columnIterator.next(), asc ? "asc" : "desc"));
+    }
+
+    String cmd = String.format("select * from %s order by ", this.getDDF().getSchema().getTableName()).concat(joiner.toString());
+    DDF newDDF = this.getManager().sql2ddf(cmd, this.getEngine());
+
+    newDDF.getMetaDataHandler().copyFactor(this.getDDF());
+    return newDDF;
+  }
+
   @Override public DDF factorIndexer(List<String> columns) throws DDFException {
     throw new UnsupportedOperationException();
   }

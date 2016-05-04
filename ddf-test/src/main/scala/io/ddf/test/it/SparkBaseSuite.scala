@@ -53,4 +53,9 @@ trait SparkBaseSuite extends BaseSuite {
       config.getValue("schema", "year-names"), ",")
   }
 
+  override def loadSmithsDDF(): DDF = {
+    loadTestDataFromFile(getClass.getResource("/smiths").getPath, "smiths",
+      config.getValue("schema", "smiths"), ",")
+  }
+
 }
