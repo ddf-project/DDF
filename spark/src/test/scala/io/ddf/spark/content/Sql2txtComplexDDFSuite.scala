@@ -60,28 +60,28 @@ class sqlComplexDDFSuite extends ATestSuite {
     val fddf: DDF = ddf.getFlattenedDDF()
 
     println("---sample from complex ddf with percentage:")
-    val sample = ddf.VIEWS.getRandomSample(0.1, false, 1)
+    val sample = ddf.VIEWS.sample(0.1, false, 1)
     println("sample: ")
     //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
     sample.VIEWS.head(3).asScala.toList.foreach(println)
 
     println("---sample from complex ddf with num rows:")
-    val sample1 = ddf.VIEWS.getRandomSample(5, false, 1)
+    val sample1 = ddf.VIEWS.sample(5, false, 1)
     println("sample: ")
     //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
-    sample1.asScala.toList.foreach(r => println(r.map(x => x.getClass.getName).mkString(",")))
+    sample1.VIEWS.head(5).asScala.foreach(r => println(r.map(x => x.getClass.getName).mkString(",")))
 
     println("---sample from flattened ddf with percentage:")
-    val sample2 = fddf.VIEWS.getRandomSample(0.1, false, 1)
+    val sample2 = fddf.VIEWS.sample(0.1, false, 1)
     println("sample: ")
     //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
     sample2.VIEWS.head(3).asScala.toList.foreach(println)
 
     println("---sample from flattened ddf with num rows:")
-    val sample3 = fddf.VIEWS.getRandomSample(5, false, 1)
+    val sample3 = fddf.VIEWS.sample(5, false, 1)
     println("sample: ")
     //sample.getSchema.getColumns.asScala.toList.foreach(c => {println(c.getName + " - " + c.getType)})
-    sample3.asScala.toList.foreach(r => println(r.map(x => x.getClass.getName).mkString(",")))
+    sample3.VIEWS.head(5).asScala.toList.foreach(r => println(r.map(x => x.getClass.getName).mkString(",")))
   }
 
 /*

@@ -56,7 +56,7 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     this.get(columns, ViewFormat.withName(format))
   }
 
-  override  def getRandomSampleByNum(numSamples: Long, withReplacement: Boolean,
+  override  def sample(numSamples: Long, withReplacement: Boolean,
     seed:
   Int): DDF = {
 
@@ -67,61 +67,29 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     if (!withReplacement){
       mDDF.getSqlHandler.sql2ddf(s"select * from ${mDDF.getSchema.getTableName} order by rand($seed) limit $numSamples")
     } else {
-      // First, create a Spark DF that contain random numbers from 0 to num_rows - 1
+
       val numRows = mDDF.getNumRows
-      val sqlContext = mDDF.getManager.asInstanceOf[SparkDDFManager].getHiveContext
-      val sc = sqlContext.sparkContext
-      val uniRDD = uniformRDD(sc, numSamples, 10, seed).map(x => (((numRows - 1) * x).toLong, ((numRows - 1) * x).toLong))
-
-      // Then join it with the DDF
       val rddRow: RDD[Row] = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
-      val joinedRDD = uniRDD.leftOuterJoin(rddRow.zipWithIndex().map(x => (x._2, x._1)))
+      // We use Spark's API to sample twice what we need, then only pick the first numSamples rows.
+      val sampledRDD = rddRow.sample(true, 2.0 * numSamples, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
 
-      // Get an RDD of rows, create a new SparkDF and then a DDF
-      val sampledRDD: RDD[Row] = joinedRDD.map(x => x._2._2.get)
       val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+      val sqlContext = mDDF.getManager.asInstanceOf[SparkDDFManager].getHiveContext
       val sampledDF = sqlContext.createDataFrame(sampledRDD, df.schema)
 
 
-      val manager = this.getManager
-      val schema = SchemaHandler.getSchemaFromDataFrame(sampledDF)
-      schema.setTableName(mDDF.getSchemaHandler.newTableName())
-      val sampleDDF = manager.newDDF(manager, sampledDF, Array
-      (classOf[DataFrame]), manager.getNamespace,
-        null, schema)
+      val manager = this.getManager.asInstanceOf[SparkDDFManager]
+      val sampleDDF = manager.newDDFFromSparkDataFrame(sampledDF)
 
-      mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-      this.getDDF.getSchemaHandler.getColumns.foreach{
-        col => if(col.getOptionalFactor != null) {
-          sampleDDF.getSchemaHandler.setAsFactor(col.getName)
-        }
-      }
+      // Copy Factor info
+      sampleDDF.getMetaDataHandler.copyFactor(mDDF)
 
       sampleDDF
     }
 
   }
 
-  override def getRandomSample(numSamples: Int, withReplacement: Boolean, seed: Int): java.util.List[Array[Object]] = {
-    if (numSamples < 0) {
-      throw new IllegalArgumentException("Number of samples must be larger than or equal to 0");
-    } else {
-      if(mDDF.getRepresentationHandler.has(classOf[RDD[_]], classOf[Array[Object]])) {
-        val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
-        val sampleData = rdd.takeSample(withReplacement, numSamples, seed).toList.asJava
-        sampleData
-      } else {
-        val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
-        rdd.takeSample(withReplacement, numSamples, seed).map {
-          row => {
-            row.toSeq.toArray.asInstanceOf[Array[Object]]
-          }
-        }.toList.asJava
-      }
-    }
-  }
-
-  override def getRandomSample(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
+  override def sample(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
     if (!withReplacement && (fraction > 1 || fraction < 0)) {
       throw new IllegalArgumentException("Sampling fraction must be from 0 to 1 in sampling without replacement")
     }
@@ -130,11 +98,11 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       throw new IllegalArgumentException("Sampling fraction must be larger or equal to 0 in sampling with replacement")
     }
 
-    getRandomSampleByNum((fraction * mDDF.getNumRows).toLong, withReplacement, seed)
+    sample((fraction * mDDF.getNumRows).toLong, withReplacement, seed)
 
   }
 
-  override def getRandomSampleApprox(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
+  override def sampleApprox(fraction: Double, withReplacement: Boolean, seed: Int): DDF = {
     if (!withReplacement && (fraction > 1 || fraction < 0)) {
       throw new IllegalArgumentException("Sampling fraction must be from 0 to 1 in sampling without replacement")
     }
@@ -151,12 +119,9 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     val sampleDDF = manager.newDDF(manager, sample_df, Array
     (classOf[DataFrame]), manager.getNamespace,
       null, schema)
-    mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-    this.getDDF.getSchemaHandler.getColumns.foreach{
-      col => if(col.getOptionalFactor != null) {
-        sampleDDF.getSchemaHandler.setAsFactor(col.getName)
-      }
-    }
+
+    // Copy Factor info
+    sampleDDF.getMetaDataHandler.copyFactor(mDDF)
 
     sampleDDF
 
