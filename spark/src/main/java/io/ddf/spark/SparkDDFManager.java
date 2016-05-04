@@ -48,6 +48,7 @@ import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -609,13 +610,14 @@ public class SparkDDFManager extends DDFManager {
   public Tuple3<SparkDDF,CsvRelation.ParsingStatistic,SchemaHandler.ApplySchemaStatistic> newDDFFromCsv(
       String source,
       Schema requiredSchema,
-      Map csvOptions,
+      Map<String,String> csvOptions,
       String applySchemaMode,
       int numHeadRows
   ) throws DDFException {
     String tmpStringSchema = StringUtils.join(requiredSchema.getColumnNames(), " String,") + " String";
     StructType stringSchema = SparkUtils.str2SparkSchema(tmpStringSchema);
-    CsvParser csvParser = new CsvParser().withSchema(stringSchema).withOptions(Utils.<String,String>toScalaMap(csvOptions));
+
+    CsvParser csvParser = new CsvParser().withSchema(stringSchema).withOptions(Utils.toScalaMap(csvOptions));
     Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfAndPStats = csvParser.csvFileWithStats(getHiveContext(), source);
 
     SparkDDF tmpStringDDF = new SparkDDF(this, dfAndPStats._1(), null, null);
