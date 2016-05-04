@@ -67,35 +67,22 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     if (!withReplacement){
       mDDF.getSqlHandler.sql2ddf(s"select * from ${mDDF.getSchema.getTableName} order by rand($seed) limit $numSamples")
     } else {
-      // First, create a Spark DF that contain random numbers from 0 to num_rows - 1
+
       val numRows = mDDF.getNumRows
-      val sqlContext = mDDF.getManager.asInstanceOf[SparkDDFManager].getHiveContext
-      val sc = sqlContext.sparkContext
-      val uniRDD = uniformRDD(sc, numSamples, 10, seed).map(x => (((numRows - 1) * x).toLong, ((numRows - 1) * x).toLong))
-
-      // Then join it with the DDF
       val rddRow: RDD[Row] = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
-      val joinedRDD = uniRDD.leftOuterJoin(rddRow.zipWithIndex().map(x => (x._2, x._1)))
+      // We use Spark's API to sample twice what we need, then only pick the first numSamples rows.
+      val sampledRDD = rddRow.sample(true, 2.0 * numSamples/numRows, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
 
-      // Get an RDD of rows, create a new SparkDF and then a DDF
-      val sampledRDD: RDD[Row] = joinedRDD.map(x => x._2._2.get)
       val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+      val sqlContext = mDDF.getManager.asInstanceOf[SparkDDFManager].getHiveContext
       val sampledDF = sqlContext.createDataFrame(sampledRDD, df.schema)
 
 
-      val manager = this.getManager
-      val schema = SchemaHandler.getSchemaFromDataFrame(sampledDF)
-      schema.setTableName(mDDF.getSchemaHandler.newTableName())
-      val sampleDDF = manager.newDDF(manager, sampledDF, Array
-      (classOf[DataFrame]), manager.getNamespace,
-        null, schema)
+      val manager = this.getManager.asInstanceOf[SparkDDFManager]
+      val sampleDDF = manager.newDDFFromSparkDataFrame(sampledDF)
 
-      mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-      this.getDDF.getSchemaHandler.getColumns.foreach{
-        col => if(col.getOptionalFactor != null) {
-          sampleDDF.getSchemaHandler.setAsFactor(col.getName)
-        }
-      }
+      // Copy Factor info
+      sampleDDF.getMetaDataHandler.copyFactor(mDDF)
 
       sampleDDF
     }
