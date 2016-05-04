@@ -61,9 +61,9 @@ public class StatisticsSupporterTest extends BaseTest {
   @Test
   public void testSampling() throws DDFException {
     DDF ddf2 = manager.sql2ddf("select * from airline", "SparkSQL");
-    Assert.assertEquals(25, ddf2.VIEWS.getRandomSample(25).size());
-    SparkDDF sampleDDF = (SparkDDF) ddf2.VIEWS.getRandomSample(0.5, false, 1);
-    Assert.assertEquals(25, ddf2.VIEWS.getRandomSample(25).size());
+    Assert.assertEquals(25, ddf2.VIEWS.sample(25, true, 1).getNumRows());
+    SparkDDF sampleDDF = (SparkDDF) ddf2.VIEWS.sample(0.5, false, 1);
+    Assert.assertEquals(25, ddf2.VIEWS.sample(25, true, 1).getNumRows());
     Assert.assertTrue(sampleDDF.getRDD(Object[].class).count() > 10);
   }
 

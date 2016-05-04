@@ -17,18 +17,13 @@ import java.util.List;
  */
 public interface IHandleViews extends IHandleDDFFunctionalGroup {
 
-  /**
-   * @param <T>
-   * @param numSamples
-   * @return a new DDF containing `numSamples` rows selected randomly from our owner DDF.
-   */
-  public List<Object[]> getRandomSample(int numSamples, boolean withReplacement, int seed);
-
-  public DDF getRandomSampleByNum(int numSamples,
+  public DDF sample(long numSamples,
                                   boolean withReplacement,
                                   int seed);
 
-  public DDF getRandomSample(double percent, boolean withReplacement, int seed);
+  public DDF sample(double percent, boolean withReplacement, int seed);
+
+  public DDF sampleApprox(double percent, boolean withReplacement, int seed);
 
   public List<String> head(int numRows) throws DDFException;
 
