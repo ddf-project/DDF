@@ -37,23 +37,6 @@ trait ViewsHandlerBaseSuite extends BaseSuite with Matchers {
     newddf3.getNumColumns should be(26)
   }
 
-  test("test sample") {
-    val ddf = loadMtCarsDDF()
-    val sample = ddf.VIEWS.sample(10, false, 1)
-    sample.getNumRows should be(10)
-    val sampleDF = sample.VIEWS.head(10)
-    sampleDF.get(0)(0).toString.toDouble should not be sampleDF.get(1)(0).toString.toDouble
-    sampleDF.get(1)(0).toString.toDouble should not be sampleDF.get(2)(0).toString.toDouble
-    sampleDF.get(2)(0).toString.toDouble should not be sampleDF.get(3)(0).toString.toDouble
-
-  }
-
-  test("test sample with percentage") {
-    val ddf = loadAirlineDDF()
-    val sample = ddf.VIEWS.sample(0.5, false, 1)
-    sample.getNumRows should be (3)
-  }
-
   test("get top 3 rows") {
     loadAirlineDDF()
     val sample = manager.sql2ddf("SELECT Month from airline", engineName)

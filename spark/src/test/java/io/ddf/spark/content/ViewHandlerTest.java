@@ -207,4 +207,21 @@ public class ViewHandlerTest extends BaseTest{
       Assert.assertTrue(e.getMessage().contains("Sampling fraction must be from 0 to 1 in sampling without replacement"));
     }
   }
+
+  @Test
+  public void testSamplePreservingFactorColumn() throws DDFException {
+    createTableAirline();
+
+    DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+    ddf.setAsFactor("Year");
+    DDF sampleDDF = ddf.VIEWS.sample(10, true, 1);
+    Assert.assertTrue(sampleDDF.getColumn("Year").getOptionalFactor() != null);
+
+    sampleDDF = ddf.VIEWS.sample(0.5, true, 1);
+    Assert.assertTrue(sampleDDF.getColumn("Year").getOptionalFactor() != null);
+
+    sampleDDF = ddf.VIEWS.sampleApprox(0.5, true, 1);
+    Assert.assertTrue(sampleDDF.getColumn("Year").getOptionalFactor() != null);
+  }
+
 }
