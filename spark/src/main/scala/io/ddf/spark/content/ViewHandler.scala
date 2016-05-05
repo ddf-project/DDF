@@ -1,6 +1,6 @@
 /**
- *
- */
+  *
+  */
 package io.ddf.spark.content
 
 import io.ddf.DDF
@@ -16,11 +16,12 @@ import scala.collection.JavaConversions._
 import scala.util.Random
 import org.apache.spark.mllib.random.RandomRDDs._
 import org.apache.spark.sql.types.{LongType, StructField, StructType}
+
 /**
- * RDD-based ViewHandler
- *
- *
- */
+  * RDD-based ViewHandler
+  *
+  *
+  */
 class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHandleViews {
 
   object ViewFormat extends Enumeration {
@@ -31,14 +32,14 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
   import ViewFormat._
 
   /**
-   * Same as {@link #get(int[], int)}, but accepts a scala.Enumeration for format instead.
-   *
-   * @param columns
-   * @param format
-   * A scala.Enumeration that will be converted to an integer by calling
-   * formatEnum.toString()
-   * @return
-   */
+    * Same as {@link #get(int[], int)}, but accepts a scala.Enumeration for format instead.
+    *
+    * @param columns
+    * @param format
+    * A scala.Enumeration that will be converted to an integer by calling
+    * formatEnum.toString()
+    * @return
+    */
   def get(columns: Array[Int], format: ViewFormat): DDF = {
     format match {
       case ViewFormat.DEFAULT => ViewHandler.getDefault(columns, mDDF)
@@ -56,30 +57,25 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     this.get(columns, ViewFormat.withName(format))
   }
 
-  override  def getRandomSampleByNum(numSamples: Long, withReplacement: Boolean,
-    seed:
-  Int): DDF = {
+  override def getRandomSampleByNum(numSamples: Long, withReplacement: Boolean,
+                                    seed:
+                                    Int): DDF = {
 
     if (numSamples < 0) {
       throw new IllegalArgumentException("Number of samples must be larger than or equal to 0")
     }
 
-    if (!withReplacement){
+    if (!withReplacement) {
       mDDF.getSqlHandler.sql2ddf(s"select * from ${mDDF.getSchema.getTableName} order by rand($seed) limit $numSamples")
     } else {
 
       val numRows = mDDF.getNumRows
       val rddRow: RDD[Row] = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
       // We use Spark's API to sample twice what we need, then only pick the first numSamples rows.
-      val sampledRDD = rddRow.sample(true, 2.0 * numSamples/numRows, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
+      val sampledRDD = rddRow.sample(true, 2.0 * numSamples / numRows, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
 
-      val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-      val sqlContext = mDDF.getManager.asInstanceOf[SparkDDFManager].getHiveContext
-      val sampledDF = sqlContext.createDataFrame(sampledRDD, df.schema)
-
-
-      val manager = this.getManager.asInstanceOf[SparkDDFManager]
-      val sampleDDF = manager.newDDFFromSparkDataFrame(sampledDF)
+      val manager = this.getManager
+      val sampleDDF = manager.newDDF(sampledRDD, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, mDDF.getSchema)
 
       // Copy Factor info
       sampleDDF.getMetaDataHandler.copyFactor(mDDF)
@@ -93,7 +89,7 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     if (numSamples < 0) {
       throw new IllegalArgumentException("Number of samples must be larger than or equal to 0");
     } else {
-      if(mDDF.getRepresentationHandler.has(classOf[RDD[_]], classOf[Array[Object]])) {
+      if (mDDF.getRepresentationHandler.has(classOf[RDD[_]], classOf[Array[Object]])) {
         val rdd = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Array[Object]])
         val sampleData = rdd.takeSample(withReplacement, numSamples, seed).toList.asJava
         sampleData
@@ -139,8 +135,8 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     (classOf[DataFrame]), manager.getNamespace,
       null, schema)
     mLog.info(">>>>>>> adding ddf to DDFManager " + sampleDDF.getName)
-    this.getDDF.getSchemaHandler.getColumns.foreach{
-      col => if(col.getOptionalFactor != null) {
+    this.getDDF.getSchemaHandler.getColumns.foreach {
+      col => if (col.getOptionalFactor != null) {
         sampleDDF.getSchemaHandler.setAsFactor(col.getName)
       }
     }
