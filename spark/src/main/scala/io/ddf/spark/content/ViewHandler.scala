@@ -17,6 +17,8 @@ import scala.util.Random
 import org.apache.spark.mllib.random.RandomRDDs._
 import org.apache.spark.sql.types.{LongType, StructField, StructType}
 
+import scala.collection.JavaConverters
+
 /**
   * RDD-based ViewHandler
   *
@@ -75,7 +77,9 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       val sampledRDD = rddRow.sample(true, 2.0 * numSamples / numRows, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
 
       val manager = this.getManager
-      val sampleDDF = manager.newDDF(sampledRDD, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, mDDF.getSchema)
+      val schema: Schema = new Schema(null,
+        JavaConverters.asScalaBufferConverter(mDDF.getSchema.getColumns).asScala.toArray)
+      val sampleDDF = manager.newDDF(sampledRDD, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
 
       // Copy Factor info
       sampleDDF.getMetaDataHandler.copyFactor(mDDF)
