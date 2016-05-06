@@ -347,7 +347,7 @@ public class SparkDDFManagerTests extends BaseTest {
   @Test
   public void TestNewSampleDDFWithStats() throws DDFException {
     SparkDDFManager ddfManager = (SparkDDFManager) manager;
-    String source = "resources/test/parsing_statistic.csv";
+    String source = "../resources/test/parsing_statistic.csv";
     System.out.println("Create DDF From "+ (new File(source)).getAbsolutePath());
     Map<String,String> options = new HashMap();
     options.put("header","true");
@@ -355,14 +355,10 @@ public class SparkDDFManagerTests extends BaseTest {
     options.put("mode","PERMISSIVE");
 
     Schema schema;
-//    tstring, tbool, tshort, tlong, tfloat, tdouble, tdate, ttimestamp
     schema = new Schema("tstring string, tbool string, tshort string, tlong string," +
         "tfloat string, tdouble string, tdate string, ttimestamp string");
     Tuple2<SparkDDF, CsvRelation.ParsingStatistic> ddfAndStats = ddfManager.newDDFFromCsv(source,schema,options,10);
     Assert.assertEquals(ddfAndStats._2().getNumLengthenRows() + ddfAndStats._2().getNumShortenRows(),2);
-
-    ddfAndStats._1().VIEWS.head(10).forEach(s -> System.out.println(s));
-    ddfAndStats._2().debugPrint();
 
   }
 
