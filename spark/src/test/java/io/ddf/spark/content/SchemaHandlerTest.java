@@ -35,7 +35,7 @@ public class SchemaHandlerTest extends BaseTest {
         + "type_double string,type_decimal string,type_date string,type_timestamp string) "
         + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", "SparkSQL");
 
-    manager.sql("load data local inpath 'resources/test/data4ingestion.csv' into table DataIngestion", "SparkSQL");
+    manager.sql("load data local inpath '../resources/test/data4ingestion.csv' into table DataIngestion", "SparkSQL");
   }
 
 
