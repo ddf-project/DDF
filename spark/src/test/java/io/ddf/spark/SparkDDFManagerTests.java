@@ -1,5 +1,20 @@
 package io.ddf.spark;
 
+import com.google.common.collect.ImmutableList;
+import com.databricks.spark.csv.CsvRelation;
+import com.google.common.collect.ImmutableMap;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import scala.Tuple2;
 
 import io.ddf.DDF;
 import io.ddf.DDFManager;
@@ -14,23 +29,6 @@ import io.ddf.s3.S3DDF;
 import io.ddf.s3.S3DDFManager;
 import io.ddf.util.Utils;
 
-
-import com.google.common.collect.ImmutableList;
-import com.databricks.spark.csv.CsvRelation;
-import com.google.common.collect.ImmutableMap;
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import scala.Tuple2;
 
 public class SparkDDFManagerTests extends BaseTest {
 
@@ -222,7 +220,7 @@ public class SparkDDFManagerTests extends BaseTest {
     final Map<String, String> delim2pathMap = ImmutableMap.<String, String>builder()
         .put(" ", "adatao-sample-data/test/extra/delim/space/")
         .put("|", "adatao-sample-data/test/extra/delim/vertical-bar/")
-        .put("\u0001", "adatao-sample-data/test/extra/delim/ctra/")
+        .put("\u0001", "adatao-sample-data/test/extra/delim/ctrla/")
         .build();
     Map<String, String> options = new HashMap<>();
     for (Map.Entry<String, String> entry: delim2pathMap.entrySet()) {

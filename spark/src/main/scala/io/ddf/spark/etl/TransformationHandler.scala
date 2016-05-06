@@ -235,13 +235,20 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
         @tailrec
         def getNewColName(c: Int): Int = {
           val cn = s"c$c"
-          if (!setExistingColumns.contains(cn) && !newNamedColumns.contains(cn)) {
+          if (!setExistingColumns.exists(cn.equalsIgnoreCase)
+            && !newNamedColumns.exists(cn.equalsIgnoreCase)) {
             return c
           }
           getNewColName(c + 1)
         }
         s"c${getNewColName(0)}"
-      case colName => colName
+      case colName =>
+        if (setExistingColumns.exists(colName.equalsIgnoreCase)
+          || newNamedColumns.count(colName.equalsIgnoreCase) > 1) {
+          throw new DDFException(s"Duplicated column name: $colName. " +
+            s"Please use another name for the column.")
+        }
+        colName
     }
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[PyObject]).asInstanceOf[RDD[PyObject]]
 
@@ -307,6 +314,20 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     ddf
   }
 
+  /**
+    *
+    * @param transformFunctions base64-encoded marshaled bytecode of the functions
+    * @param destColumns names of the new columns
+    * @param sourceColumns names of the source columns
+    * @return
+    */
+  override def transformPython(transformFunctions: Array[String], functionNames: Array[String],
+                               destColumns: Array[String],
+                               sourceColumns: Array[Array[String]], inPlace: java.lang.Boolean): DDF = {
+    val ddf = this.transformPython(transformFunctions, functionNames, destColumns, sourceColumns)
+    if (inPlace) this.getDDF.updateInplace(ddf) else ddf
+  }
+
   override def factorIndexer(columns: java.util.List[String]): DDF = {
 
     val factorIndexerModel = FactorIndexer.fit(mDDF, columns.asScala.toArray)
@@ -335,6 +356,12 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     encoder.setOutputCol(outputColumnName)
     val encodedDF = encoder.transform(newDF)
     this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(encodedDF)
+  }
+
+  override def castType(column: String, newType: String): DDF = {
+    val df = this.mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    val newDF = df.withColumn(column , df.col(column).cast(newType))
+    this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(newDF)
   }
 }
 

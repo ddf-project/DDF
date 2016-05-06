@@ -9,7 +9,7 @@ import scala.util.Properties.{envOrNone => env}
 
 object RootBuild extends Build {
 
-  // lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, examples)
+  // Project modules
   lazy val root = Project("root", file("."), settings = rootSettings) aggregate(core, spark, s3, hdfs, examples, test_ddf)
   lazy val core = Project("core", file("core"), settings = coreSettings)
   lazy val test_ddf = Project("ddf-test", file("ddf-test"), settings = testSettings) dependsOn (core)
@@ -17,20 +17,18 @@ object RootBuild extends Build {
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings) dependsOn (spark) dependsOn (core)
   lazy val s3 = Project("s3", file("s3"), settings = s3Settings) dependsOn (core)
   lazy val hdfs = Project("hdfs", file("hdfs"), settings = hdfsSettings) dependsOn (core)
+  
   // A configuration to set an alternative publishLocalConfiguration
   lazy val MavenCompile = config("m2r") extend (Compile)
   lazy val publishLocalBoth = TaskKey[Unit]("publish-local", "publish local for m2 and ivy")
-  //////// Project definitions/configs ///////
+  
+  // Project definitions / configs
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
   val SPARK_VERSION = "1.6.0-adatao-hd2.7.2"
   val SPARK_CSV_VERSION = "arimo-1.4.0.11"
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
-  //val rootVersion = if(YARN_ENABLED) {
-  //  "1.2-adatao"
-  //} else {
-  //  "1.2-mesos"
-  //}
+  
   // Target JVM version
   val SCALAC_JVM_VERSION = "jvm-1.8"
   val JAVAC_JVM_VERSION = "1.8"
@@ -41,12 +39,8 @@ object RootBuild extends Build {
   val projectName = "ddf"
   val rootProjectName = projectName
   val rootVersion = "1.4.15-SNAPSHOT"
-  //val rootVersion = if(YARN_ENABLED) {
-  //  "1.2-adatao"
-  //} else {
-  //  "1.2-mesos"
-  //}
-
+  
+  // Project and modules information
   val projectOrganization = rootOrganization + "." + projectName
   val coreProjectName = "ddf_core"
   val coreVersion = rootVersion
@@ -60,11 +54,6 @@ object RootBuild extends Build {
   val hdfsVersion = rootVersion
   val testProjectName = "ddf_test"
   val testVersion = rootVersion
-//  val sparkVersion = if(YARN_ENABLED) {
-//    rootVersion
-//  } else {
-//    rootVersion + "-mesos"
-//  }
   val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + ".jar"
   val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + "-tests.jar"
   val examplesProjectName = projectName + "_examples"
@@ -72,16 +61,11 @@ object RootBuild extends Build {
   val examplesJarName = examplesProjectName + "-" + rootVersion + ".jar"
   val examplesTestJarName = examplesProjectName + "-" + rootVersion + "-tests.jar"
 
-
-  //////// Variables/flags ////////
+  // Variables / flags
   // Hadoop version to build against. For example, "0.20.2", "0.20.205.0", or
   // "1.0.4" for Apache releases, or "0.20.2-cdh3u5" for Cloudera Hadoop.
   val HADOOP_VERSION = "1.0.4"
   val HADOOP_MAJOR_VERSION = "0"
-
-  // For Hadoop 2 versions such as "2.0.0-mr1-cdh4.1.1", set the HADOOP_MAJOR_VERSION to "2"
-  //val HADOOP_VERSION = "2.0.0-mr1-cdh4.1.1"
-  //val HADOOP_MAJOR_VERSION = "2"
 
   val slf4jVersion = "1.7.2"
   val excludeAvro = ExclusionRule(organization = "org.apache.avro" , name = "avro-ipc")
@@ -97,7 +81,6 @@ object RootBuild extends Build {
 
   // We define this explicitly rather than via unmanagedJars, so that make-pom will generate it in pom.xml as well
   // org % package % version
-
   val rforge = Seq(
     "net.rforge" % "REngine" % "2.1.1.compiled",
     "net.rforge" % "Rserve" % "1.8.2.compiled"
@@ -115,17 +98,13 @@ object RootBuild extends Build {
     "com.novocode" % "junit-interface" % "0.10" % "test",
     "net.sf" % "jsqlparser" % "0.9.8.8",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
-    //"org.apache.derby" % "derby" % "10.4.2.0",
-   // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
       exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty"),
-    //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
     "org.apache.spark" % "spark-sql_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
-    //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
     "com.google.protobuf" % "protobuf-java" % "2.5.0",
     "org.apache.hadoop" % "hadoop-aws" % "2.7.2" exclude("com.amazonaws", "aws-java-sdk") exclude("com.fasterxml.jackson.core", "jackson-annotations"),
     "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4"
@@ -141,7 +120,6 @@ object RootBuild extends Build {
     "org.apache.hadoop" % "hadoop-hdfs" % "2.7.2",
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
       exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty")
-    //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
   )
 
   val test_dependencies = Seq(
@@ -160,12 +138,12 @@ object RootBuild extends Build {
     case (key, value) => "System.setProperty(\"%s\", \"%s\")".format(key, value)
   }.mkString("\n|")
 
-  /////// Individual project settings //////
+  // Individual project settings
   def rootSettings = commonSettings ++ Seq(publish := {})
 
   def coreSettings = commonSettings ++ Seq(
     name := coreProjectName,
-    //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
+    
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally {
       List("sh", "-c", "touch core/" + targetDir + "/*timestamp")
@@ -186,12 +164,6 @@ object RootBuild extends Build {
     compile in Compile <<= compile in Compile andFinally {
       List("sh", "-c", "touch spark/" + targetDir + "/*timestamp")
     },
-    resolvers ++= Seq(
-      //"JBoss Repository" at "http://repository.jboss.org/nexus/content/repositories/releases/",
-      //"Spray Repository" at "http://repo.spray.cc/",
-      //"Twitter4J Repository" at "http://twitter4j.org/maven2/"
-      //"Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
-    ),
     testOptions in Test += Tests.Argument("-oI"),
     libraryDependencies ++= rforge,
     libraryDependencies ++= spark_dependencies,
@@ -224,14 +196,13 @@ object RootBuild extends Build {
 
   def examplesSettings = commonSettings ++ Seq(
     name := examplesProjectName,
-    //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally {
       List("sh", "-c", "touch examples/" + targetDir + "/*timestamp")
     }
   ) ++ assemblySettings ++ extraAssemblySettings
 
-  /////// Common/Shared project settings ///////
+  // Common / Shared project settings
   def commonSettings = Defaults.defaultSettings ++ Seq(
     organization := projectOrganization,
     version := rootVersion,
@@ -254,7 +225,6 @@ object RootBuild extends Build {
     // This goes first for fastest resolution. We need this for rforge.
     // Now, sometimes missing .jars in ~/.m2 can lead to sbt compile errors.
     // In that case, clean up the ~/.m2 local repository using bin/clean-m2-repository.sh
-
     resolvers ++= Seq(
       "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository",
       //"Local ivy Repository" at "file://"+Path.userHome.absolutePath+"/.ivy2/local",
@@ -264,7 +234,6 @@ object RootBuild extends Build {
       "Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/",
       "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
     ),
-
 
     publishMavenStyle := true, // generate pom.xml with "sbt make-pom"
 
@@ -287,7 +256,6 @@ object RootBuild extends Build {
       "joda-time" % "joda-time" % "2.8.1",
       "org.joda" % "joda-convert" % "1.7"
     ),
-
 
     otherResolvers := Seq(Resolver.file("dotM2", file(Path.userHome + "/.m2/repository"))),
 
@@ -352,11 +320,11 @@ object RootBuild extends Build {
     dependencyOverrides += "org.apache.commons" % "commons-lang3" % "3.1",
     dependencyOverrides += "org.apache.curator" % "curator-recipes" % "2.7.1",
       pomExtra := (
-      <!--
-      **************************************************************************************************
-      IMPORTANT: This file is generated by "sbt make-pom" (bin/make-poms.sh). Edits will be overwritten!
-      **************************************************************************************************
-      -->
+        <!--
+        **************************************************************************************************
+        IMPORTANT: This file is generated by "sbt make-pom" (bin/make-poms.sh). Edits will be overwritten!
+        **************************************************************************************************
+        -->
         <parent>
           <groupId>{rootOrganization}</groupId>
           <artifactId>{rootProjectName}</artifactId>
@@ -372,10 +340,10 @@ object RootBuild extends Build {
               <version>2.15</version>
               <configuration>
                 <reuseForks>false</reuseForks>
-	<enableAssertions>false</enableAssertions>
-        <environmentVariables>
-		 <RSERVER_JAR>${{basedir}}/{targetDir}/*.jar,${{basedir}}/{targetDir}/lib/*</RSERVER_JAR>
-        </environmentVariables>
+	        <enableAssertions>false</enableAssertions>
+                <environmentVariables>
+		  <RSERVER_JAR>${{basedir}}/{targetDir}/*.jar,${{basedir}}/{targetDir}/lib/*</RSERVER_JAR>
+                </environmentVariables>
                 <systemPropertyVariables>
                   <spark.serializer>org.apache.spark.serializer.KryoSerializer</spark.serializer>
                   <spark.kryo.registrator>io.ddf.spark.content.KryoRegistrator</spark.kryo.registrator>
@@ -414,9 +382,9 @@ object RootBuild extends Build {
               </executions>
             </plugin>
 	    <plugin>
-		 <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.10</version>
+	      <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <version>2.10</version>
            </plugin>
             <plugin>
               <groupId>net.alchim31.maven</groupId>
@@ -533,7 +501,6 @@ object RootBuild extends Build {
           </profile>
         </profiles>
       )
-
   ) // end of commonSettings
 
   def extraAssemblySettings() = Seq(test in assembly := {}) ++ Seq(

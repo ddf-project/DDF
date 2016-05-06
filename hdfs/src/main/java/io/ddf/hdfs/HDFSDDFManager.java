@@ -55,9 +55,6 @@ public class HDFSDDFManager extends DDFManager {
     } catch (Exception e) {
       throw new DDFException(e);
     }
-    Logger.getLogger(HDFSDDFManager.class).info("Init HDFSDDFManager( fsUri="+fsUri +")");
-    Logger.getLogger(HDFSDDFManager.class).info("-- FS Scheme:"+fs.getScheme()+")");
-    Logger.getLogger(HDFSDDFManager.class).info("-- FS URI:"+fs.getUri()+")");
   }
 
   /**

@@ -41,5 +41,5 @@ trait BaseSuite extends FunSuite {
   def loadAirlineDDFWithoutDefault(): DDF
   def loadAirlineDDFWithNA(): DDF
   def loadYearNamesDDF(): DDF
-
+  def loadSmithsDDF(): DDF
 }
