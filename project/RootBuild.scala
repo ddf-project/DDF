@@ -28,11 +28,6 @@ object RootBuild extends Build {
   val SPARK_VERSION = "1.6.0-adatao-hd2.7.2"
   val SPARK_CSV_VERSION = "arimo-1.4.0.11"
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
-  //val rootVersion = if(YARN_ENABLED) {
-  //  "1.2-adatao"
-  //} else {
-  //  "1.2-mesos"
-  //}
   
   // Target JVM version
   val SCALAC_JVM_VERSION = "jvm-1.8"
@@ -44,12 +39,7 @@ object RootBuild extends Build {
   val projectName = "ddf"
   val rootProjectName = projectName
   val rootVersion = "1.4.15-SNAPSHOT"
-  //val rootVersion = if(YARN_ENABLED) {
-  //  "1.2-adatao"
-  //} else {
-  //  "1.2-mesos"
-  //}
-
+  
   // Project and modules information
   val projectOrganization = rootOrganization + "." + projectName
   val coreProjectName = "ddf_core"
@@ -64,11 +54,6 @@ object RootBuild extends Build {
   val hdfsVersion = rootVersion
   val testProjectName = "ddf_test"
   val testVersion = rootVersion
-//  val sparkVersion = if(YARN_ENABLED) {
-//    rootVersion
-//  } else {
-//    rootVersion + "-mesos"
-//  }
   val sparkJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + ".jar"
   val sparkTestJarName = sparkProjectName.toLowerCase + "_" + theScalaVersion + "-" + rootVersion + "-tests.jar"
   val examplesProjectName = projectName + "_examples"
@@ -81,10 +66,6 @@ object RootBuild extends Build {
   // "1.0.4" for Apache releases, or "0.20.2-cdh3u5" for Cloudera Hadoop.
   val HADOOP_VERSION = "1.0.4"
   val HADOOP_MAJOR_VERSION = "0"
-
-  // For Hadoop 2 versions such as "2.0.0-mr1-cdh4.1.1", set the HADOOP_MAJOR_VERSION to "2"
-  //val HADOOP_VERSION = "2.0.0-mr1-cdh4.1.1"
-  //val HADOOP_MAJOR_VERSION = "2"
 
   val slf4jVersion = "1.7.2"
   val excludeAvro = ExclusionRule(organization = "org.apache.avro" , name = "avro-ipc")
@@ -117,17 +98,13 @@ object RootBuild extends Build {
     "com.novocode" % "junit-interface" % "0.10" % "test",
     "net.sf" % "jsqlparser" % "0.9.8.8",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
-    //"org.apache.derby" % "derby" % "10.4.2.0",
-   // "org.apache.spark" % "spark-streaming_2.10" % SPARK_VERSION excludeAll(excludeSpark),
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
       exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty"),
-    //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
     "org.apache.spark" % "spark-mllib_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("io.netty", "netty-all"),
     "org.apache.spark" % "spark-sql_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty"),
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
-    //"org.apache.spark" % "spark-yarn_2.10" % SPARK_VERSION exclude("io.netty", "netty-all")
     "com.google.protobuf" % "protobuf-java" % "2.5.0",
     "org.apache.hadoop" % "hadoop-aws" % "2.7.2" exclude("com.amazonaws", "aws-java-sdk") exclude("com.fasterxml.jackson.core", "jackson-annotations"),
     "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4"
@@ -143,7 +120,6 @@ object RootBuild extends Build {
     "org.apache.hadoop" % "hadoop-hdfs" % "2.7.2",
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
       exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty")
-    //"org.apache.spark" % "spark-repl_2.10" % SPARK_VERSION excludeAll(excludeSpark) exclude("com.google.protobuf", "protobuf-java") exclude("io.netty", "netty-all") exclude("org.jboss.netty", "netty"),
   )
 
   val test_dependencies = Seq(
@@ -167,7 +143,7 @@ object RootBuild extends Build {
 
   def coreSettings = commonSettings ++ Seq(
     name := coreProjectName,
-    //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
+    
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally {
       List("sh", "-c", "touch core/" + targetDir + "/*timestamp")
@@ -188,12 +164,6 @@ object RootBuild extends Build {
     compile in Compile <<= compile in Compile andFinally {
       List("sh", "-c", "touch spark/" + targetDir + "/*timestamp")
     },
-    resolvers ++= Seq(
-      //"JBoss Repository" at "http://repository.jboss.org/nexus/content/repositories/releases/",
-      //"Spray Repository" at "http://repo.spray.cc/",
-      //"Twitter4J Repository" at "http://twitter4j.org/maven2/"
-      //"Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
-    ),
     testOptions in Test += Tests.Argument("-oI"),
     libraryDependencies ++= rforge,
     libraryDependencies ++= spark_dependencies,
@@ -226,7 +196,6 @@ object RootBuild extends Build {
 
   def examplesSettings = commonSettings ++ Seq(
     name := examplesProjectName,
-    //javaOptions in Test <+= baseDirectory map {dir => "-Dspark.classpath=" + dir + "/../lib_managed/jars/*"},
     // Add post-compile activities: touch the maven timestamp files so mvn doesn't have to compile again
     compile in Compile <<= compile in Compile andFinally {
       List("sh", "-c", "touch examples/" + targetDir + "/*timestamp")
