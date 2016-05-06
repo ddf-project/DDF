@@ -18,9 +18,13 @@
  */
 package io.ddf.test.it.etl
 
+import java.lang.Boolean
+import java.util
+
 import io.ddf.DDF
 import io.ddf.analytics.Summary
 import io.ddf.content.Schema.ColumnType
+import io.ddf.exception.DDFException
 import io.ddf.test.it.BaseSuite
 import org.scalatest.Matchers
 
@@ -69,4 +73,135 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     newDDF.getSummary.length should be(8)
   }
 
+  test("test sort ascending single column") {
+    val smithsData: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+    val columns = new util.ArrayList[String]()
+    columns.add("variable")
+    val ascending = new util.ArrayList[Boolean]()
+    ascending.add(true)
+    val newDDF: DDF = smithsData.Transform.sort(columns, ascending)
+
+    val data = newDDF.VIEWS.head(newDDF.getNumRows.toInt)
+    val arr = data.map{str => str.split("\\t")}
+    arr.get(0)(0) should be("John")
+    arr.get(0)(1) should be ("age")
+    arr.get(0)(2) should be ("33.0")
+
+    arr.get(1)(0) should be ("Mary")
+    arr.get(1)(1) should be ("age")
+    arr.get(1)(2) should be ("33.0")
+
+    arr.get(6)(0) should be ("John")
+    arr.get(6)(1) should be ("weight")
+    arr.get(6)(2) should be ("90.0")
+
+    arr.get(7)(0) should be ("Mary")
+    arr.get(7)(1) should be ("weight")
+    arr.get(7)(2) should be ("null")
+  }
+
+  test("test sort multiple columns") {
+    val smithsData: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+    val columns = new util.ArrayList[String]()
+    columns.add("variable")
+    columns.add("value")
+    val ascending = new util.ArrayList[Boolean]()
+    ascending.add(true) // ascending
+    ascending.add(false) // descending
+    val newDDF: DDF = smithsData.Transform.sort(columns, ascending)
+
+    val data = newDDF.VIEWS.head(newDDF.getNumRows.toInt)
+    val arr = data.map{str => str.split("\\t")}
+
+    arr.get(2)(0) should be("John")
+    arr.get(2)(1) should be("height")
+    arr.get(2)(2) should be("1.87")
+
+    arr.get(3)(0) should be("Mary")
+    arr.get(3)(1) should be("height")
+    arr.get(3)(2) should be("1.54")
+
+    arr.get(6)(0) should be("John")
+    arr.get(6)(1) should be("weight")
+    arr.get(6)(2) should be("90.0")
+
+    arr.get(7)(0) should be("Mary")
+    arr.get(7)(1) should be("weight")
+    arr.get(7)(2) should be("null")
+  }
+
+  test("test sort multiple columns with no sort order") {
+    val smithsData: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+    val columns = new util.ArrayList[String]()
+    columns.add("subject")
+    columns.add("variable")
+    val newDDF: DDF = smithsData.Transform.sort(columns, new util.ArrayList[Boolean]())
+
+    val data = newDDF.VIEWS.head(newDDF.getNumRows.toInt)
+    val arr = data.map{str => str.split("\\t")}
+
+    arr.get(0)(0) should be("John")
+    arr.get(0)(1) should be("age")
+    arr.get(0)(2) should be("33.0")
+
+    arr.get(1)(0) should be("John")
+    arr.get(1)(1) should be("height")
+    arr.get(1)(2) should be("1.87")
+
+    arr.get(6)(0) should be("Mary")
+    arr.get(6)(1) should be("time")
+    arr.get(6)(2) should be("1.0")
+
+    arr.get(7)(0) should be("Mary")
+    arr.get(7)(1) should be("weight")
+    arr.get(7)(2) should be("null")
+  }
+
+  test("test sort descending with more sort order than column") {
+    val smithsData: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+    val columns = new util.ArrayList[String]()
+    columns.add("subject")
+    columns.add("variable")
+    val ascending = new util.ArrayList[Boolean]()
+    ascending.add(false)
+    ascending.add(false)
+    ascending.add(true)
+    ascending.add(false)
+    val newDDF: DDF = smithsData.Transform.sort(columns, ascending)
+
+    val data = newDDF.VIEWS.head(newDDF.getNumRows.toInt)
+    val arr = data.map{str => str.split("\\t")}
+
+    arr.get(0)(0) should be("Mary")
+    arr.get(0)(1) should be("weight")
+    arr.get(0)(2) should be("null")
+
+    arr.get(1)(0) should be("Mary")
+    arr.get(1)(1) should be("time")
+    arr.get(1)(2) should be("1.0")
+
+    arr.get(6)(0) should be("John")
+    arr.get(6)(1) should be("height")
+    arr.get(6)(2) should be("1.87")
+
+    arr.get(7)(0) should be("John")
+    arr.get(7)(1) should be("age")
+    arr.get(7)(2) should be("33.0")
+  }
+
+  test("test sort multiple columns empty columns") {
+    intercept[DDFException] {
+      val smithsData: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+      smithsData.Transform.sort(new util.ArrayList[String](), new util.ArrayList[Boolean]())
+    }
+  }
+
+  test("test sort unknown column") {
+    intercept[DDFException] {
+      val smithsData: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+      val columns = new util.ArrayList[String]()
+      columns.add("don't exist")
+      smithsData.Transform.sort(columns, new util.ArrayList[Boolean]())
+    }
+  }
 }
