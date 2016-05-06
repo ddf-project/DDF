@@ -22,6 +22,8 @@ import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
+import org.apache.log4j.Logger;
+import org.apache.spark.deploy.SparkHadoopUtil;
 
 /**
  * Created by jing on 2/22/16.
@@ -42,8 +44,13 @@ public class HDFSDDFManager extends DDFManager {
     assert !Strings.isNullOrEmpty(fsUri);
     this.fsUri = fsUri;
     try {
-      Configuration conf = new Configuration();
-      conf.set("fs.defaultFS", fsUri);
+      Configuration conf;
+      if (fsUri.equals("hdfs:;")) {
+        conf = SparkHadoopUtil.get().conf();
+      } else {
+        conf = new Configuration();
+        conf.set("fs.defaultFS", fsUri);
+      }
       this.fs = FileSystem.get(conf);
     } catch (Exception e) {
       throw new DDFException(e);
@@ -226,7 +233,7 @@ public class HDFSDDFManager extends DDFManager {
 
   @Override
   public String getSourceUri() {
-    return this.fsUri;
+    return fs.getUri().toString();
   }
 
   @Override

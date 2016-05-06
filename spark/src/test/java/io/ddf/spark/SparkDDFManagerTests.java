@@ -1,20 +1,24 @@
 package io.ddf.spark;
 
-
 import com.google.common.collect.ImmutableList;
+import com.databricks.spark.csv.CsvRelation;
 import com.google.common.collect.ImmutableMap;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import scala.Tuple2;
+
 import io.ddf.DDF;
 import io.ddf.DDFManager;
+import io.ddf.content.Schema;
 import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.datasource.S3DataSourceURI;
@@ -23,6 +27,8 @@ import io.ddf.hdfs.HDFSDDF;
 import io.ddf.hdfs.HDFSDDFManager;
 import io.ddf.s3.S3DDF;
 import io.ddf.s3.S3DDFManager;
+import io.ddf.util.Utils;
+
 
 public class SparkDDFManagerTests extends BaseTest {
 
@@ -334,6 +340,24 @@ public class SparkDDFManagerTests extends BaseTest {
     HDFSDDF orcDDF = hdfsDDFManager.newDDF("/test_pe/orc/default/", null, null);
     DDF orcSparkDDF = sparkDDFManager.copyFrom(orcDDF);
     assert (orcSparkDDF.getNumRows() > 0);
+  }
+
+  @Test
+  public void TestNewSampleDDFWithStats() throws DDFException {
+    SparkDDFManager ddfManager = (SparkDDFManager) manager;
+    String source = "../resources/test/parsing_statistic.csv";
+    System.out.println("Create DDF From "+ (new File(source)).getAbsolutePath());
+    Map<String,String> options = new HashMap();
+    options.put("header","true");
+    options.put("delimiter",",");
+    options.put("mode","PERMISSIVE");
+
+    Schema schema;
+    schema = new Schema("tstring string, tbool string, tshort string, tlong string," +
+        "tfloat string, tdouble string, tdate string, ttimestamp string");
+    Tuple2<SparkDDF, CsvRelation.ParsingStatistic> ddfAndStats = ddfManager.newDDFFromCsv(source,schema,options,10);
+    Assert.assertEquals(ddfAndStats._2().getNumLengthenRows() + ddfAndStats._2().getNumShortenRows(),2);
+
   }
 
 }
