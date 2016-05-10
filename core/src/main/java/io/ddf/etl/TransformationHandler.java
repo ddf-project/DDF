@@ -400,6 +400,16 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return newDDF;
   }
 
+  @Override
+  public DDF sort(List<String> columns, List<Boolean> ascending, Boolean inPlace) throws DDFException {
+    DDF ddf = sort(columns, ascending);
+    if (inPlace) {
+      return this.getDDF().updateInplace(ddf);
+    } else {
+      return ddf;
+    }
+  }
+
   @Override public DDF factorIndexer(List<String> columns) throws DDFException {
     throw new UnsupportedOperationException();
   }
