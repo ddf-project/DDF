@@ -119,4 +119,10 @@ public class BasicDDFTests {
     List<String> columnNames = Arrays.asList("row", "price", "lotsize", "bedrooms", "bathrms", "row");
     schema.setColumnNames(columnNames);
   }
+
+  @Test(expected = DDFException.class)
+  public void testGettingInexistedColumn() throws DDFException {
+    DDF ddf = this.getTestDDF();
+    Schema.Column age = ddf.getSchema().getColumn("age");
+  }
 }

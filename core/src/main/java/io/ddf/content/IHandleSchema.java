@@ -18,7 +18,7 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
 
   String getTableName();
 
-  Column getColumn(String columnName);
+  Column getColumn(String columnName) throws DDFException;
 
   List<Column> getColumns();
 
@@ -34,9 +34,9 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
    */
   String newTableName(Object forObject);
 
-  int getColumnIndex(String columnName);
+  int getColumnIndex(String columnName) throws DDFException;
 
-  String getColumnName(int columnIndex);
+  String getColumnName(int columnIndex) throws DDFException;
 
   /**
    * Generate a basic schema for the current DDF
@@ -53,9 +53,9 @@ public interface IHandleSchema extends IHandleDDFFunctionalGroup {
 
   Factor<?> setAsFactor(int columnIndex) throws DDFException;
 
-  void unsetAsFactor(String columnName);
+  void unsetAsFactor(String columnName) throws DDFException;
 
-  void unsetAsFactor(int columnIndex);
+  void unsetAsFactor(int columnIndex) throws DDFException;
 
   void setFactorLevels(String columnName, Factor<?> factor) throws DDFException;
 

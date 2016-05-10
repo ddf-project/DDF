@@ -162,25 +162,25 @@ public class Schema implements Serializable {
     }
   }
 
-  public Column getColumn(int i) {
+  public Column getColumn(int i) throws DDFException {
     if (mColumns.isEmpty()) {
-      return null;
+      throw new DDFException("List of columns is empty");
     }
-    if (i < 0 || i >= mColumns.size()) {
-      return null;
+    if(i < 0) {
+      throw new DDFException("index must be larger or equal to 0");
+    }
+    if (i >= mColumns.size()) {
+      throw new DDFException(String.format("index must be smaller than number of columns: %s", mColumns.size()));
     }
 
     return mColumns.get(i);
   }
 
-  public String getColumnName(int i) {
-    if (getColumn(i) == null) {
-      return null;
-    }
+  public String getColumnName(int i) throws DDFException {
     return getColumn(i).getName();
   }
 
-  public Column getColumn(String name) {
+  public Column getColumn(String name) throws DDFException {
     int i = getColumnIndex(name);
     if (i == -1) {
       return null;
@@ -189,16 +189,21 @@ public class Schema implements Serializable {
     return getColumn(i);
   }
 
-  public int getColumnIndex(String name) {
-    if (mColumns.isEmpty() || Strings.isNullOrEmpty(name))
-      return -1;
+  public int getColumnIndex(String name) throws DDFException {
+    if(mColumns.isEmpty()) {
+      throw new DDFException("List of columns is empty");
+    }
+
+    if (Strings.isNullOrEmpty(name)) {
+      throw new DDFException("ColumName cannot be null or empty");
+    }
 
     for (int i = 0; i < mColumns.size(); i++) {
       if (name.equalsIgnoreCase(mColumns.get(i).getName()))
         return i;
     }
 
-    return -1;
+    throw new DDFException(String.format("Can't find column %s", name));
   }
 
   @Override
@@ -229,11 +234,8 @@ public class Schema implements Serializable {
    * @param name Column name
    * @return true if succeed
    */
-  public boolean removeColumn(String name) {
-    if (getColumnIndex(name) < 0)
-      return false;
+  public void removeColumn(String name) throws DDFException {
     this.mColumns.remove(getColumnIndex(name));
-    return true;
   }
 
   /**
@@ -242,11 +244,8 @@ public class Schema implements Serializable {
    * @param i Column index
    * @return true if succeed
    */
-  public boolean removeColumn(int i) {
-    if (getColumn(i) == null)
-      return false;
+  public void removeColumn(int i) throws DDFException {
     this.mColumns.remove(i);
-    return true;
   }
 
   /**

@@ -51,7 +51,7 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public Column getColumn(String columnName) {
+  public Column getColumn(String columnName) throws DDFException {
     return mSchema.getColumn(columnName);
   }
 
@@ -76,12 +76,12 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public int getColumnIndex(String columnName) {
+  public int getColumnIndex(String columnName) throws DDFException {
     return mSchema != null ? mSchema.getColumnIndex(columnName) : -1;
   }
 
   @Override
-  public String getColumnName(int columnIndex) {
+  public String getColumnName(int columnIndex) throws DDFException {
     return mSchema != null ? mSchema.getColumnName(columnIndex) : null;
   }
 
@@ -145,12 +145,12 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public synchronized void unsetAsFactor(String columnName) {
+  public synchronized void unsetAsFactor(String columnName) throws DDFException {
     this.unsetAsFactor(this.getColumnIndex(columnName));
   }
 
   @Override
-  public synchronized void unsetAsFactor(int columnIndex) {
+  public synchronized void unsetAsFactor(int columnIndex) throws DDFException {
 
     if (this.getSchema() != null) {
       Column column = this.getSchema().getColumn(columnIndex);

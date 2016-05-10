@@ -1,6 +1,8 @@
 package io.ddf.content;
 
 
+import io.ddf.exception.DDFException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class SqlTypedResult {
    * @brief Construtor
    * @param sqlResult The result that is of SqlResult type.
    */
-  public SqlTypedResult(SqlResult sqlResult) {
+  public SqlTypedResult(SqlResult sqlResult) throws DDFException {
       Schema schema = sqlResult.getSchema();
       this.schema = schema;
       List<String> nonTypedRows = sqlResult.getRows();
