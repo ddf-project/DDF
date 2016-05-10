@@ -43,27 +43,48 @@ public class TransformationHandlerTest extends BaseTest {
 
   @Test
   public void testTransformNativeRserveInPlaceSingleExpression() throws DDFException {
+    Boolean inPlace = Boolean.TRUE;
+    // Inplace TRUE
     DDF newDdf = ddf.copy();
-    DDF newDdf2 = newDdf.Transform.transformNativeRserve("newcol = deptime / arrtime", Boolean.TRUE);
+    DDF newDdf2 = newDdf.Transform.transformNativeRserve("newcol = deptime / arrtime", inPlace);
     List<String> res = newDdf2.VIEWS.head(10);
     Assert.assertNotNull(newDdf2);
     Assert.assertNotNull(newDdf);
-    Assert.assertTrue(newDdf.getUUID().equals(newDdf2.getUUID()));
+    Assert.assertTrue("With inPlace being true, two DDF should have the same UUID", newDdf.getUUID().equals(newDdf2.getUUID()));
     Assert.assertEquals("newcol", newDdf.getColumnName(8));
     Assert.assertEquals(10, res.size());
+
+    //Inplace FALSE
+    inPlace = Boolean.FALSE;
+    DDF newDdf3 = ddf.copy();
+    DDF newDdf4 = newDdf.Transform.transformNativeRserve("newcol = deptime / arrtime", inPlace);
+    Assert.assertNotNull(newDdf3);
+    Assert.assertNotNull(newDdf4);
+    Assert.assertFalse("With inPlace being false, two DDF should have different UUID", newDdf3.getUUID().equals(newDdf4.getUUID()));
   }
 
   @Test
   public void testTransformNativeRserveInPlaceMultipleExpression() throws DDFException {
+    Boolean inPlace = Boolean.TRUE;
+
+    // Inplace TRUE
     String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
     DDF newDdf = ddf.copy();
-    DDF newDdf2 = newDdf.Transform.transformNativeRserve(expressions, Boolean.TRUE);
+    DDF newDdf2 = newDdf.Transform.transformNativeRserve(expressions, inPlace);
     List<String> res = newDdf2.VIEWS.head(10);
     Assert.assertNotNull(newDdf2);
     Assert.assertNotNull(newDdf);
-    Assert.assertTrue(newDdf.getUUID().equals(newDdf2.getUUID()));
+    Assert.assertTrue("With inPlace being true, two DDF should have the same UUID", newDdf.getUUID().equals(newDdf2.getUUID()));
     Assert.assertEquals("newcol", newDdf2.getColumnName(8));
     Assert.assertEquals("newcol2", newDdf2.getColumnName(9));
+
+    // Inplace FALSE
+    inPlace = Boolean.FALSE;
+    DDF newDdf3 = ddf.copy();
+    DDF newDdf4 = newDdf.Transform.transformNativeRserve(expressions, inPlace);
+    Assert.assertNotNull(newDdf3);
+    Assert.assertNotNull(newDdf4);
+    Assert.assertFalse("With inPlace being false, two DDF should have different UUID", newDdf3.getUUID().equals(newDdf4.getUUID()));
   }
 
   @Test
