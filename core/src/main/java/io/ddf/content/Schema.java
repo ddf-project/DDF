@@ -182,10 +182,7 @@ public class Schema implements Serializable {
 
   public Column getColumn(String name) throws DDFException {
     int i = getColumnIndex(name);
-    if (i == -1) {
-      return null;
-    }
-
+    
     return getColumn(i);
   }
 
