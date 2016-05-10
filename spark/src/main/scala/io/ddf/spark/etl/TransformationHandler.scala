@@ -149,6 +149,15 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     transformNativeRserve(Array(transformExpression))
   }
 
+  override def transformNativeRserve(transformExpression: String, inPlace: java.lang.Boolean): DDF = {
+    transformNativeRserve(Array(transformExpression), inPlace)
+  }
+
+  override def transformNativeRserve(transformExpression: Array[String], inPlace: java.lang.Boolean): DDF = {
+    val ddf = this.transformNativeRserve(transformExpression)
+    if (inPlace) this.getDDF.updateInplace(ddf) else ddf
+  }
+
   override def transformNativeRserve(transformExpressions: Array[String]): DDF = {
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
 

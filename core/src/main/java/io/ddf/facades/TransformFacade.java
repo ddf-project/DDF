@@ -49,13 +49,21 @@ public class TransformFacade implements IHandleTransformations {
   @Override
   public DDF transformNativeRserve(String transformExpression) {
     return mTransformationHandler.transformNativeRserve(transformExpression);
+  }
 
+  @Override
+  public DDF transformNativeRserve(String transformExpression, Boolean inPlace) {
+    return mTransformationHandler.transformNativeRserve(transformExpression, inPlace);
   }
 
   @Override
   public DDF transformNativeRserve(String[] transformExpressions) {
     return mTransformationHandler.transformNativeRserve(transformExpressions);
+  }
 
+  @Override
+  public DDF transformNativeRserve(String[] transformExpressions, Boolean inPlace) {
+    return mTransformationHandler.transformNativeRserve(transformExpressions, inPlace);
   }
 
   @Override

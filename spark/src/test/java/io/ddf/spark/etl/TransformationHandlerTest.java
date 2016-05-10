@@ -42,6 +42,31 @@ public class TransformationHandlerTest extends BaseTest {
   }
 
   @Test
+  public void testTransformNativeRserveInPlaceSingleExpression() throws DDFException {
+    DDF newDdf = ddf.copy();
+    DDF newDdf2 = newDdf.Transform.transformNativeRserve("newcol = deptime / arrtime", Boolean.TRUE);
+    List<String> res = newDdf2.VIEWS.head(10);
+    Assert.assertNotNull(newDdf2);
+    Assert.assertNotNull(newDdf);
+    Assert.assertTrue(newDdf.getUUID().equals(newDdf2.getUUID()));
+    Assert.assertEquals("newcol", newDdf.getColumnName(8));
+    Assert.assertEquals(10, res.size());
+  }
+
+  @Test
+  public void testTransformNativeRserveInPlaceMultipleExpression() throws DDFException {
+    String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
+    DDF newDdf = ddf.copy();
+    DDF newDdf2 = newDdf.Transform.transformNativeRserve(expressions, Boolean.TRUE);
+    List<String> res = newDdf2.VIEWS.head(10);
+    Assert.assertNotNull(newDdf2);
+    Assert.assertNotNull(newDdf);
+    Assert.assertTrue(newDdf.getUUID().equals(newDdf2.getUUID()));
+    Assert.assertEquals("newcol", newDdf2.getColumnName(8));
+    Assert.assertEquals("newcol2", newDdf2.getColumnName(9));
+  }
+
+  @Test
   public void testTransformPython() throws DDFException {
     // f = lambda x: x/2.
     // f = lambda x: x+10
@@ -486,7 +511,6 @@ public class TransformationHandlerTest extends BaseTest {
     DDF newDDF = ddf.Transform.castType("year", "string");
     assert(newDDF.getUUID() != ddf.getUUID());
     assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
-    assert(ddf.getColumn("year").getType() == ColumnType.STRING);
   }
 
   @Test
@@ -494,5 +518,6 @@ public class TransformationHandlerTest extends BaseTest {
     DDF newDDF = ddf.Transform.castType("year", "string", true);
     assert(newDDF.getUUID() == ddf.getUUID());
     assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
+    assert(ddf.getColumn("year").getType() == ColumnType.STRING);
   }
 }
