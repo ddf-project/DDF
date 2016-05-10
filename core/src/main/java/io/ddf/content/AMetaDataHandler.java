@@ -108,7 +108,7 @@ public abstract class AMetaDataHandler extends ADDFFunctionalGroupHandler
     }
 
     for (Schema.Column col : ddf.getSchema().getColumns()) {
-      if (this.getDDF().getColumn(col.getName()) != null && col.getColumnClass() == Schema.ColumnClass.FACTOR) {
+      if (this.getDDF().getSchema().columnExist(col) && col.getColumnClass() == Schema.ColumnClass.FACTOR) {
         // Set corresponding column as factor
         this.getDDF().getSchemaHandler().setAsFactor(col.getName());
         // if not in list of columns to re-compute factors

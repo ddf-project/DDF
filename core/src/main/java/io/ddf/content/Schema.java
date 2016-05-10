@@ -182,7 +182,7 @@ public class Schema implements Serializable {
 
   public Column getColumn(String name) throws DDFException {
     int i = getColumnIndex(name);
-    
+
     return getColumn(i);
   }
 
@@ -201,6 +201,22 @@ public class Schema implements Serializable {
     }
 
     throw new DDFException(String.format("Can't find column %s", name));
+  }
+
+  /**
+   * Check if column with the same name and type exist
+   * @param col column to check
+   * @return true if exist else false
+   */
+  public boolean columnExist(Column col) {
+    boolean columnExist = false;
+    for(int i = 0; i < mColumns.size(); i++) {
+      Column column = mColumns.get(i);
+      if(col.getName().equalsIgnoreCase(column.getName()) && column.getType() == col.getType()) {
+        columnExist = true;
+      }
+    }
+    return columnExist;
   }
 
   @Override
