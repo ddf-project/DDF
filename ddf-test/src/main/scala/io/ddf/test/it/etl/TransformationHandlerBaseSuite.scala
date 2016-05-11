@@ -205,7 +205,7 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     }
   }
 
-  test("test sort inPlace") {
+  test("test sort inPlace false") {
     val ddf: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
     val columns = new util.ArrayList[String]()
     columns.add("variable")
@@ -214,18 +214,28 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     ascending.add(true) // ascending
     ascending.add(false) // descending
 
-    // test inPlace true
-    var inPlace : Boolean = Boolean.TRUE
-    val transformedDDF1: DDF = ddf.Transform.sort(columns, ascending, inPlace)
-    transformedDDF1 should not be null
-    ddf.getUUID shouldEqual transformedDDF1.getUUID
+    // test inPlace false
+    val inPlace = Boolean.FALSE
+    val transformedDDF2: DDF = ddf.Transform.sort(columns, ascending, inPlace)
+    ddf should not be null
+    transformedDDF2 should not be null
+    transformedDDF2.getUUID.equals(ddf.getUUID) should be(false)
+  }
+
+  test("test sort inPlace true") {
+    val ddf: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+    val columns = new util.ArrayList[String]()
+    columns.add("variable")
+    columns.add("value")
+    val ascending = new util.ArrayList[Boolean]()
+    ascending.add(true) // ascending
+    ascending.add(false) // descending
 
     // test inPlace false
-    inPlace = Boolean.FALSE
+    val inPlace = Boolean.TRUE
     val transformedDDF2: DDF = ddf.Transform.sort(columns, ascending, inPlace)
+    ddf should not be null
     transformedDDF2 should not be null
-    ddf.getUUID.equals(transformedDDF1.getUUID) should be(true)
-    transformedDDF2.getUUID.equals(transformedDDF1.getUUID) should be(false)
-    transformedDDF2.getUUID.equals(ddf.getUUID) should be(false)
+    transformedDDF2.getUUID.equals(ddf.getUUID) should be(true)
   }
 }
