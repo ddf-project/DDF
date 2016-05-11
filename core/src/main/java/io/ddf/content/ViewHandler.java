@@ -47,7 +47,6 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   @Override
   public DDF getRandomSample(double percent, boolean withReplacement, int seed) {
-    // TODO Auto-generated method stub
     return null;
   }
 
