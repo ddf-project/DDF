@@ -204,4 +204,38 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
       smithsData.Transform.sort(columns, new util.ArrayList[Boolean]())
     }
   }
+
+  test("test sort inPlace false") {
+    val ddf: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+    val columns = new util.ArrayList[String]()
+    columns.add("variable")
+    columns.add("value")
+    val ascending = new util.ArrayList[Boolean]()
+    ascending.add(true) // ascending
+    ascending.add(false) // descending
+
+    // test inPlace false
+    val inPlace = Boolean.FALSE
+    val transformedDDF2: DDF = ddf.Transform.sort(columns, ascending, inPlace)
+    ddf should not be null
+    transformedDDF2 should not be null
+    transformedDDF2.getUUID.equals(ddf.getUUID) should be(false)
+  }
+
+  test("test sort inPlace true") {
+    val ddf: DDF = loadSmithsDDF().VIEWS.project("subject, variable, value")
+    val columns = new util.ArrayList[String]()
+    columns.add("variable")
+    columns.add("value")
+    val ascending = new util.ArrayList[Boolean]()
+    ascending.add(true) // ascending
+    ascending.add(false) // descending
+
+    // test inPlace false
+    val inPlace = Boolean.TRUE
+    val transformedDDF2: DDF = ddf.Transform.sort(columns, ascending, inPlace)
+    ddf should not be null
+    transformedDDF2 should not be null
+    transformedDDF2.getUUID.equals(ddf.getUUID) should be(true)
+  }
 }

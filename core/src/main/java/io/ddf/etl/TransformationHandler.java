@@ -370,6 +370,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
   @Override
   public DDF sort(List<String> columns, List<Boolean> ascending) throws DDFException {
+    return sort(columns, ascending, false);
+  }
+
+  @Override
+  public DDF sort(List<String> columns, List<Boolean> ascending, Boolean inPlace) throws DDFException {
     if (columns == null || columns.isEmpty()) {
       throw new DDFException("List of columns to sort is empty");
     }
@@ -397,7 +402,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     DDF newDDF = this.getManager().sql2ddf(cmd, this.getEngine());
 
     newDDF.getMetaDataHandler().copyFactor(this.getDDF());
-    return newDDF;
+    if (inPlace) {
+      return this.getDDF().updateInplace(newDDF);
+    } else {
+      return newDDF;
+    }
   }
 
   @Override public DDF factorIndexer(List<String> columns) throws DDFException {

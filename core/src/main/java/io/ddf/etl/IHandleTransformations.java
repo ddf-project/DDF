@@ -84,6 +84,8 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
 
   DDF sort(List<String> columns, List<Boolean> ascending) throws DDFException;
 
+  DDF sort(List<String> columns, List<Boolean> ascending, Boolean inPlace) throws DDFException;
+
   /**
    * Cast a column to newType
    * @param column name of column to be casted
