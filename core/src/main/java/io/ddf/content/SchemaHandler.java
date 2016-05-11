@@ -77,12 +77,12 @@ public class SchemaHandler extends ADDFFunctionalGroupHandler implements
 
   @Override
   public int getColumnIndex(String columnName) throws DDFException {
-    return mSchema != null ? mSchema.getColumnIndex(columnName) : -1;
+    return mSchema.getColumnIndex(columnName);
   }
 
   @Override
   public String getColumnName(int columnIndex) throws DDFException {
-    return mSchema != null ? mSchema.getColumnName(columnIndex) : null;
+    return mSchema.getColumnName(columnIndex);
   }
 
   @Override
