@@ -117,7 +117,7 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       throw new IllegalArgumentException("Sampling fraction must be larger or equal to 0 in sampling with replacement")
     }
 
-    getRandomSampleByNum((fraction * mDDF.getNumRows).toLong, withReplacement, seed)
+    getRandomSampleByNum(Math.round(fraction * mDDF.getNumRows), withReplacement, seed)
 
   }
 

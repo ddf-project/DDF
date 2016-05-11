@@ -121,18 +121,20 @@ public class ViewHandlerTest extends BaseTest{
     createTableAirline();
 
     DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
-    int sampleSize = 2;
+    long[] sampleSizes = {0, 2, ddf.getNumRows()};
 
-    // sample with replacement
-    DDF randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, true, 123);
-    Assert.assertTrue(randomSample.getNumRows() == sampleSize);
+    for(long sampleSize: sampleSizes) {
+      // sample with replacement
+      DDF randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, true, 123);
+      Assert.assertTrue(randomSample.getNumRows() == sampleSize);
 
-    // sample without replacement
-    randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, false, 123);
-    Assert.assertTrue(randomSample.getNumRows() == sampleSize);
+      // sample without replacement
+      randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, false, 123);
+      Assert.assertTrue(randomSample.getNumRows() == sampleSize);
+    }
 
     try {
-      randomSample = ddf.VIEWS.getRandomSampleByNum(-1, false, 123);
+      DDF randomSample = ddf.VIEWS.getRandomSampleByNum(-1, false, 123);
       Assert.fail("Should not be able to oversampling without replacement");
     } catch (IllegalArgumentException e) {
       Assert.assertTrue(e.getMessage().contains("Number of samples must be larger than or equal to 0"));
@@ -146,24 +148,28 @@ public class ViewHandlerTest extends BaseTest{
     DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
     long numRows = ddf.getNumRows();
 
-    // sample with replacement
-    // In Spark, size of the sampled DDF is not always equal to size of original DDF * fraction
-    DDF ddf2 = ddf.VIEWS.getRandomSample(0.5, true, 123);
-    Assert.assertTrue(ddf2.getNumRows() == (int)(numRows * 0.5));
+    double[] fractions = {0, 0.5, 1};
 
-    // sample without replacement
-    ddf2 = ddf.VIEWS.getRandomSample(0.5, false, 123);
-    Assert.assertTrue(ddf2.getNumRows() == (int)(numRows * 0.5));
+    for(double fraction: fractions) {
+      // sample with replacement
+      DDF ddf2 = ddf.VIEWS.getRandomSample(fraction, true, 123);
+      Assert.assertTrue(ddf2.getNumRows() == Math.round(numRows * fraction));
+
+      // sample without replacement
+      ddf2 = ddf.VIEWS.getRandomSample(fraction, false, 123);
+      Assert.assertTrue(ddf2.getNumRows() == Math.round(numRows * fraction));
+    }
+
 
     try {
-      ddf2 = ddf.VIEWS.getRandomSample(-1.0, false, 123);
+      DDF ddf2 = ddf.VIEWS.getRandomSample(-1.0, false, 123);
       Assert.fail("Sample fraction must be >= 0 in sampling without replacement");
     } catch (IllegalArgumentException e) {
       Assert.assertTrue(e.getMessage().contains("Sampling fraction must be from 0 to 1 in sampling without replacement"));
     }
 
     try {
-      ddf2 = ddf.VIEWS.getRandomSample(-1.0, true, 123);
+      DDF ddf2 = ddf.VIEWS.getRandomSample(-1.0, true, 123);
       Assert.fail("Sample fraction must be >= 0 in sampling with replacement");
     } catch (IllegalArgumentException e) {
       Assert.assertTrue(e.getMessage().contains("Sampling fraction must be larger or equal to 0 in sampling with replacement"));
