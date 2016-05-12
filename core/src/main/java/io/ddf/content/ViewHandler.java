@@ -86,15 +86,13 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     DDF projectedDDF = sql2ddf(String.format("SELECT %s FROM %%s", selectedColumns),
         String.format("Unable to project column(s) %s from table %%s", selectedColumns));
     //reserve factor information
-    List<Schema.Column> columns = this.getDDF().getSchema().getColumns();
-    for(Schema.Column column: columns) {
-      if(projectedDDF.getColumn(column.getName()) != null) {
-        Factor<?> factor = column.getOptionalFactor();
-        if(factor != null) {
-          mLog.info(">>> set factor for column " + column.getName());
-          Factor<?> newFactor = projectedDDF.getSchemaHandler().setAsFactor(column.getName());
-          if(factor.getLevels().isPresent()) {newFactor.setLevels(factor.getLevels().get());}
-        }
+    List<Schema.Column> projectedColumns = projectedDDF.getSchema().getColumns();
+    for(Schema.Column column: projectedColumns) {
+      Schema.Column ddfColumn = this.getDDF().getColumn(column.getName());
+      if(ddfColumn.getColumnClass() == Schema.ColumnClass.FACTOR) {
+        mLog.info(">>> set factor for column " + column.getName());
+        Factor<?> newFactor = projectedDDF.getSchemaHandler().setAsFactor(column.getName());
+        if(ddfColumn.getOptionalFactor().getLevels().isPresent()) {newFactor.setLevels(ddfColumn.getOptionalFactor().getLevels().get());}
       }
     }
     return projectedDDF;
@@ -471,7 +469,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
   }
 
 
-  private io.ddf.content.Schema.Column[] selectColumnMetaInfo(List<Column> columns, DDF ddf) {
+  private io.ddf.content.Schema.Column[] selectColumnMetaInfo(List<Column> columns, DDF ddf) throws DDFException {
     int length = columns.size();
     io.ddf.content.Schema.Column[] retObj = new io.ddf.content.Schema.Column[length];
     for (int i = 0; i < length; i++) {
@@ -480,7 +478,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     return retObj;
   }
 
-  private void updateVectorIndex(Expression expression, DDF ddf) {
+  private void updateVectorIndex(Expression expression, DDF ddf) throws DDFException {
     if (expression == null) {
       return;
     }
@@ -502,7 +500,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     }
   }
 
-  protected void updateVectorName(Expression expression, DDF ddf) {
+  protected void updateVectorName(Expression expression, DDF ddf) throws DDFException {
     if (expression == null) {
       return;
     }

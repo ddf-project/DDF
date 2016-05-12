@@ -345,7 +345,7 @@ public abstract class DDF extends ALoggable //
     return this.getSchemaHandler().getSchema();
   }
 
-  public Column getColumn(String column) {
+  public Column getColumn(String column) throws DDFException {
     return this.getSchema().getColumn(column);
   }
 
@@ -950,11 +950,11 @@ public abstract class DDF extends ALoggable //
    * @param columnName
    * @return
    */
-  public int getColumnIndex(String columnName) {
+  public int getColumnIndex(String columnName) throws DDFException {
     return this.getSchema().getColumnIndex(columnName);
   }
 
-  public String getColumnName(int columnIndex) {
+  public String getColumnName(int columnIndex) throws DDFException {
     return this.getSchema().getColumnName(columnIndex);
   }
 
@@ -966,11 +966,11 @@ public abstract class DDF extends ALoggable //
     return this.getSchemaHandler().setAsFactor(columnName);
   }
 
-  public void unsetAsFactor(int columnIndex) {
+  public void unsetAsFactor(int columnIndex) throws DDFException {
     this.getSchemaHandler().unsetAsFactor(columnIndex);
   }
 
-  public void unsetAsFactor(String columnName) {
+  public void unsetAsFactor(String columnName) throws DDFException {
     this.getSchemaHandler().unsetAsFactor(columnName);
   }
 

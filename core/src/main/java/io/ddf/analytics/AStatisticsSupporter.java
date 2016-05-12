@@ -238,7 +238,7 @@ public abstract class AStatisticsSupporter extends ADDFFunctionalGroupHandler im
     return query;
   }
 
-  private String fiveNumHiveFunction(String columnName) {
+  private String fiveNumHiveFunction(String columnName) throws DDFException {
     ColumnType colType = this.getDDF().getColumn(columnName).getType();
 
     if(ColumnType.isIntegral(colType))
