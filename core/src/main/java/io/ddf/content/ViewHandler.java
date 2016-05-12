@@ -36,19 +36,22 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
 
   @Override
   public List<Object[]> getRandomSample(int numSamples, boolean withReplacement, int seed) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public DDF getRandomSampleByNum(int numSamples, boolean withReplacement,
+  public DDF getRandomSampleByNum(long numSamples, boolean withReplacement,
                                   int seed) {
     return null;
   }
 
   @Override
   public DDF getRandomSample(double percent, boolean withReplacement, int seed) {
-    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public DDF getRandomSampleApprox(double percent, boolean withReplacement, int seed) {
     return null;
   }
 
