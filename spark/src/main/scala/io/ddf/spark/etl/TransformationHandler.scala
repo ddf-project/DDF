@@ -149,7 +149,11 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     transformNativeRserve(Array(transformExpression))
   }
 
-  override def transformNativeRserve(transformExpressions: Array[String]): DDF = {
+  override def transformNativeRserve(transformExpression: String, inPlace: java.lang.Boolean): DDF = {
+    transformNativeRserve(Array(transformExpression), inPlace)
+  }
+
+  override def transformNativeRserve(transformExpressions: Array[String], inPlace: java.lang.Boolean): DDF = {
     val dfrdd = mDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
 
     // process each DF partition in R
@@ -205,7 +209,12 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
       newSchema)
     mLog.info(">>>>> adding ddf to manager: " + ddf.getName)
     ddf.getMetaDataHandler.copyFactor(this.getDDF)
-    ddf
+
+    if (inPlace) this.getDDF.updateInplace(ddf) else ddf
+  }
+
+  override def transformNativeRserve(transformExpressions: Array[String]): DDF = {
+    transformNativeRserve(transformExpressions, false)
   }
 
 

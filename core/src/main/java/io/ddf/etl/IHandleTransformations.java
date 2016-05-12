@@ -12,9 +12,15 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
 
   DDF transformScaleStandard() throws DDFException;
 
+  @Deprecated
   DDF transformNativeRserve(String transformExpression);
 
+  DDF transformNativeRserve(String transformExpression, Boolean inPlace);
+
+  @Deprecated
   DDF transformNativeRserve(String[] transformExpression);
+
+  DDF transformNativeRserve(String[] transformExpression, Boolean inPlace);
 
   DDF transformPython(String[] transformFunctions, String[] functionNames,
       String[] destColumns, String[][] sourceColumns) throws DDFException;

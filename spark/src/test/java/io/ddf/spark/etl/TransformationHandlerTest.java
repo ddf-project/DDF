@@ -10,7 +10,6 @@ import io.ddf.etl.TransformationHandler;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.BaseTest;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +38,63 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertNotNull(newddf);
     Assert.assertEquals("newcol", newddf.getColumnName(8));
     Assert.assertEquals(10, res.size());
+  }
+
+  @Test
+  public void testTransformNativeRserveSingleExpressionInPlaceTrue() throws DDFException {
+    Boolean inPlace = Boolean.TRUE;
+    DDF newDdf = ddf.copy();
+    DDF newDdf2 = newDdf.Transform.transformNativeRserve("newcol = deptime / arrtime", inPlace);
+    List<String> res = newDdf2.VIEWS.head(10);
+
+    Assert.assertNotNull(newDdf);
+    Assert.assertNotNull(newDdf2);
+    Assert.assertTrue("With inPlace being true, two DDF should have the same UUID", newDdf.getUUID().equals(newDdf2.getUUID()));
+    Assert.assertEquals("With inPlace being true, original DDF should have newcol added", "newcol", newDdf.getColumnName(8));
+    Assert.assertEquals("transformed DDF newDdf2 should have newcol added", "newcol", newDdf2.getColumnName(8));
+    Assert.assertEquals(10, res.size());
+  }
+
+  @Test
+  public void testTransformNativeRserveSingleExpressionInPlaceFalse() throws DDFException {
+    Boolean inPlace = Boolean.FALSE;
+    DDF newDdf3 = ddf.copy();
+    DDF newDdf4 = newDdf3.Transform.transformNativeRserve("newcol = deptime / arrtime", inPlace);
+
+    Assert.assertNotNull(newDdf3);
+    Assert.assertNotNull(newDdf4);
+    Assert.assertEquals("transformed DDF newDdf4 should have newcol added", "newcol", newDdf4.getColumnName(8));
+    Assert.assertFalse("With inPlace being false, two DDF should have different UUID", newDdf3.getUUID().equals(newDdf4.getUUID()));
+  }
+
+  @Test
+  public void testTransformNativeRserveMultipleExpressionInPlaceTrue() throws DDFException {
+    Boolean inPlace = Boolean.TRUE;
+    String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
+    DDF newDdf = ddf.copy();
+    DDF newDdf2 = newDdf.Transform.transformNativeRserve(expressions, inPlace);
+
+    Assert.assertNotNull(newDdf);
+    Assert.assertNotNull(newDdf2);
+    Assert.assertTrue("With inPlace being true, two DDF should have the same UUID", newDdf.getUUID().equals(newDdf2.getUUID()));
+    Assert.assertEquals("With inPlace being true, original DDF should have newcol added", "newcol", newDdf.getColumnName(8));
+    Assert.assertEquals("With inPlace being true, original DDF should have newcol2 added", "newcol2", newDdf.getColumnName(9));
+    Assert.assertEquals("transformed DDF newDdf2 should have newcol added", "newcol", newDdf2.getColumnName(8));
+    Assert.assertEquals("transformed DDF newDdf2 should have newcol2 added", "newcol2", newDdf2.getColumnName(9));
+  }
+
+  @Test
+  public void testTransformNativeRserveMultipleExpressionInPlaceFalse() throws DDFException {
+    Boolean inPlace = Boolean.FALSE;
+    String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
+    DDF newDdf3 = ddf.copy();
+    DDF newDdf4 = newDdf3.Transform.transformNativeRserve(expressions, inPlace);
+
+    Assert.assertNotNull(newDdf3);
+    Assert.assertNotNull(newDdf4);
+    Assert.assertFalse("With inPlace being false, two DDF should have different UUID", newDdf3.getUUID().equals(newDdf4.getUUID()));
+    Assert.assertEquals("transformed DDF newDdf4 should have newcol added", "newcol", newDdf4.getColumnName(8));
+    Assert.assertEquals("transformed DDF newDdf4 should have newcol2 added", "newcol2", newDdf4.getColumnName(9));
   }
 
   @Test
@@ -486,7 +542,6 @@ public class TransformationHandlerTest extends BaseTest {
     DDF newDDF = ddf.Transform.castType("year", "string");
     assert(newDDF.getUUID() != ddf.getUUID());
     assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
-    assert(ddf.getColumn("year").getType() == ColumnType.STRING);
   }
 
   @Test
@@ -494,5 +549,6 @@ public class TransformationHandlerTest extends BaseTest {
     DDF newDDF = ddf.Transform.castType("year", "string", true);
     assert(newDDF.getUUID() == ddf.getUUID());
     assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
+    assert(ddf.getColumn("year").getType() == ColumnType.STRING);
   }
 }

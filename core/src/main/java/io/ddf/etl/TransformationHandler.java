@@ -82,7 +82,15 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     return null;
   }
 
+  @Override public DDF transformNativeRserve(String transformExpression, Boolean inPlace) {
+    return null;
+  }
+
   @Override public DDF transformNativeRserve(String[] transformExpressions) {
+    return null;
+  }
+
+  @Override public DDF transformNativeRserve(String[] transformExpressions, Boolean inPlace) {
     return null;
   }
 
