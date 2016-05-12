@@ -47,10 +47,11 @@ public class TransformationHandlerTest extends BaseTest {
     DDF newDdf2 = newDdf.Transform.transformNativeRserve("newcol = deptime / arrtime", inPlace);
     List<String> res = newDdf2.VIEWS.head(10);
 
-    Assert.assertNotNull(newDdf2);
     Assert.assertNotNull(newDdf);
+    Assert.assertNotNull(newDdf2);
     Assert.assertTrue("With inPlace being true, two DDF should have the same UUID", newDdf.getUUID().equals(newDdf2.getUUID()));
-    Assert.assertEquals("newcol", newDdf.getColumnName(8));
+    Assert.assertEquals("With inPlace being true, original DDF should have newcol added", "newcol", newDdf.getColumnName(8));
+    Assert.assertEquals("transformed DDF newDdf2 should have newcol added", "newcol", newDdf2.getColumnName(8));
     Assert.assertEquals(10, res.size());
   }
 
@@ -62,6 +63,7 @@ public class TransformationHandlerTest extends BaseTest {
 
     Assert.assertNotNull(newDdf3);
     Assert.assertNotNull(newDdf4);
+    Assert.assertEquals("transformed DDF newDdf4 should have newcol added", "newcol", newDdf4.getColumnName(8));
     Assert.assertFalse("With inPlace being false, two DDF should have different UUID", newDdf3.getUUID().equals(newDdf4.getUUID()));
   }
 
@@ -71,12 +73,14 @@ public class TransformationHandlerTest extends BaseTest {
     String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
     DDF newDdf = ddf.copy();
     DDF newDdf2 = newDdf.Transform.transformNativeRserve(expressions, inPlace);
-    
-    Assert.assertNotNull(newDdf2);
+
     Assert.assertNotNull(newDdf);
+    Assert.assertNotNull(newDdf2);
     Assert.assertTrue("With inPlace being true, two DDF should have the same UUID", newDdf.getUUID().equals(newDdf2.getUUID()));
-    Assert.assertEquals("newcol", newDdf2.getColumnName(8));
-    Assert.assertEquals("newcol2", newDdf2.getColumnName(9));
+    Assert.assertEquals("With inPlace being true, original DDF should have newcol added", "newcol", newDdf.getColumnName(8));
+    Assert.assertEquals("With inPlace being true, original DDF should have newcol2 added", "newcol2", newDdf.getColumnName(9));
+    Assert.assertEquals("transformed DDF newDdf2 should have newcol added", "newcol", newDdf2.getColumnName(8));
+    Assert.assertEquals("transformed DDF newDdf2 should have newcol2 added", "newcol2", newDdf2.getColumnName(9));
   }
 
   @Test
@@ -89,6 +93,8 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertNotNull(newDdf3);
     Assert.assertNotNull(newDdf4);
     Assert.assertFalse("With inPlace being false, two DDF should have different UUID", newDdf3.getUUID().equals(newDdf4.getUUID()));
+    Assert.assertEquals("transformed DDF newDdf4 should have newcol added", "newcol", newDdf4.getColumnName(8));
+    Assert.assertEquals("transformed DDF newDdf4 should have newcol2 added", "newcol2", newDdf4.getColumnName(9));
   }
 
   @Test
