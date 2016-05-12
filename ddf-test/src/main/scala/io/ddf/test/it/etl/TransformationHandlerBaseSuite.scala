@@ -238,4 +238,58 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     transformedDDF2 should not be null
     transformedDDF2.getUUID.equals(ddf.getUUID) should be(true)
   }
+
+  test("test flatten column of array type") {
+    val ddf: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
+    ddf.setMutable(false)
+    val ddfWithArrayTypeColumn: DDF = ddf.Transform.transformUDF("arrCol = array(1.234, 5.678, 9.123)")
+    val flattenedDDF: DDF = ddfWithArrayTypeColumn.Transform.flattenArrayTypeColumn("arrCol")
+
+    flattenedDDF.getNumColumns should be(12)
+    flattenedDDF.getColumnName(8) should be("arrCol")
+    flattenedDDF.getColumnName(9) should be("arrCol_c0")
+
+    val element = flattenedDDF.VIEWS.project("arrCol_c2").VIEWS.head(1).get(0)
+    element.toDouble should be(9.123)
+
+    val ddfWithArrayTypeColumnStr: DDF = ddf.Transform.transformUDF("arrColStr = array('day', 'month', 'year')")
+    val flattenedDDFString: DDF = ddfWithArrayTypeColumnStr.Transform.flattenArrayTypeColumn("arrColStr")
+
+    flattenedDDFString.getNumColumns should be(12)
+    flattenedDDFString.getColumnName(8) should be("arrColStr")
+    flattenedDDFString.getColumnName(9) should be("arrColStr_c0")
+
+    val elementStr = flattenedDDFString.VIEWS.project("arrColStr_c1").VIEWS.head(1).get(0)
+    elementStr should be("month")
+  }
+
+  test("test flatten column of array type inPlace False") {
+    val inPlace = false
+    val ddf: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
+    val ddfWithArrayTypeColumn: DDF = ddf.Transform.transformUDF("arrCol = array(1.234, 5.678, 9.123)")
+    val flattenedDDF: DDF = ddfWithArrayTypeColumn.Transform.flattenArrayTypeColumn("arrCol", inPlace)
+
+    ddfWithArrayTypeColumn should not be null
+    ddfWithArrayTypeColumn should not be null
+    ddfWithArrayTypeColumn.getUUID should not equal flattenedDDF.getUUID
+    flattenedDDF.getColumnName(8) should be("arrCol")
+    flattenedDDF.getColumnName(9) should be("arrCol_c0")
+    flattenedDDF.getColumnName(10) should be("arrCol_c1")
+    flattenedDDF.getColumnName(11) should be("arrCol_c2")
+  }
+
+  test("test flatten column of array type inPlace True") {
+    val inPlace = true
+    val ddf: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
+    val ddfWithArrayTypeColumn: DDF = ddf.Transform.transformUDF("arrCol = array(1.234, 5.678, 9.123)")
+    val flattenedDDF: DDF = ddfWithArrayTypeColumn.Transform.flattenArrayTypeColumn("arrCol", inPlace)
+
+    ddfWithArrayTypeColumn should not be null
+    ddfWithArrayTypeColumn should not be null
+    ddfWithArrayTypeColumn.getUUID should equal(flattenedDDF.getUUID)
+    flattenedDDF.getColumnName(8) should be("arrCol")
+    flattenedDDF.getColumnName(9) should be("arrCol_c0")
+    flattenedDDF.getColumnName(10) should be("arrCol_c1")
+    flattenedDDF.getColumnName(11) should be("arrCol_c2")
+  }
 }

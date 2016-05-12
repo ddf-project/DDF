@@ -129,16 +129,34 @@ public class TransformFacade implements IHandleTransformations {
     return mTransformationHandler.transformUDFWithNames(newColumnNames, transformExpressions, selectedColumns, inPlace);
   }
 
+  @Override
   public DDF flattenDDF(String[] columns) throws DDFException {
-    return flattenDDF(columns);
+    return mTransformationHandler.flattenDDF(columns);
   }
 
+  @Override
   public DDF flattenDDF() throws DDFException {
-    return flattenDDF();
+    return mTransformationHandler.flattenDDF();
   }
 
+  @Override
   public DDF flattenArrayTypeColumn(String colName) throws DDFException {
     return mTransformationHandler.flattenArrayTypeColumn(colName);
+  }
+
+  @Override
+  public DDF flattenDDF(String[] columns, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.flattenDDF(columns, inPlace);
+  }
+
+  @Override
+  public DDF flattenDDF(Boolean inPlace) throws DDFException {
+    return mTransformationHandler.flattenDDF(inPlace);
+  }
+
+  @Override
+  public DDF flattenArrayTypeColumn(String colName, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.flattenArrayTypeColumn(colName, inPlace);
   }
 
   public DDF factorIndexer(List<String> columns) throws DDFException {

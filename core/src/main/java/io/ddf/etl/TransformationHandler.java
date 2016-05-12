@@ -105,12 +105,25 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override public DDF flattenDDF() {
-    return flattenDDF(null);
+    return this.flattenDDF(new String[0]);
   }
 
-
+  @Override
   public DDF flattenArrayTypeColumn(String colName) throws DDFException {
-    StringBuffer newCols = new StringBuffer();
+    return flattenArrayTypeColumn(colName, Boolean.FALSE);
+  }
+
+  @Override public DDF flattenDDF(String[] columns, Boolean inPlace) {
+    return null;
+  }
+
+  @Override public DDF flattenDDF(Boolean inPlace) {
+    return this.flattenDDF(new String[0], inPlace);
+  }
+
+  @Override
+  public DDF flattenArrayTypeColumn(String colName, Boolean inPlace) throws DDFException {
+    StringBuilder newCols = new StringBuilder();
     Column arrCol = this.getDDF().getColumn(colName);
     if (arrCol.getType() != ColumnType.ARRAY) {
       throw new DDFException("Column to be flattened must be an array");
@@ -128,7 +141,12 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     String sqlCmd = String.format("SELECT *, %s FROM @this", newCols.toString());
     DDF newddf = this.getDDF().sql2ddf(sqlCmd);
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
-    return newddf;
+
+    if(inPlace) {
+      return this.getDDF().updateInplace(newddf);
+    } else {
+      return newddf;
+    }
   }
 
   public synchronized DDF transformUDF(String RExprs, List<String> columns) throws DDFException {

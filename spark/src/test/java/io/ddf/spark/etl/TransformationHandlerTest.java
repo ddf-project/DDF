@@ -139,34 +139,6 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(8, newddf1.getSummary().length);
   }
 
-  @Test
-  public void testFlattenArrayTypeColumn() throws DDFException {
-
-    ddf.setMutable(false);
-    
-    // flatten ArrayType column with numeric elements
-    DDF ddfWithArrayTypeColumn = ddf.Transform.transformUDF("arrCol = array(1.234, 5.678, 9.123)");
-    DDF flattened_ddf = ddfWithArrayTypeColumn.Transform.flattenArrayTypeColumn("arrCol");
-
-    Assert.assertEquals(12, flattened_ddf.getNumColumns());
-    Assert.assertEquals("arrCol", flattened_ddf.getColumnName(8));
-    Assert.assertEquals("arrCol_c0", flattened_ddf.getColumnName(9));
-
-    String element = flattened_ddf.VIEWS.project("arrCol_c2").VIEWS.head(1).get(0);
-    Assert.assertEquals(9.123, Double.parseDouble(element), 1e-5);
-
-    // flatten ArrayType column with string elements
-    DDF ddfWithArrayTypeColumnStr = ddf.Transform.transformUDF("arrColStr = array('day', 'month', 'year')");
-    DDF flattened_ddf_str = ddfWithArrayTypeColumnStr.Transform.flattenArrayTypeColumn("arrColStr");
-
-    Assert.assertEquals(12, flattened_ddf_str.getNumColumns());
-    Assert.assertEquals("arrColStr", flattened_ddf_str.getColumnName(8));
-    Assert.assertEquals("arrColStr_c0", flattened_ddf_str.getColumnName(9));
-
-    String elementStr = flattened_ddf_str.VIEWS.project("arrColStr_c1").VIEWS.head(1).get(0);
-    Assert.assertEquals("month", elementStr);
-  }
-
   @Ignore
   public void testTransformMapReduceNative() throws DDFException {
     // aggregate sum of month group by year
