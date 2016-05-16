@@ -68,7 +68,9 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     }
 
     if (!withReplacement) {
-      mDDF.getSqlHandler.sql2ddf(s"select * from ${mDDF.getSchema.getTableName} order by rand($seed) limit $numSamples")
+      // This subquery is a workaround for Spark's inability to order rows by rand(<negative_seed>)
+      // Example: select * from table order by rand(-123)
+      mDDF.getSqlHandler.sql2ddf(s"select ${mDDF.getColumnNames.mkString(",")} from (select *, rand($seed) as rnd from ${mDDF.getSchema.getTableName}) t order by rnd limit $numSamples")
     } else {
 
       val numRows = mDDF.getNumRows
