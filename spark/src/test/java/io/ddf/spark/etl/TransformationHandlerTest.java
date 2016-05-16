@@ -3,21 +3,26 @@ package io.ddf.spark.etl;
 
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
+import io.ddf.DDFManager;
 import io.ddf.analytics.Summary;
 import io.ddf.content.Schema;
 import io.ddf.content.Schema.ColumnType;
+import io.ddf.datasource.*;
 import io.ddf.etl.TransformationHandler;
 import io.ddf.exception.DDFException;
+import io.ddf.s3.S3DDF;
+import io.ddf.s3.S3DDFManager;
 import io.ddf.spark.BaseTest;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TransformationHandlerTest extends BaseTest {
   private DDF ddf;
-
+  private S3DDFManager s3DDFManager;
 
   @Before
   public void setUp() throws Exception {
@@ -26,6 +31,12 @@ public class TransformationHandlerTest extends BaseTest {
     createTableAirlineBigInt();
     ddf = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, " +
             "distance, arrdelay, depdelay from airline", "SparkSQL");
+
+    S3DataSourceDescriptor s3dsd = new S3DataSourceDescriptor(new S3DataSourceURI("ada-demo-data/sleep_data_sample.json"),
+            new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY")),
+            null,
+            new FileFormat(DataFormat.JSON));
+    s3DDFManager = (S3DDFManager) DDFManager.get(DDFManager.EngineType.S3, s3dsd);
   }
 
   @Test
@@ -466,5 +477,95 @@ public class TransformationHandlerTest extends BaseTest {
     DDF newDDF = ddf.Transform.castType("year", "string", true);
     assert(newDDF.getUUID() == ddf.getUUID());
     assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
+  }
+
+  @Test
+  public void testFlattenDDFAllColumns() throws Exception {
+    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, null);
+    DDF originalDDF = manager.copyFrom(allJsonDDF);
+    DDF flattenedDDF = originalDDF.Transform.flattenDDF();
+
+    Assert.assertNotNull(flattenedDDF);
+    Assert.assertTrue(originalDDF.getColumnNames().size() == 8);
+    Assert.assertTrue(flattenedDDF.getColumnNames().size() == 15);
+    Assert.assertTrue(flattenedDDF.getNumRows() == 100);
+
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("created_at_date"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("uid_oid"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("u_at_date"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("id_oid"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_bookmarkTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realEndTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_isFirstSleepOfDay"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_normalizedSleepQuality"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realDeepSleepTimeInMinutes"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realSleepTimeInMinutes"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realStartTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_sleepStateChanges"));
+  }
+
+  @Test
+  public void testFlattenDDFSingleColumn() throws Exception {
+    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, null);
+    DDF originalDDF = manager.copyFrom(allJsonDDF);
+    DDF flattenedDDF = originalDDF.Transform.flattenDDF(new String[]{"data"});
+
+    Assert.assertNotNull(flattenedDDF);
+    Assert.assertTrue(originalDDF.getColumnNames().size() == 8);
+    Assert.assertTrue(flattenedDDF.getColumnNames().size() == 8);
+    Assert.assertTrue(flattenedDDF.getNumRows() == 100);
+
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_bookmarkTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realEndTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_isFirstSleepOfDay"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_normalizedSleepQuality"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realDeepSleepTimeInMinutes"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realSleepTimeInMinutes"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realStartTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_sleepStateChanges"));
+  }
+
+  @Test
+  public void testFlattenDDFInPlaceFalse() throws Exception {
+    Boolean inPlace = Boolean.FALSE;
+    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, null);
+    DDF originalDDF = manager.copyFrom(allJsonDDF);
+    DDF flattenedDDF = originalDDF.Transform.flattenDDF(new String[]{"data"}, inPlace);
+
+    Assert.assertNotNull(originalDDF);
+    Assert.assertNotNull(flattenedDDF);
+    Assert.assertNotSame("inPlace FALSE, two DDF should have different UUID", originalDDF.getUUID(), flattenedDDF.getUUID());
+
+    Assert.assertTrue(flattenedDDF.getColumnNames().size() == 8);
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_bookmarkTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realEndTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_isFirstSleepOfDay"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_normalizedSleepQuality"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realDeepSleepTimeInMinutes"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realSleepTimeInMinutes"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realStartTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_sleepStateChanges"));
+  }
+
+  @Test
+  public void testFlattenDDFInPlaceTrue() throws Exception {
+    Boolean inPlace = Boolean.TRUE;
+    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, null);
+    DDF originalDDF = manager.copyFrom(allJsonDDF);
+    DDF flattenedDDF = originalDDF.Transform.flattenDDF(new String[]{"data"}, inPlace);
+
+    Assert.assertNotNull(originalDDF);
+    Assert.assertNotNull(flattenedDDF);
+    Assert.assertEquals("inPlace TRUE, two DDF should have same UUID", originalDDF.getUUID(), flattenedDDF.getUUID());
+
+    Assert.assertTrue(flattenedDDF.getColumnNames().size() == 8);
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_bookmarkTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realEndTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_isFirstSleepOfDay"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_normalizedSleepQuality"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realDeepSleepTimeInMinutes"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realSleepTimeInMinutes"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_realStartTime"));
+    Assert.assertTrue(flattenedDDF.getColumnNames().contains("data_sleepStateChanges"));
   }
 }
