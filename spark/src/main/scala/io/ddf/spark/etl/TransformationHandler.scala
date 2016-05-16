@@ -36,10 +36,18 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
 
 
   override def flattenDDF(): DDF = {
-    flattenDDF(null)
+    flattenDDF(Array.empty[String])
   }
 
   override def flattenDDF(selectedColumns: Array[String]): DDF = {
+    flattenDDF(selectedColumns, java.lang.Boolean.FALSE)
+  }
+
+  override def flattenDDF(inPlace: java.lang.Boolean): DDF = {
+    flattenDDF(Array.empty[String], java.lang.Boolean.FALSE)
+  }
+
+  override def flattenDDF(selectedColumns: Array[String], inPlace: java.lang.Boolean): DDF = {
     val df: DataFrame = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     val flattenedColumns: Array[String] = SparkUtils.flattenColumnNamesFromDataFrame(df, selectedColumns)
 
@@ -55,14 +63,10 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     }
 
     val selectClause = selectColumns.mkString(",")
-    //val q = String.format("select %s from %s", selectClause, mDDF.getTableName)
     val q = s"select $selectClause from @this"
-
-    //println("Query: \n" + q)
-
     val result = mDDF.sql2ddf(q)
-    //println("Resulted DDF's columns: " + result.getColumnNames)
-    result
+
+    if (inPlace) this.getDDF.updateInplace(result) else result
   }
 
   override def transformUDFWithNames(newColumnNames: Array[String], transformExpressions: Array[String], selectedColumns: Array[String]): DDF = {

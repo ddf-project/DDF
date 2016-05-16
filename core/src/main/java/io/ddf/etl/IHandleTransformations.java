@@ -76,11 +76,20 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
   DDF transformUDFWithNames(String[] newColumnNames, String[] transformExpressions,
       String[] selectedColumns, Boolean inPlace) throws DDFException;
 
+  @Deprecated
   DDF flattenDDF(String[] columns) throws DDFException;
 
+  @Deprecated
   DDF flattenDDF() throws DDFException;
 
+  @Deprecated
   DDF flattenArrayTypeColumn(String colName) throws DDFException;
+
+  DDF flattenDDF(String[] columns, Boolean inPlace) throws DDFException;
+
+  DDF flattenDDF(Boolean inPlace) throws DDFException;
+
+  DDF flattenArrayTypeColumn(String colName, Boolean inPlace) throws DDFException;
 
   DDF factorIndexer(List<String> columns) throws DDFException;
 
