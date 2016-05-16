@@ -270,7 +270,6 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     val flattenedDDF: DDF = ddfWithArrayTypeColumn.Transform.flattenArrayTypeColumn("arrCol", inPlace)
 
     ddfWithArrayTypeColumn should not be null
-    ddfWithArrayTypeColumn should not be null
     ddfWithArrayTypeColumn.getUUID should not equal flattenedDDF.getUUID
     flattenedDDF.getColumnName(8) should be("arrCol")
     flattenedDDF.getColumnName(9) should be("arrCol_c0")
@@ -283,8 +282,7 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     val ddf: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
     val ddfWithArrayTypeColumn: DDF = ddf.Transform.transformUDF("arrCol = array(1.234, 5.678, 9.123)")
     val flattenedDDF: DDF = ddfWithArrayTypeColumn.Transform.flattenArrayTypeColumn("arrCol", inPlace)
-
-    ddfWithArrayTypeColumn should not be null
+    
     ddfWithArrayTypeColumn should not be null
     ddfWithArrayTypeColumn.getUUID should equal(flattenedDDF.getUUID)
     flattenedDDF.getColumnName(8) should be("arrCol")
