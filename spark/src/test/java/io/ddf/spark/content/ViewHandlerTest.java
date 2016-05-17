@@ -8,7 +8,7 @@ import io.ddf.content.ViewHandler;
 import io.ddf.content.ViewHandler.*;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.BaseTest;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
@@ -126,11 +126,23 @@ public class ViewHandlerTest extends BaseTest{
     for(long sampleSize: sampleSizes) {
       // sample with replacement
       DDF randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, true, 123);
-      Assert.assertTrue(randomSample.getNumRows() == sampleSize);
+      Assert.assertArrayEquals(randomSample.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertEquals(randomSample.getNumRows(), sampleSize);
+
+      // sample with replacement and negative seed
+      randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, true, -123);
+      Assert.assertArrayEquals(randomSample.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertEquals(randomSample.getNumRows(), sampleSize);
 
       // sample without replacement
       randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, false, 123);
-      Assert.assertTrue(randomSample.getNumRows() == sampleSize);
+      Assert.assertArrayEquals(randomSample.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertEquals(randomSample.getNumRows(), sampleSize);
+
+      // sample without replacement with negative seed
+      randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, false, -123);
+      Assert.assertArrayEquals(randomSample.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertEquals(randomSample.getNumRows(), sampleSize);
     }
 
     try {
@@ -153,10 +165,22 @@ public class ViewHandlerTest extends BaseTest{
     for(double fraction: fractions) {
       // sample with replacement
       DDF ddf2 = ddf.VIEWS.getRandomSample(fraction, true, 123);
+      Assert.assertArrayEquals(ddf2.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertTrue(ddf2.getNumRows() == Math.round(numRows * fraction));
+
+      // sample with replacement with negative seed
+      ddf2 = ddf.VIEWS.getRandomSample(fraction, true, -123);
+      Assert.assertArrayEquals(ddf2.getColumnNames().toArray(), ddf.getColumnNames().toArray());
       Assert.assertTrue(ddf2.getNumRows() == Math.round(numRows * fraction));
 
       // sample without replacement
       ddf2 = ddf.VIEWS.getRandomSample(fraction, false, 123);
+      Assert.assertArrayEquals(ddf2.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertTrue(ddf2.getNumRows() == Math.round(numRows * fraction));
+
+      // sample without replacement with negative seed
+      ddf2 = ddf.VIEWS.getRandomSample(fraction, true, -123);
+      Assert.assertArrayEquals(ddf2.getColumnNames().toArray(), ddf.getColumnNames().toArray());
       Assert.assertTrue(ddf2.getNumRows() == Math.round(numRows * fraction));
     }
 
