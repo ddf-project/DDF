@@ -5,6 +5,8 @@ package io.ddf.spark.etl;
 
 
 import io.ddf.DDF;
+import io.ddf.SqlTraverser;
+import io.ddf.TableVisitor;
 import io.ddf.content.Schema;
 import io.ddf.content.SqlTypedCell;
 import io.ddf.content.SqlTypedResult;
@@ -17,7 +19,8 @@ import io.ddf.exception.DDFException;
 import io.ddf.spark.SparkDDFManager;
 import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.util.SparkUtils;
-import org.apache.avro.generic.GenericData;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.statement.select.Select;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
@@ -27,7 +30,11 @@ import scala.collection.Seq;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-//import org.apache.hadoop.hive.ql.metadata.HiveException;
+
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 
 /**
  */
@@ -184,6 +191,38 @@ public class SqlHandler extends ASqlHandler {
     }
 
     return new SqlTypedResult(schema, sqlTypedResult);
+  }
+
+  @Override
+  protected String handleSqlExpression(String sql) throws DDFException {
+    class SqlExpressionMapper extends SqlTraverser {
+      @Override
+      public void visit(Function function) throws Exception {
+        ExpressionList expressionList = function.getParameters();
+        if (function.getName().equals("median")) {
+          function.setName("percentile");
+          expressionList.getExpressions().add(new DoubleValue("0.5"));
+        } else if (function.getName().equals("median_approx")) {
+          function.setName("percentile_approx");
+          expressionList.getExpressions().add(new DoubleValue("0.5"));
+        }
+        super.visit(function);
+      }
+    }
+
+    try {
+
+      Select select = (Select)CCJSqlParserUtil.parse(sql);
+      select.getSelectBody().accept(new SqlExpressionMapper());
+      return select.toString();
+
+    } catch (JSQLParserException jpe) {
+      throw new DDFException("Error parsing the sql", jpe);
+    } catch (Exception e) {
+      throw new DDFException("Error parsing the sql", e);
+    }
+
+
   }
 
 }
