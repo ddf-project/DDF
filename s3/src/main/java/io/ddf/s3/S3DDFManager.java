@@ -277,7 +277,7 @@ public class S3DDFManager extends DDFManager {
 
   @Override
   public String getSourceUri() {
-    return "s3n://" + mCredential.getAwsKeyID() + "/" + mCredential.getAwsScretKey();
+    return "s3n://" + mCredential.getAwsKeyID() + ":" + mCredential.getAwsScretKey();
 
   }
 
