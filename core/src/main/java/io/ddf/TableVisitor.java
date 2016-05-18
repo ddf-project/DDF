@@ -39,106 +39,106 @@ import java.util.List;
  */
 public class TableVisitor extends SqlTraverser {
 
-    protected List<String> withTableNameList = new ArrayList<String>();
-    protected List<String> aliasTableNameList = new ArrayList<>();
+  protected List<String> withTableNameList = new ArrayList<String>();
+  protected List<String> aliasTableNameList = new ArrayList<>();
 
-    /**
-     * @brief The following functions override functions of the interfaces.
-     */
-    @Override
-    public void visit(PlainSelect plainSelect) throws Exception {
-        if (plainSelect.getFromItem() != null) {
-            if (plainSelect.getFromItem().getAlias() != null) {
-                this.aliasTableNameList.add(plainSelect.getFromItem()
-                        .getAlias().getName());
-            }
-            plainSelect.getFromItem().accept(this);
-        }
-
-        if (plainSelect.getJoins() != null) {
-            for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
-                Join join = (Join) joinsIt.next();
-                if (join.getRightItem().getAlias() != null) {
-                    this.aliasTableNameList.add(join.getRightItem().getAlias
-                            ().getName());
-                }
-                if (join.getOnExpression() != null) {
-                    join.getOnExpression().accept(this);
-                }
-                join.getRightItem().accept(this);
-            }
-        }
-
-        // Select selectItem From fromItem, joinItem Where whereClause.
-        if (plainSelect.getSelectItems() != null) {
-            for (SelectItem selectItem : plainSelect.getSelectItems()) {
-                selectItem.accept(this);
-            }
-        }
-
-
-        if (plainSelect.getWhere() != null) {
-            plainSelect.getWhere().accept(this);
-	    }
-
-	    if (plainSelect.getGroupByColumnReferences() != null) {
-            for (Iterator groupByIt = plainSelect.getGroupByColumnReferences().iterator();
-                 groupByIt.hasNext(); ) {
-                Expression groupBy = (Expression) groupByIt.next();
-                groupBy.accept(this);
-            }
-        }
-
-        if (plainSelect.getClusterByElements() != null) {
-            for (Iterator clusterByit = plainSelect.getClusterByElements().iterator();
-                 clusterByit.hasNext(); ) {
-                ClusterByElement clusterByElement = (ClusterByElement) clusterByit.next();
-                visit(clusterByElement);
-            }
-        }
-
-        if (plainSelect.getDistributeByElements() != null) {
-            for (Iterator distributeByIt = plainSelect.getDistributeByElements().iterator();
-                    distributeByIt.hasNext();) {
-                DistributeByElement distributeByElement = (DistributeByElement) distributeByIt.next();
-                visit(distributeByElement);
-            }
-        }
-
-        if (plainSelect.getOrderByElements() != null) {
-            for (Iterator orderByIt = plainSelect.getOrderByElements().iterator();
-                 orderByIt.hasNext(); ) {
-                OrderByElement orderByElement = (OrderByElement) orderByIt.next();
-                orderByElement.accept(this);
-            }
-        }
-
-        if (plainSelect.getSortByElements() != null) {
-            for (Iterator sortByIt = plainSelect.getSortByElements().iterator();
-                    sortByIt.hasNext();) {
-                SortByElement sortByElement = (SortByElement) sortByIt.next();
-                visit(sortByElement);
-            }
-        }
-
-        if (plainSelect.getHaving() != null) {
-            plainSelect.getHaving().accept(this);
-        }
+  /**
+   * @brief The following functions override functions of the interfaces.
+   */
+  @Override
+  public void visit(PlainSelect plainSelect) throws Exception {
+    if (plainSelect.getFromItem() != null) {
+      if (plainSelect.getFromItem().getAlias() != null) {
+        this.aliasTableNameList.add(plainSelect.getFromItem()
+                .getAlias().getName());
+      }
+      plainSelect.getFromItem().accept(this);
     }
 
-    @Override
-    public void visit(WithItem withItem) throws Exception {
-        // TODO: Redo this later. What's withItem list.
-        // Add with name here.
-        if (withItem.getName() != null) {
-            this.withTableNameList.add(withItem.getName());
+    if (plainSelect.getJoins() != null) {
+      for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext(); ) {
+        Join join = (Join) joinsIt.next();
+        if (join.getRightItem().getAlias() != null) {
+          this.aliasTableNameList.add(join.getRightItem().getAlias
+                  ().getName());
         }
-        withItem.getSelectBody().accept(this);
-        if (withItem.getWithItemList() != null) {
-            for (SelectItem selectItem : withItem.getWithItemList()) {
-                selectItem.accept(this);
-            }
+        if (join.getOnExpression() != null) {
+          join.getOnExpression().accept(this);
         }
+        join.getRightItem().accept(this);
+      }
     }
+
+    // Select selectItem From fromItem, joinItem Where whereClause.
+    if (plainSelect.getSelectItems() != null) {
+      for (SelectItem selectItem : plainSelect.getSelectItems()) {
+        selectItem.accept(this);
+      }
+    }
+
+
+    if (plainSelect.getWhere() != null) {
+      plainSelect.getWhere().accept(this);
+    }
+
+    if (plainSelect.getGroupByColumnReferences() != null) {
+      for (Iterator groupByIt = plainSelect.getGroupByColumnReferences().iterator();
+           groupByIt.hasNext(); ) {
+        Expression groupBy = (Expression) groupByIt.next();
+        groupBy.accept(this);
+      }
+    }
+
+    if (plainSelect.getClusterByElements() != null) {
+      for (Iterator clusterByit = plainSelect.getClusterByElements().iterator();
+           clusterByit.hasNext(); ) {
+        ClusterByElement clusterByElement = (ClusterByElement) clusterByit.next();
+        visit(clusterByElement);
+      }
+    }
+
+    if (plainSelect.getDistributeByElements() != null) {
+      for (Iterator distributeByIt = plainSelect.getDistributeByElements().iterator();
+           distributeByIt.hasNext(); ) {
+        DistributeByElement distributeByElement = (DistributeByElement) distributeByIt.next();
+        visit(distributeByElement);
+      }
+    }
+
+    if (plainSelect.getOrderByElements() != null) {
+      for (Iterator orderByIt = plainSelect.getOrderByElements().iterator();
+           orderByIt.hasNext(); ) {
+        OrderByElement orderByElement = (OrderByElement) orderByIt.next();
+        orderByElement.accept(this);
+      }
+    }
+
+    if (plainSelect.getSortByElements() != null) {
+      for (Iterator sortByIt = plainSelect.getSortByElements().iterator();
+           sortByIt.hasNext(); ) {
+        SortByElement sortByElement = (SortByElement) sortByIt.next();
+        visit(sortByElement);
+      }
+    }
+
+    if (plainSelect.getHaving() != null) {
+      plainSelect.getHaving().accept(this);
+    }
+  }
+
+  @Override
+  public void visit(WithItem withItem) throws Exception {
+    // TODO: Redo this later. What's withItem list.
+    // Add with name here.
+    if (withItem.getName() != null) {
+      this.withTableNameList.add(withItem.getName());
+    }
+    withItem.getSelectBody().accept(this);
+    if (withItem.getWithItemList() != null) {
+      for (SelectItem selectItem : withItem.getWithItemList()) {
+        selectItem.accept(this);
+      }
+    }
+  }
 
 }
