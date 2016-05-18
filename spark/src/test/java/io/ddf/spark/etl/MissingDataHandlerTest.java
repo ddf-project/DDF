@@ -46,6 +46,14 @@ public class MissingDataHandlerTest extends BaseTest {
     Assert.assertEquals(282, newddf.aggregate("year, sum(LateAircraftDelay)").get("2008")[0], 0.1);
     Assert.assertEquals(301, ddf1.fillNA("1").aggregate("year, sum(LateAircraftDelay)").get("2008")[0], 0.1);
 
+    // test invalid numeric value
+    try {
+      newddf = ddf1.fillNA("aaa");
+      Assert.fail("Should not go here");
+    } catch (DDFException e) {
+      Assert.assertTrue(e.getMessage().equals("aaa is not a valid numeric value while year is a(n) int column"));
+    }
+
     // test fill by aggregate function
     ddf1.getMissingDataHandler().fillNA(null, null, 0, AggregateFunction.MEAN, null, null);
 

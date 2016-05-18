@@ -10,6 +10,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.types.AggregateTypes.AggregateFunction;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -174,6 +175,10 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
         if (!Strings.isNullOrEmpty(value)) { // fill by value
 
           if (this.getDDF().getColumn(col).isNumeric()) {
+            // check to see if value is a numeric string or not
+            if (!StringUtils.isNumeric(value)) {
+              throw new DDFException(String.format("%s is not a valid numeric value while %s is a(n) %s column", value, col, this.getDDF().getColumn(col).getType().toString().toLowerCase()));
+            }
             caseCmd.append(fillNACaseSql(col, value));
           } else {
             caseCmd.append(fillNACaseSql(col, String.format("'%s'", value)));
