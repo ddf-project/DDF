@@ -154,6 +154,41 @@ public class ViewHandlerTest extends BaseTest{
   }
 
   @Test
+  public void testSampleWithSizeToDDFWithFactors() throws DDFException {
+    createTableAirline();
+
+    DDF ddf = manager.sql2ddf("select * from airline", "SparkSQL");
+    ddf.setAsFactor(2);
+    long[] sampleSizes = {0, 2, ddf.getNumRows()};
+
+    for(long sampleSize: sampleSizes) {
+      // sample with replacement
+      DDF randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, true, 123);
+      Assert.assertArrayEquals(randomSample.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertEquals(randomSample.getNumRows(), sampleSize);
+      Assert.assertTrue(randomSample.getSchemaHandler().getColumns().get(2).getColumnClass() == Schema.ColumnClass.FACTOR);
+
+      // sample with replacement and negative seed
+      randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, true, -123);
+      Assert.assertArrayEquals(randomSample.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertEquals(randomSample.getNumRows(), sampleSize);
+      Assert.assertTrue(randomSample.getSchemaHandler().getColumns().get(2).getColumnClass() == Schema.ColumnClass.FACTOR);
+
+      // sample without replacement
+      randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, false, 123);
+      Assert.assertArrayEquals(randomSample.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertEquals(randomSample.getNumRows(), sampleSize);
+      Assert.assertTrue(randomSample.getSchemaHandler().getColumns().get(2).getColumnClass() == Schema.ColumnClass.FACTOR);
+
+      // sample without replacement with negative seed
+      randomSample = ddf.VIEWS.getRandomSampleByNum(sampleSize, false, -123);
+      Assert.assertArrayEquals(randomSample.getColumnNames().toArray(), ddf.getColumnNames().toArray());
+      Assert.assertEquals(randomSample.getNumRows(), sampleSize);
+      Assert.assertTrue(randomSample.getSchemaHandler().getColumns().get(2).getColumnClass() == Schema.ColumnClass.FACTOR);
+    }
+  }
+
+  @Test
   public void testSampleWithFraction() throws DDFException {
     createTableAirline();
 
