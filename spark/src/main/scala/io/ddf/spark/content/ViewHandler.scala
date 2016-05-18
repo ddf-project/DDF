@@ -67,13 +67,14 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       throw new IllegalArgumentException("Number of samples must be larger than or equal to 0")
     }
 
-    if (!withReplacement) {
+    val sampleDDF = if (!withReplacement) {
       if (seed >= 0) {
         mDDF.getSqlHandler.sql2ddf(s"select * from ${mDDF.getSchema.getTableName} order by rand($seed) limit $numSamples")
       } else {
         // This is a workaround to deal with Spark's inability to order rows by rand(<negative_seed>)
         // Example: select * from table order by rand(-123)
-        mDDF.getSqlHandler.sql2ddf(s"select ${mDDF.getColumnNames.mkString(",")} from (select *, rand($seed) as rnd from ${mDDF.getSchema.getTableName}) t order by rnd limit $numSamples")
+        mDDF.getSqlHandler.sql2ddf(s"select ${mDDF.getColumnNames.mkString(",")} from " +
+          s"(select *, rand($seed) as rnd from ${mDDF.getSchema.getTableName}) t order by rnd limit $numSamples")
       }
     } else {
 
@@ -85,13 +86,11 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       val manager = this.getManager
       val schema: Schema = new Schema(null,
         JavaConverters.asScalaBufferConverter(mDDF.getSchema.getColumns).asScala.toArray)
-      val sampleDDF = manager.newDDF(sampledRDD, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
-
-      // Copy Factor info
-      sampleDDF.getMetaDataHandler.copyFactor(mDDF)
-
-      sampleDDF
+      manager.newDDF(sampledRDD, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
     }
+    // Copy Factor info
+    sampleDDF.getMetaDataHandler.copyFactor(mDDF)
+    sampleDDF
   }
 
   override def getRandomSample(numSamples: Int, withReplacement: Boolean, seed: Int): java.util.List[Array[Object]] = {
