@@ -618,10 +618,10 @@ public class SparkDDFManager extends DDFManager {
     StructType stringSchema = SparkUtils.str2SparkSchema(tmpStringSchema);
 
     CsvParser csvParser = new CsvParser().withSchema(stringSchema).withOptions(Utils.toScalaMap(csvOptions));
-    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfAndPStats = csvParser.csvFileWithStats(getHiveContext(), source);
+    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfAndPStats = csvParser.csvFileWithStats(getHiveContext(), source,numHeadRows);
 
     SparkDDF tmpStringDDF = new SparkDDF(this, dfAndPStats._1(), null, null);
-    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> dfWithCStats = ((SchemaHandler) tmpStringDDF.getSchemaHandler()).applySchema(requiredSchema, applySchemaMode,numHeadRows);
+    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> dfWithCStats = ((SchemaHandler) tmpStringDDF.getSchemaHandler()).applySchema(requiredSchema, applySchemaMode,0);
     return new Tuple3<>(dfWithCStats._1(),dfAndPStats._2(),dfWithCStats._2());
   }
 
@@ -645,9 +645,9 @@ public class SparkDDFManager extends DDFManager {
     String tmpStringSchema = StringUtils.join(requiredSchema.getColumnNames(), " String,") + " String";
     StructType stringSchema = SparkUtils.str2SparkSchema(tmpStringSchema);
     CsvParser csvParser = new CsvParser().withSchema(stringSchema).withOptions(Utils.<String,String>toScalaMap(csvOptions));
-    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfWithStats = csvParser.csvFileWithStats(getHiveContext(), source);
+    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfWithStats = csvParser.csvFileWithStats(getHiveContext(), source,nHeadRow);
 
-    DataFrame df = dfWithStats._1().limit(nHeadRow);
+    DataFrame df = dfWithStats._1();
     df.count();
     SparkDDF ddf = (SparkDDF) SparkUtils.df2ddf(df,this);
 

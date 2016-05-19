@@ -359,5 +359,4 @@ public class SparkDDFManagerTests extends BaseTest {
     Assert.assertEquals(ddfAndStats._2().getNumLengthenRows() + ddfAndStats._2().getNumShortenRows(),2);
 
   }
-
 }
