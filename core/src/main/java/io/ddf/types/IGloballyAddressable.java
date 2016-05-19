@@ -24,5 +24,7 @@ public interface IGloballyAddressable {
 
   String getUri();
 
-  String getGlobalObjectType();
+  default String getGlobalObjectType() {
+    return this.getClass().getSimpleName();
+  }
 }
