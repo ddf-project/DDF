@@ -15,7 +15,7 @@ import org.slf4j.{Logger, LoggerFactory}
 @RunWith(classOf[JUnitRunner])
 abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
   val LOG: Logger = LoggerFactory.getLogger(this.getClass())
-  val manager = DDFManager.get(DDFManager.EngineType.SPARK).asInstanceOf[SparkDDFManager]
+  val manager = ATestSuite.manager
 
   def truncate(x: Double, n: Int) = {
     def p10(n: Int, pow: Long = 10): Long = if (n == 0) pow else p10(n - 1, pow * 10)
@@ -175,6 +175,10 @@ abstract class ATestSuite extends FunSuite with BeforeAndAfterEach with BeforeAn
       "INTO TABLE airlineWithNA", "SparkSQL")
   }
 
+}
+
+object ATestSuite {
+  val manager = DDFManager.get(DDFManager.EngineType.SPARK).asInstanceOf[SparkDDFManager]
 }
 
 /**

@@ -1,10 +1,14 @@
 package io.ddf.types;
 
 import com.google.common.base.Strings;
+import io.ddf.misc.Config;
 
 import java.util.UUID;
 
 public abstract class AGloballyAddressable implements IGloballyAddressable {
+
+  private String nameSpace = Config.getConfigHandler().getSection(Config.ConfigConstant.SECTION_GLOBAL.toString())
+      .get("nameSpace");
 
   protected UUID uuid =  UUID.randomUUID();
 
@@ -24,6 +28,16 @@ public abstract class AGloballyAddressable implements IGloballyAddressable {
 
   public String getName() {
     return this.name;
+  }
+
+  @Override
+  public void setNamespace(String nameSpace) {
+    this.nameSpace = nameSpace;
+  }
+
+  @Override
+  public String getNamespace() {
+    return this.nameSpace;
   }
 
   public static String getUri(IGloballyAddressable obj) {
