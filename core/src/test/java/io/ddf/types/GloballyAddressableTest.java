@@ -8,13 +8,13 @@ import io.ddf.DDFManager;
  */
 public class GloballyAddressableTest {
 
-  public class MyClass extends GloballyAddressable {
+  public class MyClass extends AGloballyAddressable {
 
   }
 
   @Test
   public void testGloballyAddressable() throws DDFException {
-    GloballyAddressable instance = new MyClass();
+    IGloballyAddressable instance = new MyClass();
     instance.setName("myName");
     Assert.assertEquals(instance.getNamespace(), "adatao");
     Assert.assertEquals(instance.getName(), "myName");
