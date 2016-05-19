@@ -217,7 +217,8 @@ public class SqlHandler extends ASqlHandler {
       return select.toString();
 
     } catch (JSQLParserException jpe) {
-      throw new DDFException("Error parsing the sql", jpe);
+      throw new DDFException(" SQL Syntax ERROR: " + jpe.getCause().getMessage
+              ().split("\n")[0]);
     } catch (Exception e) {
       throw new DDFException("Error parsing the sql", e);
     }
