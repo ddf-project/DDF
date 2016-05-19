@@ -55,22 +55,251 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     newDDF.getColumn("val").getType should be(ColumnType.INT)
   }
 
-  //Transform scale min max and transform scale standard currently have functions in ddf core which currently do
-  // not work if min and max are equal
-  ignore("transform scale min max") {
-    val relevantData: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
-    val newddf0: DDF = relevantData.Transform.transformScaleMinMax
-    val summaryArr: Array[Summary] = newddf0.getSummary
-    println("result summary is" + summaryArr(0))
-    summaryArr(0).min should be < 1.0
-    summaryArr(0).max should be(1.0)
+  test("transform scale min max all columns") {
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleMinMax
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(31)
+    scaledDDF.getNumColumns should be(11)
+
+    val scaledDDFSummary: Array[Summary] = scaledDDF.getSummary
+    scaledDDFSummary(0).min should be(0)
+    scaledDDFSummary(0).max should be(1)
+    scaledDDFSummary(1).min should be(0)
+    scaledDDFSummary(1).max should be(1)
+    scaledDDFSummary(4).min should be(0)
+    scaledDDFSummary(4).max should be(1)
+    // The following column has min == max, hence should not be scaled
+    scaledDDFSummary(2).min should be(3)
+    scaledDDFSummary(2).max should be(3)
+    scaledDDFSummary(3).min should be(4)
+    scaledDDFSummary(3).max should be(4)
+    // Not numeric columns
+    scaledDDFSummary(8) should be(null)
+    scaledDDFSummary(10) should be(null)
+
+    val data = scaledDDF.VIEWS.head(scaledDDF.getNumRows.toInt)
+    val arr = data.map{str => str.split("\\t")}
+
+    arr.get(0)(0).toDouble should be(0)
+    arr.get(1)(0).toDouble should be(0.5)
+    arr.get(2)(0).toDouble should be(1)
+
+    arr.get(0)(2).toDouble should be(3)
+    arr.get(1)(2).toDouble should be(3)
+    arr.get(2)(2).toDouble should be(3)
+
+    arr.get(0)(4).toDouble should be((2003 - originalDDFSummary(4).min) / (originalDDFSummary(4).max-originalDDFSummary(4).min))
+    arr.get(1)(4).toDouble should be((754 - originalDDFSummary(4).min) / (originalDDFSummary(4).max-originalDDFSummary(4).min))
+    arr.get(2)(4).toDouble should be((628 - originalDDFSummary(4).min) / (originalDDFSummary(4).max-originalDDFSummary(4).min))
+
+    arr.get(0)(8) should be("WN")
+    arr.get(1)(8) should be("WN")
+    arr.get(2)(8) should be("WN")
   }
 
-  ignore("transform scale standard") {
-    val relevantData: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime", "CRSDepTime", "ArrTime", "CRSArrTime")
-    val newDDF: DDF = relevantData.Transform.transformScaleStandard()
-    newDDF.getNumRows should be(31)
-    newDDF.getSummary.length should be(8)
+  test("transform scale min max subset of columns") {
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val columnsToScale = List("Year", "DayofMonth", "TailNum", "UnknownColumn", null, "DayofMonth")
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleMinMax(columnsToScale, false)
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(31)
+    scaledDDF.getNumColumns should be(11)
+
+    val scaledDDFSummary: Array[Summary] = scaledDDF.getSummary
+    scaledDDFSummary(0).min should be(0)
+    scaledDDFSummary(0).max should be(1)
+    scaledDDFSummary(1).min should be(1)
+    scaledDDFSummary(1).max should be(11)
+    scaledDDFSummary(4).min should be(617)
+    scaledDDFSummary(4).max should be(2107)
+    // The following column has min == max, hence should not be scaled
+    scaledDDFSummary(2).min should be(3)
+    scaledDDFSummary(2).max should be(3)
+    // Not numeric columns
+    scaledDDFSummary(8) should be(null)
+    scaledDDFSummary(10) should be(null)
+
+    val data = scaledDDF.VIEWS.head(scaledDDF.getNumRows.toInt)
+    val arr = data.map{str => str.split("\\t")}
+    arr.get(0)(0).toDouble should be(0)
+    arr.get(1)(0).toDouble should be(0.5)
+    arr.get(2)(0).toDouble should be(1)
+
+    // not requested to be scaled
+    arr.get(0)(1).toDouble should be(1)
+    arr.get(1)(1).toDouble should be(1)
+    arr.get(2)(1).toDouble should be(3)
+
+    // requested to be scaled but min == max
+    arr.get(0)(2).toDouble should be(3)
+    arr.get(1)(2).toDouble should be(3)
+    arr.get(2)(2).toDouble should be(3)
+
+    // not requested to be scaled
+    arr.get(0)(4).toDouble should be(2003)
+    arr.get(1)(4).toDouble should be(754)
+    arr.get(2)(4).toDouble should be(628)
+
+    arr.get(0)(8) should be("WN")
+    arr.get(1)(8) should be("WN")
+    arr.get(2)(8) should be("WN")
+  }
+
+  test("transform scale min max inPlace false") {
+    val inPlace = false
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val columnsToScale = List("Year", "DayofMonth", "TailNum", "UnknownColumn", null, "DayofMonth")
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleMinMax(columnsToScale, inPlace)
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(31)
+    scaledDDF.getNumColumns should be(11)
+
+    scaledDDF.getUUID should not be(originalDDF.getUUID)
+  }
+
+  test("transform scale min max inPlace true") {
+    val inPlace = true
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleMinMax(List(), inPlace)
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(31)
+    scaledDDF.getNumColumns should be(11)
+
+    scaledDDF.getUUID should be(originalDDF.getUUID)
+  }
+
+  test("transform scale standard all columns") {
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleStandard(null, true)
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(31)
+    scaledDDF.getNumColumns should be(11)
+
+    val scaledDDFSummary: Array[Summary] = scaledDDF.getSummary
+    BigDecimal(scaledDDFSummary(0).mean).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble should be(0)
+    BigDecimal(scaledDDFSummary(0).stdev).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble should be(1)
+    BigDecimal(scaledDDFSummary(1).mean).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble should be(0)
+    BigDecimal(scaledDDFSummary(1).stdev).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble should be(1)
+    BigDecimal(scaledDDFSummary(4).mean).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble should be(0)
+    BigDecimal(scaledDDFSummary(4).stdev).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble should be(1)
+    // The following column has min == max, hence should not be scaled
+    scaledDDFSummary(2).mean should be(3)
+    scaledDDFSummary(2).stdev should be(0)
+    scaledDDFSummary(3).mean should be(4)
+    scaledDDFSummary(3).stdev should be(0)
+    // Not numeric columns
+    scaledDDFSummary(8) should be(null)
+    scaledDDFSummary(10) should be(null)
+
+    val data = scaledDDF.VIEWS.head(scaledDDF.getNumRows.toInt)
+    val arr = data.map{str => str.split("\\t")}
+
+    arr.get(0)(0).toDouble should be((2008 - originalDDFSummary(0).mean) / originalDDFSummary(0).stdev)
+    arr.get(1)(0).toDouble should be((2009 - originalDDFSummary(0).mean) / originalDDFSummary(0).stdev)
+    arr.get(2)(0).toDouble should be((2010 - originalDDFSummary(0).mean) / originalDDFSummary(0).stdev)
+
+    arr.get(0)(2).toDouble should be(3)
+    arr.get(1)(2).toDouble should be(3)
+    arr.get(2)(2).toDouble should be(3)
+
+    arr.get(0)(4).toDouble should be((2003 - originalDDFSummary(4).mean) / originalDDFSummary(4).stdev)
+    arr.get(1)(4).toDouble should be((754 - originalDDFSummary(4).mean) / originalDDFSummary(4).stdev)
+    arr.get(2)(4).toDouble should be((628 - originalDDFSummary(4).mean) / originalDDFSummary(4).stdev)
+
+    arr.get(0)(8) should be("WN")
+    arr.get(1)(8) should be("WN")
+    arr.get(2)(8) should be("WN")
+  }
+
+  test("transform scale standard subset of columns") {
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val columnsToScale = List("Year", "DayofMonth", "TailNum", "UnknownColumn", null, "DayofMonth")
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleStandard(columnsToScale, false)
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(31)
+    scaledDDF.getNumColumns should be(11)
+
+    val scaledDDFSummary: Array[Summary] = scaledDDF.getSummary
+    BigDecimal(scaledDDFSummary(0).mean).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble should be(0)
+    BigDecimal(scaledDDFSummary(0).stdev).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble should be(1)
+    scaledDDFSummary(1).mean should be(originalDDFSummary(1).mean)
+    scaledDDFSummary(1).stdev should be(originalDDFSummary(1).stdev)
+    // The following column has stddev == 0, hence wasn't rescaled
+    scaledDDFSummary(2).mean should be(originalDDFSummary(2).mean)
+    scaledDDFSummary(2).stdev should be(originalDDFSummary(2).stdev)
+    // This column wasn't in the list to be scaled
+    scaledDDFSummary(4).mean should be(originalDDFSummary(4).mean)
+    scaledDDFSummary(4).stdev should be(originalDDFSummary(4).stdev)
+    // Not numeric columns
+    scaledDDFSummary(8) should be(null)
+    scaledDDFSummary(10) should be(null)
+
+    val data = scaledDDF.VIEWS.head(scaledDDF.getNumRows.toInt)
+    val arr = data.map{str => str.split("\\t")}
+
+    arr.get(0)(0).toDouble should be((2008 - originalDDFSummary(0).mean) / originalDDFSummary(0).stdev)
+    arr.get(1)(0).toDouble should be((2009 - originalDDFSummary(0).mean) / originalDDFSummary(0).stdev)
+    arr.get(2)(0).toDouble should be((2010 - originalDDFSummary(0).mean) / originalDDFSummary(0).stdev)
+
+    arr.get(0)(2).toDouble should be(3)
+    arr.get(1)(2).toDouble should be(3)
+    arr.get(2)(2).toDouble should be(3)
+
+    arr.get(0)(4).toDouble should be(2003)
+    arr.get(1)(4).toDouble should be(754)
+    arr.get(2)(4).toDouble should be(628)
+
+    arr.get(0)(8) should be("WN")
+    arr.get(1)(8) should be("WN")
+    arr.get(2)(8) should be("WN")
+  }
+
+  test("transform scale standard inPlace false") {
+    val inPlace = false
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val columnsToScale = List("Year", "DayofMonth", "TailNum", "UnknownColumn", null, "DayofMonth")
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleStandard(columnsToScale, inPlace)
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(31)
+    scaledDDF.getNumColumns should be(11)
+
+    scaledDDF.getUUID should not be(originalDDF.getUUID)
+  }
+
+  test("transform scale standard inPlace true") {
+    val inPlace = true
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleStandard(null, inPlace)
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(31)
+    scaledDDF.getNumColumns should be(11)
+
+    scaledDDF.getUUID should be(originalDDF.getUUID)
   }
 
   test("test sort ascending single column") {

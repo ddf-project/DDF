@@ -8,9 +8,15 @@ import java.util.List;
 
 public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
 
+  @Deprecated
   DDF transformScaleMinMax() throws DDFException;
 
+  DDF transformScaleMinMax(List<String> columns, Boolean inPlace) throws DDFException;
+
+  @Deprecated
   DDF transformScaleStandard() throws DDFException;
+
+  DDF transformScaleStandard(List<String> columns, Boolean inPlace) throws DDFException;
 
   @Deprecated
   DDF transformNativeRserve(String transformExpression);

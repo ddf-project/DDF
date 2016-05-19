@@ -85,8 +85,18 @@ public class TransformFacade implements IHandleTransformations {
   }
 
   @Override
+  public DDF transformScaleMinMax(List<String> columns, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.transformScaleMinMax(columns, inPlace);
+  }
+
+  @Override
   public DDF transformScaleStandard() throws DDFException {
     return mTransformationHandler.transformScaleStandard();
+  }
+
+  @Override
+  public DDF transformScaleStandard(List<String> columns, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.transformScaleStandard(columns, inPlace);
   }
 
   @Override

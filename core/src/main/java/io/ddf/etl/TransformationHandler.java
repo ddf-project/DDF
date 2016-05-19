@@ -12,70 +12,108 @@ import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TransformationHandler extends ADDFFunctionalGroupHandler implements IHandleTransformations {
+
+  private static Logger LOG = LoggerFactory.getLogger(TransformationHandler.class);
 
   public TransformationHandler(DDF theDDF) {
     super(theDDF);
     // TODO Auto-generated constructor stub
   }
 
-  @Override public DDF transformScaleMinMax() throws DDFException {
-    Summary[] summaryArr = this.getDDF().getSummary();
-    List<Column> columns = this.getDDF().getSchema().getColumns();
-
-    // Compose a transformation query
-    StringBuffer sqlCmdBuffer = new StringBuffer("SELECT ");
-
-    for (int i = 0; i < columns.size(); i++) {
-      Column col = columns.get(i);
-      if (!col.isNumeric() || col.getColumnClass() == ColumnClass.FACTOR) {
-        sqlCmdBuffer.append(col.getName()).append(" ");
-      } else {
-        // subtract min, divide by (max - min)
-        sqlCmdBuffer.append(String.format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[i].min(),
-            (summaryArr[i].max() - summaryArr[i].min()), col.getName()));
-      }
-      sqlCmdBuffer.append(",");
-    }
-    sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
-    sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
-
-    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
-    newddf.getMetaDataHandler().copyFactor(this.getDDF());
-    return newddf;
+  @Override
+  public DDF transformScaleMinMax() throws DDFException {
+    return this.transformScaleMinMax(new ArrayList<>(), Boolean.FALSE);
   }
 
-  @Override public DDF transformScaleStandard() throws DDFException {
+  @Override
+  public DDF transformScaleMinMax(List<String> columns, Boolean inPlace) throws DDFException {
     Summary[] summaryArr = this.getDDF().getSummary();
-    List<Column> columns = this.getDDF().getSchema().getColumns();
-
     // Compose a transformation query
-    StringBuffer sqlCmdBuffer = new StringBuffer("SELECT ");
+    StringBuilder sqlCmdBuffer = new StringBuilder("SELECT ");
 
-    for (int i = 0; i < columns.size(); i++) {
-      Column col = columns.get(i);
-      if (!col.isNumeric() || col.getColumnClass() == ColumnClass.FACTOR) {
-        sqlCmdBuffer.append(col.getName()).append(" ");
+    for (int colIndex = 0; colIndex < this.getDDF().getSchema().getNumColumns(); colIndex++) {
+      Column col = this.getDDF().getSchema().getColumn(colIndex);
+
+      if (!col.isNumeric() || col.getColumnClass() == ColumnClass.FACTOR
+              || ((columns != null) && (!columns.isEmpty()) && (!columns.contains(col.getName()))) ) {
+        sqlCmdBuffer.append(col.getName()).append(",");
       } else {
-        // subtract mean, divide by stdev
-        sqlCmdBuffer.append(String
-            .format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[i].mean(), summaryArr[i].stdev(),
-                col.getName()));
+        if (summaryArr[colIndex] == null) {
+          LOG.warn("Missing column summary. transformScaleMinMax ignored for column: " + col.getName());
+
+          sqlCmdBuffer.append(col.getName()).append(" ");
+        } else if (Double.compare(summaryArr[colIndex].max(), summaryArr[colIndex].min()) == 0) {
+          LOG.warn("max equals min. transformScaleMinMax ignored for column: " + col.getName());
+
+          sqlCmdBuffer.append(col.getName()).append(" ");
+        } else {
+          // subtract min, divide by (max - min)
+          sqlCmdBuffer.append(String.format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[colIndex].min(),
+                  (summaryArr[colIndex].max() - summaryArr[colIndex].min()), col.getName()));
+        }
+
+        sqlCmdBuffer.append(",");
       }
-      sqlCmdBuffer.append(",");
     }
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
-    sqlCmdBuffer.append("FROM ").append(this.getDDF().getTableName());
+    sqlCmdBuffer.append(" FROM ").append(this.getDDF().getTableName());
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
-    return newddf;
 
+    return inPlace ? this.getDDF().updateInplace(newddf) : newddf;
+  }
+
+  @Override
+  public DDF transformScaleStandard() throws DDFException {
+    return this.transformScaleStandard(new ArrayList<>(), Boolean.FALSE);
+  }
+
+  @Override
+  public DDF transformScaleStandard(List<String> columns, Boolean inPlace) throws DDFException {
+    Summary[] summaryArr = this.getDDF().getSummary();
+    // Compose a transformation query
+    StringBuilder sqlCmdBuffer = new StringBuilder("SELECT ");
+
+    for (int colIndex = 0; colIndex < this.getDDF().getSchema().getNumColumns(); colIndex++) {
+      Column col = this.getDDF().getSchema().getColumn(colIndex);
+
+      if (!col.isNumeric() || col.getColumnClass() == ColumnClass.FACTOR
+              || ((columns != null) && (!columns.isEmpty()) && (!columns.contains(col.getName()))) ) {
+        sqlCmdBuffer.append(col.getName()).append(",");
+      } else {
+        if (summaryArr[colIndex] == null) {
+          LOG.warn("Missing column summary. transformScaleStandard ignored for column: " + col.getName());
+
+          sqlCmdBuffer.append(col.getName()).append(" ");
+        } else if (summaryArr[colIndex].stdev() == 0) {
+          LOG.warn("standard deviation equals zero. transformScaleStandard ignored for column: " + col.getName());
+
+          sqlCmdBuffer.append(col.getName()).append(" ");
+        } else {
+          // subtract mean, divide by stdev
+          sqlCmdBuffer.append(String
+                  .format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[colIndex].mean(), summaryArr[colIndex].stdev(),
+                          col.getName()));
+        }
+
+        sqlCmdBuffer.append(",");
+      }
+    }
+    sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
+    sqlCmdBuffer.append(" FROM ").append(this.getDDF().getTableName());
+
+    DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
+    newddf.getMetaDataHandler().copyFactor(this.getDDF());
+
+    return inPlace ? this.getDDF().updateInplace(newddf) : newddf;
   }
 
   @Override public DDF transformNativeRserve(String transformExpression) {
