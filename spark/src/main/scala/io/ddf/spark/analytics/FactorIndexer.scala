@@ -212,7 +212,7 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
                   if (row.isNullAt(i)) {
                     newRow.update(i, Double.NaN)
                   } else {
-                    newRow.update(i, factorMap.index2Value(row.getDouble(i)))
+                    newRow.update(i, factorMap.index2Value(row.get(i)))
                   }
                 }
                 case None => newRow.update(i, row(i))
@@ -237,9 +237,17 @@ class FactorMap(val values: JList[AnyRef], val originalColumnType: ColumnType)
     value2Index.get(value)
   }
 
-  def index2Value(index: Double): Any = {
-    if (index < values.size) {
-      values(index.toInt)
+  def index2Value(index: Any): Any = {
+    val i = index match {
+      case d: Double => d.toInt
+      case f: Float => f.toInt
+      case j: Int => j
+      case javaInt: Integer => javaInt.toInt
+      case v => s"$v".toInt
+    }
+
+    if (i < values.size) {
+      values(i)
     } else {
       null
     }
