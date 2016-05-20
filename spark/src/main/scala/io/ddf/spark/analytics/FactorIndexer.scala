@@ -85,6 +85,7 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
     }
 
     val numCols = ddf.getNumColumns
+    val numNewCols = newColumnNames.size
     val newColNameWithIndex = ddf.getColumnNames.toSeq.zipWithIndex.map {
       case (c, i) => (i, if (oldColNames.contains(c)) oldColNames.indexOf(c) else -1)
     }.toMap
@@ -92,7 +93,7 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
     val transformedRdd = rddRow.mapPartitions {
       iter => iter.map {
         row => {
-          val newRow = new Array[Any](numCols + oldColNames.length)
+          val newRow = new Array[Any](numCols + numNewCols)
           for (i <- 0 until numCols) {
             newRow.update(i, row(i))
 
@@ -112,11 +113,12 @@ class FactorIndexerModel(categoryMap: Map[String, FactorMap]) {
       }
     }
 
-    val newColumns = oldColNames.map { colName =>
-      categoryMap.get(colName) match {
+    val newColumns = newColumnNames.map {
+      case (oldName, newName) =>
+      categoryMap.get(oldName) match {
         case Some(factorMap) =>
-          val newColumn = new Column(colName, factorMap.getTransformedColumnType())
-          val factor: Factor[_] = new FactorBuilder().setType(ddf.getColumn(colName).getType)
+          val newColumn = new Column(newName, factorMap.getTransformedColumnType())
+          val factor: Factor[_] = new FactorBuilder().setType(ddf.getColumn(oldName).getType)
             .setLevels(factorMap.values).build()
           newColumn.setAsFactor(factor)
       }
