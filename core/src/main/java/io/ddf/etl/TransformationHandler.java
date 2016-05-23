@@ -41,8 +41,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     for (int colIndex = 0; colIndex < this.getDDF().getSchema().getNumColumns(); colIndex++) {
       Column col = this.getDDF().getSchema().getColumn(colIndex);
 
-      if (!col.isNumeric() || col.getColumnClass() == ColumnClass.FACTOR
-              || ((columns != null) && (!columns.isEmpty()) && (!columns.contains(col.getName()))) ) {
+      if (!isColumnEligibleToScale(col, columns)) {
         sqlCmdBuffer.append(col.getName()).append(",");
       } else {
         if (summaryArr[colIndex] == null) {
@@ -85,8 +84,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     for (int colIndex = 0; colIndex < this.getDDF().getSchema().getNumColumns(); colIndex++) {
       Column col = this.getDDF().getSchema().getColumn(colIndex);
 
-      if (!col.isNumeric() || col.getColumnClass() == ColumnClass.FACTOR
-              || ((columns != null) && (!columns.isEmpty()) && (!columns.contains(col.getName()))) ) {
+      if (!isColumnEligibleToScale(col, columns)) {
         sqlCmdBuffer.append(col.getName()).append(",");
       } else {
         if (summaryArr[colIndex] == null) {
@@ -496,5 +494,11 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
     } else {
       return castType(column, newType);
     }
+  }
+
+  private boolean isColumnEligibleToScale(Column column, List<String> scaleRequestedColumnNames) {
+    return (column.isNumeric()
+            && column.getColumnClass() != ColumnClass.FACTOR
+            && ((scaleRequestedColumnNames == null) || scaleRequestedColumnNames.isEmpty() || scaleRequestedColumnNames.contains(column.getName())));
   }
 }
