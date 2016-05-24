@@ -3,7 +3,6 @@ package io.ddf.spark.etl;
 
 import io.ddf.DDF;
 import io.ddf.content.SqlResult;
-import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.spark.BaseTest;
 import io.ddf.spark.util.Utils;
@@ -743,34 +742,5 @@ public class UDFTest extends BaseTest {
     ddf3 = ddf.sql2ddf("select millisecond(cast(from_unixtime(1433386800) as timestamp)) from @this");
     rows = ddf3.VIEWS.head(1);
     Assert.assertTrue(Integer.parseInt(rows.get(0))== dt.getMillisOfSecond());
-  }
-
-  @Test
-  public void testMedian() throws DDFException {
-    String sql1 = "select median_approx(ArrDelay) - percentile_approx(ArrDelay, 0.5), median(Year) - percentile(Year, 0.5) from @this";
-    DDF ddf1 = ddf.sql2ddf(sql1);
-    List<String> rows = ddf1.VIEWS.head(1);
-    Assert.assertTrue(rows.get(0).equals("0.0\t0.0"));
-
-    SqlResult ret = ddf.sql(sql1, "error_message");
-    Assert.assertTrue(ret.getRows().get(0).equals("0.0\t0.0"));
-
-    String sql2 = "select median_approx(ArrDelay) - percentile_approx(ArrDelay, 0.5), median(Year) - percentile(Year, 0.5) from airline";
-    SqlResult ret2 = manager.sql(sql2, "SparkSQL");
-    Assert.assertTrue(ret2.getRows().get(0).equals("0.0\t0.0"));
-
-    DDF ddf2 = manager.sql2ddf(sql2, "SparkSQL");
-    List<String> rows2 = ddf1.VIEWS.head(1);
-    Assert.assertTrue(rows2.get(0).equals("0.0\t0.0"));
-
-    manager.setDDFName(ddf, "airline_ddf");
-    String sql3 = "select median_approx(ArrDelay) - percentile_approx(ArrDelay, 0.5), median(Year) - percentile(Year, 0.5) from ddf://adatao/airline_ddf";
-
-    SqlResult ret3 = manager.sql(sql3);
-    Assert.assertTrue(ret2.getRows().get(0).equals("0.0\t0.0"));
-
-    DDF ddf3 = manager.sql2ddf(sql3);
-    List<String> rows3 = ddf3.VIEWS.head(1);
-    Assert.assertTrue(rows3.get(0).equals("0.0\t0.0"));
   }
 }
