@@ -96,7 +96,7 @@ object RootBuild extends Build {
     "commons-configuration" % "commons-configuration" % "1.6",
     "com.google.code.gson"% "gson" % "2.2.2",
     "com.novocode" % "junit-interface" % "0.10" % "test",
-    "net.sf" % "jsqlparser" % "0.9.8.9",
+    "net.sf" % "jsqlparser" % "0.9.8.8",
     "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
       exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty"),
@@ -248,7 +248,7 @@ object RootBuild extends Build {
       "com.novocode" % "junit-interface" % "0.10" % "test",
       "org.jblas" % "jblas" % "1.2.3", // for fast linear algebra
       "com.googlecode.matrix-toolkits-java" % "mtj" % "0.9.14",
-      "net.sf" % "jsqlparser" % "0.9.8.9",
+      "net.sf" % "jsqlparser" % "0.9.8.8",
       "commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
       "mysql" % "mysql-connector-java" % "5.1.25",
