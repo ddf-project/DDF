@@ -274,7 +274,7 @@
         <dependency>
             <groupId>net.sf</groupId>
             <artifactId>jsqlparser</artifactId>
-            <version>0.9.8.8</version>
+            <version>0.9.8.9</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
