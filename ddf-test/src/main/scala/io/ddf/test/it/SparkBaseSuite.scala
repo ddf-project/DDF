@@ -1,14 +1,14 @@
 package io.ddf.test.it
 
-import io.ddf.datasource.{DataSourceDescriptor, JDBCDataSourceDescriptor, JDBCDataSourceCredentials, DataSourceURI}
+import io.ddf.datasource.{DataSourceDescriptor, DataSourceURI, JDBCDataSourceCredentials, JDBCDataSourceDescriptor}
 import io.ddf.misc.Config
-import io.ddf.{DDFManager, DDF}
+import io.ddf.{DDF, DDFManager}
 
 trait SparkBaseSuite extends BaseSuite {
 
   override val engineName: String = "spark"
-  override val manager: DDFManager = DDFManager.get(DDFManager.EngineType.fromString(engineName))
 
+  override val manager: DDFManager = SparkBaseSuite.manager
 
   private def loadTestDataFromFile(filePath: String,
                                    tableName: String,
@@ -57,5 +57,9 @@ trait SparkBaseSuite extends BaseSuite {
     loadTestDataFromFile(getClass.getResource("/smiths").getPath, "smiths",
       config.getValue("schema", "smiths"), ",")
   }
+}
 
+object SparkBaseSuite {
+  val engineName: String = "spark"
+  val manager = DDFManager.get(DDFManager.EngineType.fromString(engineName))
 }
