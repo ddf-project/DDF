@@ -85,9 +85,9 @@ public class Utils {
     } else if (object instanceof Long) {
       return new DateTime((Long) object * 1000L);
     } else if (object instanceof Date) {
-      return new DateTime(((Date) object).getTime());
+      return new DateTime(((Date) object));
     } else if (object instanceof Timestamp) {
-      return new DateTime(((Timestamp) object).getTime());
+      return new DateTime(((Timestamp) object));
     } else if (object instanceof String) {
 
       Matcher matcher = isoPattern.matcher((String)object);

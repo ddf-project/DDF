@@ -112,6 +112,17 @@ object DateUDF {
     }
   }
 
+  val parseWeekOfMonth: Object => Integer = {
+    (obj: Object) => {
+      val dateTime = Utils.toDateTimeObject(obj)
+      if(dateTime != null) {
+        (dateTime.getDayOfMonth() / 7) + 1
+      } else {
+        null
+      }
+    }
+  }
+
   val parseDay: Object => Integer = {
     (obj: Object) => {
       val dateTime = Utils.toDateTimeObject(obj)
@@ -173,7 +184,9 @@ object DateUDF {
     sQLContext.udf.register("month", parseMonth)
     sQLContext.udf.register("month_text", parseMonthAsText)
     sQLContext.udf.register("weekyear", parseWeekYear)
+    sQLContext.udf.register("week", parseWeekOfYear)
     sQLContext.udf.register("weekofyear", parseWeekOfYear)
+    sQLContext.udf.register("weekofmonth", parseWeekOfMonth)
     sQLContext.udf.register("day", parseDay)
     sQLContext.udf.register("dayofweek", parseDayOfWeek)
     sQLContext.udf.register("dayofweek_text", parseDayOfWeekAsText)
