@@ -1018,15 +1018,25 @@ public abstract class DDF extends ALoggable //
 
 
   public DDF dropNA() throws DDFException {
-    return dropNA(Axis.ROW);
+    return dropNA(Axis.ROW, Boolean.FALSE);
   }
 
+  @Deprecated
   public DDF dropNA(Axis pattern) throws DDFException {
-    return this.getMissingDataHandler().dropNA(pattern, NAChecking.ANY, 0, null);
+    return this.dropNA(pattern, Boolean.FALSE);
   }
 
+  public DDF dropNA(Axis pattern, Boolean inPlace) throws DDFException {
+    return this.getMissingDataHandler().dropNA(pattern, NAChecking.ANY, 0, null, inPlace);
+  }
+
+  @Deprecated
   public DDF fillNA(String value) throws DDFException {
-    return this.getMissingDataHandler().fillNA(value, null, 0, null, null, null);
+    return this.fillNA(value, Boolean.FALSE);
+  }
+
+  public DDF fillNA(String value, Boolean inPlace) throws DDFException {
+    return this.getMissingDataHandler().fillNA(value, null, 0, null, null, null, inPlace);
   }
 
   public DDF updateInplace(DDF result) throws DDFException {
