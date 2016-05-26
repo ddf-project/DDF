@@ -316,8 +316,8 @@ public class SparkDDFManager extends DDFManager {
       }
       DDF newDDF = this.newDDF(this, df, new Class<?>[]{DataFrame.class}, null,
           null, ddf.getSchema());
-      newDDF.getRepresentationHandler().cache(false);
-      newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+//      newDDF.getRepresentationHandler().cache(false);
+//      newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
 
       if (flattenFormat.contains(dataFormat)
           && options != null
