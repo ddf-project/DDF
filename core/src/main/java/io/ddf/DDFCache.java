@@ -2,52 +2,62 @@ package io.ddf;
 
 
 import com.google.common.base.Strings;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import io.ddf.exception.DDFException;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.cache.CacheBuilder;
+import io.ddf.misc.Config;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by huandao on 6/11/15.
  */
 public class DDFCache {
 
-  private Map<UUID, DDF> mDDFs = new ConcurrentHashMap<UUID, DDF>();
+  private LoadingCache<UUID, DDF> mDDFCache;
+
+  private DDFManager mDDFManager;
+  public DDFCache(DDFManager manager) {
+    mDDFManager = manager;
+    Long maxNumberOfDDFs = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.MAX_NUMBER_OF_DDFS_IN_CACHE));
+    mDDFCache = CacheBuilder.newBuilder().
+        maximumSize(maxNumberOfDDFs).expireAfterAccess(4, TimeUnit.HOURS).build(new CacheLoader<UUID, DDF>() {
+      @Override public DDF load(UUID uuid) throws Exception {
+        return mDDFManager.restoreDDF(uuid);
+      }
+    });
+  }
+//  private Map<UUID, DDF> mDDFs = new ConcurrentHashMap<UUID, DDF>();
   private Map<String, UUID> mUris = new ConcurrentHashMap<String, UUID>();
 
   public void addDDF(DDF ddf) throws DDFException {
-    mDDFs.put(ddf.getUUID(), ddf);
+    mDDFCache.put(ddf.getUUID(), ddf);
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
-    mDDFs.remove(ddf.getUUID());
+    mDDFCache.invalidate(ddf.getUUID());
+
     if(ddf.getUri() != null) {
       mUris.remove(ddf.getUri());
     }
   }
 
   public DDF[] listDDFs() {
-    return this.mDDFs.values().toArray(new DDF[] {});
+    return mDDFCache.asMap().values().toArray(new DDF[]{});
   }
 
   public DDF getDDF(UUID uuid) throws DDFException {
-    DDF ddf = mDDFs.get(uuid);
-    if(ddf == null) {
-      throw new DDFException(String.format("Cannot find ddf with uuid %s", uuid));
-
-    } else {
-      return ddf;
-    }
+    return mDDFCache.getUnchecked(uuid);
   }
 
-  public boolean hasDDF(UUID uuid) {
-    DDF ddf = mDDFs.get(uuid);
-    return ddf != null;
-  }
 
   public DDF getDDFByName(String name) throws DDFException {
-    for(DDF ddf: mDDFs.values()) {
+    for(DDF ddf: this.listDDFs()) {
       if(!Strings.isNullOrEmpty(ddf.getName()) && ddf.getName().equals(name)) {
         return ddf;
       }
@@ -68,19 +78,19 @@ public class DDFCache {
   }
 
   public synchronized void setDDFUUID(DDF ddf, UUID uuid) throws DDFException {
-    if(this.hasDDF(uuid)) {
+    try {
+      this.getDDF(uuid);
       throw new DDFException(String.format("DDF with uuid %s already exists", uuid));
-    } else {
-      //remove old key
+    } catch(DDFException exception) {
       UUID prevUUID = ddf.getUUID();
       if(prevUUID != null) {
-        mDDFs.remove(prevUUID);
-      }
-      ddf.setUUID(uuid);
-      mDDFs.put(uuid, ddf);
-      if(ddf.getUri() != null) {
-        mUris.remove(ddf.getUri());
-        mUris.put(ddf.getUri(), ddf.getUUID());
+        mDDFCache.invalidate(prevUUID);
+        ddf.setUUID(uuid);
+        mDDFCache.put(uuid, ddf);
+        if(ddf.getUri() != null) {
+          mUris.remove(ddf.getUri());
+          mUris.put(ddf.getUri(), ddf.getUUID());
+        }
       }
     }
   }

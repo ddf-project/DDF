@@ -158,7 +158,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   /**
    * List of existing DDFs, only in memory one.
    */
-  protected DDFCache mDDFCache = new DDFCache();
+  protected DDFCache mDDFCache = new DDFCache(this);
 
   protected Map<String, IModel> mModels = new ConcurrentHashMap<String, IModel>();
 
@@ -184,10 +184,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return mDDFCache.getDDF(uuid);
   }
 
-  // TODO: Should we consider restore here?
-  public boolean hasDDF(UUID uuid) {
-    return mDDFCache.hasDDF(uuid);
-  }
 
   // TODO: Should we consider restore here?
   public DDF getDDFByName(String name) throws DDFException {
