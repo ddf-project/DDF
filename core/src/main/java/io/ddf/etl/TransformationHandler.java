@@ -13,6 +13,7 @@ import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.exception.DDFException;
 import io.ddf.misc.ADDFFunctionalGroupHandler;
 import io.ddf.util.Utils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,29 +43,30 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     for (int colIndex = 0; colIndex < schema.getNumColumns(); colIndex++) {
       Column col = schema.getColumn(colIndex);
+      String escapedColName = StringEscapeUtils.escapeJava(col.getName());
 
       if (!isColumnEligibleToScale(col, columns)) {
-        sqlCmdBuffer.append(col.getName()).append(",");
+        sqlCmdBuffer.append(escapedColName).append(",");
       } else {
         if (summaryArr[colIndex] == null) {
           LOG.warn("Missing column summary. transformScaleMinMax ignored for column: " + col.getName());
 
-          sqlCmdBuffer.append(col.getName()).append(" ");
+          sqlCmdBuffer.append(escapedColName).append(" ");
         } else if (Double.compare(summaryArr[colIndex].max(), summaryArr[colIndex].min()) == 0) {
           LOG.warn("max equals min. transformScaleMinMax ignored for column: " + col.getName());
 
-          sqlCmdBuffer.append(col.getName()).append(" ");
+          sqlCmdBuffer.append(escapedColName).append(" ");
         } else {
           // subtract min, divide by (max - min)
-          sqlCmdBuffer.append(String.format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[colIndex].min(),
-                  (summaryArr[colIndex].max() - summaryArr[colIndex].min()), col.getName()));
+          sqlCmdBuffer.append(String.format("((%s - %s) / %s) as %s ", escapedColName, summaryArr[colIndex].min(),
+                  (summaryArr[colIndex].max() - summaryArr[colIndex].min()), escapedColName));
         }
 
         sqlCmdBuffer.append(",");
       }
     }
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
-    sqlCmdBuffer.append(" FROM ").append(schema.getTableName());
+    sqlCmdBuffer.append(" FROM ").append(StringEscapeUtils.escapeJava(schema.getTableName()));
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
@@ -86,30 +88,31 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
     for (int colIndex = 0; colIndex < schema.getNumColumns(); colIndex++) {
       Column col = schema.getColumn(colIndex);
+      String escapedColName = StringEscapeUtils.escapeJava(col.getName());
 
       if (!isColumnEligibleToScale(col, columns)) {
-        sqlCmdBuffer.append(col.getName()).append(",");
+        sqlCmdBuffer.append(escapedColName).append(",");
       } else {
         if (summaryArr[colIndex] == null) {
           LOG.warn("Missing column summary. transformScaleStandard ignored for column: " + col.getName());
 
-          sqlCmdBuffer.append(col.getName()).append(" ");
+          sqlCmdBuffer.append(escapedColName).append(" ");
         } else if (summaryArr[colIndex].stdev() == 0) {
           LOG.warn("standard deviation equals zero. transformScaleStandard ignored for column: " + col.getName());
 
-          sqlCmdBuffer.append(col.getName()).append(" ");
+          sqlCmdBuffer.append(escapedColName).append(" ");
         } else {
           // subtract mean, divide by stdev
           sqlCmdBuffer.append(String
-                  .format("((%s - %s) / %s) as %s ", col.getName(), summaryArr[colIndex].mean(), summaryArr[colIndex].stdev(),
-                          col.getName()));
+                  .format("((%s - %s) / %s) as %s ", escapedColName, summaryArr[colIndex].mean(), summaryArr[colIndex].stdev(),
+                          escapedColName));
         }
 
         sqlCmdBuffer.append(",");
       }
     }
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
-    sqlCmdBuffer.append(" FROM ").append(schema.getTableName());
+    sqlCmdBuffer.append(" FROM ").append(StringEscapeUtils.escapeJava(schema.getTableName()));
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
