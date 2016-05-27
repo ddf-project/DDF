@@ -5,6 +5,7 @@ package io.ddf.etl;
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.analytics.Summary;
+import io.ddf.content.Schema;
 import io.ddf.content.Schema.Column;
 import io.ddf.content.Schema.ColumnClass;
 import io.ddf.content.Schema.ColumnType;
@@ -35,11 +36,12 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   @Override
   public DDF transformScaleMinMax(List<String> columns, Boolean inPlace) throws DDFException {
     Summary[] summaryArr = this.getDDF().getSummary();
+    Schema schema = this.getDDF().getSchema();
     // Compose a transformation query
     StringBuilder sqlCmdBuffer = new StringBuilder("SELECT ");
 
-    for (int colIndex = 0; colIndex < this.getDDF().getSchema().getNumColumns(); colIndex++) {
-      Column col = this.getDDF().getSchema().getColumn(colIndex);
+    for (int colIndex = 0; colIndex < schema.getNumColumns(); colIndex++) {
+      Column col = schema.getColumn(colIndex);
 
       if (!isColumnEligibleToScale(col, columns)) {
         sqlCmdBuffer.append(col.getName()).append(",");
@@ -62,7 +64,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       }
     }
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
-    sqlCmdBuffer.append(" FROM ").append(this.getDDF().getTableName());
+    sqlCmdBuffer.append(" FROM ").append(schema.getTableName());
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
@@ -78,11 +80,12 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   @Override
   public DDF transformScaleStandard(List<String> columns, Boolean inPlace) throws DDFException {
     Summary[] summaryArr = this.getDDF().getSummary();
+    Schema schema = this.getDDF().getSchema();
     // Compose a transformation query
     StringBuilder sqlCmdBuffer = new StringBuilder("SELECT ");
 
-    for (int colIndex = 0; colIndex < this.getDDF().getSchema().getNumColumns(); colIndex++) {
-      Column col = this.getDDF().getSchema().getColumn(colIndex);
+    for (int colIndex = 0; colIndex < schema.getNumColumns(); colIndex++) {
+      Column col = schema.getColumn(colIndex);
 
       if (!isColumnEligibleToScale(col, columns)) {
         sqlCmdBuffer.append(col.getName()).append(",");
@@ -106,7 +109,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
       }
     }
     sqlCmdBuffer.setLength(sqlCmdBuffer.length() - 1);
-    sqlCmdBuffer.append(" FROM ").append(this.getDDF().getTableName());
+    sqlCmdBuffer.append(" FROM ").append(schema.getTableName());
 
     DDF newddf = this.getManager().sql2ddf(sqlCmdBuffer.toString(), this.getEngine());
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
