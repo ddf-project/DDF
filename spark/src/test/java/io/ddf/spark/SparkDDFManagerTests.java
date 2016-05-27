@@ -68,7 +68,6 @@ public class SparkDDFManagerTests extends BaseTest {
     Assert.assertEquals(ddf, manager.getDDF(ddf.getUUID()));
   }
 
-
   public void testBasicCopyForS3(S3DDFManager s3DDFManager) throws DDFException {
     LOG.info("========== non-exist========");
     try {
