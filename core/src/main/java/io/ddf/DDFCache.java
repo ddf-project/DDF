@@ -3,6 +3,7 @@ package io.ddf;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
 import io.ddf.exception.DDFException;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import com.google.common.cache.CacheBuilder;
+import io.ddf.misc.ALoggable;
 import io.ddf.misc.Config;
 
 import java.util.concurrent.TimeUnit;
@@ -17,26 +19,52 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by huandao on 6/11/15.
  */
-public class DDFCache {
+public class DDFCache extends ALoggable {
 
   private LoadingCache<UUID, DDF> mDDFCache;
 
   private DDFManager mDDFManager;
+
   public DDFCache(DDFManager manager) {
     mDDFManager = manager;
     Long maxNumberOfDDFs = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.MAX_NUMBER_OF_DDFS_IN_CACHE));
+    Long ddfExpiredTime = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.DDF_EXPIRED_TIME));
+    mLog.info(String.format("Maximum number of ddfs in cache %s", maxNumberOfDDFs));
     mDDFCache = CacheBuilder.newBuilder().
-        maximumSize(maxNumberOfDDFs).expireAfterAccess(4, TimeUnit.HOURS).build(new CacheLoader<UUID, DDF>() {
+        maximumSize(maxNumberOfDDFs).recordStats().
+        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS)
+        .build(new CacheLoader<UUID, DDF>() {
       @Override public DDF load(UUID uuid) throws Exception {
-        return mDDFManager.restoreDDF(uuid);
+        try {
+          mLog.info(String.format("restoring ddf %s", uuid));
+          return mDDFManager.restoreDDF(uuid);
+        } catch (Exception e) {
+          throw new DDFException(String.format("DDF with uuid %s does not exist", uuid));
+        }
       }
     });
   }
+
+  private boolean containsDDF(UUID uuid) {
+    return mDDFCache.asMap().containsKey(uuid);
+  }
+
+  private Map<UUID, DDF> getEntries() {
+    return mDDFCache.asMap();
+  }
+
 //  private Map<UUID, DDF> mDDFs = new ConcurrentHashMap<UUID, DDF>();
   private Map<String, UUID> mUris = new ConcurrentHashMap<String, UUID>();
 
   public void addDDF(DDF ddf) throws DDFException {
+    if(ddf.getUUID() == null) {
+      throw new DDFException("uuid is null");
+    }
     mDDFCache.put(ddf.getUUID(), ddf);
+  }
+
+  public CacheStats getCacheStats() {
+    return mDDFCache.stats();
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
@@ -54,7 +82,6 @@ public class DDFCache {
   public DDF getDDF(UUID uuid) throws DDFException {
     return mDDFCache.getUnchecked(uuid);
   }
-
 
   public DDF getDDFByName(String name) throws DDFException {
     for(DDF ddf: this.listDDFs()) {
@@ -78,14 +105,13 @@ public class DDFCache {
   }
 
   public synchronized void setDDFUUID(DDF ddf, UUID uuid) throws DDFException {
-    try {
-      this.getDDF(uuid);
+    if(this.containsDDF(uuid)) {
       throw new DDFException(String.format("DDF with uuid %s already exists", uuid));
-    } catch(DDFException exception) {
+    } else {
       UUID prevUUID = ddf.getUUID();
+      ddf.setUUID(uuid);
       if(prevUUID != null) {
         mDDFCache.invalidate(prevUUID);
-        ddf.setUUID(uuid);
         mDDFCache.put(uuid, ddf);
         if(ddf.getUri() != null) {
           mUris.remove(ddf.getUri());

@@ -160,6 +160,10 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
    */
   protected DDFCache mDDFCache = new DDFCache(this);
 
+  public DDFCache getDDFcache() {
+    return this.mDDFCache;
+  }
+
   protected Map<String, IModel> mModels = new ConcurrentHashMap<String, IModel>();
 
   public void addDDF(DDF ddf) throws DDFException {

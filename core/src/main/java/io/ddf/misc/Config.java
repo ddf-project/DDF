@@ -181,7 +181,8 @@ public class Config {
     SFDC_JDBC_DRIVER("Driver"), DEFAULT_SFDC_JDBC_DRIVER("cdata.jdbc.salesforce.SalesforceDriver"),
     JDBC_DDF_AUTOCREATE("DDFAutoCreate"),
     MAX_LEVELS_COUNT("MAX_LEVELS_COUNT"),
-    MAX_NUMBER_OF_DDFS_IN_CACHE("MAX_NUMBER_OF_DDFS_IN_CACHE")
+    MAX_NUMBER_OF_DDFS_IN_CACHE("MAX_NUMBER_OF_DDFS_IN_CACHE"),
+    DDF_EXPIRED_TIME("DDF_EXPIRED_TIME")
     ;
     // @formatter:on
 
