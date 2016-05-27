@@ -152,6 +152,28 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     arr.get(2)(8) should be("WN")
   }
 
+  test("transform scale min max empty list of columns") {
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val columnsToScale = List()
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleMinMax(columnsToScale, false)
+    val scaledDDFSummary: Array[Summary] = scaledDDF.getSummary
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(originalDDF.getNumRows)
+    scaledDDF.getNumColumns should be(originalDDF.getNumColumns)
+
+    for (i <- 0 until scaledDDF.getNumColumns ) {
+      if (originalDDFSummary(i) != null) {
+        scaledDDFSummary(i).min should be(originalDDFSummary(i).min)
+        scaledDDFSummary(i).max should be(originalDDFSummary(i).max)
+      } else {
+        scaledDDFSummary(i) should be(null)
+      }
+    }
+  }
+
   test("transform scale min max inPlace false") {
     val inPlace = false
     val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
@@ -173,7 +195,7 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
       "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
     val originalDDFSummary: Array[Summary] = originalDDF.getSummary
 
-    val scaledDDF: DDF = originalDDF.Transform.transformScaleMinMax(List(), inPlace)
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleMinMax(null, inPlace)
     scaledDDF should not be null
     scaledDDF.getNumRows should be(31)
     scaledDDF.getNumColumns should be(11)
@@ -271,6 +293,28 @@ trait TransformationHandlerBaseSuite extends BaseSuite with Matchers {
     arr.get(0)(8) should be("WN")
     arr.get(1)(8) should be("WN")
     arr.get(2)(8) should be("WN")
+  }
+
+  test("transform scale standard empty list of columns") {
+    val originalDDF: DDF = loadAirlineDDF().VIEWS.project("Year", "Month", "DayofMonth", "DayofWeek", "DepTime",
+      "CRSDepTime", "ArrTime", "CRSArrTime", "UniqueCarrier", "FlightNum", "TailNum")
+    val originalDDFSummary: Array[Summary] = originalDDF.getSummary
+
+    val columnsToScale = List()
+    val scaledDDF: DDF = originalDDF.Transform.transformScaleStandard(columnsToScale, false)
+    val scaledDDFSummary: Array[Summary] = scaledDDF.getSummary
+    scaledDDF should not be null
+    scaledDDF.getNumRows should be(originalDDF.getNumRows)
+    scaledDDF.getNumColumns should be(originalDDF.getNumColumns)
+
+    for (i <- 0 until scaledDDF.getNumColumns ) {
+      if (originalDDFSummary(i) != null) {
+        scaledDDFSummary(i).min should be(originalDDFSummary(i).min)
+        scaledDDFSummary(i).max should be(originalDDFSummary(i).max)
+      } else {
+        scaledDDFSummary(i) should be(null)
+      }
+    }
   }
 
   test("transform scale standard inPlace false") {

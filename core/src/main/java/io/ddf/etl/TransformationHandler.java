@@ -30,7 +30,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
   @Override
   public DDF transformScaleMinMax() throws DDFException {
-    return this.transformScaleMinMax(new ArrayList<>(), Boolean.FALSE);
+    return this.transformScaleMinMax(null, Boolean.FALSE);
   }
 
   @Override
@@ -74,7 +74,7 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
 
   @Override
   public DDF transformScaleStandard() throws DDFException {
-    return this.transformScaleStandard(new ArrayList<>(), Boolean.FALSE);
+    return this.transformScaleStandard(null, Boolean.FALSE);
   }
 
   @Override
@@ -502,6 +502,6 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   private boolean isColumnEligibleToScale(Column column, List<String> scaleRequestedColumnNames) {
     return (column.isNumeric()
             && column.getColumnClass() != ColumnClass.FACTOR
-            && ((scaleRequestedColumnNames == null) || scaleRequestedColumnNames.isEmpty() || scaleRequestedColumnNames.contains(column.getName())));
+            && ((scaleRequestedColumnNames == null) || scaleRequestedColumnNames.contains(column.getName())));
   }
 }
