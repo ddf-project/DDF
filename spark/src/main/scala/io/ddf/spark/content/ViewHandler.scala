@@ -72,23 +72,22 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     // We use Spark's API to sample twice what we need, then only pick the first numSamples rows.
     if (withReplacement) fraction = 2.0 * numSamples / numRows
 
-    var sampleDDF: DDF = null
     val manager = this.getManager
     val schema: Schema = new Schema(null,
       JavaConverters.asScalaBufferConverter(mDDF.getSchema.getColumns).asScala.toArray)
     // Optimized running time for integer values by using Spark DataFrame sample and limit APIs
     val numSamplesInt = numSamples.toInt
-    if (numSamplesInt == numSamples) {
+    val sampleDDF = if (numSamplesInt == numSamples) {
       val sparkDF = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
       val sampleDF = sparkDF.sample(withReplacement, fraction, seed).limit(numSamples.toInt)
 
-      sampleDDF = manager.newDDF(this.getManager, sampleDF, Array(classOf[DataFrame]), null, null, schema)
+      manager.newDDF(this.getManager, sampleDF, Array(classOf[DataFrame]), null, null, schema)
 
     } else {
       val rddRow: RDD[Row] = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
       val sampledRDD = rddRow.sample(withReplacement, fraction, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
 
-      sampleDDF = manager.newDDF(sampledRDD, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
+      manager.newDDF(sampledRDD, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
     }
 
     // Copy Factor info
