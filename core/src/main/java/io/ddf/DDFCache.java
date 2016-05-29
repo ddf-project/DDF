@@ -131,6 +131,7 @@ public class DDFCache extends ALoggable {
     //cleaning up DDF upon removal
     @Override
     public void onRemoval(RemovalNotification<UUID, DDF> notification) {
+      mLog.info(String.format("CacheStats = %s", getCacheStats().toString()));
       DDF ddf = notification.getValue();
       if(ddf != null) {
         mLog.info(String.format("Removing DDF %s", ddf.getUUID()));

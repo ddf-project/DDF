@@ -12,6 +12,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.hive.HiveContext;
+import org.python.google.common.base.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +136,9 @@ public class SparkDDF extends DDF {
     super.cleanup();
     this.getRepresentationHandler().uncacheAll();
     HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
-    hiveContext.dropTempTable(this.getTableName());
+    if(!Strings.isNullOrEmpty(this.getTableName()) && this.isTable()) {
+      hiveContext.dropTempTable(this.getTableName());
+    }
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
