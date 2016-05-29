@@ -133,12 +133,12 @@ public class SparkDDF extends DDF {
 
   @Override
   public  void cleanup() {
-    super.cleanup();
     this.getRepresentationHandler().uncacheAll();
     HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
     if(!Strings.isNullOrEmpty(this.getTableName()) && this.isTable()) {
       hiveContext.dropTempTable(this.getTableName());
     }
+    super.cleanup();
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
