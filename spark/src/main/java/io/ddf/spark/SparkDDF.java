@@ -135,7 +135,8 @@ public class SparkDDF extends DDF {
   public  void cleanup() {
     this.getRepresentationHandler().uncacheAll();
     HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
-    if(!Strings.isNullOrEmpty(this.getTableName()) && this.isTable()) {
+    if(!Strings.isNullOrEmpty(this.getTableName())) {
+      mLog.info(String.format("Dropping table %s", this.getTableName()));
       hiveContext.dropTempTable(this.getTableName());
     }
     super.cleanup();
