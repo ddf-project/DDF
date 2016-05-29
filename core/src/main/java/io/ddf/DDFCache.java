@@ -29,7 +29,7 @@ public class DDFCache extends ALoggable {
     mLog.info(String.format("Maximum number of ddfs in cache %s", maxNumberOfDDFs));
     mDDFCache = CacheBuilder.newBuilder().
         maximumSize(maxNumberOfDDFs).recordStats().
-        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS) //.removalListener(new DDFRemovalListener())
+        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS).removalListener(new DDFRemovalListener())
         .build(new CacheLoader<UUID, DDF>() {
       @Override public DDF load(UUID uuid) throws Exception {
         try {
