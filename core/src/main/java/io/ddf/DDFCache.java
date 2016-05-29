@@ -2,15 +2,12 @@ package io.ddf;
 
 
 import com.google.common.base.Strings;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.CacheStats;
-import com.google.common.cache.LoadingCache;
+import com.google.common.cache.*;
 import io.ddf.exception.DDFException;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import com.google.common.cache.CacheBuilder;
+
 import io.ddf.misc.ALoggable;
 import io.ddf.misc.Config;
 
@@ -32,7 +29,7 @@ public class DDFCache extends ALoggable {
     mLog.info(String.format("Maximum number of ddfs in cache %s", maxNumberOfDDFs));
     mDDFCache = CacheBuilder.newBuilder().
         maximumSize(maxNumberOfDDFs).recordStats().
-        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS)
+        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS).removalListener(new DDFRemovalListener())
         .build(new CacheLoader<UUID, DDF>() {
       @Override public DDF load(UUID uuid) throws Exception {
         try {
@@ -127,5 +124,18 @@ public class DDFCache extends ALoggable {
       throw new DDFException(String.format("Cannot find ddf with uri %s", uri));
     }
     return this.getDDF(uuid);
+  }
+
+  private class DDFRemovalListener implements RemovalListener<UUID, DDF> {
+
+    //cleaning up DDF upon removal
+    @Override
+    public void onRemoval(RemovalNotification<UUID, DDF> notification) {
+      DDF ddf = notification.getValue();
+      if(ddf != null) {
+        mLog.info(String.format("Removing DDF %s", ddf.getUUID()));
+        ddf.cleanup();
+      }
+    }
   }
 }

@@ -130,6 +130,14 @@ public class SparkDDF extends DDF {
     }
   }
 
+  @Override
+  public  void cleanup() {
+    super.cleanup();
+    this.getRepresentationHandler().uncacheAll();
+    HiveContext hiveContext = ((SparkDDFManager) this.getManager()).getHiveContext();
+    hiveContext.dropTempTable(this.getTableName());
+  }
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public IGetResult getJavaRDD(Class<?>... acceptableUnitTypes) throws DDFException {
     IGetResult result = this.getRDD(acceptableUnitTypes);
