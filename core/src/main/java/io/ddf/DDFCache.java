@@ -29,7 +29,7 @@ public class DDFCache extends ALoggable {
     mLog.info(String.format("Maximum number of ddfs in cache %s", maxNumberOfDDFs));
     mDDFCache = CacheBuilder.newBuilder().
         maximumSize(maxNumberOfDDFs).recordStats().
-        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS).removalListener(new DDFRemovalListener())
+        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS) //.removalListener(new DDFRemovalListener())
         .build(new CacheLoader<UUID, DDF>() {
       @Override public DDF load(UUID uuid) throws Exception {
         try {
@@ -131,11 +131,13 @@ public class DDFCache extends ALoggable {
     //cleaning up DDF upon removal
     @Override
     public void onRemoval(RemovalNotification<UUID, DDF> notification) {
-      mLog.info(String.format("CacheStats = %s", getCacheStats().toString()));
-      DDF ddf = notification.getValue();
-      if(ddf != null) {
-        mLog.info(String.format("Removing DDF %s", ddf.getUUID()));
-        ddf.cleanup();
+      if(notification.wasEvicted()) {
+        mLog.info(String.format("CacheStats = %s", getCacheStats().toString()));
+        DDF ddf = notification.getValue();
+        if (ddf != null) {
+          mLog.info(String.format("Removing DDF %s", ddf.getUUID()));
+          ddf.cleanup();
+        }
       }
     }
   }
