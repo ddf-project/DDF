@@ -90,10 +90,10 @@ public class BinningHandlerTest extends BaseTest {
       Assert.assertTrue(ex.getMessage().equalsIgnoreCase("Breaks must be unique: [4.0, 4.0, 4.0]"));
     }
 
-    // Binning by equal frequency always uses right = false and includeLowest = true
+    // Binning by equal frequency always uses includeLowest = true
     DDF ddf2 = ddf.binning("arrdelay", "EQUALFREQ", 2, null, true, true, true);
     Assert.assertEquals(ColumnClass.FACTOR, ddf2.getColumn("arrdelay").getColumnClass());
-    Assert.assertTrue(ddf2.getColumn("arrdelay").getOptionalFactor().getLevels().get().containsAll(Arrays.asList(new String[] {"[-24,4)", "[4,80]"})));
+    Assert.assertTrue(ddf2.getColumn("arrdelay").getOptionalFactor().getLevels().get().containsAll(Arrays.asList(new String[] {"[-24,4]", "(4,80]"})));
 
     ddf2 = ddf.binning("arrdelay", "EQUALFREQ", 2, null, true, false, false);
     Assert.assertEquals(ColumnClass.FACTOR, ddf2.getColumn("arrdelay").getColumnClass());
@@ -133,16 +133,16 @@ public class BinningHandlerTest extends BaseTest {
     Assert.assertTrue(levelCounts.get("[4,4.004]") == 31);
 
     ddf1 = ddf.binning("dayofweek", "EQUALINTERVAL", 2, null, true, false, false);
-    Assert.assertTrue(ddf1.getColumn("dayofweek").getOptionalFactor().getLevels().get().containsAll(Arrays.asList(new String[] {"[3.996,4)", "[4,4.004)"})));
+    Assert.assertTrue(ddf1.getColumn("dayofweek").getOptionalFactor().getLevels().get().containsAll(Arrays.asList(new String[] {"[3.996,4)", "[4,4.004]"})));
     levelCounts = ddf1.getSchemaHandler().computeLevelCounts("dayofweek");
     Assert.assertFalse(levelCounts.containsKey("[3.996,4)"));
-    Assert.assertTrue(levelCounts.get("[4,4.004)") == 31);
+    Assert.assertTrue(levelCounts.get("[4,4.004]") == 31);
 
     ddf1 = ddf.binning("dayofweek", "EQUALINTERVAL", 2, null, true, false, true);
-    Assert.assertTrue(ddf1.getColumn("dayofweek").getOptionalFactor().getLevels().get().containsAll(Arrays.asList(new String[] {"(3.996,4]", "(4,4.004]"})));
+    Assert.assertTrue(ddf1.getColumn("dayofweek").getOptionalFactor().getLevels().get().containsAll(Arrays.asList(new String[] {"[3.996,4]", "(4,4.004]"})));
     levelCounts = ddf1.getSchemaHandler().computeLevelCounts("dayofweek");
     Assert.assertFalse(levelCounts.containsKey("(4,4.004]"));
-    Assert.assertTrue(levelCounts.get("(3.996,4]") == 31);
+    Assert.assertTrue(levelCounts.get("[3.996,4]") == 31);
 
   }
 

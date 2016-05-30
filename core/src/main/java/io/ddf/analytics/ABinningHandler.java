@@ -50,11 +50,11 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
         if (numBins < 2) throw new DDFException("Number of bins cannot be smaller than 2");
         theBreaks = getQuantilesFromNumBins(colMeta.getName(), numBins);
         includeLowest = true;
-        right = false;
         break;
       case EQUALINTERVAL:
         if (numBins < 2) throw new DDFException("Number of bins cannot be smaller than 2");
         theBreaks = getIntervalsFromNumBins(colMeta.getName(), numBins, right);
+        includeLowest = true;
         break;
       default:throw new DDFException(String.format("Binning type %s is not supported", binningType));
     }
@@ -94,17 +94,8 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
     if (min == max) {
       min -= 0.001 * min;
       max += 0.001 * max;
-      return getBins(min, max, numBins);
-    } else {
-      double[] bins = getBins(min, max, numBins);
-      double adj = (max - min) * 0.001;
-      if (right) {
-        bins[0] -= adj;
-      } else {
-        bins[numBins - 1] += adj;
-      }
-      return bins;
     }
+    return getBins(min, max, numBins);
   }
 
   private double[] getBins(double min, double max, int numBins) {
