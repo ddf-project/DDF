@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import io.ddf.misc.ALoggable;
 import io.ddf.misc.Config;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,14 +29,15 @@ public class DDFCache extends ALoggable {
     Long ddfExpiredTime = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.DDF_EXPIRED_TIME));
     mLog.info(String.format("Maximum number of ddfs in cache %s", maxNumberOfDDFs));
     mDDFCache = CacheBuilder.newBuilder().
-        maximumSize(maxNumberOfDDFs).recordStats().
-        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS).removalListener(new DDFRemovalListener())
+        maximumSize(maxNumberOfDDFs).expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS).
+        removalListener(new DDFRemovalListener()).recordStats()
         .build(new CacheLoader<UUID, DDF>() {
       @Override public DDF load(UUID uuid) throws Exception {
         try {
           mLog.info(String.format("restoring ddf %s", uuid));
           return mDDFManager.restoreDDF(uuid);
         } catch (Exception e) {
+          mLog.error(String.format("Error restoring DDF %s, error = %s", uuid, ExceptionUtils.getStackTrace(e)));
           throw new DDFException(String.format("DDF with uuid %s does not exist", uuid));
         }
       }
