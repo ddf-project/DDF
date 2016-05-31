@@ -90,7 +90,8 @@ public class DDFCacheTests {
         removed += 1;
       }
     }
-
+    System.out.println("removed = " + removed);
+    System.out.println("cacheStats = " + manager.getDDFcache().getCacheStats());
     Assert.assertTrue(removed == 10);
     Assert.assertTrue(manager.getDDFcache().getCacheStats().evictionCount() == 10);
   }
