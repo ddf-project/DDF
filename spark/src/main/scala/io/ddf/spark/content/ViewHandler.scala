@@ -67,31 +67,29 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
       throw new IllegalArgumentException("Number of samples must be larger than or equal to 0")
     }
 
-    val numRows = mDDF.getNumRows
-    var fraction = 1.0
-    // We use Spark's API to sample twice what we need, then only pick the first numSamples rows.
-    if (withReplacement) fraction = 2.0 * numSamples / numRows
-
-    val manager = this.getManager
-    val schema: Schema = new Schema(null,
-      JavaConverters.asScalaBufferConverter(mDDF.getSchema.getColumns).asScala.toArray)
-    // Optimized running time for integer values by using Spark DataFrame sample and limit APIs
-    val sampleDDF = if (numSamples <= Int.MaxValue.toLong) {
-      val sparkDF = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-      val sampleDF = sparkDF.sample(withReplacement, fraction, seed).limit(numSamples.toInt)
-
-      manager.newDDF(this.getManager, sampleDF, Array(classOf[DataFrame]), null, null, schema)
-
+    val sampleDDF = if (!withReplacement) {
+      if (seed >= 0) {
+        mDDF.getSqlHandler.sql2ddf(s"select * from ${mDDF.getSchema.getTableName} order by rand($seed) limit $numSamples")
+      } else {
+        // This is a workaround to deal with Spark's inability to order rows by rand(<negative_seed>)
+        // Example: select * from table order by rand(-123)
+        mDDF.getSqlHandler.sql2ddf(s"select ${mDDF.getColumnNames.mkString(",")} from " +
+          s"(select *, rand($seed) as rnd from ${mDDF.getSchema.getTableName}) t order by rnd limit $numSamples")
+      }
     } else {
-      val rddRow: RDD[Row] = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
-      val sampledRDD = rddRow.sample(withReplacement, fraction, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
 
+      val numRows = mDDF.getNumRows
+      val rddRow: RDD[Row] = mDDF.asInstanceOf[SparkDDF].getRDD(classOf[Row])
+      // We use Spark's API to sample twice what we need, then only pick the first numSamples rows.
+      val sampledRDD = rddRow.sample(true, 2.0 * numSamples / numRows, seed).zipWithIndex().filter(_._2 < numSamples).map(_._1)
+
+      val manager = this.getManager
+      val schema: Schema = new Schema(null,
+        JavaConverters.asScalaBufferConverter(mDDF.getSchema.getColumns).asScala.toArray)
       manager.newDDF(sampledRDD, Array(classOf[RDD[_]], classOf[Row]), manager.getNamespace, null, schema)
     }
-
     // Copy Factor info
     sampleDDF.getMetaDataHandler.copyFactor(mDDF)
-
     sampleDDF
   }
 
