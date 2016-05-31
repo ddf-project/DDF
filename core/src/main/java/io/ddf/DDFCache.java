@@ -56,11 +56,6 @@ public class DDFCache extends ALoggable {
     return mDDFCache.asMap().containsKey(uuid);
   }
 
-  private Map<UUID, DDF> getEntries() {
-    return mDDFCache.asMap();
-  }
-
-//  private Map<UUID, DDF> mDDFs = new ConcurrentHashMap<UUID, DDF>();
   private Map<String, UUID> mUris = new ConcurrentHashMap<String, UUID>();
 
   public void addDDF(DDF ddf) throws DDFException {
