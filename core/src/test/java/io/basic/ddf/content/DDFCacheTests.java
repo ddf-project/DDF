@@ -8,6 +8,7 @@ import io.ddf.exception.DDFException;
 import io.ddf.misc.Config;
 import io.ddf.misc.Config.ConfigConstant;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.lang.ref.WeakReference;
@@ -22,7 +23,7 @@ public class DDFCacheTests {
     return DDFManager.get(DDFManager.EngineType.BASIC);
   }
 
-  protected DDF getTestDDF(DDFManager manager) throws DDFException {
+  private DDF getTestDDF(DDFManager manager) throws DDFException {
     List<Object[]> list = new ArrayList<Object[]>();
     list.add(new Object[] { "Last", "Nguyen" });
     list.add(new Object[] { "First", "Christopher" });
@@ -70,19 +71,22 @@ public class DDFCacheTests {
   @Test
   public void cleanupDDFTimeToIdle() throws Exception {
     ArrayList<WeakReference<DDF>> listDDFs = new ArrayList<WeakReference<DDF>>();
+    Config.set(ConfigConstant.SECTION_GLOBAL.toString(), ConfigConstant.MAX_NUMBER_OF_DDFS_IN_CACHE.toString(), "4000");
     Config.set(ConfigConstant.SECTION_GLOBAL.toString(), ConfigConstant.DDF_TIME_TO_IDLE_SECONDS.toString(), "1");
     DDFManager manager = getDDFManager();
     int i = 0;
     while(i < 10) {
       listDDFs.add(new WeakReference<DDF>(getTestDDF(manager)));
-      i +=1;
+      i += 1;
     }
-    Thread.sleep(5100);
 
+    Thread.sleep(2100);
     // eviction is triggered here
     getTestDDF(manager);
+    getTestDDF(manager);
+    getTestDDF(manager);
+    getTestDDF(manager);
     runGC();
-
     // count number of ddfs that were gced
     int removed = 0;
     for(WeakReference<DDF> wDDF: listDDFs) {
@@ -90,8 +94,6 @@ public class DDFCacheTests {
         removed += 1;
       }
     }
-    System.out.println("removed = " + removed);
-    System.out.println("cacheStats = " + manager.getDDFcache().getCacheStats());
     Assert.assertTrue(removed == 10);
     Assert.assertTrue(manager.getDDFcache().getCacheStats().evictionCount() == 10);
   }

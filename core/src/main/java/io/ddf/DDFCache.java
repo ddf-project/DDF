@@ -34,8 +34,8 @@ public class DDFCache extends ALoggable {
      */
     Long timeToIdle = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.DDF_TIME_TO_IDLE_SECONDS));
 
-    System.out.println(String.format("Maximum number of ddfs in cache %s", maxNumberOfDDFs));
-    System.out.println(String.format("DDF's time to idle = %s seconds", timeToIdle));
+    mLog.info(String.format("Maximum number of ddfs in cache %s", maxNumberOfDDFs));
+    mLog.info(String.format("DDF's time to idle = %s seconds", timeToIdle));
     mDDFCache = CacheBuilder.newBuilder().
         maximumSize(maxNumberOfDDFs).expireAfterAccess(timeToIdle, TimeUnit.SECONDS).
         recordStats().removalListener(new DDFRemovalListener())
