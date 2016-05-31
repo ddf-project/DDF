@@ -10,11 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import io.ddf.misc.ALoggable;
 import io.ddf.misc.Config;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by huandao on 6/11/15.
  */
 public class DDFCache extends ALoggable {
 
@@ -24,18 +24,28 @@ public class DDFCache extends ALoggable {
 
   public DDFCache(DDFManager manager) {
     mDDFManager = manager;
+    /**
+     * Maximum number of DDFs allowed in cache, DDFs will be evicted by an approximate LRU algorithm
+     */
     Long maxNumberOfDDFs = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.MAX_NUMBER_OF_DDFS_IN_CACHE));
-    Long ddfExpiredTime = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.DDF_EXPIRED_TIME));
+
+    /**
+     * The number of seconds that the DDF will live in cache since it last used(meaning inserted or accessed)
+     */
+    Long timeToIdle = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.DDF_TIME_TO_IDLE_SECONDS));
+
     mLog.info(String.format("Maximum number of ddfs in cache %s", maxNumberOfDDFs));
+    mLog.info(String.format("DDF's time to idle = %s seconds", timeToIdle));
     mDDFCache = CacheBuilder.newBuilder().
-        maximumSize(maxNumberOfDDFs).recordStats().
-        expireAfterAccess(ddfExpiredTime, TimeUnit.SECONDS).removalListener(new DDFRemovalListener())
+        maximumSize(maxNumberOfDDFs).expireAfterAccess(timeToIdle, TimeUnit.SECONDS).
+        recordStats().removalListener(new DDFRemovalListener())
         .build(new CacheLoader<UUID, DDF>() {
       @Override public DDF load(UUID uuid) throws Exception {
         try {
           mLog.info(String.format("restoring ddf %s", uuid));
           return mDDFManager.restoreDDF(uuid);
         } catch (Exception e) {
+          mLog.error(String.format("Error restoring DDF %s, error = %s", uuid, ExceptionUtils.getStackTrace(e)));
           throw new DDFException(String.format("DDF with uuid %s does not exist", uuid));
         }
       }
@@ -66,7 +76,6 @@ public class DDFCache extends ALoggable {
 
   public void removeDDF(DDF ddf) throws DDFException {
     mDDFCache.invalidate(ddf.getUUID());
-
     if(ddf.getUri() != null) {
       mUris.remove(ddf.getUri());
     }
@@ -76,7 +85,7 @@ public class DDFCache extends ALoggable {
     return mDDFCache.asMap().values().toArray(new DDF[]{});
   }
 
-  public DDF getDDF(UUID uuid) throws DDFException {
+  public DDF getDDF(UUID uuid) {
     return mDDFCache.getUnchecked(uuid);
   }
 
