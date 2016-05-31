@@ -13,11 +13,17 @@ import java.util.Map;
 
 public interface IHandleMissingData extends IHandleDDFFunctionalGroup {
 
-  public DDF dropNA(Axis axis, NAChecking how, long thresh, List<String> columns) throws DDFException;
+  @Deprecated
+  DDF dropNA(Axis axis, NAChecking how, long thresh, List<String> columns) throws DDFException;
 
-  public DDF fillNA(String value, FillMethod method, long limit, AggregateFunction function,
+  DDF dropNA(Axis axis, NAChecking how, long thresh, List<String> columns, Boolean inPlace) throws DDFException;
+
+  @Deprecated
+  DDF fillNA(String value, FillMethod method, long limit, AggregateFunction function,
       Map<String, String> columnsToValues, List<String> columns) throws DDFException;
 
+  DDF fillNA(String value, FillMethod method, long limit, AggregateFunction function,
+             Map<String, String> columnsToValues, List<String> columns, Boolean inPlace) throws DDFException;
 
   public enum Axis {
     ROW, COLUMN;
