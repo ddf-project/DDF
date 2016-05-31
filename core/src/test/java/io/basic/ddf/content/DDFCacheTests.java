@@ -70,7 +70,7 @@ public class DDFCacheTests {
   @Test
   public void cleanupDDFTimeToIdle() throws Exception {
     ArrayList<WeakReference<DDF>> listDDFs = new ArrayList<WeakReference<DDF>>();
-    Config.set(ConfigConstant.SECTION_GLOBAL.toString(), ConfigConstant.DDF_TIME_TO_IDLE_SECONDS.toString(), "5");
+    Config.set(ConfigConstant.SECTION_GLOBAL.toString(), ConfigConstant.DDF_TIME_TO_IDLE_SECONDS.toString(), "1");
     DDFManager manager = getDDFManager();
     int i = 0;
     while(i < 10) {
