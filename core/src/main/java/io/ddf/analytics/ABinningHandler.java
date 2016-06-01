@@ -37,12 +37,13 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
 
     BinningType binType = BinningType.get(binningType);
 
-    double[] theBreaks = breaks;
+    double[] theBreaks = null;
 
     switch(binType) {
       case CUSTOM:
         if (breaks == null) throw new DDFException("Please enter valid break points");
         // check for monotonic
+        theBreaks = Arrays.copyOf(breaks, breaks.length);
         Arrays.sort(theBreaks);
         if (!Arrays.equals(theBreaks, breaks)) throw new DDFException("Please enter increasing breaks");
         break;
@@ -53,7 +54,7 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
         break;
       case EQUALINTERVAL:
         if (numBins < 2) throw new DDFException("Number of bins cannot be smaller than 2");
-        theBreaks = getIntervalsFromNumBins(colMeta.getName(), numBins, right);
+        theBreaks = getIntervalsFromNumBins(colMeta.getName(), numBins);
         includeLowest = true;
         break;
       default:throw new DDFException(String.format("Binning type %s is not supported", binningType));
@@ -86,7 +87,7 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
     return newDDF;
   }
 
-  private double[] getIntervalsFromNumBins(String colName, int numBins, Boolean right) throws DDFException {
+  private double[] getIntervalsFromNumBins(String colName, int numBins) throws DDFException {
     DDF ddf = this.getDDF();
     double[] minMax = new double[] {ddf.getVectorMin(colName), ddf.getVectorMax(colName)};
     double min = minMax[0];
@@ -169,41 +170,41 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
 
     List<String> binningColumns = new ArrayList<String>(columns.size());
 
-    for(int i = 0; i < columns.size(); i++) {
-      String colName = columns.get(i).getName();
+    for (Schema.Column col : columns) {
+      String colName = col.getName();
       if (!column.equals(colName)) {
         binningColumns.add(colName);
       } else {
         String caseLowest;
         if (right) {
           if (includeLowest) {
-            caseLowest = String.format("when ((%s >= %s) and (%s <= %s)) then %s", column, breaks[0], column, breaks[1], toLabels?intervals[0]:"0");
+            caseLowest = String.format("when ((%s >= %s) and (%s <= %s)) then %s", column, breaks[0], column, breaks[1], toLabels ? intervals[0] : "0");
           } else {
-            caseLowest = String.format("when ((%s > %s) and (%s <= %s)) then %s", column, breaks[0], column, breaks[1], toLabels?intervals[0]:"0");
+            caseLowest = String.format("when ((%s > %s) and (%s <= %s)) then %s", column, breaks[0], column, breaks[1], toLabels ? intervals[0] : "0");
           }
         } else {
-          caseLowest = String.format("when ((%s >= %s) and (%s < %s)) then %s", column, breaks[0], column, breaks[1], toLabels?intervals[0]:"0");
+          caseLowest = String.format("when ((%s >= %s) and (%s < %s)) then %s", column, breaks[0], column, breaks[1], toLabels ? intervals[0] : "0");
         }
 
         String caseMiddle;
         List<String> whenClauses = new ArrayList<>(breaks.length - 2);
-        for(int j = 1; j < breaks.length - 2; j++) {
+        for (int i = 1; i < breaks.length - 2; i++) {
           if (right) {
-            whenClauses.add(String.format("when ((%s > %s) and (%s <= %s)) then %s", column, breaks[j], column, breaks[j + 1], toLabels?intervals[j]:String.format("%d", j)));
+            whenClauses.add(String.format("when ((%s > %s) and (%s <= %s)) then %s", column, breaks[i], column, breaks[i + 1], toLabels ? intervals[i] : String.format("%d", i)));
           } else {
-            whenClauses.add(String.format("when ((%s >= %s) and (%s < %s)) then %s", column, breaks[j], column, breaks[j + 1], toLabels?intervals[j]:String.format("%d", j)));
+            whenClauses.add(String.format("when ((%s >= %s) and (%s < %s)) then %s", column, breaks[i], column, breaks[i + 1], toLabels ? intervals[i] : String.format("%d", i)));
           }
         }
         caseMiddle = StringUtils.join(whenClauses, " ").toString();
 
         String caseHighest;
         if (right) {
-          caseHighest = String.format("when ((%s > %s) and (%s <= %s)) then %s", column, breaks[breaks.length - 2], column, breaks[breaks.length - 1], toLabels?intervals[intervals.length - 1]:String.format("%d", intervals.length - 1));
+          caseHighest = String.format("when ((%s > %s) and (%s <= %s)) then %s", column, breaks[breaks.length - 2], column, breaks[breaks.length - 1], toLabels ? intervals[intervals.length - 1] : String.format("%d", intervals.length - 1));
         } else {
           if (includeLowest) {
-            caseHighest = String.format("when ((%s >= %s) and (%s <= %s)) then %s", column, breaks[breaks.length - 2], column, breaks[breaks.length - 1], toLabels?intervals[intervals.length - 1]:String.format("%d", intervals.length - 1));
+            caseHighest = String.format("when ((%s >= %s) and (%s <= %s)) then %s", column, breaks[breaks.length - 2], column, breaks[breaks.length - 1], toLabels ? intervals[intervals.length - 1] : String.format("%d", intervals.length - 1));
           } else {
-            caseHighest = String.format("when ((%s >= %s) and (%s < %s)) then %s", column, breaks[breaks.length - 2], column, breaks[breaks.length - 1], toLabels?intervals[intervals.length - 1]:String.format("%d", intervals.length - 1));
+            caseHighest = String.format("when ((%s >= %s) and (%s < %s)) then %s", column, breaks[breaks.length - 2], column, breaks[breaks.length - 1], toLabels ? intervals[intervals.length - 1] : String.format("%d", intervals.length - 1));
           }
         }
 
@@ -211,7 +212,7 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
       }
     }
 
-    return String.format("SELECT %s FROM %s", StringUtils.join(binningColumns, ", ").toString(), this.getDDF().getTableName());
+    return String.format("SELECT %s FROM %s", StringUtils.join(binningColumns, ", "), this.getDDF().getTableName());
   }
 
   public enum BinningType {
