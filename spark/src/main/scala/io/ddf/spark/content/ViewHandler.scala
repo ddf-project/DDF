@@ -76,7 +76,8 @@ class ViewHandler(mDDF: DDF) extends io.ddf.content.ViewHandler(mDDF) with IHand
     val schema: Schema = new Schema(null,
       JavaConverters.asScalaBufferConverter(mDDF.getSchema.getColumns).asScala.toArray)
     // Optimized running time for integer values by using Spark DataFrame sample and limit APIs
-    val sampleDDF = if (numSamples <= Int.MaxValue.toLong) {
+    val numSamplesInt = numSamples.toInt
+    val sampleDDF = if (numSamplesInt == numSamples) {
       val sparkDF = mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
       val sampleDF = sparkDF.sample(withReplacement, fraction, seed).limit(numSamples.toInt)
 
