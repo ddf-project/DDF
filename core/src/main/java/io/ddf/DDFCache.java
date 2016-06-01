@@ -155,8 +155,8 @@ public class DDFCache extends ALoggable {
       } else {
         throw new DDFException("Timeout getting DDF");
       }
-    } catch (InterruptedException e) {
-      throw new DDFException("Error getting DDF ", e);
+    } catch (Exception e) {
+      throw new DDFException(String.format("DDF with uuid %s does not exist", uuid), e);
     }
   }
 

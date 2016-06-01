@@ -65,7 +65,7 @@ public class BasicDDFTests {
     }
   }
 
-  @Test(expected = com.google.common.util.concurrent.UncheckedExecutionException.class)
+  @Test(expected = io.ddf.exception.DDFException.class)
   public void testDDFManagerSetUUID() throws DDFException {
     DDF ddf = this.getTestDDF();
     UUID uuid = ddf.getUUID();
