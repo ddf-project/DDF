@@ -5,17 +5,14 @@ import com.google.common.base.Strings;
 import com.google.common.cache.*;
 import com.google.common.util.concurrent.Striped;
 import io.ddf.exception.DDFException;
+import io.ddf.misc.ALoggable;
+import io.ddf.misc.Config;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import io.ddf.misc.ALoggable;
-import io.ddf.misc.Config;
-import org.apache.commons.lang.exception.ExceptionUtils;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -50,7 +47,8 @@ public class DDFCache extends ALoggable {
     /**
      * Maximum number of DDFs with name allowed in cache, DDFs with name will be evicted by an approximate LRU algorithm
      */
-    Long maxNumberOfDDFsWName = Long.valueOf(Config.getGlobalValue(Config.ConfigConstant.MAX_NUMBER_OF_DDFS_WITH_NAME_IN_CACHE));
+    Long maxNumberOfDDFsWName = Long
+        .valueOf(Config.getGlobalValue(Config.ConfigConstant.MAX_NUMBER_OF_DDFS_WITH_NAME_IN_CACHE));
 
     /**
      * The number of seconds that the DDF will live in cache since it last used(meaning inserted or accessed)
@@ -62,13 +60,11 @@ public class DDFCache extends ALoggable {
 
     mDDFCache = CacheBuilder.newBuilder().
         maximumSize(maxNumberOfDDFs).expireAfterAccess(timeToIdle, TimeUnit.SECONDS).
-        recordStats().removalListener(new DDFRemovalListener())
-        .build();
+        recordStats().removalListener(new DDFRemovalListener()).build();
 
     // Don't do time based eviction for DDF with name
     mDDFwithNameCache = CacheBuilder.newBuilder().
-        maximumSize(maxNumberOfDDFsWName).recordStats().removalListener(new DDFRemovalListener())
-        .build();
+        maximumSize(maxNumberOfDDFsWName).recordStats().removalListener(new DDFRemovalListener()).build();
   }
 
   private boolean containsDDF(UUID uuid) {
@@ -78,12 +74,12 @@ public class DDFCache extends ALoggable {
   private Map<String, UUID> mUris = new ConcurrentHashMap<String, UUID>();
 
   public void addDDF(DDF ddf) throws DDFException {
-    if(ddf.getUUID() == null) {
+    if (ddf.getUUID() == null) {
       throw new DDFException("uuid is null");
     }
     Lock lock = uuidLocks.get(ddf.getUUID());
     try {
-      if(lock.tryLock(120, TimeUnit.SECONDS)) {
+      if (lock.tryLock(120, TimeUnit.SECONDS)) {
         try {
           if (ddf.getName() == null) {
             mDDFCache.put(ddf.getUUID(), ddf);
@@ -97,7 +93,7 @@ public class DDFCache extends ALoggable {
         throw new DDFException("Timeout getting DDF");
       }
     } catch (InterruptedException e) {
-
+      throw new DDFException(e);
     }
   }
 
@@ -108,7 +104,7 @@ public class DDFCache extends ALoggable {
   public synchronized void removeDDF(DDF ddf) throws DDFException {
     mDDFCache.invalidate(ddf.getUUID());
     mDDFwithNameCache.invalidate(ddf.getUUID());
-    if(ddf.getUri() != null) {
+    if (ddf.getUri() != null) {
       mUris.remove(ddf.getUri());
     }
   }
@@ -117,7 +113,7 @@ public class DDFCache extends ALoggable {
     List<DDF> ddfs = new ArrayList<DDF>();
     ddfs.addAll(mDDFCache.asMap().values());
     ddfs.addAll(mDDFwithNameCache.asMap().values());
-    return ddfs.toArray(new DDF[]{});
+    return ddfs.toArray(new DDF[] {});
   }
 
   public long size() {
@@ -125,8 +121,9 @@ public class DDFCache extends ALoggable {
   }
 
   /**
-   *  Try to get DDF from both mDDFCache and mDDFWithNameCache
-   *  if DDF is not present in both, do a restore and put it into the respective cache
+   * Try to get DDF from both mDDFCache and mDDFWithNameCache
+   * if DDF is not present in both, do a restore and put it into the respective cache
+   *
    * @param uuid
    * @return
    * @throws DDFException
@@ -161,46 +158,56 @@ public class DDFCache extends ALoggable {
   }
 
   public DDF getDDFByName(String name) throws DDFException {
-    for(DDF ddf: this.listDDFs()) {
-      if(!Strings.isNullOrEmpty(ddf.getName()) && ddf.getName().equals(name)) {
+    for (DDF ddf : this.listDDFs()) {
+      if (!Strings.isNullOrEmpty(ddf.getName()) && ddf.getName().equals(name)) {
         return ddf;
       }
     }
     throw new DDFException(String.format("Cannot find ddf with name %s", name));
   }
 
-  public synchronized void setDDFName(DDF ddf, String name) throws DDFException {
-    synchronized (ddf) {
-      if (!Strings.isNullOrEmpty(name)) {
-        if (!Strings.isNullOrEmpty(ddf.getName())) {
-          this.mUris.remove(ddf.getUri());
+  public void setDDFName(DDF ddf, String name) throws DDFException {
+    Lock lock = uuidLocks.get(ddf.getUUID());
+    try {
+      if(lock.tryLock(120, TimeUnit.SECONDS)) {
+        try {
+          if (!Strings.isNullOrEmpty(name)) {
+            if (!Strings.isNullOrEmpty(ddf.getName())) {
+              this.mUris.remove(ddf.getUri());
+            }
+            ddf.setName(name);
+            mDDFCache.invalidate(ddf.getUUID());
+            mDDFwithNameCache.put(ddf.getUUID(), ddf);
+            this.mUris.put(ddf.getUri(), ddf.getUUID());
+          } else {
+            throw new DDFException(String.format("DDF's name cannot be null or empty"));
+          }
+        } finally {
+          lock.unlock();
         }
-        ddf.setName(name);
-
-        mDDFCache.invalidate(ddf.getUUID());
-        mDDFwithNameCache.put(ddf.getUUID(), ddf);
-        this.mUris.put(ddf.getUri(), ddf.getUUID());
       } else {
-        throw new DDFException(String.format("DDF's name cannot be null or empty"));
+        throw new DDFException("Timeout setting DDF name");
       }
+    } catch (Exception e) {
+      throw new DDFException(e);
     }
   }
 
   public synchronized void setDDFUUID(DDF ddf, UUID uuid) throws DDFException {
-    if(this.containsDDF(uuid)) {
+    if (this.containsDDF(uuid)) {
       throw new DDFException(String.format("DDF with uuid %s already exists", uuid));
     } else {
       UUID prevUUID = ddf.getUUID();
       ddf.setUUID(uuid);
-      if(prevUUID != null) {
-        if(ddf.getName() == null) {
+      if (prevUUID != null) {
+        if (ddf.getName() == null) {
           mDDFCache.invalidate(prevUUID);
           mDDFCache.put(uuid, ddf);
         } else {
           mDDFwithNameCache.invalidate(prevUUID);
           mDDFCache.put(uuid, ddf);
         }
-        if(ddf.getUri() != null) {
+        if (ddf.getUri() != null) {
           mUris.put(ddf.getUri(), ddf.getUUID());
         }
       }
@@ -209,7 +216,7 @@ public class DDFCache extends ALoggable {
 
   public DDF getDDFByUri(String uri) throws DDFException {
     UUID uuid = this.mUris.get(uri);
-    if(uuid == null) {
+    if (uuid == null) {
       throw new DDFException(String.format("Cannot find ddf with uri %s", uri));
     }
     return this.getDDF(uuid);
@@ -218,13 +225,12 @@ public class DDFCache extends ALoggable {
   private class DDFRemovalListener implements RemovalListener<UUID, DDF> {
 
     //cleaning up DDF upon removal
-    @Override
-    public void onRemoval(RemovalNotification<UUID, DDF> notification) {
-      if(notification.wasEvicted()) {
+    @Override public void onRemoval(RemovalNotification<UUID, DDF> notification) {
+      if (notification.wasEvicted()) {
         mLog.info(String.format("CacheStats = %s", getCacheStats().toString()));
         DDF ddf = notification.getValue();
         if (ddf != null) {
-          if(ddf.getName() != null) {
+          if (ddf.getName() != null) {
             mLog.info(String.format("Removing DDF %s, name = %s", ddf.getUUID(), ddf.getName()));
           } else {
             mLog.info(String.format("Removing DDF %s", ddf.getUUID()));
@@ -234,18 +240,5 @@ public class DDFCache extends ALoggable {
       }
     }
   }
-//
-//  private class DDFLoader extends CacheLoader<UUID, DDF> {
-//
-//    @Override
-//    public DDF load(UUID uuid) throws Exception {
-//      try {
-//        mLog.info(String.format("restoring ddf %s", uuid));
-//        return mDDFManager.restoreDDF(uuid);
-//      } catch (Exception e) {
-//        mLog.error(String.format("Error restoring DDF %s, error = %s", uuid, ExceptionUtils.getStackTrace(e)));
-//        throw new DDFException(String.format("DDF with uuid %s does not exist", uuid));
-//      }
-//    }
-//  }
+
 }
