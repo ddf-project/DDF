@@ -57,7 +57,8 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
         theBreaks = getIntervalsFromNumBins(colMeta.getName(), numBins);
         includeLowest = true;
         break;
-      default:throw new DDFException(String.format("Binning type %s is not supported", binningType));
+      default:
+        throw new DDFException(String.format("Binning type %s is not supported", binningType));
     }
 
     // Check for uniqueness
@@ -89,9 +90,8 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
 
   private double[] getIntervalsFromNumBins(String colName, int numBins) throws DDFException {
     DDF ddf = this.getDDF();
-    double[] minMax = new double[] {ddf.getVectorMin(colName), ddf.getVectorMax(colName)};
-    double min = minMax[0];
-    double max = minMax[1];
+    double min = ddf.getVectorMin(colName);
+    double max = ddf.getVectorMax(colName);
     if (min == max) {
       min -= 0.001 * min;
       max += 0.001 * max;
