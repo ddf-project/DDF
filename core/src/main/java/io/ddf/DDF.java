@@ -486,9 +486,24 @@ public abstract class DDF extends ALoggable //
   }
 
   // ///// binning
+  // This one is kept for backward compatible
   public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
                      boolean right) throws DDFException {
-    return this.getBinningHandler().binning(column, binningType, numBins, breaks, includeLowest, right);
+    return this.getBinningHandler().binning(column, binningType, numBins, breaks, true, includeLowest, right, 3);
+  }
+
+  public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean toLabels, boolean includeLowest,
+                     boolean right, int precision) throws DDFException {
+    return this.getBinningHandler().binning(column, binningType, numBins, breaks, toLabels, includeLowest, right, precision);
+  }
+
+  public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean toLabels, boolean includeLowest,
+                     boolean right) throws DDFException {
+    return this.getBinningHandler().binning(column, binningType, numBins, breaks, toLabels, includeLowest, right, 3);
+  }
+
+  public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean toLabels) throws DDFException {
+    return this.getBinningHandler().binning(column, binningType, numBins, breaks, toLabels, true, false, 3);
   }
 
 
