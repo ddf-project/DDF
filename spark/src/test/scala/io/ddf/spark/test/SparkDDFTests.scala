@@ -68,11 +68,6 @@ with TransformationHandlerBaseSuite with ViewsHandlerBaseSuite {
     assert(ddf1.getNumColumns == ddf2.getNumColumns)
   }
 
-  test("clean up ddf") {
-    val ddf = loadMtCarsDDF()
-    ddf.cleanup()
-  }
-
   ignore("name is not copied") {
     val ddf1 = loadMtCarsDDF()
     Array("cyl", "hp", "vs", "am", "gear", "carb").foreach {

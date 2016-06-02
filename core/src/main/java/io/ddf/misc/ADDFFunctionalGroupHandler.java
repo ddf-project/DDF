@@ -22,6 +22,7 @@ public abstract class ADDFFunctionalGroupHandler extends ALoggable implements IH
 
   public ADDFFunctionalGroupHandler(DDF theDDF) {
     this.setDDF(theDDF);
+    PhantomReference.register(this);
   }
 
 
