@@ -17,13 +17,12 @@ public class BasicDDFTests {
 
   DDFManager mManager;
 
-
   private DDFManager getDDFManager() throws DDFException {
     if (mManager == null) mManager = DDFManager.get(DDFManager.EngineType.BASIC);
     return mManager;
   }
 
-  private DDF getTestDDF() throws DDFException {
+  protected DDF getTestDDF() throws DDFException {
     List<Object[]> list = new ArrayList<Object[]>();
     list.add(new Object[] { "Last", "Nguyen" });
     list.add(new Object[] { "First", "Christopher" });
@@ -66,7 +65,7 @@ public class BasicDDFTests {
     }
   }
 
-  @Test(expected = DDFException.class)
+  @Test(expected = io.ddf.exception.DDFException.class)
   public void testDDFManagerSetUUID() throws DDFException {
     DDF ddf = this.getTestDDF();
     UUID uuid = ddf.getUUID();

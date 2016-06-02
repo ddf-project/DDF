@@ -158,7 +158,11 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   /**
    * List of existing DDFs, only in memory one.
    */
-  protected DDFCache mDDFCache = new DDFCache();
+  protected DDFCache mDDFCache = new DDFCache(this);
+
+  public DDFCache getDDFcache() {
+    return this.mDDFCache;
+  }
 
   protected Map<String, IModel> mModels = new ConcurrentHashMap<String, IModel>();
 
@@ -184,10 +188,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
     return mDDFCache.getDDF(uuid);
   }
 
-  // TODO: Should we consider restore here?
-  public boolean hasDDF(UUID uuid) {
-    return mDDFCache.hasDDF(uuid);
-  }
 
   // TODO: Should we consider restore here?
   public DDF getDDFByName(String name) throws DDFException {
@@ -322,7 +322,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       // throw new DDFException("Cannot get DDFManager for engine " + engineName, e);
       throw new DDFException(
           "Cannot get DDFManager for engine " + engineType.name() + " " +
-                  "classname " + className + " " + e.getMessage());
+                  "classname " + className + " " + e.getMessage(), e);
 
     }
   }
