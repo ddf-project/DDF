@@ -26,6 +26,12 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
     // TODO Auto-generated constructor stub
   }
 
+  @Override
+  @Deprecated
+  public DDF dropNA(Axis axis, NAChecking how, long thresh, List<String> columns) throws DDFException {
+    return this.dropNA(axis, how, thresh, columns, Boolean.FALSE);
+  }
+
   /**
    * This function filters out rows or columns that contain NA values, Default: axis=0, how='any', thresh=0, columns=null,
    * inplace=false
@@ -34,10 +40,11 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
    * @param how     = 'any' or 'all', default 'any'
    * @param thresh  = required number of non-NA values to skip, default 0
    * @param columns = only consider NA dropping on the given columns, set to null for all columns of the DDF, default null
+   * @param inPlace = false: result in new DDF, true: update on the same DDF
    * @return a DDF with NAs filtered
    */
   @Override
-  public DDF dropNA(Axis axis, NAChecking how, long thresh, List<String> columns) throws DDFException {
+  public DDF dropNA(Axis axis, NAChecking how, long thresh, List<String> columns, Boolean inPlace) throws DDFException {
     DDF newddf = null;
 
     int numcols = this.getDDF().getNumColumns();
@@ -88,7 +95,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
     }
 
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
-    return newddf;
+    return inPlace ? this.getDDF().updateInplace(newddf) : newddf;
   }
 
   private String dropNARowSQL(long thresh, List<String> columns) {
@@ -127,6 +134,13 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
             .getRows().get(0));
   }
 
+  @Override
+  @Deprecated
+  public DDF fillNA(String value, FillMethod method, long limit, AggregateFunction function,
+                    Map<String, String> columnsToValues,
+                    List<String> columns) throws DDFException {
+    return this.fillNA(value, method, limit, function, columnsToValues, columns, Boolean.FALSE);
+  }
 
   /**
    * This function fills NA with given values. Default using a scalar value fillNA(value,null, 0, null, null, null,
@@ -138,13 +152,13 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
    * @param function        aggregate function to generate the filled value for a column
    * @param columnsToValues = a map to provide different values to fill for different columns
    * @param columns         = only consider NA filling on the given columns, set to null for all columns of the DDF
-   * @param inplace         = false: result in new DDF, true: update on the same DDF
+   * @param inPlace         = false: result in new DDF, true: update on the same DDF
    * @return a DDF with NAs filled
    */
   @Override
   public DDF fillNA(String value, FillMethod method, long limit, AggregateFunction function,
       Map<String, String> columnsToValues,
-      List<String> columns) throws DDFException {
+      List<String> columns, Boolean inPlace) throws DDFException {
 
     DDF newddf = null;
     if (columns == null) {
@@ -161,7 +175,7 @@ public class MissingDataHandler extends ADDFFunctionalGroupHandler implements IH
     }
 
     newddf.getMetaDataHandler().copyFactor(this.getDDF());
-    return newddf;
+    return inPlace ? this.getDDF().updateInplace(newddf) : newddf;
   }
 
   private String fillNAWithValueSQL(String value, AggregateFunction function, Map<String, String> columnsToValues,

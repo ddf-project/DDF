@@ -176,6 +176,15 @@ public class SparkDDFManager extends DDFManager {
   }
 
   @Override
+  public void shutdown() {
+//  ToDo: Find a good way to release hive lock-resource
+//    mSparkContext.stop();
+//    this.mHiveContext = null;
+//    this.mJavaSparkContext = null;
+//    this.mSparkContext = null;
+  }
+
+  @Override
   public String getEngine() {
     return "spark";
   }
@@ -596,21 +605,21 @@ public class SparkDDFManager extends DDFManager {
 
 
   /**
-   * A special function to create full ddf for data ingestion
-   * It load whole dataset, do parsing csv,casting to required type
-   * and collect Parsing Statistic also Casting Statistic
+   * A special function to create full ddf for data ingestion It load whole dataset, do parsing csv,casting to required
+   * type and collect Parsing Statistic also Casting Statistic
    *
-   * @param source         : datasource uri
-   * @param requiredSchema : required schema for return ddf
-   * @param csvOptions     : https://github.com/databricks/spark-csv
-   * @param applySchemaMode      : SET_NONE: set malformed column to null, DROPMALFORMED: Drop rows which contain any malformed column, FAILFAST ->throw exception
-   * @param numHeadRows: if <= 0, then whole data set will be loaded
+   * @param source          : datasource uri
+   * @param requiredSchema  : required schema for return ddf
+   * @param csvOptions      : https://github.com/databricks/spark-csv
+   * @param applySchemaMode : SET_NONE: set malformed column to null, DROPMALFORMED: Drop rows which contain any
+   *                        malformed column, FAILFAST ->throw exception
+   * @param numHeadRows:    if <= 0, then whole data set will be loaded
    * @return SparkDDF & Statistic
    */
-  public Tuple3<SparkDDF,CsvRelation.ParsingStatistic,SchemaHandler.ApplySchemaStatistic> newDDFFromCsv(
+  public Tuple3<SparkDDF, CsvRelation.ParsingStatistic, SchemaHandler.ApplySchemaStatistic> newDDFFromCsv(
       String source,
       Schema requiredSchema,
-      Map<String,String> csvOptions,
+      Map<String, String> csvOptions,
       String applySchemaMode,
       int numHeadRows
   ) throws DDFException {
@@ -618,38 +627,38 @@ public class SparkDDFManager extends DDFManager {
     StructType stringSchema = SparkUtils.str2SparkSchema(tmpStringSchema);
 
     CsvParser csvParser = new CsvParser().withSchema(stringSchema).withOptions(Utils.toScalaMap(csvOptions));
-    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfAndPStats = csvParser.csvFileWithStats(getHiveContext(), source,numHeadRows);
+    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfAndPStats = csvParser.csvFileWithStats(getHiveContext(), source, numHeadRows);
 
     SparkDDF tmpStringDDF = new SparkDDF(this, dfAndPStats._1(), null, null);
-    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> dfWithCStats = ((SchemaHandler) tmpStringDDF.getSchemaHandler()).applySchema(requiredSchema, applySchemaMode,0);
-    return new Tuple3<>(dfWithCStats._1(),dfAndPStats._2(),dfWithCStats._2());
+    Tuple2<SparkDDF, SchemaHandler.ApplySchemaStatistic> dfWithCStats = ((SchemaHandler) tmpStringDDF.getSchemaHandler()).applySchema(requiredSchema, applySchemaMode, 0);
+    return new Tuple3<>(dfWithCStats._1(), dfAndPStats._2(), dfWithCStats._2());
   }
 
 
-
   /**
-   * A special function to create sample ddf for Data Ingestion
-   * It will take nHeadRow from source, do parsing csv data & collect parsing statistic
-   * @param source     : datasource uri
+   * A special function to create sample ddf for Data Ingestion It will take nHeadRow from source, do parsing csv data &
+   * collect parsing statistic
+   *
+   * @param source         : datasource uri
    * @param requiredSchema : required schema for return ddf
-   * @param csvOptions : https://github.com/databricks/spark-csv
-   * @param nHeadRow   : num row will be used for sample ddf
+   * @param csvOptions     : https://github.com/databricks/spark-csv
+   * @param nHeadRow       : num row will be used for sample ddf
    * @return SparkDDF & Statistic
    */
-  public Tuple2<SparkDDF,CsvRelation.ParsingStatistic> newDDFFromCsv(
+  public Tuple2<SparkDDF, CsvRelation.ParsingStatistic> newDDFFromCsv(
       String source,
       Schema requiredSchema,
-      Map<String,String> csvOptions,
+      Map<String, String> csvOptions,
       int nHeadRow
   ) throws DDFException {
     String tmpStringSchema = StringUtils.join(requiredSchema.getColumnNames(), " String,") + " String";
     StructType stringSchema = SparkUtils.str2SparkSchema(tmpStringSchema);
-    CsvParser csvParser = new CsvParser().withSchema(stringSchema).withOptions(Utils.<String,String>toScalaMap(csvOptions));
-    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfWithStats = csvParser.csvFileWithStats(getHiveContext(), source,nHeadRow);
+    CsvParser csvParser = new CsvParser().withSchema(stringSchema).withOptions(Utils.<String, String>toScalaMap(csvOptions));
+    Tuple2<DataFrame, CsvRelation.ParsingStatistic> dfWithStats = csvParser.csvFileWithStats(getHiveContext(), source, nHeadRow);
 
     DataFrame df = dfWithStats._1();
     df.count();
-    SparkDDF ddf = (SparkDDF) SparkUtils.df2ddf(df,this);
+    SparkDDF ddf = (SparkDDF) SparkUtils.df2ddf(df, this);
 
     return new Tuple2<>(ddf, dfWithStats._2);
 
