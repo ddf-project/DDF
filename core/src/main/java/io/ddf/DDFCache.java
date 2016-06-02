@@ -138,6 +138,10 @@ public class DDFCache extends ALoggable {
             ddf = mDDFwithNameCache.getIfPresent(uuid);
             if (ddf == null) {
               ddf = mDDFManager.restoreDDF(uuid);
+              // XXX: hot fix for not being able to run SQL on DDF, this might not belong here
+              // this is needed because DDFCoordinator keeps a mapping between DDF <-> DDFManager
+              // and SQL API uses that map to figure out which DDFManager should be used to run given a query
+              mDDFManager.getDDFCoordinator().addDDF(ddf);
             }
             if (ddf.getName() != null) {
               mDDFwithNameCache.put(uuid, ddf);
