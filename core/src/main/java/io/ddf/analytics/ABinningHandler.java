@@ -30,6 +30,11 @@ public abstract class ABinningHandler extends ADDFFunctionalGroupHandler impleme
   public abstract List<AStatisticsSupporter.HistogramBin> getVectorApproxHistogram(String column, int numBins)
           throws DDFException;
 
+  public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean includeLowest,
+                     boolean right) throws DDFException {
+    return binning(column, binningType, numBins, breaks, true, includeLowest, right, 2);
+  }
+
   public DDF binning(String column, String binningType, int numBins, double[] breaks, boolean toLabels, boolean includeLowest,
       boolean right, int precision) throws DDFException {
 
