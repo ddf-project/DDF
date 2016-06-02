@@ -173,6 +173,23 @@ public class DDFCoordinator extends ALoggable {
     throw new DDFException("Can't find ddf with uuid: " + uuid.toString());
   }
 
+  public DDF getDDFByURI(String uri) throws DDFException {
+    for (Map.Entry<UUID, DDFManager> entry : mEngineUUID2DDFManager.entrySet()) {
+      DDFManager manager = entry.getValue();
+      try {
+        return manager.getDDFByURI(uri);
+      } catch (Exception e) {
+        try {
+          return manager.getOrRestoreDDFUri(uri);
+        } catch (Exception ignored) {
+          // this is not the right manager for given DDF id
+        }
+      }
+    }
+
+    throw new DDFException("Can't find ddf with uri: " + uri);
+  }
+
   /**
    * @brief Return the uuid for one uri.
    * @param uri The uri of the ddf.
@@ -236,6 +253,37 @@ public class DDFCoordinator extends ALoggable {
     return this.initEngine(null, engineType, dataSourceDescriptor);
   }
 
+  // TODO: Is this used?
+  public int stopEngine(String engineName) {
+    return 0;
+  }
+
+
+  // TODO: Is this used?
+  /**
+   * @param engineUUID the engine uuid.
+   * @return The "show tables" result.
+   * @throws DDFException
+   * @brief Browse what content is in the engine.
+   */
+  public SqlResult browseEngine(UUID engineUUID) throws DDFException {
+    DDFManager ddfManager = this.getEngine(engineUUID);
+    return ddfManager.sql("show tables", ddfManager.getEngine());
+  }
+
+  /**
+   * @return
+   * @throws DDFException
+   * @brief Browse ddfs in all engines.
+   */
+  public List<SqlResult> browseEngines() throws DDFException {
+    List<SqlResult> retList = new ArrayList<SqlResult>();
+    for (UUID engineUUID : mEngineUUID2DDFManager.keySet()) {
+      retList.add(this.browseEngine(engineUUID));
+    }
+    return retList;
+  }
+
   /**
    * @param engineUUID The uuid of the engine.
    * @return The ddfmanager, or null if there is no such engine.
@@ -250,4 +298,18 @@ public class DDFCoordinator extends ALoggable {
     return manager;
   }
 
+  public DDF sql2ddf(String sqlCmd, UUID engineUUID) {
+    return null;
+  }
+
+  public DDF sql2ddf(String sqlCmd, DataSourceDescriptor dataSourceDescriptor) {
+    return null;
+  }
+
+  // TODO: is this used?
+  public DDF transfer(UUID fromEngine, UUID engineUUID, UUID ddfUUID) throws
+      DDFException {
+    DDFManager defaultManager = this.getEngine(engineUUID);
+    return defaultManager.transfer(fromEngine, ddfUUID);
+  }
 }
