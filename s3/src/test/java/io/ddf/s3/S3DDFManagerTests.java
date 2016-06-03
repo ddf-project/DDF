@@ -90,6 +90,12 @@ public class S3DDFManagerTests {
         }
     }
 
+    private Map<String, String> withFormat(String format) {
+        Map<String, String> options = new HashMap<>();
+        options.put("format", format);
+        return options;
+    }
+
     @Test
     public void testCreateDDF() throws DDFException {
         try {
@@ -122,12 +128,9 @@ public class S3DDFManagerTests {
         assert (pqtDDF.getIsDir() == true);
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
-        Map<String, String> options = new HashMap<>();
-        options.put("format", "parquet");
-        S3DDF pqtDDFWithOpts = manager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null, options);
+        S3DDF pqtDDFWithOpts = manager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null, withFormat("parquet"));
         assert (pqtDDFWithOpts.getIsDir() == true);
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
-
 
         S3DDF avroDDF = manager.newDDF("adatao-sample-data", "test/avro/single/twitter.avro", null, null);
         assert (avroDDF.getIsDir() == false);
@@ -136,6 +139,10 @@ public class S3DDFManagerTests {
         S3DDF orcDDF = manager.newDDF("adatao-test", "orc/", null, null);
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
+
+        // Need to accept lower case
+        orcDDF = manager.newDDF("adatao-test", "orc/", null, withFormat("orc"));
+        assert (orcDDF.getDataFormat().equals((DataFormat.ORC)));
 
         S3DDF noExtensionDDF = manager.newDDF("adatao-sample-data/test/csv/withheader");
 

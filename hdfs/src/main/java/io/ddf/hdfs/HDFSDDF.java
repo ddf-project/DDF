@@ -53,20 +53,21 @@ public class HDFSDDF extends DDF {
         }
         // Check directory or file.
         HDFSDDFManager hdfsDDFManager = this.getManager();
+        mIsDir = hdfsDDFManager.isDir(this);
         // Check dataformat.
         if (options != null && options.containsKey("format")) {
             try {
                 String format = options.get("format").toUpperCase();
                 format = format.equals("PARQUET") ? "PQT" : format;
-                mDataFormat = DataFormat.valueOf(options.get("format"));
+                mDataFormat = DataFormat.valueOf(format);
             } catch (IllegalArgumentException e) {
-                mIsDir = hdfsDDFManager.isDir(this);
+                // TODO: Disable automatic format choosing, or put it under a convenience flag.
                 mDataFormat = hdfsDDFManager.getDataFormat(this);
             }
         } else {
-            mIsDir = hdfsDDFManager.isDir(this);
             mDataFormat = hdfsDDFManager.getDataFormat(this);
         }
+        mLog.info(String.format("HDFS data format %s", mDataFormat));
     }
 
     public DataFormat getDataFormat() {
