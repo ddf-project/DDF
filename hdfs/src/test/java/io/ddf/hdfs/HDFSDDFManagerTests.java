@@ -6,7 +6,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
@@ -42,6 +44,12 @@ public class HDFSDDFManagerTests {
         assert (files.size() > 0);
     }
 
+    private Map<String, String> withFormat(String format) {
+        Map<String, String> options = new HashMap<>();
+        options.put("format", format);
+        return options;
+    }
+
     @Test
     public void testCreateDDF() throws DDFException {
         HDFSDDF cleanFolderDDF = manager.newDDF("/test_pe/csv/multiple", null, null);
@@ -70,12 +78,19 @@ public class HDFSDDFManagerTests {
         assert (pqtDDF.getIsDir() == true);
         assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
 
-
         HDFSDDF avroDDF = manager.newDDF("/test_pe/avro/single", null, null);
         assert (avroDDF.getIsDir() == true);
         assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
 
+        avroDDF = manager.newDDF("/test_pe/avro/single", null, withFormat("AVRO"));
+        assert (avroDDF.getIsDir() == true);
+        assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
+
         HDFSDDF orcDDF = manager.newDDF("/test_pe/orc/default", null, null);
+        assert (orcDDF.getIsDir() == true);
+        assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
+
+        orcDDF = manager.newDDF("/test_pe/orc/default", null, withFormat("orc"));
         assert (orcDDF.getIsDir() == true);
         assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
 

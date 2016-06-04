@@ -89,20 +89,21 @@ public class S3DDF extends DDF {
         mLog.info(String.format("Initialize s3 ddf: %s %s", mBucket, mKey));
         // Check directory or file.
         S3DDFManager s3DDFManager = this.getManager();
+        mIsDir = s3DDFManager.isDir(this);
         // Check dataformat.
         if (options != null && options.containsKey("format")) {
             try {
                 String format = options.get("format").toUpperCase();
                 format = format.equals("PARQUET") ? "PQT" : format;
-                mDataFormat = DataFormat.valueOf(options.get("format"));
+                mDataFormat = DataFormat.valueOf(format);
             } catch (IllegalArgumentException e) {
-                mIsDir = s3DDFManager.isDir(this);
+                // TODO: Disable automatic format choosing, or put it under a convenience flag.
                 mDataFormat = s3DDFManager.getDataFormat(this);
             }
         } else {
-            mIsDir = s3DDFManager.isDir(this);
             mDataFormat = s3DDFManager.getDataFormat(this);
         }
+        mLog.info(String.format("S3 data format %s", mDataFormat));
     }
 
     public DataFormat getDataFormat() {
