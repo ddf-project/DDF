@@ -114,6 +114,7 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
    * @return a new DDF
    * @throws DDFException
    */
+  @Deprecated
   DDF castType(String column, String newType) throws DDFException;
 
   /**
@@ -124,5 +125,16 @@ public interface IHandleTransformations extends IHandleDDFFunctionalGroup {
    * @return the current DDF if inplace is true, else return new DDF
    * @throws DDFException
    */
+  @Deprecated
   DDF castType(String column, String newType, Boolean inPlace) throws DDFException;
+
+  /**
+   * Cast column(s) to newType
+   * @param columns list of column names to be casted
+   * @param newType type of new columns
+   * @param inPlace if true modify the DDF, else return new DDF
+   * @return the current DDF if inplace is true, else return new DDF
+   * @throws DDFException
+   */
+  DDF castType(List<String> columns, String newType, Boolean inPlace) throws DDFException;
 }

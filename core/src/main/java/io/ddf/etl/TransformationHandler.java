@@ -494,12 +494,12 @@ public class TransformationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override public DDF castType(String column, String newType, Boolean inPlace) throws DDFException {
-    if (inPlace) {
-      DDF ddf = castType(column, newType);
-      return this.getDDF().updateInplace(ddf);
-    } else {
-      return castType(column, newType);
-    }
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public DDF castType(List<String> columns, String newType, Boolean inPlace) throws DDFException {
+    throw new UnsupportedOperationException();
   }
 
   private boolean isColumnEligibleToScale(Column column, List<String> scaleRequestedColumnNames) {

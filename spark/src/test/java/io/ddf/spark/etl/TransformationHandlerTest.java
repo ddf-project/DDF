@@ -523,16 +523,56 @@ public class TransformationHandlerTest extends BaseTest {
   @Test
   public void testCastType() throws DDFException {
     DDF newDDF = ddf.Transform.castType("year", "string");
-    assert(newDDF.getUUID() != ddf.getUUID());
-    assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
+    Assert.assertTrue(newDDF.getUUID() != ddf.getUUID());
+    Assert.assertTrue(newDDF.getColumn("year").getType() == ColumnType.STRING);
   }
 
   @Test
   public void testCastTypeMutable() throws DDFException {
-    DDF newDDF = ddf.Transform.castType("year", "string", true);
-    assert(newDDF.getUUID() == ddf.getUUID());
-    assert(newDDF.getColumn("year").getType() == ColumnType.STRING);
-    assert(ddf.getColumn("year").getType() == ColumnType.STRING);
+    DDF inputDDF = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, " +
+            "distance, arrdelay, depdelay from airline", "SparkSQL");
+
+    DDF newDDF = inputDDF.Transform.castType("year", "string", true);
+    Assert.assertTrue(newDDF.getUUID().equals(inputDDF.getUUID()));
+    Assert.assertTrue(newDDF.getColumn("year").getType() == ColumnType.STRING);
+    Assert.assertTrue(inputDDF.getColumn("year").getType() == ColumnType.STRING);
+  }
+
+  @Test
+  public void testCastTypeMultipleColumns() throws DDFException {
+    List<String> columns = new ArrayList<>();
+    columns.add("year");
+    columns.add("month");
+
+    Assert.assertTrue(ddf.getColumn("year").getType() == ColumnType.INT);
+    Assert.assertTrue(ddf.getColumn("month").getType() == ColumnType.INT);
+
+    DDF newDDF = ddf.Transform.castType(columns, "string", Boolean.FALSE);
+    Assert.assertFalse(newDDF.getUUID().equals(ddf.getUUID()));
+    Assert.assertTrue(newDDF.getColumn("year").getType() == ColumnType.STRING);
+    Assert.assertTrue(newDDF.getColumn("month").getType() == ColumnType.STRING);
+  }
+
+  @Test
+  public void testCastTypeMultipleColumnsInPlaceTrue() throws DDFException {
+    DDF inputDDF = manager.sql2ddf("select year, month, dayofweek, deptime, arrtime, " +
+            "distance, arrdelay, depdelay from airline", "SparkSQL");
+
+    List<String> columns = new ArrayList<>();
+    columns.add("year");
+    columns.add("month");
+
+    Assert.assertTrue(inputDDF.getColumn("year").getType() == ColumnType.INT);
+    Assert.assertTrue(inputDDF.getColumn("month").getType() == ColumnType.INT);
+
+    Boolean inPlace = Boolean.TRUE;
+
+    DDF newDDF = inputDDF.Transform.castType(columns, "string", inPlace);
+    Assert.assertTrue(newDDF.getUUID().equals(inputDDF.getUUID()));
+    Assert.assertTrue(newDDF.getColumn("year").getType() == ColumnType.STRING);
+    Assert.assertTrue(newDDF.getColumn("month").getType() == ColumnType.STRING);
+    Assert.assertTrue(inputDDF.getColumn("year").getType() == ColumnType.STRING);
+    Assert.assertTrue(inputDDF.getColumn("month").getType() == ColumnType.STRING);
   }
 
   @Test

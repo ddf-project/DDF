@@ -199,11 +199,18 @@ public class TransformFacade implements IHandleTransformations {
     return mTransformationHandler.sort(columns, ascending, inPlace);
   }
 
+  @Deprecated
   public DDF castType(String column, String newType) throws DDFException {
     return mTransformationHandler.castType(column, newType);
   }
 
+  @Deprecated
   public DDF castType(String column, String newType, Boolean inPlace) throws DDFException {
     return mTransformationHandler.castType(column, newType, inPlace);
+  }
+
+  @Override
+  public DDF castType(List<String> columns, String newType, Boolean inPlace) throws DDFException {
+    return mTransformationHandler.castType(columns, newType, inPlace);
   }
 }
