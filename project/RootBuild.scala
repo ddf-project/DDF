@@ -38,7 +38,7 @@ object RootBuild extends Build {
   val rootOrganization = "io"
   val projectName = "ddf"
   val rootProjectName = projectName
-  val rootVersion = "1.4.17-SNAPSHOT"
+  val rootVersion = "1.4.17"
   
   // Project and modules information
   val projectOrganization = rootOrganization + "." + projectName
