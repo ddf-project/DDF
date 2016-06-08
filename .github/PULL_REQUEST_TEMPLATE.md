@@ -4,9 +4,10 @@ Describe what you changed / implemented / refactored. Add related github issue /
 Improve `kmeans` API
 - https://github.com/ddf-project/DDF/issues/45
 
-Main reviewer: Tag reviewer here
-Optional reviewer: Tag reviewer here
-Observers: @hai-adatao, @SeineRiver
+Reviewers: 
+- Main reviewer: Tag reviewer here
+- Optional reviewer: Tag reviewer here
+- Observers: @hai-adatao, @SeineRiver
 
 ### Breaking changes & backward compatible issues
 Is this PR a breaking change or has backward compatible issue (e.g: changes in API names, interfaces, signature / remove something...) that will makes DDF-JDBC / PE fails to build after merge?
