@@ -4,17 +4,15 @@ Describe what you changed / implemented / refactored. Add related github issue /
 Improve `kmeans` API
 - https://github.com/ddf-project/DDF/issues/45
 
-Reviewers: Tag reviewers here
+Main reviewer: Tag reviewer here
+Optional reviewer: Tag reviewer here
+Observers: @hai-adatao, @SeineRiver
 
 ### Breaking changes & backward compatible issues
-Is this PR a breaking change or has backward compatible issue (e.g: changes in API names, interfaces, signature / remove something...)?
-If yes, please state out what and tag, and if it can possibly affect BA, please tag aht, tuananh, khangpham and baonguyen
-
-### How to test
-Describe how this PR is tested. In case manual testing is required, describe how to do so.
+Is this PR a breaking change or has backward compatible issue (e.g: changes in API names, interfaces, signature / remove something...) that will makes DDF-JDBC / PE fails to build after merge?
 
 ### PR Progress
 Make sure all checkboxes below are checked before merged
-- [ ] Branch is in format `prefix/description` (see [this](http://www.guyroutledge.co.uk/blog/git-branch-naming-conventions/))
 - [ ] Merge check has no conflicts. PR checks passed.
-- [ ] Code review is done. 
+- [ ] Main reviewer approved
+- [ ] Optional reviewer approved
