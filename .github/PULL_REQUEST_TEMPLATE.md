@@ -10,7 +10,7 @@ Reviewers:
 - Observers: @hai-adatao, @SeineRiver
 
 ### Breaking changes & backward compatible issues
-Is this PR a breaking change or has backward compatible issue (e.g: changes in API names, interfaces, signature / remove something...) that will makes DDF-JDBC / PE fails to build after merge?
+Is this PR a breaking change or has backward compatible issue (e.g: changes in API names, interfaces, signature / remove something...) that will makes DDF-JDBC / PE fails to build after merge? If yes, please make sure all related PRs for DDF-JDBC, PE are ready and linked properly.
 
 ### PR Progress
 Make sure all checkboxes below are checked before merged
