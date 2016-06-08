@@ -359,7 +359,7 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
-            <version>1.6.0-adatao-hd2.7.2</version>
+            <version>1.6.0-adatao-mapr</version>
             <exclusions>
                 <exclusion>
                     <groupId>net.java.dev.jets3t</groupId>
@@ -386,7 +386,7 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-mllib_2.10</artifactId>
-            <version>1.6.0-adatao-hd2.7.2</version>
+            <version>1.6.0-adatao-mapr</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.spark</groupId>
@@ -401,7 +401,7 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.10</artifactId>
-            <version>1.6.0-adatao-hd2.7.2</version>
+            <version>1.6.0-adatao-mapr</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>
@@ -420,7 +420,7 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_2.10</artifactId>
-            <version>1.6.0-adatao-hd2.7.2</version>
+            <version>1.6.0-adatao-mapr</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>
@@ -452,7 +452,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-aws</artifactId>
-            <version>2.7.2</version>
+            <version>2.7.0-mapr-1602</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.amazonaws</groupId>
@@ -471,12 +471,6 @@
         </dependency>
     </dependencies>
     <repositories>
-        <repository>
-            <id>typesafereleases</id>
-            <name>typesafe-releases</name>
-            <url>http://repo.typesafe.com/typesafe/releases/</url>
-            <layout>default</layout>
-        </repository>
         <repository>
             <id>AdataoMvnreposSnapshots</id>
             <name>Adatao Mvnrepos Snapshots</name>
@@ -499,6 +493,12 @@
             <id>ClouderaRepository</id>
             <name>Cloudera Repository</name>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>MapRRepository</id>
+            <name>MapR Repository</name>
+            <url>http://repository.mapr.com/maven/</url>
             <layout>default</layout>
         </repository>
         <repository>

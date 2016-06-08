@@ -25,7 +25,7 @@ object RootBuild extends Build {
   // Project definitions / configs
   val OBSELETE_HADOOP_VERSION = "1.0.4"
   val DEFAULT_HADOOP_VERSION = "2.2.0"
-  val SPARK_VERSION = "1.6.0-adatao-hd2.7.2"
+  val SPARK_VERSION = "1.6.0-adatao-mapr"
   val SPARK_CSV_VERSION = "arimo-1.4.0.13"
   val YARN_ENABLED = env("SPARK_YARN").getOrElse("true").toBoolean
   
@@ -106,18 +106,18 @@ object RootBuild extends Build {
     "org.apache.spark" % "spark-hive_2.10" % SPARK_VERSION exclude("io.netty", "netty-all") exclude ("com.google.code.findbugs", "jsr305")
       exclude("org.jboss.netty", "netty") exclude("org.mortbay.jetty", "jetty") exclude("org.mortbay.jetty", "servlet-api"),
     "com.google.protobuf" % "protobuf-java" % "2.5.0",
-    "org.apache.hadoop" % "hadoop-aws" % "2.7.2" exclude("com.amazonaws", "aws-java-sdk") exclude("com.fasterxml.jackson.core", "jackson-annotations"),
+    "org.apache.hadoop" % "hadoop-aws" % "2.7.0-mapr-1602" exclude("com.amazonaws", "aws-java-sdk") exclude("com.fasterxml.jackson.core", "jackson-annotations"),
     "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4"
   )
 
   val s3_dependencies = Seq(
     "com.amazonaws" % "aws-java-sdk" % "1.10.8",
-    "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api") exclude("commons-httpclient", "commons-httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
+    "org.apache.hadoop" % "hadoop-common" % "2.7.0-mapr-1602" exclude("org.mortbay.jetty", "servlet-api") exclude("commons-httpclient", "commons-httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
    "org.apache.httpcomponents" % "httpcore" % "4.4.1"
   )
 
   val hdfs_dependencies = Seq(
-    "org.apache.hadoop" % "hadoop-hdfs" % "2.7.2",
+    "org.apache.hadoop" % "hadoop-hdfs" % "2.7.0-mapr-1602",
     "org.apache.spark" % "spark-core_2.10" % SPARK_VERSION  exclude("net.java.dev.jets3t", "jets3t") exclude("com.google.protobuf", "protobuf-java") exclude ("com.google.code.findbugs", "jsr305")
       exclude("io.netty", "netty-all") exclude("org.mortbay.jetty", "jetty")
   )
@@ -150,7 +150,7 @@ object RootBuild extends Build {
     },
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.7.2",
     libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.0",
-    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api")
+    libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0-mapr-1602" exclude("org.mortbay.jetty", "servlet-api")
       exclude("javax.servlet", "servlet-api"),
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.0",
     libraryDependencies ++= scalaDependencies,
@@ -232,6 +232,7 @@ object RootBuild extends Build {
       "Adatao Mvnrepos Releases" at "https://raw.github.com/adatao/mvnrepos/master/releases",
       "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
       "Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/",
+      "MapR Repository" at "http://repository.mapr.com/maven/",
       "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
     ),
 
@@ -319,6 +320,7 @@ object RootBuild extends Build {
     dependencyOverrides += "io.dropwizard.metrics" % "metrics-jvm" % "3.1.2",
     dependencyOverrides += "org.apache.commons" % "commons-lang3" % "3.1",
     dependencyOverrides += "org.apache.curator" % "curator-recipes" % "2.7.1",
+    dependencyOverrides += "org.json" % "json" % "20090211", 
       pomExtra := (
         <!--
         **************************************************************************************************
