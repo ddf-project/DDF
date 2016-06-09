@@ -27,6 +27,13 @@ import scala.collection.JavaConversions._
 
 trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
 
+  test("throw an error on aggregate without groups") {
+    val ddf = loadAirlineDDF()
+    intercept[Exception] {
+      ddf.getAggregationHandler.agg(List("mean=avg(ArrDelay)"))
+    }
+  }
+
   test("calculate simple aggregates") {
     val ddf = loadAirlineDDF()
     val aggregateResult1 = ddf.aggregate("Year, Month, min(ArrDelay), max(DepDelay)")
@@ -38,7 +45,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
 
     val aggregateResult2 = ddf.aggregate("year, month, avg(depdelay), stddev(arrdelay)")
     aggregateResult2.size() should be(13)
-    ddf.VIEWS.head(5).size should be 5
+    ddf.VIEWS.head(5).size should be(5)
     ddf.VIEWS.project(List("year", "month", "deptime")).getNumColumns should be(3)
   }
 
@@ -60,13 +67,6 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
     result.getColumnNames.map(col => col.toLowerCase) should (contain("mean") and contain("dayofmonth"))
     val rows = result.sql("select * from @this", "").getRows
     rows.head.split("\t").head.toDouble should be(9.0 +- 1.0)
-  }
-
-  test("throw an error on aggregate without groups") {
-    val ddf = loadAirlineDDF()
-    intercept[Exception] {
-      ddf.getAggregationHandler.agg(List("mean=avg(ArrDelay)"))
-    }
   }
 
   test("calculate correlation") {
