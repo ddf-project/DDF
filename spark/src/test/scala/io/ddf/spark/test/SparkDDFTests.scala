@@ -18,6 +18,7 @@
  */
 package io.ddf.spark.test
 
+import io.ddf.spark.SparkBaseSuite
 import io.ddf.test.it._
 import io.ddf.test.it.analytics.{StatisticsSupporterBaseSuite, BinningHandlerBaseSuite, AggregationHandlerBaseSuite}
 import io.ddf.test.it.content.{PersistenceHandlerBaseSuite, ViewsHandlerBaseSuite, SchemaHandlerBaseSuite}

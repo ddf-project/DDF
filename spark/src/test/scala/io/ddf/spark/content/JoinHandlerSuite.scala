@@ -2,8 +2,8 @@ package io.ddf.spark.content
 
 import java.util
 
+import io.ddf.spark.SparkBaseSuite
 import io.ddf.spark.etl.JoinHandler
-import io.ddf.test.it.SparkBaseSuite
 import io.ddf.test.it.etl.JoinHandlerBaseSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

@@ -1,8 +1,8 @@
-package io.ddf.test.it
+package io.ddf.spark
 
-import scala.collection.JavaConversions._
-
+import io.ddf.test.it.BaseSuite
 import io.ddf.{DDF, DDFManager}
+
 
 trait SparkBaseSuite extends BaseSuite {
 
@@ -21,15 +21,10 @@ trait SparkBaseSuite extends BaseSuite {
                                    tableName: String,
                                    schema: String,
                                    delimiter: String): DDF = {
-    val sqlResult = manager.sql(s"SHOW TABLES", engineName)
-    val tables = sqlResult.getRows.map(row => row.split("\t")(0))
-
-    if (!tables.contains(tableName)) {
-      manager.sql(s"DROP TABLE IF EXISTS $tableName", engineName)
-      manager.sql(s"CREATE TABLE $tableName ($schema) " +
-        s"ROW FORMAT DELIMITED FIELDS TERMINATED BY '$delimiter'", engineName)
-      manager.sql(s"LOAD DATA LOCAL INPATH '$filePath' INTO TABLE $tableName", engineName)
-    }
+    manager.sql(s"DROP TABLE IF EXISTS $tableName", engineName)
+    manager.sql(s"CREATE TABLE $tableName ($schema) " +
+      s"ROW FORMAT DELIMITED FIELDS TERMINATED BY '$delimiter'", engineName)
+    manager.sql(s"LOAD DATA LOCAL INPATH '$filePath' INTO TABLE $tableName", engineName)
     manager.sql2ddf(s"SELECT * FROM $tableName", engineName)
   }
 
