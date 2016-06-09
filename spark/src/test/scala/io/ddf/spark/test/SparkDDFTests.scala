@@ -27,7 +27,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class SparkDDFTests extends SparkBaseSuite with StatisticsSupporterBaseSuite with BinningHandlerBaseSuite
-with AggregationHandlerBaseSuite with MissingDataHandlerBaseSuite
+with MissingDataHandlerBaseSuite
 with PersistenceHandlerBaseSuite with SchemaHandlerBaseSuite with SqlHandlerBaseSuite
 with TransformationHandlerBaseSuite with ViewsHandlerBaseSuite {
 

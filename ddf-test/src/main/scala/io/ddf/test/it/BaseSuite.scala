@@ -35,11 +35,11 @@ trait BaseSuite extends FunSuite {
   val engineName: String
   val manager: DDFManager
 
-  def loadMtCarsDDF(): DDF
-  def loadCarOwnersDDF(): DDF
-  def loadAirlineDDF(): DDF
-  def loadAirlineDDFWithoutDefault(): DDF
-  def loadAirlineDDFWithNA(): DDF
-  def loadYearNamesDDF(): DDF
-  def loadSmithsDDF(): DDF
+  def loadMtCarsDDF(useCache: Boolean = true): DDF
+  def loadCarOwnersDDF(useCache: Boolean = true): DDF
+  def loadAirlineDDF(useCache: Boolean = true): DDF
+  def loadAirlineDDFWithoutDefault(useCache: Boolean = true): DDF
+  def loadAirlineDDFWithNA(useCache: Boolean = true): DDF
+  def loadYearNamesDDF(useCache: Boolean = true): DDF
+  def loadSmithsDDF(useCache: Boolean = true): DDF
 }
