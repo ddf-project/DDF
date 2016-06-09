@@ -25,6 +25,7 @@ trait SparkBaseSuite extends BaseSuite {
     val tables = sqlResult.getRows.map(row => row.split("\t")(0))
 
     if (!tables.contains(tableName)) {
+      manager.sql(s"DROP TABLE IF EXISTS $tableName", engineName)
       manager.sql(s"CREATE TABLE $tableName ($schema) " +
         s"ROW FORMAT DELIMITED FIELDS TERMINATED BY '$delimiter'", engineName)
       manager.sql(s"LOAD DATA LOCAL INPATH '$filePath' INTO TABLE $tableName", engineName)
