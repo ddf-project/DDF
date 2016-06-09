@@ -28,14 +28,14 @@ import scala.collection.JavaConversions._
 trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
 
   test("throw an error on aggregate without groups") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
     intercept[Exception] {
       ddf.getAggregationHandler.agg(List("mean=avg(ArrDelay)"))
     }
   }
 
   test("calculate simple aggregates") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
     val aggregateResult1 = ddf.aggregate("Year, Month, min(ArrDelay), max(DepDelay)")
     val result: Array[Double] = aggregateResult1.get("2008\t3")
     result.length should be(2)
@@ -50,7 +50,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("group data") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
     val l1: java.util.List[String] = List("DayofMonth")
     val l2: java.util.List[String] = List("avg(DepDelay)")
     val avgDelayByDay = ddf.groupBy(l1, l2)
@@ -61,7 +61,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("group and aggregate 2 steps") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
     val ddf2 = ddf.getAggregationHandler.groupBy(List("DayofMonth"))
     val result = ddf2.getAggregationHandler.agg(List("mean=avg(ArrDelay)"))
     result.getColumnNames.map(col => col.toLowerCase) should (contain("mean") and contain("dayofmonth"))
@@ -70,12 +70,12 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("calculate correlation") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
     ddf.correlation("ArrDelay", "DepDelay") should be(0.89 +- 1)
   }
 
   test("Proper error message for non-existent columns") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
 
     val thrown = intercept[DDFException] {
       ddf.groupBy(List("Year1"), List("count(*)"))
@@ -99,7 +99,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("Proper error message for expressions") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
 
     val thrown1 = intercept[DDFException] {
       ddf.groupBy(List("Year"), List("arrdelay+"))
@@ -113,7 +113,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("Proper error message for undefined function") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
 
     val thrown1 = intercept[DDFException] {
       ddf.groupBy(List("Year"), List("aaa(arrdelay)"))
@@ -122,7 +122,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("Proper error message for wrong Hive UDF usage") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
 
     val thrown1 = intercept[DDFException] {
       ddf.groupBy(List("Year"), List("substring('aaaa')"))
@@ -138,7 +138,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("Proper error message for expressions or columns that contain invalid characters") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
 
     val thrown1 = intercept[DDFException] {
       ddf.groupBy(List("Year@"), List("avg(arrdelay)"))
@@ -177,7 +177,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("Proper error message for new columns that contain invalid characters") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
 
     val thrown1 = intercept[DDFException] {
       ddf.groupBy(List("Year"), List("newcol@=avg(arrdelay)"))
@@ -186,7 +186,7 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
   }
 
   test("Proper error message for new columns that exist") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
 
     val groupped = ddf.groupBy(List("Year"), List("arrdelay=avg(arrdelay)"))
     assert(groupped.getColumnNames.contains("arrdelay"))

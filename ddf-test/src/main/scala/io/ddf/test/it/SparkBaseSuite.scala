@@ -1,5 +1,7 @@
 package io.ddf.test.it
 
+import scala.collection.JavaConversions._
+
 import io.ddf.{DDF, DDFManager}
 
 trait SparkBaseSuite extends BaseSuite {
@@ -19,15 +21,19 @@ trait SparkBaseSuite extends BaseSuite {
                                    tableName: String,
                                    schema: String,
                                    delimiter: String): DDF = {
-    manager.sql(s"DROP TABLE IF EXISTS $tableName", engineName)
-    manager.sql(s"CREATE TABLE $tableName ($schema) " +
-      s"ROW FORMAT DELIMITED FIELDS TERMINATED BY '$delimiter'", engineName)
-    manager.sql(s"LOAD DATA LOCAL INPATH '$filePath' INTO TABLE $tableName", engineName)
+    val sqlResult = manager.sql(s"SHOW TABLES", engineName)
+    val tables = sqlResult.getRows.map(row => row.split("\t")(0))
+
+    if (!tables.contains(tableName)) {
+      manager.sql(s"CREATE TABLE $tableName ($schema) " +
+        s"ROW FORMAT DELIMITED FIELDS TERMINATED BY '$delimiter'", engineName)
+      manager.sql(s"LOAD DATA LOCAL INPATH '$filePath' INTO TABLE $tableName", engineName)
+    }
     manager.sql2ddf(s"SELECT * FROM $tableName", engineName)
   }
 
 
-  override def loadMtCarsDDF(useCache: Boolean = true): DDF = {
+  override def loadMtCarsDDF(useCache: Boolean = false): DDF = {
     if (this.mtcars == null || !useCache) {
       this.mtcars = loadTestDataFromFile(getClass.getResource("/mtcars").getPath, "mtcars",
         config.getValue("schema", "mtcars"), " ")
@@ -35,7 +41,7 @@ trait SparkBaseSuite extends BaseSuite {
     this.mtcars
   }
 
-  override def loadCarOwnersDDF(useCache: Boolean = true): DDF = {
+  override def loadCarOwnersDDF(useCache: Boolean = false): DDF = {
     if (this.carOwners == null || !useCache) {
       this.carOwners = loadTestDataFromFile(getClass.getResource("/carowner.txt").getPath, "carowner",
         config.getValue("schema", "carowner"), " ")
@@ -43,7 +49,7 @@ trait SparkBaseSuite extends BaseSuite {
     this.carOwners
   }
 
-  override def loadAirlineDDF(useCache: Boolean = true): DDF = {
+  override def loadAirlineDDF(useCache: Boolean = false): DDF = {
     if (this.airline == null || !useCache) {
       this.airline = loadTestDataFromFile(getClass.getResource("/airline.csv").getPath, "airline",
         config.getValue("schema", "airline"), ",")
@@ -51,7 +57,7 @@ trait SparkBaseSuite extends BaseSuite {
     this.airline
   }
 
-  override def loadAirlineDDFWithoutDefault(useCache: Boolean = true): DDF = {
+  override def loadAirlineDDFWithoutDefault(useCache: Boolean = false): DDF = {
     if (this.airlineWithoutDefault == null || !useCache) {
       this.airlineWithoutDefault = loadTestDataFromFile(getClass.getResource("/airline.csv").getPath,
         "airlineWithoutDefault",
@@ -60,7 +66,7 @@ trait SparkBaseSuite extends BaseSuite {
     this.airlineWithoutDefault
   }
 
-  override def loadAirlineDDFWithNA(useCache: Boolean = true): DDF = {
+  override def loadAirlineDDFWithNA(useCache: Boolean = false): DDF = {
     if (this.airlineWithNA == null || !useCache) {
       this.airlineWithNA = loadTestDataFromFile(getClass.getResource("/airlineWithNA.csv").getPath, "airlineWithNA",
         config.getValue("schema", "airline"), ",")
@@ -68,7 +74,7 @@ trait SparkBaseSuite extends BaseSuite {
     this.airlineWithNA
   }
 
-  override def loadYearNamesDDF(useCache: Boolean = true): DDF = {
+  override def loadYearNamesDDF(useCache: Boolean = false): DDF = {
     if (this.yearNames == null || !useCache) {
       this.yearNames = loadTestDataFromFile(getClass.getResource("/year_names.csv").getPath, "year_names",
         config.getValue("schema", "year-names"), ",")
@@ -76,7 +82,7 @@ trait SparkBaseSuite extends BaseSuite {
     this.yearNames
   }
 
-  override def loadSmithsDDF(useCache: Boolean = true): DDF = {
+  override def loadSmithsDDF(useCache: Boolean = false): DDF = {
     if (this.smiths == null || !useCache) {
       this.smiths = loadTestDataFromFile(getClass.getResource("/smiths").getPath, "smiths",
         config.getValue("schema", "smiths"), ",")
