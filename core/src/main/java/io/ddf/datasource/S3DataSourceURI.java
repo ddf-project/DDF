@@ -39,13 +39,13 @@ public class S3DataSourceURI extends DataSourceURI {
         if (this.awsKeyID != null && this.awsSecretKey != null) {
             String creds = this.awsKeyID + ":" + this.awsSecretKey + "@";
             try {
-                return new URI("s3n://" + creds + this.mUri.toString());
+                return new URI("s3a://" + creds + this.mUri.toString());
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                return new URI("s3n://" + this.mUri.toString());
+                return new URI("s3a://" + this.mUri.toString());
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
