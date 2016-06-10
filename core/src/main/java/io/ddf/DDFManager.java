@@ -316,6 +316,7 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
       if (manager == null) {
         throw new DDFException("ERROR: Initializaing manager fail.");
       }
+      manager.setEngineType(engineType);
       return manager;
 
     } catch (Exception e) {
