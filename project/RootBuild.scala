@@ -111,7 +111,7 @@ object RootBuild extends Build {
   )
 
   val s3_dependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk" % "1.7.4" exclude("com.fasterxml.jackson.core", "jackson-core"),
+    "com.amazonaws" % "aws-java-sdk" % "1.7.4",
     "org.apache.hadoop" % "hadoop-common" % "2.7.2" exclude("org.mortbay.jetty", "servlet-api") exclude("commons-httpclient", "commons-httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
    "org.apache.httpcomponents" % "httpcore" % "4.4.1"
   )
@@ -279,6 +279,7 @@ object RootBuild extends Build {
     dependencyOverrides += "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-xc" % "1.8.8",
     dependencyOverrides += "org.codehaus.jackson" % "jackson-jaxrs" % "1.8.8",
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.4.4",
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4",
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.4.4",
     dependencyOverrides += "com.thoughtworks.paranamer" % "paranamer" % "2.4.1", //net.liftweb conflict with avro
