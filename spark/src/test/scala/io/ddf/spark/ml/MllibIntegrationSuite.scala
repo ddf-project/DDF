@@ -1,7 +1,8 @@
-package io.ddf.spark.analytics
+package io.ddf.spark.ml
+
+import io.ddf.spark.{ATestSuite, SparkDDF}
 
 import scala.collection.JavaConversions._
-import io.ddf.spark.{ATestSuite, SparkDDF}
 
 /**
   */

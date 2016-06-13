@@ -1,8 +1,9 @@
-package io.ddf.spark.analytics
+package io.ddf.spark.ml
 
-import org.junit.Assert._
 import io.ddf.content.Schema
-import io.ddf.spark.{SparkDDF, ATestSuite}
+import io.ddf.spark.{ATestSuite, SparkDDF}
+import org.junit.Assert._
+
 import scala.collection.JavaConversions._
 
 /**

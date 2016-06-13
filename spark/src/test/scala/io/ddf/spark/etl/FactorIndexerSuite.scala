@@ -1,12 +1,11 @@
-package io.ddf.spark.analytics
+package io.ddf.spark.etl
 
 import java.util
-
-import io.ddf.{DDF, Factor}
-import io.ddf.spark.ATestSuite
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 import java.util.Arrays
+
+import io.ddf.spark.ATestSuite
+
+import scala.collection.JavaConverters._
 /**
  * Created by huandao on 3/15/16.
  */
