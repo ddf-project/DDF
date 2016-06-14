@@ -18,6 +18,7 @@
  */
 package io.ddf.spark.test
 
+import io.ddf.spark.SparkBaseSuite
 import io.ddf.test.it._
 import io.ddf.test.it.analytics.{StatisticsSupporterBaseSuite, BinningHandlerBaseSuite, AggregationHandlerBaseSuite}
 import io.ddf.test.it.content.{PersistenceHandlerBaseSuite, ViewsHandlerBaseSuite, SchemaHandlerBaseSuite}
@@ -27,7 +28,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class SparkDDFTests extends SparkBaseSuite with StatisticsSupporterBaseSuite with BinningHandlerBaseSuite
-with AggregationHandlerBaseSuite with MissingDataHandlerBaseSuite
+with MissingDataHandlerBaseSuite
 with PersistenceHandlerBaseSuite with SchemaHandlerBaseSuite with SqlHandlerBaseSuite
 with TransformationHandlerBaseSuite with ViewsHandlerBaseSuite {
 
