@@ -14,6 +14,7 @@ import io.ddf.spark.SparkDDF;
 import io.ddf.spark.SparkDDFManager;
 import io.ddf.spark.analytics.FactorIndexer;
 import io.ddf.spark.util.SparkUtils;
+
 import org.apache.spark.Accumulator;
 import org.apache.spark.AccumulatorParam;
 import org.apache.spark.api.java.JavaRDD;
@@ -22,11 +23,13 @@ import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.catalyst.util.StringUtils;
-import org.apache.spark.sql.types.*;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.apache.spark.unsafe.types.UTF8String;
-import scala.Tuple2;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -35,6 +38,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.concurrent.NotThreadSafe;
+
+import scala.Tuple2;
 
 public class SchemaHandler extends io.ddf.content.SchemaHandler {
   /**
@@ -192,6 +199,7 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
         return row != null;
       });
       dataFrame = manager.getHiveContext().createDataFrame(appliedRdd.rdd(), newSchema);
+      dataFrame.cache();
       totalLineSuccess = dataFrame.count();
 
 
