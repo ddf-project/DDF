@@ -123,7 +123,7 @@ class S3DataSource(uri: String, manager: DDFManager) extends FileDataSource(uri,
           case Some(credential: UsernamePasswordCredential) =>
             val username = credential.getUsername
             val password = credential.getPassword
-            s"s3n://$username:$password@$bucket$absolutePath"
+            s"s3a://$username:$password@$bucket$absolutePath"
           case Some(cred) =>
             throw new UnauthenticatedDataSourceException(s"Incompatible credential for S3 source: $cred")
           case None =>
