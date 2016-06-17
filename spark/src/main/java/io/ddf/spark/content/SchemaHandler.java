@@ -4,17 +4,6 @@
 package io.ddf.spark.content;
 
 
-import io.ddf.DDF;
-import io.ddf.Factor;
-import io.ddf.content.IHandleRepresentations;
-import io.ddf.content.Schema;
-import io.ddf.content.Schema.Column;
-import io.ddf.exception.DDFException;
-import io.ddf.spark.SparkDDF;
-import io.ddf.spark.SparkDDFManager;
-import io.ddf.spark.analytics.FactorIndexer;
-import io.ddf.spark.util.SparkUtils;
-
 import org.apache.spark.Accumulator;
 import org.apache.spark.AccumulatorParam;
 import org.apache.spark.api.java.JavaRDD;
@@ -41,6 +30,16 @@ import java.util.Map;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
+import io.ddf.DDF;
+import io.ddf.Factor;
+import io.ddf.content.IHandleRepresentations;
+import io.ddf.content.Schema;
+import io.ddf.content.Schema.Column;
+import io.ddf.exception.DDFException;
+import io.ddf.spark.SparkDDF;
+import io.ddf.spark.SparkDDFManager;
+import io.ddf.spark.analytics.FactorIndexer;
+import io.ddf.spark.util.SparkUtils;
 import scala.Tuple2;
 
 public class SchemaHandler extends io.ddf.content.SchemaHandler {
@@ -199,7 +198,6 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
         return row != null;
       });
       dataFrame = manager.getHiveContext().createDataFrame(appliedRdd.rdd(), newSchema);
-      dataFrame.cache();
       totalLineSuccess = dataFrame.count();
 
 
