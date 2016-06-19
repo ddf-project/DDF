@@ -102,7 +102,11 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
 
       for (Integer columnIndex : columnIndexes) {
         String colName = this.getDDF().getColumnName(columnIndex);
-        listLevelCountsWithName.put(colName, listLevelCounts.get(columnIndex));
+        if(listLevelCounts.get(columnIndex) != null) {
+          listLevelCountsWithName.put(colName, listLevelCounts.get(columnIndex));
+        } else {
+          listLevelCountsWithName.put(colName, new HashMap<String, Integer>());
+        }
       }
       return listLevelCountsWithName;
     } else {

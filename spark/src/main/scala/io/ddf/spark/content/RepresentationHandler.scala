@@ -77,7 +77,7 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   }
 
   /**
-   * Cache SchemaRDD in memory
+   * Cache DataFrame in memory
    **/
   override def cache(isLazy: Boolean) = {
     val ddf = this.getDDF.asInstanceOf[SparkDDF]
@@ -89,6 +89,10 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
     if (!isLazy) {
       dataFrame.count()
     }
+  }
+
+  def isCache(): Boolean = {
+    this.getManager.asInstanceOf[SparkDDFManager].getHiveContext.isCached(this.getDDF.getTableName)
   }
 
   override def cacheAll = {
