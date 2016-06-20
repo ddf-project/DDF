@@ -325,9 +325,6 @@ public class SparkDDFManager extends DDFManager {
       }
       DDF newDDF = this.newDDF(this, df, new Class<?>[]{DataFrame.class}, null,
           null, ddf.getSchema());
-      newDDF.getRepresentationHandler().cache(false);
-      newDDF.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
-
       if (flattenFormat.contains(dataFormat)
           && options != null
           && options.get("flatten") != null
@@ -659,7 +656,6 @@ public class SparkDDFManager extends DDFManager {
     DataFrame df = dfWithStats._1();
     df.count();
     SparkDDF ddf = (SparkDDF) SparkUtils.df2ddf(df, this);
-
     return new Tuple2<>(ddf, dfWithStats._2);
 
   }
