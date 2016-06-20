@@ -656,7 +656,6 @@ public class SparkDDFManager extends DDFManager {
     DataFrame df = dfWithStats._1();
     df.count();
     SparkDDF ddf = (SparkDDF) SparkUtils.df2ddf(df, this);
-
     return new Tuple2<>(ddf, dfWithStats._2);
 
   }

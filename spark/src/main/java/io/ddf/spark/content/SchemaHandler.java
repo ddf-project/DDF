@@ -199,7 +199,6 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
         return row != null;
       });
       dataFrame = manager.getHiveContext().createDataFrame(appliedRdd.rdd(), newSchema);
-      dataFrame.cache();
       totalLineSuccess = dataFrame.count();
 
 
