@@ -1,5 +1,7 @@
 package io.ddf.spark.etl
 
+import java.util
+
 import _root_.io.ddf.spark.SparkDDFManager
 import _root_.io.ddf.spark.analytics.{FactorIndexer, FactorIndexerModel}
 import org.apache.spark.ml.feature.OneHotEncoder
@@ -371,10 +373,23 @@ class TransformationHandler(mDDF: DDF) extends CoreTransformationHandler(mDDF) {
     this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(encodedDF)
   }
 
+  @deprecated
   override def castType(column: String, newType: String): DDF = {
-    val df = this.mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-    val newDF = df.withColumn(column , df.col(column).cast(newType))
-    this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(newDF)
+    this.castType(column, newType, java.lang.Boolean.FALSE)
+  }
+
+  @deprecated
+  override def castType(column: String, newType: String, inPlace: java.lang.Boolean): DDF = {
+    val columns = new util.ArrayList[String]()
+    columns.add(column)
+    this.castType(columns, newType, inPlace)
+  }
+
+  override def castType(columns: util.List[String], newType: String, inPlace: java.lang.Boolean): DDF = {
+    var df = this.mDDF.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    columns.foreach { column => df = df.withColumn(column , df.col(column).cast(newType))}
+    val ddf = this.getManager.asInstanceOf[SparkDDFManager].newDDFFromSparkDataFrame(df)
+    if (inPlace) this.getDDF.updateInplace(ddf) else ddf
   }
 }
 
