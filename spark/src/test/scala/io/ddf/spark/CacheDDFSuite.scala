@@ -2,9 +2,6 @@ package io.ddf.spark
 
 import io.ddf.spark.content.RepresentationHandler
 
-/**
-  * Created by huandao on 6/20/16.
-  */
 class CacheDDFSuite extends ATestSuite {
   createTableAirline()
 
