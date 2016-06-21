@@ -26,18 +26,30 @@ import scala.collection.JavaConversions._
 
 trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
 
+  test("throw an error on aggregate without groups") {
+    val ddf = loadAirlineDDF(useCache = true)
+    intercept[Exception] {
+      ddf.getAggregationHandler.agg(List("mean=avg(ArrDelay)"))
+    }
+  }
+
   test("calculate simple aggregates") {
-    val ddf = loadAirlineDDF()
-    val aggregateResult = ddf.aggregate("Year, Month, min(ArrDelay), max(DepDelay)")
-    val result: Array[Double] = aggregateResult.get("2008\t3")
+    val ddf = loadAirlineDDF(useCache = true)
+    val aggregateResult1 = ddf.aggregate("Year, Month, min(ArrDelay), max(DepDelay)")
+    val result: Array[Double] = aggregateResult1.get("2008\t3")
     result.length should be(2)
 
     val colAggregate = ddf.getAggregationHandler.aggregateOnColumn(AggregateFunction.MAX, "Year")
     colAggregate should be(2010)
+
+    val aggregateResult2 = ddf.aggregate("year, month, avg(depdelay), stddev(arrdelay)")
+    aggregateResult2.size() should be(13)
+    ddf.VIEWS.head(5).size should be(5)
+    ddf.VIEWS.project(List("year", "month", "deptime")).getNumColumns should be(3)
   }
 
   test("group data") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
     val l1: java.util.List[String] = List("DayofMonth")
     val l2: java.util.List[String] = List("avg(DepDelay)")
     val avgDelayByDay = ddf.groupBy(l1, l2)
@@ -47,8 +59,8 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
     rows.head.split("\t").head.toDouble should be(21.0 +- 1.0)
   }
 
-  test("group and aggregate)2 steps") {
-    val ddf = loadAirlineDDF()
+  test("group and aggregate 2 steps") {
+    val ddf = loadAirlineDDF(useCache = true)
     val ddf2 = ddf.getAggregationHandler.groupBy(List("DayofMonth"))
     val result = ddf2.getAggregationHandler.agg(List("mean=avg(ArrDelay)"))
     result.getColumnNames.map(col => col.toLowerCase) should (contain("mean") and contain("dayofmonth"))
@@ -56,16 +68,8 @@ trait AggregationHandlerBaseSuite extends BaseSuite with Matchers {
     rows.head.split("\t").head.toDouble should be(9.0 +- 1.0)
   }
 
-  test("throw an error on aggregate without groups") {
-    val airlineDDF = loadAirlineDDF()
-    val ddf = manager.sql2ddf("select * from airline", engineName)
-    intercept[Exception] {
-      ddf.getAggregationHandler.agg(List("mean=avg(ArrDelay)"))
-    }
-  }
-
   test("calculate correlation") {
-    val ddf = loadAirlineDDF()
+    val ddf = loadAirlineDDF(useCache = true)
     ddf.correlation("ArrDelay", "DepDelay") should be(0.89 +- 1)
   }
 
