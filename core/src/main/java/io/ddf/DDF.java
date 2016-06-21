@@ -75,28 +75,12 @@ public abstract class DDF extends ALoggable //
   //  Whether the ddf acts as a view for the database table.
   private boolean mIsDDFView = false;
 
-  private boolean isCache = false;
-
   public boolean getIsDDFView() {
     return mIsDDFView;
   }
 
   public void setIsDDFView(boolean isDDFView) {
     this.mIsDDFView = isDDFView;
-  }
-
-  public boolean isCache() {
-    return this.isCache;
-  }
-
-  public void cache() {
-    this.isCache = true;
-    this.getRepresentationHandler().cache(false);
-  }
-
-  public void uncache() {
-    this.isCache = false;
-    this.getRepresentationHandler().uncacheAll();
   }
 
   /**
