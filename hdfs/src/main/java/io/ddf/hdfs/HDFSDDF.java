@@ -11,9 +11,6 @@ import java.util.Map;
  * Created by jing on 2/22/16.
  */
 public class HDFSDDF extends DDF {
-    // It's a directory or file.
-    private Boolean mIsDir;
-
     // The format of this s3ddf. If it's a folder, we requires that all the files in the folder should have the same
     // format, otherwise the dataformat will be set to the dataformat of the first file under this folder.
     private DataFormat mDataFormat;
@@ -53,7 +50,6 @@ public class HDFSDDF extends DDF {
         }
         // Check directory or file.
         HDFSDDFManager hdfsDDFManager = this.getManager();
-        mIsDir = hdfsDDFManager.isDir(this);
         // Check dataformat.
         if (options != null && options.containsKey("format")) {
             try {
@@ -61,11 +57,9 @@ public class HDFSDDF extends DDF {
                 format = format.equals("PARQUET") ? "PQT" : format;
                 mDataFormat = DataFormat.valueOf(format);
             } catch (IllegalArgumentException e) {
-                // TODO: Disable automatic format choosing, or put it under a convenience flag.
-                mDataFormat = hdfsDDFManager.getDataFormat(this);
+                throw new DDFException(String.format("Unsupported dataformat: %s", options.get("format")));
+
             }
-        } else {
-            mDataFormat = hdfsDDFManager.getDataFormat(this);
         }
         mLog.info(String.format("HDFS data format %s", mDataFormat));
     }
@@ -76,14 +70,6 @@ public class HDFSDDF extends DDF {
 
     public void setDataFormat(DataFormat dataFormat) {
         this.mDataFormat = dataFormat;
-    }
-
-    public Boolean getIsDir() {
-        return mIsDir;
-    }
-
-    public void setIsDir(Boolean isDir) {
-        this.mIsDir = isDir;
     }
 
     public String getPath() {

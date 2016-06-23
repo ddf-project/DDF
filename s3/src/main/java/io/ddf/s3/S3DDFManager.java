@@ -66,48 +66,6 @@ public class S3DDFManager extends DDFManager {
     this(s3Credentials, EngineType.S3);
   }
 
-  /**
-   * @brief To check whether the ddf is a directory.
-   */
-  public Boolean isDir(S3DDF s3DDF) throws DDFException {
-    List<String> keys = this.listFiles(s3DDF.getBucket(),s3DDF.getKey());
-    for (String key : keys) {
-      if (key.endsWith("/") && !key.equals(s3DDF.getKey())) {
-        throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
-      }
-    }
-    Boolean isDir = s3DDF.getKey().endsWith("/") || keys.size() > 1;
-    return isDir;
-  }
-
-  /**
-   * @breif To get the dataformat.
-   */
-  public DataFormat getDataFormat(S3DDF s3DDF) throws DDFException {
-    if (s3DDF.getIsDir()) {
-      List<String> keys = this.fileKeys(s3DDF);
-      HashSet<DataFormat> dataFormats = new HashSet<>();
-      for (String key : keys) {
-        // Check for extension.
-        DataFormat dataFormat = Utils.getDataFormatFromPath(key);
-        if (!dataFormat.equals(DataFormat.UNDEF)) {
-          dataFormats.add(dataFormat);
-        }
-      }
-      if (dataFormats.size() > 1) {
-        throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: " +
-            "%s", s3DDF.getKey(), Arrays.toString(dataFormats.toArray())));
-      } else if (dataFormats.size() == 1){
-        return dataFormats.iterator().next();
-      } else {
-        return DataFormat.CSV;
-      }
-    } else {
-      String key = s3DDF.getKey();
-      DataFormat dataFormat = Utils.getDataFormatFromPath(key);
-      return dataFormat.equals(DataFormat.UNDEF) ? DataFormat.CSV : dataFormat;
-    }
-  }
 
   /**
    * @brief List buckets.
@@ -177,22 +135,6 @@ public class S3DDFManager extends DDFManager {
     return new S3DDF(this, bucket, key, schema, options);
   }
 
-  /**
-   * @param s3DDF The s3ddf.
-   * @brief Return the key of the first non-folder file under this folder.
-   */
-  private String firstFileKey(S3DDF s3DDF) throws DDFException {
-    if (s3DDF.getIsDir()) {
-      List<String> ret = this.fileKeys(s3DDF);
-      if (ret.isEmpty()) {
-        throw new DDFException("There is no file under " + s3DDF.getBucket() + "/" + s3DDF.getKey());
-      } else {
-        return ret.get(0);
-      }
-    } else {
-      return s3DDF.getKey();
-    }
-  }
 
   private List<String> fileKeys(S3DDF s3DDF) throws DDFException {
     List<String> ret = new ArrayList<String>();
