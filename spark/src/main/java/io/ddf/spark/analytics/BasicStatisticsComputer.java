@@ -51,12 +51,13 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
         long count = Long.valueOf(rows[0].getString(i));
         double mean = Double.valueOf(rows[1].getString(i));
         double stddev = Double.valueOf(rows[2].getString(i));
+        double sqdeviation = Math.pow(stddev, 2)*(count - 1);
         double min = Double.valueOf(rows[3].getString(i));
         double max = Double.valueOf(rows[4].getString(i));
         String sqlCmd = String.format("select count(*) from %s where `%s` is null",
             this.getDDF().getTableName(), column.getName());
         long naCount = df.sqlContext().sql(sqlCmd).collect()[0].getLong(0);
-        Summary summary = new Summary(count, mean, stddev, naCount, min, max);
+        Summary summary = new Summary(count, mean, sqdeviation, naCount, min, max);
         summaries[colIndex] = summary;
         i += 1;
       } else {
