@@ -76,37 +76,31 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
         columnTypes.add(this.getColumn(columnName).getType());
       }
 
-      Map<Integer, Map<String, Integer>> listLevelCounts;
-
       IHandleRepresentations repHandler = this.getDDF().getRepresentationHandler();
-
-      try {
-        if (repHandler.has(RDD.class, Object[].class)) {
-          RDD<Object[]> rdd = ((SparkDDF) this.getDDF()).getRDD(Object[].class);
-          listLevelCounts = GetMultiFactor.getFactorCounts(rdd, columnIndexes, columnTypes, Object[].class);
-        } else {
-          RDD<Object[]> rdd = ((SparkDDF) this.getDDF()).getRDD(Object[].class);
-          if (rdd == null) {
-            throw new DDFException("RDD is null");
-          }
-          listLevelCounts = GetMultiFactor.getFactorCounts(rdd, columnIndexes, columnTypes, Object[].class);
-        }
-      } catch (DDFException e) {
-        throw new DDFException("Error getting factor level counts", e);
-      }
-
-      if (listLevelCounts == null) {
-        throw new DDFException("Error getting factor levels counts");
-      }
+      DataFrame df = (DataFrame) repHandler.get(DataFrame.class);
       Map<String, Map<String, Integer>> listLevelCountsWithName = new HashMap<String, Map<String, Integer>>();
+      if(df != null) {
+        for(String colName: columnNames) {
+          DataFrame groupedDF = df.groupBy(colName).count();
 
-      for (Integer columnIndex : columnIndexes) {
-        String colName = this.getDDF().getColumnName(columnIndex);
-        if(listLevelCounts.get(columnIndex) != null) {
-          listLevelCountsWithName.put(colName, listLevelCounts.get(columnIndex));
-        } else {
-          listLevelCountsWithName.put(colName, new HashMap<String, Integer>());
+          DataFrame groupedDF1 = groupedDF.
+              withColumn(colName, groupedDF.col(colName).cast("string")).
+              withColumn("count", groupedDF.col("count").cast("integer"));
+
+          if(groupedDF.count() > Factor.getMaxLevelCounts()) {
+            throw new DDFException(String.format("Number of unique values for column %s is larger than %s", colName, Factor.getMaxLevelCounts()));
+          }
+          Row[] rows = groupedDF1.collect();
+          Map<String, Integer> valueCounts = new HashMap<String, Integer>();
+          for(Row row: rows) {
+            String value = (String) row.getAs(colName);
+            int count = (int) row.getAs("count");
+            valueCounts.put(value, count);
+          }
+          listLevelCountsWithName.put(colName, valueCounts);
         }
+      } else {
+        throw new DDFException("No Spark DataFrame in DDF");
       }
       return listLevelCountsWithName;
     } else {
