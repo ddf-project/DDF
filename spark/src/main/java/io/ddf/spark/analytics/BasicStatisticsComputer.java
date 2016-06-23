@@ -37,11 +37,39 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
   @SuppressWarnings("unchecked")
   @Override
   public Summary[] getSummaryImpl() throws DDFException {
-    RDD<Object[]> rdd = (RDD<Object[]>) this.getDDF().getRepresentationHandler().get(RDD.class, Object[].class);
 
-    JavaRDD<Object[]> data = rdd.toJavaRDD();
-    Summary[] stats = data.map(new GetSummaryMapper()).reduce(new GetSummaryReducer());
-    return stats;
+    DataFrame df = (DataFrame) this.getDDF().getRepresentationHandler().get(DataFrame.class);
+    DataFrame summaryDF = df.describe();
+    Row[] rows = summaryDF.collect();
+    Summary[] summaries = new Summary[df.columns().length];
+    List<Column> columns = this.getDDF().getSchema().getColumns();
+
+    int colIndex = 0;
+    int i = 1;
+    for(Column column: columns) {
+      if(column.isNumeric()) {
+        long count = Long.valueOf(rows[0].getString(i));
+        double mean = Double.valueOf(rows[1].getString(i));
+        double stddev = Double.valueOf(rows[2].getString(i));
+        double min = Double.valueOf(rows[3].getString(i));
+        double max = Double.valueOf(rows[4].getString(i));
+        long naCount = df.sqlContext().sql(String.format("select count(*) from %s where %s is null", this.getDDF().getTableName(), column.getName())).collect()[0].getLong(0);
+        Summary summary = new Summary(count, mean, stddev, naCount, min, max);
+        summaries[colIndex] = summary;
+        i += 1;
+      } else {
+        long count = df.sqlContext().sql(String.format("select count(*) from %s", this.getDDF().getTableName())).
+            collect()[0].getLong(0);
+        long naCount = df.sqlContext().sql(String.format("select count(*) from %s where %s is null",
+            this.getDDF().getTableName(), column.getName())).collect()[0].getLong(0);
+        Summary summary = new Summary();
+        summary.setCount(count);
+        summary.setNACount(naCount);
+        summaries[colIndex] = summary;
+      }
+      colIndex += 1;
+    }
+    return summaries;
   }
 
   @Override
