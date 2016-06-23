@@ -53,15 +53,18 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
         double stddev = Double.valueOf(rows[2].getString(i));
         double min = Double.valueOf(rows[3].getString(i));
         double max = Double.valueOf(rows[4].getString(i));
-        long naCount = df.sqlContext().sql(String.format("select count(*) from %s where %s is null", this.getDDF().getTableName(), column.getName())).collect()[0].getLong(0);
+        String sqlCmd = String.format("select count(*) from %s where `%s` is null",
+            this.getDDF().getTableName(), column.getName());
+        long naCount = df.sqlContext().sql(sqlCmd).collect()[0].getLong(0);
         Summary summary = new Summary(count, mean, stddev, naCount, min, max);
         summaries[colIndex] = summary;
         i += 1;
       } else {
         long count = df.sqlContext().sql(String.format("select count(*) from %s", this.getDDF().getTableName())).
             collect()[0].getLong(0);
-        long naCount = df.sqlContext().sql(String.format("select count(*) from %s where %s is null",
-            this.getDDF().getTableName(), column.getName())).collect()[0].getLong(0);
+        String sqlCmd = String.format("select count(*) from %s where `%s` is null", this.getDDF().getTableName(),
+            column.getName());
+        long naCount = df.sqlContext().sql(sqlCmd).collect()[0].getLong(0);
         Summary summary = new Summary();
         summary.setCount(count);
         summary.setNACount(naCount);
