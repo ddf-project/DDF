@@ -93,9 +93,11 @@ public class SchemaHandler extends io.ddf.content.SchemaHandler {
           Row[] rows = groupedDF1.collect();
           Map<String, Integer> valueCounts = new HashMap<String, Integer>();
           for(Row row: rows) {
-            String value = (String) row.getAs(colName);
-            int count = (int) row.getAs("count");
-            valueCounts.put(value, count);
+            if(row.getAs(colName) != null) {
+              String value = (String) row.getAs(colName);
+              int count = (int) row.getAs("count");
+              valueCounts.put(value, count);
+            }
           }
           listLevelCountsWithName.put(colName, valueCounts);
         }
