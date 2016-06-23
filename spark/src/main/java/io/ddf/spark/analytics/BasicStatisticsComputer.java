@@ -61,15 +61,8 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
         summaries[colIndex] = summary;
         i += 1;
       } else {
-        long count = df.sqlContext().sql(String.format("select count(*) from %s", this.getDDF().getTableName())).
-            collect()[0].getLong(0);
-        String sqlCmd = String.format("select count(*) from %s where `%s` is null", this.getDDF().getTableName(),
-            column.getName());
-        long naCount = df.sqlContext().sql(sqlCmd).collect()[0].getLong(0);
-        Summary summary = new Summary();
-        summary.setCount(count);
-        summary.setNACount(naCount);
-        summaries[colIndex] = summary;
+        // summary = null if not numeric
+        summaries[colIndex] = null;
       }
       colIndex += 1;
     }
