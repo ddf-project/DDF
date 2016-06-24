@@ -51,6 +51,7 @@ public class HDFSDDF extends DDF {
         // Check directory or file.
         HDFSDDFManager hdfsDDFManager = this.getManager();
         // Check dataformat.
+        mDataFormat = DataFormat.CSV;
         if (options != null && options.containsKey("format")) {
             try {
                 String format = options.get("format").toUpperCase();
@@ -58,7 +59,6 @@ public class HDFSDDF extends DDF {
                 mDataFormat = DataFormat.valueOf(format);
             } catch (IllegalArgumentException e) {
                 throw new DDFException(String.format("Unsupported dataformat: %s", options.get("format")));
-
             }
         }
         mLog.info(String.format("HDFS data format %s", mDataFormat));
