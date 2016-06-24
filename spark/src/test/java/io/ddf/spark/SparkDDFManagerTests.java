@@ -93,7 +93,7 @@ public class SparkDDFManagerTests extends BaseTest {
     // assert(allJsonSparkDDF.getNumRows() == 4);
 
     LOG.info("========== testFolder/folder/d.json ==========");
-    S3DDF jsonDDF = s3DDFManager.newDDF("adatao-test", "json/", null, null);
+    S3DDF jsonDDF = s3DDFManager.newDDF("adatao-test", "json/", null, ImmutableMap.of("format", "json"));
     DDF jsonSparkDDF = manager.copyFrom(jsonDDF);
     LOG.info(jsonSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
 
@@ -126,7 +126,7 @@ public class SparkDDFManagerTests extends BaseTest {
     LOG.info("========== tsv ==========");
     S3DDF tsvDDF = s3DDFManager.newDDF("adatao-sample-data", "test/tsv/noheader/results.tsv", "ID int, FlagTsunami " +
         "string, Year int, " +
-        "Month int, Day int, Hour int, Minute int, Second double, FocalDepth int, EqPrimary double, EqMagMw double, EqMagMs double, EqMagMb double, EqMagMl double, EqMagMfd double, EqMagUnk double, Intensity int, Country string, State string, LocationName string, Latitude double, Longitude double, RegionCode int, Death int, DeathDescription int, Injuries int, InjuriesDescription int", null);
+        "Month int, Day int, Hour int, Minute int, Second double, FocalDepth int, EqPrimary double, EqMagMw double, EqMagMs double, EqMagMb double, EqMagMl double, EqMagMfd double, EqMagUnk double, Intensity int, Country string, State string, LocationName string, Latitude double, Longitude double, RegionCode int, Death int, DeathDescription int, Injuries int, InjuriesDescription int", ImmutableMap.of("format", "tsv"));
     // TODO: Check the file?
     /*
     DDF tsvSparkDDF = sparkDDFManager.copyFrom(tsvDDF);
@@ -135,11 +135,13 @@ public class SparkDDFManagerTests extends BaseTest {
     */
 
     LOG.info("========== pqt ==========");
-    S3DDF pqtDDF = s3DDFManager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null, null);
+    S3DDF pqtDDF
+        = s3DDFManager.newDDF("adatao-sample-data", "test/parquet/sleep_parquet/", null, ImmutableMap.of("format", "parquet"));
     DDF pqtSparkDDF = manager.copyFrom(pqtDDF);
     LOG.info(pqtSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     LOG.info("========== avro ==========");
-    S3DDF avroDDF = s3DDFManager.newDDF("adatao-sample-data", "test/avro/partition/", null, null);
+    S3DDF avroDDF
+        = s3DDFManager.newDDF("adatao-sample-data", "test/avro/partition/", null, ImmutableMap.of("format", "avro"));
     DDF avroSparkDDF = manager.copyFrom(avroDDF);
     assert (avroSparkDDF.getNumRows() > 0);
 
@@ -291,7 +293,8 @@ public class SparkDDFManagerTests extends BaseTest {
 
     // Test copy from a folder with all json files.
     LOG.info("========== test_pe/json/single ==========");
-    HDFSDDF jsonDDF = hdfsDDFManager.newDDF("/test_pe/json/single/flat_sleep_data.json", null, null);
+    HDFSDDF jsonDDF =
+        hdfsDDFManager.newDDF("/test_pe/json/single/flat_sleep_data.json", null, ImmutableMap.of("format", "json"));
     DDF jsonSparkDDF = sparkDDFManager.copyFrom(jsonDDF);
     assert(jsonSparkDDF.getNumRows() > 0);
 
@@ -325,19 +328,19 @@ public class SparkDDFManagerTests extends BaseTest {
 
 
     LOG.info("========== pqt ==========");
-    HDFSDDF pqtDDF = hdfsDDFManager.newDDF("/test_pe/parquet/default", null, null);
+    HDFSDDF pqtDDF = hdfsDDFManager.newDDF("/test_pe/parquet/default", null, ImmutableMap.of("format", "parquet"));
     DDF pqtSparkDDF = sparkDDFManager.copyFrom(pqtDDF);
     LOG.info(pqtSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     assert (pqtSparkDDF.getNumRows() > 0);
 
     LOG.info("========== avro ==========");
-    HDFSDDF avroDDF = hdfsDDFManager.newDDF("/test_pe/avro/partition", null, null);
+    HDFSDDF avroDDF = hdfsDDFManager.newDDF("/test_pe/avro/partition", null, ImmutableMap.of("format", "avro"));
     DDF avroSparkDDF = sparkDDFManager.copyFrom(avroDDF);
     LOG.info(avroSparkDDF.sql("select * from @this limit 5", "error").getRows().toString());
     assert (avroSparkDDF.getNumRows() > 0);
 
     LOG.info("========== orc ==========");
-    HDFSDDF orcDDF = hdfsDDFManager.newDDF("/test_pe/orc/default/", null, null);
+    HDFSDDF orcDDF = hdfsDDFManager.newDDF("/test_pe/orc/default/", null, ImmutableMap.of("format", "orc"));
     DDF orcSparkDDF = sparkDDFManager.copyFrom(orcDDF);
     assert (orcSparkDDF.getNumRows() > 0);
   }

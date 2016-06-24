@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 
 
@@ -48,72 +47,6 @@ public class HDFSDDFManagerTests {
         Map<String, String> options = new HashMap<>();
         options.put("format", format);
         return options;
-    }
-
-    @Test
-    public void testCreateDDF() throws DDFException {
-        HDFSDDF cleanFolderDDF = manager.newDDF("/test_pe/csv/multiple", null, null);
-        HDFSDDF jsonDDF = manager.newDDF("/test_pe/json/noheader", null, null);
-        HDFSDDF csvDDF = manager.newDDF("/test_pe/csv/noheader", null, null);
-        assert (cleanFolderDDF.getIsDir() == true);
-        assert(jsonDDF.getIsDir() == true);
-        assert(csvDDF.getIsDir() == true);
-        assert(jsonDDF.getDataFormat().equals(DataFormat.JSON));
-        assert(csvDDF.getDataFormat().equals(DataFormat.CSV));
-        try {
-            // Test on non-exist folder/file. Should throw exception.
-            HDFSDDF nonExistDDF = manager.newDDF("/test_pe/nonexist.csv", null, null);
-            assert (false);
-        } catch (Exception e) {
-
-        }
-        try {
-            HDFSDDF nonExistDDF2 = manager.newDDF("/test_pe/nonexist", null, null);
-            assert (false);
-        } catch (Exception e) {
-
-        }
-
-        HDFSDDF pqtDDF = manager.newDDF("/test_pe/parquet/default", null, null);
-        assert (pqtDDF.getIsDir() == true);
-        assert (pqtDDF.getDataFormat().equals(DataFormat.PQT));
-
-        HDFSDDF avroDDF = manager.newDDF("/test_pe/avro/single", null, null);
-        assert (avroDDF.getIsDir() == true);
-        assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
-
-        avroDDF = manager.newDDF("/test_pe/avro/single", null, withFormat("AVRO"));
-        assert (avroDDF.getIsDir() == true);
-        assert (avroDDF.getDataFormat().equals(DataFormat.AVRO));
-
-        HDFSDDF orcDDF = manager.newDDF("/test_pe/orc/default", null, null);
-        assert (orcDDF.getIsDir() == true);
-        assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
-
-        orcDDF = manager.newDDF("/test_pe/orc/default", null, withFormat("orc"));
-        assert (orcDDF.getIsDir() == true);
-        assert (orcDDF.getDataFormat().equals(DataFormat.ORC));
-
-        HDFSDDF noExtensionDDF = manager.newDDF("/test_pe/extra/schema/lines-with-different-cols/lines-with-different-cols", null, null);
-        assert (noExtensionDDF.getIsDir() == false);
-        assert (noExtensionDDF.getDataFormat().equals(DataFormat.CSV));
-
-        HDFSDDF emptyDDF = manager.newDDF("/test_pe/extra/empty-folder/", null, null);
-        assert (emptyDDF.getIsDir() == true);
-        assert (emptyDDF.getDataFormat().equals(DataFormat.CSV));
-
-        try {
-            HDFSDDF folderDDF = manager.newDDF("/test_pe/", null, null);
-            assert false;
-        } catch (DDFException e) {
-        }
-
-        try {
-            HDFSDDF mixedDDF = manager.newDDF("/test_pe/extra/format/mixed-csv-tsv/", null, null);
-            assert (false);
-        } catch (DDFException e) {
-            assert (e.getMessage().contains("more than 1"));
-        }
     }
 
     @Test
