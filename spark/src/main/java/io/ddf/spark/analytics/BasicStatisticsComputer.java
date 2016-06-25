@@ -48,12 +48,35 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
     int i = 1;
     for(Column column: columns) {
       if(column.isNumeric()) {
-        long count = Long.valueOf(rows[0].getString(i));
-        double mean = Double.valueOf(rows[1].getString(i));
-        double stddev = Double.valueOf(rows[2].getString(i));
-        double sqdeviation = Math.pow(stddev, 2)*(count - 1);
-        double min = Double.valueOf(rows[3].getString(i));
-        double max = Double.valueOf(rows[4].getString(i));
+
+        long count = 0L;
+        if(rows[0].isNullAt(i)) {
+          count = 0L;
+        } else {
+          count = Long.valueOf(rows[0].getString(i));
+        }
+
+        Double mean = Double.NaN;
+        if(!rows[1].isNullAt(i)) {
+          mean = Double.valueOf(rows[1].getString(i));
+        }
+
+        Double sqdeviation = Double.NaN;
+        if(!rows[2].isNullAt(i)) {
+          Double stddev = Double.valueOf(rows[2].getString(i));
+          sqdeviation = Math.pow(stddev, 2)*(count - 1);
+        }
+
+        Double min = Double.NaN;
+        if(!rows[3].isNullAt(i)) {
+          min = Double.valueOf(rows[3].getString(i));
+        }
+
+        Double max = Double.NaN;
+        if(!rows[4].isNullAt(i)) {
+          max = Double.valueOf(rows[4].getString(i));
+        }
+
         String sqlCmd = String.format("select count(*) from %s where `%s` is null",
             this.getDDF().getTableName(), column.getName());
         long naCount = df.sqlContext().sql(sqlCmd).collect()[0].getLong(0);
