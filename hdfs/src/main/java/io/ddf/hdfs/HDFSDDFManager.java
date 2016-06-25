@@ -58,57 +58,6 @@ public class HDFSDDFManager extends DDFManager {
   }
 
   /**
-   * @brief To check whether the ddf is a directory.
-   */
-  public Boolean isDir(HDFSDDF hdfsDDF) throws DDFException {
-    String path = hdfsDDF.getPath();
-    try {
-      FileStatus fileStatus = fs.getFileStatus(new Path(path));
-      return fileStatus.isDirectory();
-    } catch (IOException e) {
-      throw new DDFException(e);
-    }
-  }
-
-  /**
-   * @breif To get the dataformat.
-   */
-  public DataFormat getDataFormat(HDFSDDF hdfsDDF) throws DDFException {
-    if (hdfsDDF.getIsDir()) {
-      try {
-        FileStatus[] files = this.fs.listStatus(new Path(hdfsDDF.getPath()));
-        HashSet<DataFormat> dataFormats = new HashSet<>();
-        for (FileStatus file : files) {
-          if (file.isDirectory()) {
-            throw new DDFException("This folder contains subfolder, we currently do not support nested folders");
-          }
-          String filePath = file.getPath().toString();
-          // Check for extension.
-          DataFormat dataFormat = Utils.getDataFormatFromPath(filePath);
-          if (!dataFormat.equals(DataFormat.UNDEF)) {
-            dataFormats.add(dataFormat);
-          }
-        }
-        if (dataFormats.size() > 1) {
-          throw new DDFException(String.format("Find more than 1 formats of data under the directory %s: %s", hdfsDDF
-              .getPath(), Arrays.toString(dataFormats.toArray())));
-        } else if (dataFormats.size() == 1) {
-          return dataFormats.iterator().next();
-        } else {
-          return DataFormat.CSV;
-        }
-      } catch (IOException e) {
-        throw new DDFException(String.format("Can't open directory : %s", hdfsDDF.getPath()));
-      }
-    } else {
-      String filePath = hdfsDDF.getPath();
-      // Check for extension.
-      DataFormat dataFormat = Utils.getDataFormatFromPath(filePath);
-      return dataFormat.equals(DataFormat.UNDEF) ? DataFormat.CSV : dataFormat;
-    }
-  }
-
-  /**
    * @param path The path.
    * @return The list of file names
    * @brief List all the files (including directories under one path)
@@ -158,7 +107,16 @@ public class HDFSDDFManager extends DDFManager {
     int pos = 0;
     String s = null;
 
-    if (!hdfsDDF.getIsDir()) {
+    String path = hdfsDDF.getPath();
+    boolean isDir;
+    try {
+      FileStatus fileStatus = fs.getFileStatus(new Path(path));
+      isDir=fileStatus.isDirectory();
+    } catch (IOException e) {
+      throw new DDFException(e);
+    }
+
+    if (!isDir) {
       try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(new Path(hdfsDDF.getPath()))))) {
         while ((s = br.readLine()) != null && pos < limit) {
           rows.add(s);

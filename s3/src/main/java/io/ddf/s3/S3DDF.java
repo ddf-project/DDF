@@ -12,9 +12,6 @@ import java.util.Map;
  * Created by jing on 12/2/15.
  */
 public class S3DDF extends DDF {
-    // It's a directory or file.
-    private Boolean mIsDir;
-
     // The format of this s3ddf. If it's a folder, we requires that all the files in the folder should have the same
     // format, otherwise the dataformat will be set to the dataformat of the first file under this folder.
     private DataFormat mDataFormat;
@@ -89,19 +86,16 @@ public class S3DDF extends DDF {
         mLog.info(String.format("Initialize s3 ddf: %s %s", mBucket, mKey));
         // Check directory or file.
         S3DDFManager s3DDFManager = this.getManager();
-        mIsDir = s3DDFManager.isDir(this);
         // Check dataformat.
+        mDataFormat = DataFormat.CSV;
         if (options != null && options.containsKey("format")) {
             try {
                 String format = options.get("format").toUpperCase();
                 format = format.equals("PARQUET") ? "PQT" : format;
                 mDataFormat = DataFormat.valueOf(format);
             } catch (IllegalArgumentException e) {
-                // TODO: Disable automatic format choosing, or put it under a convenience flag.
-                mDataFormat = s3DDFManager.getDataFormat(this);
+                throw new DDFException(String.format("Unsupported dataformat: %s", options.get("format")));
             }
-        } else {
-            mDataFormat = s3DDFManager.getDataFormat(this);
         }
         mLog.info(String.format("S3 data format %s", mDataFormat));
     }
@@ -112,14 +106,6 @@ public class S3DDF extends DDF {
 
     public void setDataFormat(DataFormat dataFormat) {
         this.mDataFormat = dataFormat;
-    }
-
-    public Boolean getIsDir() {
-        return mIsDir;
-    }
-
-    public void setIsDir(Boolean isDir) {
-        this.mIsDir = isDir;
     }
 
     public String getBucket() {

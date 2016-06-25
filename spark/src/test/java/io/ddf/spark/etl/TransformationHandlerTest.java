@@ -1,6 +1,7 @@
 package io.ddf.spark.etl;
 
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
@@ -577,7 +578,7 @@ public class TransformationHandlerTest extends BaseTest {
 
   @Test
   public void testFlattenDDFAllColumns() throws Exception {
-    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, null);
+    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, ImmutableMap.of("format", "json"));
     DDF originalDDF = manager.copyFrom(allJsonDDF);
     DDF flattenedDDF = originalDDF.Transform.flattenDDF();
 
@@ -602,7 +603,7 @@ public class TransformationHandlerTest extends BaseTest {
 
   @Test
   public void testFlattenDDFSingleColumn() throws Exception {
-    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, null);
+    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, ImmutableMap.of("format", "json"));
     DDF originalDDF = manager.copyFrom(allJsonDDF);
     DDF flattenedDDF = originalDDF.Transform.flattenDDF(new String[]{"data"});
 
@@ -624,7 +625,7 @@ public class TransformationHandlerTest extends BaseTest {
   @Test
   public void testFlattenDDFInPlaceFalse() throws Exception {
     Boolean inPlace = Boolean.FALSE;
-    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, null);
+    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, ImmutableMap.of("format", "json"));
     DDF originalDDF = manager.copyFrom(allJsonDDF);
     DDF flattenedDDF = originalDDF.Transform.flattenDDF(new String[]{"data"}, inPlace);
 
@@ -646,7 +647,7 @@ public class TransformationHandlerTest extends BaseTest {
   @Test
   public void testFlattenDDFInPlaceTrue() throws Exception {
     Boolean inPlace = Boolean.TRUE;
-    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, null);
+    S3DDF allJsonDDF = s3DDFManager.newDDF("ada-demo-data", "sleep_data_sample_test.json", null, ImmutableMap.of("format", "json"));
     DDF originalDDF = manager.copyFrom(allJsonDDF);
     DDF flattenedDDF = originalDDF.Transform.flattenDDF(new String[]{"data"}, inPlace);
 
