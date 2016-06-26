@@ -272,8 +272,23 @@ public class SparkDDFManager extends DDFManager {
       if (ddf instanceof S3DDF) {
         S3DDF s3DDF = (S3DDF) ddf;
         S3DataSourceCredentials cred = s3DDF.getManager().getCredential();
-        uri = String.format("s3a://%s:%s@%s/%s", cred.getAwsKeyID(), cred.getAwsScretKey(),
-            s3DDF.getBucket(), s3DDF.getKey());
+        if (s3DDF.getPath() != null) {
+          String[] fileList;
+          String path = s3DDF.getPath();
+          fileList = path.split(",");
+          StringBuffer buffer = new StringBuffer(String.format("s3a://%s:%s@%s", cred.getAwsKeyID(), cred.getAwsScretKey(), fileList[0].trim()));
+
+          for (int i = 1; i < fileList.length; ++i) {
+            buffer.append(",");
+            buffer.append(String.format("s3a://%s:%s@%s", cred.getAwsKeyID(), cred.getAwsScretKey(),
+                fileList[i].trim()));
+          }
+          uri = buffer.toString();
+        } else {
+          uri = String.format("s3a://%s:%s@%s/%s", cred.getAwsKeyID(), cred.getAwsScretKey(),
+              s3DDF.getBucket(), s3DDF.getKey());
+        }
+
         dataFormat = s3DDF.getDataFormat();
         if (s3DDF.getSchemaString() != null) {
           schema = SparkUtils.str2SparkSchema(s3DDF.getSchemaString());

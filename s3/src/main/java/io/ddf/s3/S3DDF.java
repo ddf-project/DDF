@@ -25,6 +25,9 @@ public class S3DDF extends DDF {
     // Path after bucket.
     private String mKey;
 
+    // Path
+    private String path;
+
     // Options, including:
     // key : possible values
     // header : true / false
@@ -46,9 +49,7 @@ public class S3DDF extends DDF {
      */
     public S3DDF(S3DDFManager manager, String path, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        List<String> bucketAndKey = S3DDFManager.getBucketAndKey(path);
-        mBucket = bucketAndKey.get(0);
-        mKey = bucketAndKey.get(1);
+        this.path = path;
         this.options = options;
         initialize();
     }
@@ -56,9 +57,7 @@ public class S3DDF extends DDF {
     public S3DDF(S3DDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         mSchemaString = schema;
-        List<String> bucketAndKey = S3DDFManager.getBucketAndKey(path);
-        mBucket = bucketAndKey.get(0);
-        mKey = bucketAndKey.get(1);
+        this.path = path;
         this.options = options;
         initialize();
     }
@@ -75,15 +74,6 @@ public class S3DDF extends DDF {
     }
 
     private void initialize() throws DDFException {
-        // Check key and path
-        if (Strings.isNullOrEmpty(mBucket)) {
-            throw new DDFException("The bucket of s3ddf is null");
-        }
-        if (Strings.isNullOrEmpty(mKey)) {
-            throw new DDFException("The key of s3ddf is null");
-        }
-
-        mLog.info(String.format("Initialize s3 ddf: %s %s", mBucket, mKey));
         // Check directory or file.
         S3DDFManager s3DDFManager = this.getManager();
         // Check dataformat.
@@ -122,6 +112,12 @@ public class S3DDF extends DDF {
 
     public void setKey(String key) {
         this.mKey = key;
+    }
+
+    public void setPath(String path) {this.path = path;}
+
+    public String getPath() {
+        return path;
     }
 
     public String getSchemaString() {

@@ -70,13 +70,11 @@ public class SparkDDFManagerTests extends BaseTest {
 
 
   public void testBasicCopyForS3(S3DDFManager s3DDFManager) throws DDFException {
-    LOG.info("========== non-exist========");
-    try {
-      S3DDF nonExistDDF = s3DDFManager.newDDF("jing-bucket", "non-exist", null, null);
-      assert (false);
-    } catch (DDFException e) {
-      assert (e.getMessage().equals("java.io.FileNotFoundException: File does not exist"));
-    }
+    LOG.info("========== multiplepath========");
+    S3DDF multiplePathDDF = s3DDFManager.newDDF("adatao-test/csv/1.csv, adatao-test/csv/2.csv", null);
+    DDF multiplePathSparkDDF = manager.copyFrom(multiplePathDDF);
+    assert (multiplePathSparkDDF.getNumRows()==4);
+
 
     // Test copy from a folder, the schema should be given.
     LOG.info("========== testFolder/folder ==========");
