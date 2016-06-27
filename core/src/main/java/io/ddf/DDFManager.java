@@ -174,7 +174,6 @@ public abstract class DDFManager extends ALoggable implements IDDFManager, IHand
   }
 
   public void removeDDF(DDF ddf) throws DDFException {
-    ddf.getRepresentationHandler().uncache(true);
     ddf.getRepresentationHandler().reset();
     mDDFCache.removeDDF(ddf);
   }
