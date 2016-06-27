@@ -14,6 +14,7 @@ import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.SQLDataSourceDescriptor;
 import io.ddf.etl.ASqlHandler;
 import io.ddf.exception.DDFException;
+import io.ddf.spark.SparkDDF;
 import io.ddf.spark.SparkDDFManager;
 import io.ddf.spark.content.SchemaHandler;
 import io.ddf.spark.util.SparkUtils;
@@ -91,17 +92,9 @@ public class SqlHandler extends ASqlHandler {
         }
       }
     }
-    //else {
-    //  throw new DDFException("No availabe datasource information");
-    //}
-
 
     rdd = this.getHiveContext().sql(command);
-    if (schema == null) schema = SchemaHandler.getSchemaFromDataFrame(rdd);
-    DDF ddf = this.getManager().newDDF(this.getManager(), rdd, new Class<?>[]
-                    {DataFrame.class}, null,
-        null, schema);
-    ddf.getRepresentationHandler().get(new Class<?>[]{RDD.class, Row.class});
+    DDF ddf = ((SparkDDFManager) this.getManager()).newDDFFromSparkDataFrame(rdd);
     return ddf;
   }
 
