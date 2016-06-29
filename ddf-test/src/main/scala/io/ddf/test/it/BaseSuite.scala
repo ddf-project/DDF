@@ -42,4 +42,5 @@ trait BaseSuite extends FunSuite {
   def loadAirlineDDFWithNA(useCache: Boolean = false): DDF
   def loadYearNamesDDF(useCache: Boolean = false): DDF
   def loadSmithsDDF(useCache: Boolean = false): DDF
+  def loadCarOwnersNADDF(useCache: Boolean = false): DDF
 }

@@ -37,11 +37,59 @@ public class BasicStatisticsComputer extends AStatisticsSupporter {
   @SuppressWarnings("unchecked")
   @Override
   public Summary[] getSummaryImpl() throws DDFException {
-    RDD<Object[]> rdd = (RDD<Object[]>) this.getDDF().getRepresentationHandler().get(RDD.class, Object[].class);
 
-    JavaRDD<Object[]> data = rdd.toJavaRDD();
-    Summary[] stats = data.map(new GetSummaryMapper()).reduce(new GetSummaryReducer());
-    return stats;
+    DataFrame df = (DataFrame) this.getDDF().getRepresentationHandler().get(DataFrame.class);
+    DataFrame summaryDF = df.describe();
+    Row[] rows = summaryDF.collect();
+    Summary[] summaries = new Summary[df.columns().length];
+    List<Column> columns = this.getDDF().getSchema().getColumns();
+
+    int colIndex = 0;
+    int i = 1;
+    for(Column column: columns) {
+      if(column.isNumeric()) {
+
+        long count = 0L;
+        if(rows[0].isNullAt(i)) {
+          count = 0L;
+        } else {
+          count = Long.valueOf(rows[0].getString(i));
+        }
+
+        Double mean = Double.NaN;
+        if(!rows[1].isNullAt(i)) {
+          mean = Double.valueOf(rows[1].getString(i));
+        }
+
+        Double sqdeviation = Double.NaN;
+        if(!rows[2].isNullAt(i)) {
+          Double stddev = Double.valueOf(rows[2].getString(i));
+          sqdeviation = Math.pow(stddev, 2)*(count - 1);
+        }
+
+        Double min = Double.NaN;
+        if(!rows[3].isNullAt(i)) {
+          min = Double.valueOf(rows[3].getString(i));
+        }
+
+        Double max = Double.NaN;
+        if(!rows[4].isNullAt(i)) {
+          max = Double.valueOf(rows[4].getString(i));
+        }
+
+        String sqlCmd = String.format("select count(*) from %s where `%s` is null",
+            this.getDDF().getTableName(), column.getName());
+        long naCount = df.sqlContext().sql(sqlCmd).collect()[0].getLong(0);
+        Summary summary = new Summary(count, mean, sqdeviation, naCount, min, max);
+        summaries[colIndex] = summary;
+        i += 1;
+      } else {
+        // summary = null if not numeric
+        summaries[colIndex] = null;
+      }
+      colIndex += 1;
+    }
+    return summaries;
   }
 
   @Override

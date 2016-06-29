@@ -179,15 +179,18 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
    */
   @Override
   public void reset() {
-    this.uncacheAll();
+    this.uncacheAll(true);
     mReps.clear();
     this.setDefaultDataType((Class<?>[]) null);
+  }
+
+  protected void uncacheAll(boolean isLazy) {
+
   }
 
   private boolean equalsDefaultDataType(Class<?>... typeSpecs) {
     return this.getSpecsAsString(typeSpecs).equals(this.getSpecsAsString(this.getDefaultDataType()));
   }
-
 
   /**
    * Converts from existing representation(s) to the desired representation, which has the specified dataType.
@@ -299,9 +302,9 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
 
   @Override
   public void cleanup() {
+    uncache(false);
     mReps.clear();
     super.cleanup();
-    uncacheAll();
   }
 
   @Override
@@ -310,16 +313,14 @@ public class RepresentationHandler extends ADDFFunctionalGroupHandler implements
   }
 
   @Override
-  public void cacheAll() {
-    // TODO Auto-generated method stub
+  public void uncache(boolean lazy) {
 
   }
 
   @Override
-  public void uncacheAll() {
-    // TODO Auto-generated method stub
+  public boolean isCached() {
+    return false;
   }
-
 
   /**
    * A special class representing a Table that's native to the engine, e.g., Shark Table for the Spark engine.
