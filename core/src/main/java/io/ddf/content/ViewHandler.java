@@ -269,7 +269,7 @@ public class ViewHandler extends ADDFFunctionalGroupHandler implements IHandleVi
     @Override
     public String toSql() {
       if (name == null) {
-        throw new IllegalArgumentException("Missing Operator name from Adatao client for operands[] "
+        throw new IllegalArgumentException("Missing Operator name from DDF client for operands[] "
             + Arrays.toString(operands));
       }
       switch (name) {
