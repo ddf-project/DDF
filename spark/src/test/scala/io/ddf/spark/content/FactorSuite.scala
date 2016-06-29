@@ -2,6 +2,8 @@ package io.ddf.spark.content
 
 import io.ddf.content.Schema.{ColumnClass, ColumnType}
 import io.ddf.spark.ATestSuite
+import org.apache.spark.sql.DataFrame
+
 import scala.collection.JavaConversions._
 
 /**

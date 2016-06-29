@@ -134,14 +134,11 @@ public interface IHandleRepresentations extends IHandleDDFFunctionalGroup {
   void cache(boolean lazy);
 
   /**
-   * Cache all representations, e.g., in an in-memory context
-   */
-  void cacheAll();
-
-  /**
    * Uncache all representations, e.g., in an in-memory context
    */
-  void uncacheAll();
+  void uncache(boolean lazy);
+
+  boolean isCached();
 
   /**
    * Returns the default representation for this engine
