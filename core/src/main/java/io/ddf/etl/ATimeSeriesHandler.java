@@ -82,14 +82,20 @@ public abstract class ATimeSeriesHandler extends ADDFFunctionalGroupHandler impl
   }
 
   @Override
-  public DDF addDiffColumn(String timestampColumn, String columnToGetDiff, String diffColumn) {
+  public DDF addDiffColumn(String timestampColumn, String colToGetDiff, String diffColumn) {
+    return addDiffColumn(timestampColumn, null, colToGetDiff, diffColumn);
+  }
+
+  @Override
+  public DDF addDiffColumn(String timestampColumn, String tsIDColumn, String colToGetDiff, String diffColumn)
+      throws DDFException {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public DDF addDiffColumn(String timestampColumn, String groupedColumn, String columnToGetDiff, String diffColumn) 
-      throws DDFException{
+  public DDF computeMovingAverage(String timestampColumn, String tsIDColumn, String colToComputeMovingAverage,
+      String movingAverageColName, int windowSize) throws DDFException {
     // TODO Auto-generated method stub
     return null;
   }
