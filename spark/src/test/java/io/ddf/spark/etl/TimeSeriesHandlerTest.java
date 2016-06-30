@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.BeforeClass;
 import com.google.common.collect.Lists;
 
@@ -25,7 +26,7 @@ public class TimeSeriesHandlerTest extends BaseTest {
         "select unix_timestamp(concat(Date,' 00:00:00')) as unixts, * from stocks where Symbol='AAL'", "SparkSQL");
   }
 
-  @Test
+  @Ignore
   public void testDownSampling() throws DDFException {
 
     Assert.assertTrue(aal_stocks.getNumRows() == 30);
@@ -39,6 +40,18 @@ public class TimeSeriesHandlerTest extends BaseTest {
 
     Assert.assertTrue(downsampled_aal.getNumRows() == 8);
     Assert.assertTrue(downsampled_stocks.getNumRows() == 80);
+
+  }
+  
+  @Test
+  public void testDiff() throws DDFException {
+    Assert.assertTrue(stocks.getNumRows() == 300);
+    DDF ddfWithDiff = stocks.getTimeSeriesHandler().addDiffColumn("unixts", "symbol", "close", "close_diff");
+    Assert.assertEquals(9, ddfWithDiff.getNumColumns());
+    List<String> rs = manager.sql(String.format("Select * from %s limit 12", 
+        ddfWithDiff.getTableName(), manager.getEngine())).getRows();
+    
+    System.out.println(rs);
 
   }
 

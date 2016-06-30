@@ -11,8 +11,8 @@ import com.google.common.collect.Lists;
 
 public abstract class ATimeSeriesHandler extends ADDFFunctionalGroupHandler implements IHandleTimeSeries {
 
-  private String mTimestampColumn;
-  private String mTsIDColumn = "";
+  protected String mTimestampColumn;
+  protected String mTsIDColumn = null;
 
 
   public ATimeSeriesHandler(DDF theDDF) {
@@ -43,7 +43,7 @@ public abstract class ATimeSeriesHandler extends ADDFFunctionalGroupHandler impl
 
     this.mTimestampColumn = timestampColumn;
     List<String> groupByCols = Lists.newArrayList(timestampColumn);
-    if (!mTsIDColumn.isEmpty()) {
+    if (mTsIDColumn != null && !mTsIDColumn.isEmpty()) {
       groupByCols.add(mTsIDColumn);
     }
 
@@ -88,7 +88,8 @@ public abstract class ATimeSeriesHandler extends ADDFFunctionalGroupHandler impl
   }
 
   @Override
-  public DDF addDiffColumn(String timestampColumn, String groupedColumn, String columnToGetDiff, String diffColumn) {
+  public DDF addDiffColumn(String timestampColumn, String groupedColumn, String columnToGetDiff, String diffColumn) 
+      throws DDFException{
     // TODO Auto-generated method stub
     return null;
   }

@@ -20,7 +20,7 @@ public interface IHandleTimeSeries extends IHandleDDFFunctionalGroup {
   
   DDF addDiffColumn(String timestampColumn, String columnToGetDiff, String diffColumn);
   
-  DDF addDiffColumn(String timestampColumn, String tsIDColumn, String columnToGetDiff, String diffColumn);
+  DDF addDiffColumn(String timestampColumn, String tsIDColumn, String columnToGetDiff, String diffColumn) throws DDFException;
   
   void persist_ts(String path);
   
