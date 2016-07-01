@@ -91,6 +91,17 @@ trait StatisticsSupporterBaseSuite extends BaseSuite with Matchers {
     first.getX should be(-24)
     first.getY should be(10.0)
   }
+
+  test("handle all null column") {
+    val ddf = loadCarOwnersNADDF()
+    val summaries = ddf.getSummary()
+    summaries(1).count() should be(0)
+    summaries(1).NACount() should be(4)
+    assert(summaries(1).max().isNaN)
+    assert(summaries(1).min().isNaN)
+    assert(summaries(1).stdev().isNaN)
+
+  }
   // This test is unsupported for ddf-on-jdbc due to the sql statement distinct(column) used in getSimpleSummary
   //ddf-on-jdbc requires distinct on(column) as valid SQL
   ignore("compute simple summary") {

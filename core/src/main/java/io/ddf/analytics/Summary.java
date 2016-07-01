@@ -69,6 +69,10 @@ public class Summary implements Serializable {
     this.mNACount = n;
   }
 
+  public void setCount(long n) {
+    this.mCount = n;
+  }
+
   public double min() {
     if (this.mCount == 0)
       return Double.NaN;

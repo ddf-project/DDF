@@ -50,6 +50,8 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   this.addConvertFunction(RDD_ROW, RDD_STRING, new RDDRow2String(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_LABELED_POINT, new Row2LabeledPoint(this.mDDF))
 
+  private var mIsCached = false
+
   override def getDefaultDataType: Array[Class[_]] = Array(classOf[RDD[_]], classOf[Array[Object]])
 
   /**
@@ -77,13 +79,28 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   }
 
   /**
-   * Cache SchemaRDD in memory
+   * Cache DataFrame in memory
    **/
-  override def cache(isLazy: Boolean) = {
+
+  override def cache(isLazy: Boolean) = synchronized {
+    cacheDataFrame(isLazy)
+    this.mIsCached = true
+  }
+
+  override def uncache(isLazy: Boolean) = synchronized {
+    this.uncacheAll(isLazy)
+    this.mIsCached = false
+  }
+
+  override def isCached() = {
+    this.mIsCached
+  }
+
+  protected def cacheDataFrame(isLazy: Boolean) = {
     val ddf = this.getDDF.asInstanceOf[SparkDDF]
     ddf.saveAsTable()
     val dataFrame = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
-    if(!this.getManager.asInstanceOf[SparkDDFManager].getHiveContext.isCached(ddf.getTableName)) {
+    if(!isCachedInSpark()) {
       dataFrame.persist()
     }
     if (!isLazy) {
@@ -91,22 +108,18 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
     }
   }
 
-  override def cacheAll = {
-    forAllReps({
-      rdd: RDD[_] ⇒
-        if (rdd != null) {
-          mLog.info(this.getClass() + ": Persisting " + rdd)
-          rdd.persist
-        }
-    })
+  //check whether spark is caching the DataFrame of this DDF in memory
+  protected def isCachedInSpark(): Boolean = {
+    this.getManager.asInstanceOf[SparkDDFManager].getHiveContext.isCached(this.getDDF.getTableName)
   }
 
-  override def uncacheAll = {
+
+  override protected def uncacheAll(isLazy: Boolean) = {
     forAllReps({
       rdd: RDD[_] ⇒
         if (rdd != null) {
           mLog.info(this.getClass() + ": Unpersisting " + rdd.toString())
-          rdd.unpersist(false)
+          rdd.unpersist(isLazy)
         }
     })
     

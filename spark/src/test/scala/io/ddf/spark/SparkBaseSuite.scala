@@ -16,6 +16,7 @@ trait SparkBaseSuite extends BaseSuite {
   var airlineWithNA: DDF = null
   var yearNames: DDF = null
   var smiths: DDF = null
+  var carOwnersNA: DDF = null
 
   private def loadTestDataFromFile(filePath: String,
                                    tableName: String,
@@ -43,6 +44,19 @@ trait SparkBaseSuite extends BaseSuite {
         config.getValue("schema", "carowner"), " ")
     }
     this.carOwners
+  }
+
+  override def loadCarOwnersNADDF(useCache: Boolean = false): DDF = {
+    if(this.carOwnersNA == null) {
+      this.carOwnersNA = loadTestDataFromFile(getClass.getResource("/carownerNA").getPath, "carownerNA",
+        config.getValue("schema", "carowner"), "")
+    }
+    if(useCache) {
+      this.carOwnersNA.getRepresentationHandler.cache(false)
+    } else {
+      this.carOwnersNA.getRepresentationHandler.uncache(false)
+    }
+    return this.carOwnersNA
   }
 
   override def loadAirlineDDF(useCache: Boolean = false): DDF = {
