@@ -24,8 +24,7 @@ class JdbcDataSource(uri: String, manager: DDFManager) extends BaseDataSource(ur
     val query = if (options.containsKey("query")) {
       options.get("query").get.toString
     } else if (options.containsKey("table")) {
-      val table = options.get("table").get
-      s"select * from $table"
+      options.get("table").get.asInstanceOf[String]
     } else {
       throw new DDFException("Required either 'table' or 'query' option to load from JDBC")
     }
