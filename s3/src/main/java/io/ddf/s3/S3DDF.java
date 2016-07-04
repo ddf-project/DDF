@@ -1,12 +1,17 @@
 package io.ddf.s3;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import io.ddf.DDF;
 import io.ddf.datasource.DataFormat;
+import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.exception.DDFException;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by jing on 12/2/15.
@@ -19,14 +24,7 @@ public class S3DDF extends DDF {
     // Schema String.
     private String mSchemaString;
 
-    // Bucket.
-    private String mBucket;
-
-    // Path after bucket.
-    private String mKey;
-
-    // Path
-    private String path;
+    private ImmutableList<String> paths;
 
     // Options, including:
     // key : possible values
@@ -49,33 +47,41 @@ public class S3DDF extends DDF {
      */
     public S3DDF(S3DDFManager manager, String path, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        this.path = path;
-        this.options = options;
-        initialize();
+        initialize(ImmutableList.of(path), null, options);
     }
 
     public S3DDF(S3DDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        mSchemaString = schema;
-        this.path = path;
-        this.options = options;
-        initialize();
+        initialize(ImmutableList.of(path), schema, options);
     }
 
+    public S3DDF(S3DDFManager manager, List<String> paths, String schema, Map<String, String> options) throws DDFException {
+        super(manager, null, null, null, null, null);
+        initialize(ImmutableList.copyOf(paths), schema, options);
+    }
 
     public S3DDF(S3DDFManager manager, String bucket, String key, String schema, Map<String, String> options)
-        throws DDFException {
+            throws DDFException {
         super(manager, null, null, null, null, null);
-        mBucket = bucket;
-        mKey = key;
-        mSchemaString = schema;
-        this.options = options;
-        initialize();
+        initialize(ImmutableList.of(String.format("%s/%s", bucket, key)), schema, options);
     }
 
-    private void initialize() throws DDFException {
-        // Check directory or file.
-        S3DDFManager s3DDFManager = this.getManager();
+    private void initialize(ImmutableList<String> paths, String schema, Map<String, String> options) throws DDFException {
+        this.paths = paths;
+        this.mSchemaString = schema;
+        this.options = options;
+
+        if (paths.size() == 0) {
+            throw new DDFException("No path was specified");
+        }
+        Iterator<String> i = paths.iterator();
+        while (i.hasNext()) {
+            String path = i.next();
+            if (Strings.isNullOrEmpty(path)) {
+                throw new DDFException("One of the paths is empty");
+            }
+        }
+
         // Check dataformat.
         mDataFormat = DataFormat.CSV;
         if (options != null && options.containsKey("format")) {
@@ -94,46 +100,12 @@ public class S3DDF extends DDF {
         return mDataFormat;
     }
 
-    public void setDataFormat(DataFormat dataFormat) {
-        this.mDataFormat = dataFormat;
-    }
-
-    public String getBucket() {
-        return mBucket;
-    }
-
-    public void setBucket(String bucket) {
-        this.mBucket = bucket;
-    }
-
-    public String getKey() {
-        return mKey;
-    }
-
-    public void setKey(String key) {
-        this.mKey = key;
-    }
-
-    public void setPath(String path) {this.path = path;}
-
-    public String getPath() {
-        return path;
-    }
-
     public String getSchemaString() {
         return mSchemaString;
     }
 
-    public void setSchemaString(String schemaString) {
-        this.mSchemaString = schemaString;
-    }
-
     public Map<String, String> getOptions() {
         return options;
-    }
-
-    public void setOptions(Map<String, String> options) {
-        this.options = options;
     }
 
     @Override
@@ -144,5 +116,12 @@ public class S3DDF extends DDF {
     @Override
     public DDF copy() throws DDFException {
         throw new DDFException(new UnsupportedOperationException());
+    }
+
+    public List<String> getPaths() {
+        S3DataSourceCredentials cred = getManager().getCredential();
+        return paths.stream().map(
+                path -> String.format("s3a://%s:%s@%s", cred.getAwsKeyID(), cred.getAwsScretKey(), path)
+        ).collect(Collectors.toList());
     }
 }

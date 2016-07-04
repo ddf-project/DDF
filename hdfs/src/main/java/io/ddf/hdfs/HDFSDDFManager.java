@@ -93,62 +93,6 @@ public class HDFSDDFManager extends DDFManager {
     return new HDFSDDF(this, path, schema, options);
   }
 
-
-  /**
-   * @brief Show the first several rows of the s3ddf.
-   */
-  public List<String> head(HDFSDDF hdfsDDF, int limit) throws DDFException {
-    if (limit > K_LIMIT) {
-      limit = K_LIMIT;
-    }
-
-    List<String> rows = new ArrayList<String>();
-
-    int pos = 0;
-    String s = null;
-
-    String path = hdfsDDF.getPath();
-    boolean isDir;
-    try {
-      FileStatus fileStatus = fs.getFileStatus(new Path(path));
-      isDir=fileStatus.isDirectory();
-    } catch (IOException e) {
-      throw new DDFException(e);
-    }
-
-    if (!isDir) {
-      try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(new Path(hdfsDDF.getPath()))))) {
-        while ((s = br.readLine()) != null && pos < limit) {
-          rows.add(s);
-          ++pos;
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } else {
-      RemoteIterator<LocatedFileStatus> files = null;
-      try {
-        files = fs.listFiles(new Path(hdfsDDF.getPath()), false);
-        while (files.hasNext() && pos < limit) {
-          LocatedFileStatus lfs = files.next();
-          try (BufferedReader br = new BufferedReader(
-              new InputStreamReader(
-                  fs.open(lfs.getPath())))) {
-            while ((s = br.readLine()) != null && pos < limit) {
-              rows.add(s);
-              ++pos;
-            }
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-      } catch (IOException e) {
-        throw new DDFException(e);
-      }
-    }
-    return rows;
-  }
-
   @Override
   public DDF transfer(UUID fromEngine, UUID ddfuuid) throws DDFException {
     throw new DDFException(new UnsupportedOperationException());

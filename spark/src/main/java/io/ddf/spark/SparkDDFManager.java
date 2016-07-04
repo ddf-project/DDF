@@ -7,7 +7,6 @@ import io.ddf.content.Schema;
 import io.ddf.datasource.DataFormat;
 import io.ddf.datasource.DataSourceDescriptor;
 import io.ddf.datasource.JDBCDataSourceDescriptor;
-import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.datasource.S3DataSourceDescriptor;
 import io.ddf.ds.DataSourceCredential;
 import io.ddf.exception.DDFException;
@@ -37,10 +36,8 @@ import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.execution.ScalaBigDecimalSerializer;
 import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.StructType;
-import org.python.indexer.Builtins;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,7 +45,6 @@ import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +53,7 @@ import java.util.UUID;
 import scala.Tuple2;
 import scala.Tuple3;
 import scala.collection.JavaConversions;
-import scala.collection.convert.WrapAsJava;
+import scala.collection.Seq;
 
 /**
  * An Apache-Spark-based implementation of DDFManager
@@ -254,10 +250,10 @@ public class SparkDDFManager extends DDFManager {
   @Override
   public DDF copyFrom(DDF ddf) throws DDFException {
     if (ddf instanceof S3DDF || ddf instanceof HDFSDDF) {
-      DataFormat dataFormat = null;
-      String uri = null;
+      DataFormat dataFormat;
       StructType schema = null;
-      Map<String, String> options = null;
+      Map<String, String> options;
+      List<String> paths;
       final Map<DataFormat, String> formatMapping = ImmutableMap.<DataFormat, String>builder()
           .put(DataFormat.CSV, "com.databricks.spark.csv")
           .put(DataFormat.JSON, "json")
@@ -271,24 +267,7 @@ public class SparkDDFManager extends DDFManager {
 
       if (ddf instanceof S3DDF) {
         S3DDF s3DDF = (S3DDF) ddf;
-        S3DataSourceCredentials cred = s3DDF.getManager().getCredential();
-        if (s3DDF.getPath() != null) {
-          String[] fileList;
-          String path = s3DDF.getPath();
-          fileList = path.split(",");
-          StringBuffer buffer = new StringBuffer(String.format("s3a://%s:%s@%s", cred.getAwsKeyID(), cred.getAwsScretKey(), fileList[0].trim()));
-
-          for (int i = 1; i < fileList.length; ++i) {
-            buffer.append(",");
-            buffer.append(String.format("s3a://%s:%s@%s", cred.getAwsKeyID(), cred.getAwsScretKey(),
-                fileList[i].trim()));
-          }
-          uri = buffer.toString();
-        } else {
-          uri = String.format("s3a://%s:%s@%s/%s", cred.getAwsKeyID(), cred.getAwsScretKey(),
-              s3DDF.getBucket(), s3DDF.getKey());
-        }
-
+        paths = s3DDF.getPaths();
         dataFormat = s3DDF.getDataFormat();
         if (s3DDF.getSchemaString() != null) {
           schema = SparkUtils.str2SparkSchema(s3DDF.getSchemaString());
@@ -296,7 +275,7 @@ public class SparkDDFManager extends DDFManager {
         options = s3DDF.getOptions();
       } else {
         HDFSDDF hdfsDDF = (HDFSDDF) ddf;
-        uri = String.format("%s%s", hdfsDDF.getManager().getSourceUri(), hdfsDDF.getPath());
+        paths = hdfsDDF.getPaths();
         dataFormat = hdfsDDF.getDataFormat();
         if (hdfsDDF.getSchemaString() != null) {
           schema = SparkUtils.str2SparkSchema(hdfsDDF.getSchemaString());
@@ -305,7 +284,7 @@ public class SparkDDFManager extends DDFManager {
       }
 
       DataFrameReader dfr = this.getHiveContext().read().format(formatMapping.get(dataFormat));
-      DataFrame df = null;
+      DataFrame df;
       switch (dataFormat) {
         case TSV:
           if (options == null || !options.containsKey("delimiter")) {
@@ -324,9 +303,9 @@ public class SparkDDFManager extends DDFManager {
       if (options != null) {
         dfr = dfr.options(options);
       }
-      mLog.info(String.format(">>>>>>>> Load data from uri: %s", uri));
+      paths.forEach(path -> mLog.info(String.format(">>>>>>>> Load data from path: %s", path)));
       try {
-        df = dfr.load(uri);
+        df = dfr.load(JavaConversions.asScalaBuffer(paths).toList());
       } catch (Exception e) {
         if (e instanceof InvalidInputException) {
           throw new DDFException(new FileNotFoundException("File does not exist"));
@@ -334,7 +313,6 @@ public class SparkDDFManager extends DDFManager {
           throw new DDFException(e);
         }
       }
-      mLog.info(String.format(">>>>>>>> Finish loading for uri: %s", uri));
       if (ddf.getSchema() == null) {
         ddf.getSchemaHandler().setSchema(SchemaHandler.getSchemaFromDataFrame(df));
       }

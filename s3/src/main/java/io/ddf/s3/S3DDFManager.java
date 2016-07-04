@@ -135,53 +135,6 @@ public class S3DDFManager extends DDFManager {
     return new S3DDF(this, bucket, key, schema, options);
   }
 
-
-  private List<String> fileKeys(S3DDF s3DDF) throws DDFException {
-    List<String> ret = new ArrayList<String>();
-    ObjectListing objectListing = mConn.listObjects(new ListObjectsRequest().withBucketName(s3DDF.getBucket())
-        .withPrefix(s3DDF.getKey()));
-    for (S3ObjectSummary summary : objectListing.getObjectSummaries()) {
-      if (!summary.getKey().endsWith("/")) {
-        ret.add(summary.getKey());
-      }
-    }
-    return ret;
-  }
-
-  /**
-   * @brief Show the first several rows of the s3ddf.
-   */
-  public List<String> head(S3DDF s3DDF, int limit) throws DDFException {
-    if (limit > K_LIMIT) {
-      limit = K_LIMIT;
-    }
-
-    String bucket = s3DDF.getBucket();
-    List<String> keys = this.fileKeys(s3DDF);
-    List<String> rows = new ArrayList<String>();
-
-    for (int i = 0; i < keys.size() && limit > 0; ++i) {
-      S3Object obj = mConn.getObject(bucket, keys.get(i));
-      try (BufferedReader br = new BufferedReader(
-          new InputStreamReader(obj.getObjectContent()))) {
-        String line = null;
-        while (limit > 0 && ((line = br.readLine()) != null)) {
-          rows.add(line);
-          --limit;
-        }
-      } catch (IOException e) {
-        throw new DDFException(e);
-      }
-
-      try {
-        obj.close();
-      } catch (IOException e) {
-        throw new DDFException(e);
-      }
-    }
-    return rows;
-  }
-
   @Override
   public DDF transfer(UUID fromEngine, UUID ddfuuid) throws DDFException {
     throw new DDFException(new UnsupportedOperationException());

@@ -1,11 +1,15 @@
 package io.ddf.hdfs;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import io.ddf.DDF;
 import io.ddf.datasource.DataFormat;
 import io.ddf.exception.DDFException;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by jing on 2/22/16.
@@ -18,8 +22,7 @@ public class HDFSDDF extends DDF {
     // Schema String.
     private String mSchemaString;
 
-    // File path.
-    private String mPath;
+    private ImmutableList<String> paths;
 
     private Map<String, String> options;
 
@@ -29,27 +32,35 @@ public class HDFSDDF extends DDF {
      */
     public HDFSDDF(HDFSDDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        mSchemaString = schema;
-        mPath = path;
-        this.options = options;
-        initialize();
+        initialize(ImmutableList.of(path), schema, options);
     }
 
     public HDFSDDF(HDFSDDFManager manager, String path, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        mPath = path;
-        this.options = options;
-        initialize();
+        initialize(ImmutableList.of(path), null, options);
     }
 
+    public HDFSDDF(HDFSDDFManager manager, List<String> paths, String schema, Map<String, String> options) throws DDFException {
+        super(manager, null, null, null, null, null);
+        paths = ImmutableList.copyOf(paths);
+        initialize(ImmutableList.copyOf(paths), schema, options);
+    }
 
-    private void initialize() throws DDFException {
-        // Check key and path
-        if (Strings.isNullOrEmpty(mPath)) {
-            throw new DDFException("The path of hdfsddf is null");
+    private void initialize(ImmutableList<String> paths, String schema, Map<String, String> options) throws DDFException {
+        this.paths = paths;
+        this.mSchemaString = schema;
+        this.options = options;
+
+        if (paths.size() == 0) {
+            throw new DDFException("No path was specified");
         }
-        // Check directory or file.
-        HDFSDDFManager hdfsDDFManager = this.getManager();
+        Iterator<String> i = paths.iterator();
+        while (i.hasNext()) {
+            String path = i.next();
+            if (Strings.isNullOrEmpty(path)) {
+                throw new DDFException("One of the paths is empty");
+            }
+        }
         // Check dataformat.
         mDataFormat = DataFormat.CSV;
         if (options != null && options.containsKey("format")) {
@@ -68,32 +79,12 @@ public class HDFSDDF extends DDF {
         return mDataFormat;
     }
 
-    public void setDataFormat(DataFormat dataFormat) {
-        this.mDataFormat = dataFormat;
-    }
-
-    public String getPath() {
-        return mPath;
-    }
-
-    public void setPath(String path) {
-        this.mPath = path;
-    }
-
     public String getSchemaString() {
         return mSchemaString;
     }
 
-    public void setSchemaString(String schemaString) {
-        this.mSchemaString = schemaString;
-    }
-
     public Map<String, String> getOptions() {
         return options;
-    }
-
-    public void setOptions(Map<String, String> options) {
-        this.options = options;
     }
 
     @Override
@@ -104,5 +95,12 @@ public class HDFSDDF extends DDF {
     @Override
     public DDF copy() throws DDFException {
         throw new DDFException(new UnsupportedOperationException());
+    }
+
+    public List<String> getPaths() {
+        String sourceUri = getManager().getSourceUri();
+        return paths.stream().map(
+                path -> String.format("%s%s", sourceUri, path)
+        ).collect(Collectors.toList());
     }
 }
