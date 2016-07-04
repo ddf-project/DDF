@@ -55,13 +55,10 @@ public class HDFSDDF extends DDF {
         if (paths.size() == 0) {
             throw new DDFException("No path was specified");
         }
-        Iterator<String> i = paths.iterator();
-        while (i.hasNext()) {
-            String path = i.next();
-            if (Strings.isNullOrEmpty(path)) {
-                throw new DDFException("One of the paths is empty");
-            }
+        if (paths.stream().filter(Strings::isNullOrEmpty).count() > 0) {
+            throw new DDFException("One of the paths is empty");
         }
+
         // Check dataformat.
         mDataFormat = DataFormat.CSV;
         if (options != null && options.containsKey("format")) {
