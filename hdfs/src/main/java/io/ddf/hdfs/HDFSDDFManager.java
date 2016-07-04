@@ -1,5 +1,6 @@
 package io.ddf.hdfs;
 
+import com.google.common.collect.ImmutableList;
 import io.ddf.DDF;
 import io.ddf.DDFManager;
 import io.ddf.datasource.DataFormat;
@@ -81,16 +82,27 @@ public class HDFSDDFManager extends DDFManager {
    * @brief Create a ddf given path.
    */
 
+  @Deprecated
   public HDFSDDF newDDF(String path) throws DDFException {
     return this.newDDF(path, null);
   }
 
+  @Deprecated
   public HDFSDDF newDDF(String path, Map<String, String> options) throws DDFException {
     return this.newDDF(path, null, options);
   }
 
+  @Deprecated
   public HDFSDDF newDDF(String path, String schema, Map<String, String> options) throws DDFException {
     return new HDFSDDF(this, path, schema, options);
+  }
+
+  public HDFSDDF newDDF(String[] paths, String schema, Map<String, String> options) throws DDFException {
+    return new HDFSDDF(this, paths, schema, options);
+  }
+
+  public HDFSDDF newDDF(List<String> paths, String schema, Map<String, String> options) throws DDFException {
+    return new HDFSDDF(this, (String[])paths.toArray(), schema, options);
   }
 
   @Override

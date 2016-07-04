@@ -45,17 +45,19 @@ public class S3DDF extends DDF {
     /**
      * S3DDF is the ddf for s3. It point to a single S3DDFManager, and every S3DDF is a unqiue mapping to a s3 uri.
      */
+    @Deprecated
     public S3DDF(S3DDFManager manager, String path, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         initialize(ImmutableList.of(path), null, options);
     }
 
+    @Deprecated
     public S3DDF(S3DDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         initialize(ImmutableList.of(path), schema, options);
     }
 
-    public S3DDF(S3DDFManager manager, List<String> paths, String schema, Map<String, String> options) throws DDFException {
+    public S3DDF(S3DDFManager manager, String[] paths, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         initialize(ImmutableList.copyOf(paths), schema, options);
     }

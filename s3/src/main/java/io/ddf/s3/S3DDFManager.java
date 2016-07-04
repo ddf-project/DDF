@@ -119,20 +119,31 @@ public class S3DDFManager extends DDFManager {
    * @brief Create a ddf given path.
    */
   // TODO: switch to builder pattern
+  @Deprecated
   public S3DDF newDDF(String path) throws DDFException {
     return this.newDDF(path, null);
   }
 
+  @Deprecated
   public S3DDF newDDF(String path, Map<String, String> options) throws DDFException {
     return this.newDDF(path, null, options);
   }
 
+  @Deprecated
   public S3DDF newDDF(String path, String schema, Map<String, String> options) throws DDFException {
     return new S3DDF(this, path, schema, options);
   }
 
   public S3DDF newDDF(String bucket, String key, String schema, Map<String, String> options) throws DDFException {
     return new S3DDF(this, bucket, key, schema, options);
+  }
+
+  public S3DDF newDDF(String[] paths, String schema, Map<String, String> options) throws DDFException {
+    return new S3DDF(this, paths, schema, options);
+  }
+
+  public S3DDF newDDF(List<String> paths, String schema, Map<String, String> options) throws DDFException {
+    return new S3DDF(this, (String[])paths.toArray(), schema, options);
   }
 
   @Override

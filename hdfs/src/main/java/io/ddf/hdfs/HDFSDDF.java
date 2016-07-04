@@ -30,19 +30,20 @@ public class HDFSDDF extends DDF {
      * S3DDF is the ddf for s3. It point to a single S3DDFManager, and every S3DDF is a unqiue mapping to a s3 uri.
      * The schema should store the s3 uri as tablename.
      */
+    @Deprecated
     public HDFSDDF(HDFSDDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         initialize(ImmutableList.of(path), schema, options);
     }
 
+    @Deprecated
     public HDFSDDF(HDFSDDFManager manager, String path, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         initialize(ImmutableList.of(path), null, options);
     }
 
-    public HDFSDDF(HDFSDDFManager manager, List<String> paths, String schema, Map<String, String> options) throws DDFException {
+    public HDFSDDF(HDFSDDFManager manager, String[] paths, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        paths = ImmutableList.copyOf(paths);
         initialize(ImmutableList.copyOf(paths), schema, options);
     }
 
