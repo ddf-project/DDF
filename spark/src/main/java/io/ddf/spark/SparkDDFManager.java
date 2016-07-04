@@ -305,7 +305,12 @@ public class SparkDDFManager extends DDFManager {
       }
       paths.forEach(path -> mLog.info(String.format(">>>>>>>> Load data from path: %s", path)));
       try {
-        df = dfr.load(JavaConversions.asScalaBuffer(paths).toList());
+        // XXX: https://github.com/databricks/spark-csv/issues/242
+        if (dataFormat == DataFormat.CSV || dataFormat == DataFormat.TSV) {
+          df = dfr.load(paths.get(0));
+        } else {
+          df = dfr.load(JavaConversions.asScalaBuffer(paths).toList());
+        }
       } catch (Exception e) {
         if (e instanceof InvalidInputException) {
           throw new DDFException(new FileNotFoundException("File does not exist"));

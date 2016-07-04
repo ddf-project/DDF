@@ -74,6 +74,13 @@ public class HDFSDDF extends DDF {
             }
         }
         mLog.info(String.format("HDFS data format %s", mDataFormat));
+
+        // XXX: https://github.com/databricks/spark-csv/issues/242
+        if (mDataFormat == DataFormat.CSV || mDataFormat == DataFormat.TSV) {
+            if (paths.size() > 1) {
+                throw new DDFException("Multiple paths are not yet supported for CSV/TSV format");
+            }
+        }
     }
 
     public DataFormat getDataFormat() {
