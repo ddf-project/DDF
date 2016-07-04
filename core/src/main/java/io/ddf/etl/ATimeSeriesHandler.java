@@ -77,12 +77,11 @@ public abstract class ATimeSeriesHandler extends ADDFFunctionalGroupHandler impl
         newDDF = newDDF.getJoinsHandler().merge(nextDDF);
       }
     }
-
     return newDDF;
   }
 
   @Override
-  public DDF addDiffColumn(String timestampColumn, String colToGetDiff, String diffColumn) {
+  public DDF addDiffColumn(String timestampColumn, String colToGetDiff, String diffColumn) throws DDFException{
     return addDiffColumn(timestampColumn, null, colToGetDiff, diffColumn);
   }
 
@@ -101,7 +100,7 @@ public abstract class ATimeSeriesHandler extends ADDFFunctionalGroupHandler impl
   }
 
   @Override
-  public void persist_ts(String path) {
+  public void save_ts(String pathToStorage) {
     // TODO Auto-generated method stub
 
   }
@@ -125,5 +124,4 @@ public abstract class ATimeSeriesHandler extends ADDFFunctionalGroupHandler impl
     DDF filteredDDF = this.getDDF().getSqlHandler().sql2ddf(sqlCmd);
     return filteredDDF;
   }
-
 }

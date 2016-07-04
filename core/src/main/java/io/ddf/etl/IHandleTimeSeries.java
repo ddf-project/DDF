@@ -18,13 +18,13 @@ public interface IHandleTimeSeries extends IHandleDDFFunctionalGroup {
   
   DDF downsample(String timestampColumn, String tsIDColumn, List<String> aggregateFunctions, int interval, TimeUnit timeUnit) throws DDFException;
   
-  DDF addDiffColumn(String timestampColumn, String colToGetDiff, String diffColName);
+  DDF addDiffColumn(String timestampColumn, String colToGetDiff, String diffColName) throws DDFException;
   
   DDF addDiffColumn(String timestampColumn, String tsIDColumn, String colToGetDiff, String diffColName) throws DDFException;
   
   DDF computeMovingAverage(String timestampColumn, String tsIDColumn, String colToComputeMovingAverage, String movingAverageColName, 
       int windowSize) throws DDFException;
   
-  void persist_ts(String path);
+  void save_ts(String pathToStorage);
   
 }

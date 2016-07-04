@@ -18,14 +18,12 @@ class TimeSeriesHandler(ddf: DDF) extends ATimeSeriesHandler(ddf) {
     diffColName: String): DDF = {
     val sparkdf = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
 
-    var wSpec: WindowSpec = null
-
     this.setTsIDColumn(tsIdColumn)
 
-    if (mTsIDColumn != null && !mTsIDColumn.isEmpty()) {
-      wSpec = Window.partitionBy(tsIdColumn).orderBy(timestampColumn)
+    val wSpec = if (mTsIDColumn != null && !mTsIDColumn.isEmpty()) {
+      Window.partitionBy(tsIdColumn).orderBy(timestampColumn)
     } else {
-      wSpec = Window.orderBy(timestampColumn)
+      Window.orderBy(timestampColumn)
     }
 
     val prev = lag(colToGetDiff, 1).over(wSpec)
@@ -34,9 +32,7 @@ class TimeSeriesHandler(ddf: DDF) extends ATimeSeriesHandler(ddf) {
 
     val manager = ddf.getManager.asInstanceOf[SparkDDFManager]
     val res = manager.newDDFFromSparkDataFrame(newdf)
-    manager.addDDF(res)
     res
-
   }
 
   override def computeMovingAverage(timestampColumn: String,
@@ -46,24 +42,24 @@ class TimeSeriesHandler(ddf: DDF) extends ATimeSeriesHandler(ddf) {
 
     val sparkdf = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
 
-    var wSpec: WindowSpec = null
     val halfWindowSize = Math.floor(windowSize / 2).toInt
 
     this.setTsIDColumn(tsIdColumn)
 
-    if (mTsIDColumn != null && !mTsIDColumn.isEmpty()) {
-      wSpec = Window.partitionBy(tsIdColumn).orderBy(timestampColumn).rowsBetween(halfWindowSize - windowSize + 1, halfWindowSize)
+    val wSpec = if (mTsIDColumn != null && !mTsIDColumn.isEmpty()) {
+      Window.partitionBy(tsIdColumn).orderBy(timestampColumn).rowsBetween(halfWindowSize - windowSize + 1, halfWindowSize)
     } else {
-      wSpec = Window.orderBy(timestampColumn).rowsBetween(halfWindowSize - windowSize + 1, halfWindowSize)
+      Window.orderBy(timestampColumn).rowsBetween(halfWindowSize - windowSize + 1, halfWindowSize)
     }
 
     val newdf = sparkdf.withColumn(movingAverageColName, avg(sparkdf(colToComputeMovingAverage)).over(wSpec))
 
     val manager = ddf.getManager.asInstanceOf[SparkDDFManager]
     val res = manager.newDDFFromSparkDataFrame(newdf)
-    manager.addDDF(res)
     res
-
   }
-
+  
+  override def save_ts(pathToStorage : String) {
+    
+  }
 }
