@@ -57,7 +57,7 @@ public class S3DDF extends DDF {
         initialize(ImmutableList.of(path), schema, options);
     }
 
-    public S3DDF(S3DDFManager manager, String[] paths, String schema, Map<String, String> options) throws DDFException {
+    public S3DDF(S3DDFManager manager, List<String> paths, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         initialize(ImmutableList.copyOf(paths), schema, options);
     }

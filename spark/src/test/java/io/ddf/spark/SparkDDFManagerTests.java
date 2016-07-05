@@ -72,7 +72,7 @@ public class SparkDDFManagerTests extends BaseTest {
   public void testBasicCopyForS3(S3DDFManager s3DDFManager) throws DDFException {
     LOG.info("========== multiplepath========");
     S3DDF multiplePathDDF = s3DDFManager.newDDF(
-            new String[]{"adatao-sample-data/test/orc/wildcard/part=1/", "adatao-sample-data/test/orc/wildcard/part=2/"},
+            ImmutableList.of("adatao-sample-data/test/orc/wildcard/part=1/", "adatao-sample-data/test/orc/wildcard/part=2/"),
             null, ImmutableMap.of("format", "orc"));
     DDF multiplePathSparkDDF = manager.copyFrom(multiplePathDDF);
     assert (multiplePathSparkDDF.getNumRows()==200);

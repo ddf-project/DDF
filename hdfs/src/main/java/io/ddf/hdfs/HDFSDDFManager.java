@@ -97,12 +97,8 @@ public class HDFSDDFManager extends DDFManager {
     return new HDFSDDF(this, path, schema, options);
   }
 
-  public HDFSDDF newDDF(String[] paths, String schema, Map<String, String> options) throws DDFException {
-    return new HDFSDDF(this, paths, schema, options);
-  }
-
   public HDFSDDF newDDF(List<String> paths, String schema, Map<String, String> options) throws DDFException {
-    return new HDFSDDF(this, (String[])paths.toArray(), schema, options);
+    return new HDFSDDF(this, paths, schema, options);
   }
 
   @Override

@@ -42,7 +42,7 @@ public class HDFSDDF extends DDF {
         initialize(ImmutableList.of(path), null, options);
     }
 
-    public HDFSDDF(HDFSDDFManager manager, String[] paths, String schema, Map<String, String> options) throws DDFException {
+    public HDFSDDF(HDFSDDFManager manager, List<String> paths, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
         initialize(ImmutableList.copyOf(paths), schema, options);
     }

@@ -138,12 +138,8 @@ public class S3DDFManager extends DDFManager {
     return new S3DDF(this, bucket, key, schema, options);
   }
 
-  public S3DDF newDDF(String[] paths, String schema, Map<String, String> options) throws DDFException {
-    return new S3DDF(this, paths, schema, options);
-  }
-
   public S3DDF newDDF(List<String> paths, String schema, Map<String, String> options) throws DDFException {
-    return new S3DDF(this, (String[])paths.toArray(), schema, options);
+    return new S3DDF(this, paths, schema, options);
   }
 
   @Override
