@@ -95,30 +95,4 @@ public class S3DDFManagerTests {
         options.put("format", format);
         return options;
     }
-
-    @Test
-    public void testHead() throws DDFException {
-        S3DDF csvDDF = manager.newDDF("jing-bucket", "testFolder/year.csv", null, null);
-        List<String> rows = manager.head(csvDDF, 5);
-        assert(rows.size() == 2);
-        LOG.info("========== content of year.csv ==========");
-        for (String s : rows) {
-            LOG.info(s);
-        }
-
-        rows = manager.head(csvDDF, 20000);
-        assert(rows.size() == 2);
-
-        rows = manager.head(csvDDF, 1000);
-        assert(rows.size() == 2);
-
-        S3DDF folderDDF = manager.newDDF("jing-bucket", "testFolder/folder/", null, null);
-        rows = manager.head(folderDDF, 5);
-        assert (rows.size() == 4);
-
-        S3DDF ddf1024 = manager.newDDF("jing-bucket", "testFolder/1024.csv", null, null);
-        rows = manager.head(ddf1024, 9999);
-        assert (rows.size() == 1000);
-
-    }
 }

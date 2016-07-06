@@ -1,12 +1,17 @@
 package io.ddf.s3;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import io.ddf.DDF;
 import io.ddf.datasource.DataFormat;
+import io.ddf.datasource.S3DataSourceCredentials;
 import io.ddf.exception.DDFException;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by jing on 12/2/15.
@@ -19,11 +24,7 @@ public class S3DDF extends DDF {
     // Schema String.
     private String mSchemaString;
 
-    // Bucket.
-    private String mBucket;
-
-    // Path after bucket.
-    private String mKey;
+    private ImmutableList<String> paths;
 
     // Options, including:
     // key : possible values
@@ -44,48 +45,41 @@ public class S3DDF extends DDF {
     /**
      * S3DDF is the ddf for s3. It point to a single S3DDFManager, and every S3DDF is a unqiue mapping to a s3 uri.
      */
+    @Deprecated
     public S3DDF(S3DDFManager manager, String path, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        List<String> bucketAndKey = S3DDFManager.getBucketAndKey(path);
-        mBucket = bucketAndKey.get(0);
-        mKey = bucketAndKey.get(1);
-        this.options = options;
-        initialize();
+        initialize(ImmutableList.of(path), null, options);
     }
 
+    @Deprecated
     public S3DDF(S3DDFManager manager, String path, String schema, Map<String, String> options) throws DDFException {
         super(manager, null, null, null, null, null);
-        mSchemaString = schema;
-        List<String> bucketAndKey = S3DDFManager.getBucketAndKey(path);
-        mBucket = bucketAndKey.get(0);
-        mKey = bucketAndKey.get(1);
-        this.options = options;
-        initialize();
+        initialize(ImmutableList.of(path), schema, options);
     }
 
+    public S3DDF(S3DDFManager manager, List<String> paths, String schema, Map<String, String> options) throws DDFException {
+        super(manager, null, null, null, null, null);
+        initialize(ImmutableList.copyOf(paths), schema, options);
+    }
 
     public S3DDF(S3DDFManager manager, String bucket, String key, String schema, Map<String, String> options)
-        throws DDFException {
+            throws DDFException {
         super(manager, null, null, null, null, null);
-        mBucket = bucket;
-        mKey = key;
-        mSchemaString = schema;
-        this.options = options;
-        initialize();
+        initialize(ImmutableList.of(String.format("%s/%s", bucket, key)), schema, options);
     }
 
-    private void initialize() throws DDFException {
-        // Check key and path
-        if (Strings.isNullOrEmpty(mBucket)) {
-            throw new DDFException("The bucket of s3ddf is null");
+    private void initialize(ImmutableList<String> paths, String schema, Map<String, String> options) throws DDFException {
+        this.paths = paths;
+        this.mSchemaString = schema;
+        this.options = options;
+
+        if (paths.size() == 0) {
+            throw new DDFException("No path was specified");
         }
-        if (Strings.isNullOrEmpty(mKey)) {
-            throw new DDFException("The key of s3ddf is null");
+        if (paths.stream().filter(Strings::isNullOrEmpty).count() > 0) {
+            throw new DDFException("One of the paths is empty");
         }
 
-        mLog.info(String.format("Initialize s3 ddf: %s %s", mBucket, mKey));
-        // Check directory or file.
-        S3DDFManager s3DDFManager = this.getManager();
         // Check dataformat.
         mDataFormat = DataFormat.CSV;
         if (options != null && options.containsKey("format")) {
@@ -98,46 +92,25 @@ public class S3DDF extends DDF {
             }
         }
         mLog.info(String.format("S3 data format %s", mDataFormat));
+
+        // XXX: https://github.com/databricks/spark-csv/issues/242
+        if (mDataFormat == DataFormat.CSV || mDataFormat == DataFormat.TSV) {
+            if (paths.size() > 1) {
+                throw new DDFException("Multiple paths are not yet supported for CSV/TSV format");
+            }
+        }
     }
 
     public DataFormat getDataFormat() {
         return mDataFormat;
     }
 
-    public void setDataFormat(DataFormat dataFormat) {
-        this.mDataFormat = dataFormat;
-    }
-
-    public String getBucket() {
-        return mBucket;
-    }
-
-    public void setBucket(String bucket) {
-        this.mBucket = bucket;
-    }
-
-    public String getKey() {
-        return mKey;
-    }
-
-    public void setKey(String key) {
-        this.mKey = key;
-    }
-
     public String getSchemaString() {
         return mSchemaString;
     }
 
-    public void setSchemaString(String schemaString) {
-        this.mSchemaString = schemaString;
-    }
-
     public Map<String, String> getOptions() {
         return options;
-    }
-
-    public void setOptions(Map<String, String> options) {
-        this.options = options;
     }
 
     @Override
@@ -148,5 +121,12 @@ public class S3DDF extends DDF {
     @Override
     public DDF copy() throws DDFException {
         throw new DDFException(new UnsupportedOperationException());
+    }
+
+    public List<String> getPaths() {
+        S3DataSourceCredentials cred = getManager().getCredential();
+        return paths.stream().map(
+                path -> String.format("s3a://%s:%s@%s", cred.getAwsKeyID(), cred.getAwsScretKey(), path)
+        ).collect(Collectors.toList());
     }
 }
