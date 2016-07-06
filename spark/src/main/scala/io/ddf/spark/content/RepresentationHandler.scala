@@ -14,6 +14,7 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
+import org.apache.spark.storage.StorageLevel
 import org.python.core.PyObject
 import org.rosuda.REngine._
 
@@ -101,7 +102,7 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
     ddf.saveAsTable()
     val dataFrame = ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
     if(!isCachedInSpark()) {
-      dataFrame.persist()
+      dataFrame.persist(PERSIST_LEVEL)
     }
     if (!isLazy) {
       dataFrame.count()
@@ -131,6 +132,8 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
 }
 
 object RepresentationHandler {
+
+  private val PERSIST_LEVEL = StorageLevel.fromString(sys.env.getOrElse("SPARK_PERSIST_LEVEL", "MEMORY_AND_DISK_SER"))
 
   /**
    * Supported Representations
