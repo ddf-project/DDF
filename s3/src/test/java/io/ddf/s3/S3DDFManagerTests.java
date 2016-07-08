@@ -38,27 +38,6 @@ public class S3DDFManagerTests {
             null,
             null);
         manager = (S3DDFManager)DDFManager.get(DDFManager.EngineType.S3, s3dsd);
-
-        try {
-            DDFManager.get(DDFManager.EngineType.S3,
-                new S3DataSourceDescriptor(
-                    new S3DataSourceURI(""),
-                    new S3DataSourceCredentials("invalid", "invalid"),
-                    null,
-                    null));
-            assert (false);
-        } catch (Exception e) {}
-
-        try {
-            DDFManager.get(DDFManager.EngineType.S3,
-                new S3DataSourceDescriptor(
-                    new S3DataSourceURI(""),
-                    new S3DataSourceCredentials(System.getenv("AWS_ACCESS_KEY_ID"), "invalid"),
-                    null,
-                    null
-                ));
-            assert (false);
-        } catch (Exception e) {}
     }
 
     @Test
@@ -88,11 +67,5 @@ public class S3DDFManagerTests {
         } catch (DDFException e) {
             assert (e.getMessage().equals("java.io.FileNotFoundException: File does not exist"));
         }
-    }
-
-    private Map<String, String> withFormat(String format) {
-        Map<String, String> options = new HashMap<>();
-        options.put("format", format);
-        return options;
     }
 }
