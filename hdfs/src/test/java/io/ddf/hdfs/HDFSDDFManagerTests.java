@@ -48,26 +48,4 @@ public class HDFSDDFManagerTests {
         options.put("format", format);
         return options;
     }
-
-    @Test
-    public void testHead() throws DDFException {
-        HDFSDDF csvDDF = manager.newDDF("/test_pe/csv/small/1.csv", null, null);
-        List<String> rows = manager.head(csvDDF, 5);
-        assert(rows.size() == 2);
-
-        rows = manager.head(csvDDF, 20000);
-        assert(rows.size() == 2);
-
-        rows = manager.head(csvDDF, 1000);
-        assert(rows.size() == 2);
-
-        HDFSDDF folderDDF = manager.newDDF("/test_pe/csv/small", null, null);
-        rows = manager.head(folderDDF, 5);
-        assert (rows.size() == 4);
-
-        HDFSDDF ddf1024 = manager.newDDF("/test_pe/csv/fixed_len/1024.csv", null, null);
-        rows = manager.head(ddf1024, 9999);
-        assert (rows.size() == 1000);
-    }
-
 }
