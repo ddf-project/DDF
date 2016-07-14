@@ -126,6 +126,22 @@ public class BaseTest {
           + ") ROW FORMAT DELIMITED FIELDS TERMINATED BY ' '", "SparkSQL");
 
       manager.sql("load data local inpath '../resources/test/carowner' into table carowner", "SparkSQL");
-  }
+    }
+    
+    public static void createTableStocks() throws DDFException {
+      
+      manager.sql("drop table if exists stocks", "SparkSQL");
+      manager.sql("create table stocks (Symbol string, Date string, Open double, High double, Low double, Close double, Volume double, AdjustedClose double)"
+          + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", "SparkSQL");
+      
+      manager.sql("load data local inpath '../resources/test/quandl_stocks.csv' into table stocks", "SparkSQL");
+    }
 
+    public void createTableStocksSmall() throws DDFException {
+        manager.sql("drop table if exists stocks_small", "SparkSQL");
+        manager.sql("create table stocks_small (Symbol string, Date string, Open double, High double, Low double, Close double, Volume double, AdjustedClose double)"
+            + "ROW FORMAT DELIMITED FIELDS TERMINATED BY ','", "SparkSQL");
+
+        manager.sql("load data local inpath '../resources/test/quandl_stocks_small.csv' into table stocks_small", "SparkSQL");
+    }
 }
