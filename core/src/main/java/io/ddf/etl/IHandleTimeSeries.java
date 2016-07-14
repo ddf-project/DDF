@@ -24,7 +24,6 @@ public interface IHandleTimeSeries extends IHandleDDFFunctionalGroup {
   
   DDF computeMovingAverage(String timestampColumn, String tsIDColumn, String colToComputeMovingAverage, String movingAverageColName, 
       int windowSize) throws DDFException;
-  
-  void save_ts(String pathToStorage);
-  
+
+  void saveTimeSeriesToCSV(String path);
 }

@@ -7,11 +7,13 @@ import io.ddf.content.Schema
 import io.ddf.content.APersistenceHandler.PersistenceUri
 import io.ddf.util.Utils
 import io.ddf.util.Utils.JsonSerDes
-import org.apache.spark.sql.SchemaRDD
+import org.apache.spark.sql.{DataFrame, Row, SchemaRDD}
 import io.ddf.spark.SparkDDFManager
 import io.ddf.content.IHandlePersistence.IPersistible
+
 import scala.collection.JavaConversions._
 import org.apache.hadoop.fs.Path
+import org.apache.spark.rdd.RDD
 
 /**
  * author: daoduchuan
@@ -57,6 +59,13 @@ class PersistenceHandler(ddf: DDF) extends BPersistenceHandler(ddf) {
       s"$directory/$name"
     }
   }
+
+  def exportToJson(path: String) = {
+    val df = this.ddf.getRepresentationHandler.get(classOf[DataFrame]).asInstanceOf[DataFrame]
+    Utils.locateOrCreateDirectory(path)
+    df.write.json(s"$path/data")
+  }
+
   override def load(namespace: String, name: String): IPersistible = {
     val schemaPath = this.getFolderPath(namespace, name, "schema")
     val dataPath = this.getFolderPath(namespace, name, "data")

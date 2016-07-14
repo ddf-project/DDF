@@ -100,7 +100,7 @@ public abstract class ATimeSeriesHandler extends ADDFFunctionalGroupHandler impl
   }
 
   @Override
-  public void save_ts(String pathToStorage) {
+  public void saveTimeSeriesToCSV(String pathToStorage) {
     // TODO Auto-generated method stub
 
   }
