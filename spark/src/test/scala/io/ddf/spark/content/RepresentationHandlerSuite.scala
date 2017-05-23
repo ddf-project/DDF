@@ -13,7 +13,6 @@ import scala.collection.JavaConversions._
 import io.ddf.spark.{ATestSuite, SparkDDF}
 import org.apache.spark.sql.{Row, DataFrame}
 import org.apache.spark.mllib.linalg.{SparseVector, DenseVector, Vectors, Vector}
-import org.rosuda.REngine.REXP
 import io.ddf.etl.IHandleMissingData.Axis
 
 /**
@@ -129,21 +128,6 @@ class RepresentationHandlerSuite extends ATestSuite {
     assert(rdd == null)
   }
 
-  test("Can do sql queries after Transform Rserve") {
-    createTableMtcars()
-    val ddf = manager.sql2ddf("select * from mtcars", "SparkSQL")
-    val newDDF = ddf.Transform.transformNativeRserve("z1 = mpg / cyl, " +
-      "z2 = disp * 0.4251437075, " +
-      "z3 = rpois(nrow(df.partition), 1000)")
-    val rddREXP = newDDF.getRepresentationHandler.get(classOf[RDD[_]], classOf[REXP]).asInstanceOf[RDD[REXP]]
-    assert(newDDF != null)
-    val st = newDDF.VIEWS.head(32)
-    val ddf1 = newDDF.sql2ddf("select * from @this")
-
-    assert(ddf1.getNumRows == 32)
-    assert(ddf1 != null)
-  }
-  
   test("Can get RDD(Array[String])") {
     createTableText8Sample 
     val ddf = manager.sql2ddf("select * from text8sample","SparkSQL")

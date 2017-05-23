@@ -15,7 +15,6 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
 import org.python.core.PyObject
-import org.rosuda.REngine._
 
 import scala.collection.JavaConversions._
 import scala.reflect.Manifest
@@ -33,12 +32,10 @@ class RepresentationHandler(mDDF: DDF) extends RH(mDDF) {
   this.addConvertFunction(RDD_ARR_DOUBLE, RDD_LABELED_POINT, new ArrayDouble2LabeledPoint(this.mDDF))
   this.addConvertFunction(RDD_ARR_OBJECT, RDD_ARR_DOUBLE, new ArrayObject2ArrayDouble(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_ARR_STRING, new RDDRow2ArrayString(this.mDDF))
-  this.addConvertFunction(RDD_REXP, RDD_ARR_OBJECT, new REXP2ArrayObject(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_ARR_OBJECT, new RDDRow2ArrayObject(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_ARR_DOUBLE, new RDDRow2ArrayDouble(this.mDDF))
   this.addConvertFunction(RDD_ARR_DOUBLE, RDD_VECTOR, new ArrayDouble2Vector(this.mDDF))
   this.addConvertFunction(RDD_ARR_OBJECT, DATAFRAME, new ArrayObject2DataFrame(this.mDDF))
-  this.addConvertFunction(RDD_ROW, RDD_REXP, new RDDROW2REXP(this.mDDF))
   this.addConvertFunction(RDD_PYOBJ, RDD_ARR_OBJECT, new PyObj2ArrayObject(this.mDDF))
   this.addConvertFunction(RDD_ROW, RDD_PYOBJ, new RDDRow2PyObj(this.mDDF))
   this.addConvertFunction(DATAFRAME, RDD_MATRIX_VECTOR, new DataFrame2MatrixVector(this.mDDF))
@@ -140,7 +137,6 @@ object RepresentationHandler {
   val RDD_ARR_STRING = new Representation(classOf[RDD[_]], classOf[Array[String]])
   val RDD_LABELED_POINT = new Representation(classOf[RDD[_]], classOf[LabeledPoint])
   val RDD_MATRIX_VECTOR = new Representation(classOf[RDD[_]], classOf[TupleMatrixVector])
-  val RDD_REXP = new Representation(classOf[RDD[_]], classOf[REXP])
   val RDD_PYOBJ = new Representation(classOf[RDD[_]], classOf[PyObject])
   val DATAFRAME = new Representation(classOf[DataFrame])
   val RDD_ROW = new Representation(classOf[RDD[_]], classOf[Row])

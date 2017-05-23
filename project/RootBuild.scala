@@ -79,12 +79,6 @@ object RootBuild extends Build {
   val excludeEverthing = ExclusionRule(organization = "*", name = "*")
   val excludeEverythingHackForMakePom = ExclusionRule(organization = "_MAKE_POM_EXCLUDE_ALL_", name = "_MAKE_POM_EXCLUDE_ALL_")
 
-  // We define this explicitly rather than via unmanagedJars, so that make-pom will generate it in pom.xml as well
-  // org % package % version
-  val rforge = Seq(
-    "net.rforge" % "REngine" % "2.1.1.compiled",
-    "net.rforge" % "Rserve" % "1.8.2.compiled"
-  )
 
   val scalaArtifacts = Seq("jline", "scala-compiler", "scala-library", "scala-reflect")
   val scalaDependencies = scalaArtifacts.map( artifactId => "org.scala-lang" % artifactId % theScalaVersion)
@@ -165,7 +159,7 @@ object RootBuild extends Build {
       List("sh", "-c", "touch spark/" + targetDir + "/*timestamp")
     },
     testOptions in Test += Tests.Argument("-oI"),
-    libraryDependencies ++= rforge,
+
     libraryDependencies ++= spark_dependencies,
     if (isLocal) {
       initialCommands in console :=

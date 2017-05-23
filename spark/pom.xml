@@ -331,16 +331,6 @@
             <version>1.7</version>
         </dependency>
         <dependency>
-            <groupId>net.rforge</groupId>
-            <artifactId>REngine</artifactId>
-            <version>2.1.1.compiled</version>
-        </dependency>
-        <dependency>
-            <groupId>net.rforge</groupId>
-            <artifactId>Rserve</artifactId>
-            <version>1.8.2.compiled</version>
-        </dependency>
-        <dependency>
             <groupId>com.databricks</groupId>
             <artifactId>spark-csv_2.10</artifactId>
             <version>arimo-1.4.0.13</version>
@@ -471,12 +461,6 @@
         </dependency>
     </dependencies>
     <repositories>
-        <repository>
-            <id>typesafereleases</id>
-            <name>typesafe-releases</name>
-            <url>http://repo.typesafe.com/typesafe/releases/</url>
-            <layout>default</layout>
-        </repository>
         <repository>
             <id>AdataoMvnreposSnapshots</id>
             <name>Adatao Mvnrepos Snapshots</name>
