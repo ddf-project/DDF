@@ -95,7 +95,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals("transformed DDF newDdf2 should have newcol2 added", "newcol2", newDdf2.getColumnName(9));
   }
 
-  @Test
+  @Ignore
   public void testTransformNativeRserveMultipleExpressionInPlaceFalse() throws DDFException {
     Boolean inPlace = Boolean.FALSE;
     String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
