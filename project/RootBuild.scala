@@ -197,7 +197,7 @@ object RootBuild extends Build {
   ) ++ assemblySettings ++ extraAssemblySettings
 
   // Common / Shared project settings
-  def commonSettings = Defaults.defaultSettings ++ Seq(
+  def commonSettings = Defaults.defaultSettings ++ net.virtualvoid.sbt.graph.Plugin.graphSettings  ++ Seq(
     organization := projectOrganization,
     version := rootVersion,
     scalaVersion := theScalaVersion,
