@@ -11,7 +11,7 @@
 	<artifactId>ddf</artifactId>
 	<packaging>pom</packaging>
 	<description>Distributed DataFrame</description>
-	<version>1.4.19</version>
+	<version>1.4.20-SNAPSHOT</version>
 	<name>ddf</name>
 	<organization>
 		<name>io.ddf</name>
