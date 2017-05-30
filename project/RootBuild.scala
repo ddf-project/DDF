@@ -245,7 +245,7 @@ object RootBuild extends Build {
       "net.sf" % "jsqlparser" % "0.9.8.8",
       "commons-io" % "commons-io" % "1.3.2",
       "org.easymock" % "easymock" % "3.1" % "test",
-      "mysql" % "mysql-connector-java" % "5.1.25",
+      //"mysql" % "mysql-connector-java" % "5.1.25",
       "org.python" % "jython-standalone" % "2.7.0",
       "joda-time" % "joda-time" % "2.8.1",
       "org.joda" % "joda-convert" % "1.7"
