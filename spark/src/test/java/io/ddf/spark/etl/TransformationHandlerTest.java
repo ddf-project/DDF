@@ -39,7 +39,7 @@ public class TransformationHandlerTest extends BaseTest {
     s3DDFManager = (S3DDFManager) DDFManager.get(DDFManager.EngineType.S3, s3dsd);
   }
 
-  @Test
+  @Ignore
   public void testTransformNativeRserve() throws DDFException {
     DDF newddf = ddf.Transform.transformNativeRserve("newcol = deptime / arrtime");
     LOG.info("name " + ddf.getName());
@@ -52,7 +52,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(10, res.size());
   }
 
-  @Test
+  @Ignore
   public void testTransformNativeRserveSingleExpressionInPlaceTrue() throws DDFException {
     Boolean inPlace = Boolean.TRUE;
     DDF newDdf = ddf.copy();
@@ -67,7 +67,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals(10, res.size());
   }
 
-  @Test
+  @Ignore
   public void testTransformNativeRserveSingleExpressionInPlaceFalse() throws DDFException {
     Boolean inPlace = Boolean.FALSE;
     DDF newDdf3 = ddf.copy();
@@ -79,7 +79,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertFalse("With inPlace being false, two DDF should have different UUID", newDdf3.getUUID().equals(newDdf4.getUUID()));
   }
 
-  @Test
+  @Ignore
   public void testTransformNativeRserveMultipleExpressionInPlaceTrue() throws DDFException {
     Boolean inPlace = Boolean.TRUE;
     String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
@@ -95,7 +95,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals("transformed DDF newDdf2 should have newcol2 added", "newcol2", newDdf2.getColumnName(9));
   }
 
-  @Test
+  @Ignore
   public void testTransformNativeRserveMultipleExpressionInPlaceFalse() throws DDFException {
     Boolean inPlace = Boolean.FALSE;
     String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
@@ -165,7 +165,7 @@ public class TransformationHandlerTest extends BaseTest {
     }
   }
 
-  @Test
+  @Ignore
   public void testTransformNativeRserveMultipleExpressions() throws DDFException {
     String[] expressions = {"newcol = deptime / arrtime","newcol2=log(arrdelay)"};
     DDF newddf = ddf.Transform.transformNativeRserve(expressions);
@@ -174,7 +174,7 @@ public class TransformationHandlerTest extends BaseTest {
     Assert.assertEquals("newcol2", newddf.getColumnName(9));
   }
 
-  @Test
+  @Ignore
   public void testTransformNativeRserveBigIntSupport() throws DDFException {
     DDF ddf = manager.sql2ddf("select year, month, dayofweek, uniquecarrier, deptime, arrtime, " +
             "distance, arrdelay, depdelay from airline_bigint", "SparkSQL");

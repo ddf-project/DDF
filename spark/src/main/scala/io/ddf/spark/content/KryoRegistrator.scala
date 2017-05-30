@@ -7,8 +7,6 @@ import io.ddf.types.Matrix
 import io.ddf.types.Vector
 import io.ddf.spark.ml.ROCComputer
 import org.jblas.DoubleMatrix
-import org.rosuda.REngine.REXP
-import org.rosuda.REngine.RList
 import io.ddf.ml.RocMetric
 
 
@@ -19,8 +17,6 @@ class KryoRegistrator extends SparkKryoRegistrator {
     kryo.register(classOf[DoubleMatrix])
     kryo.register(classOf[ROCComputer])
     kryo.register(classOf[RocMetric])
-    kryo.register(classOf[REXP])
-    kryo.register(classOf[RList], new FieldSerializer(kryo, classOf[RList]))
     //super.registerClasses(kryo)
   }
 }
